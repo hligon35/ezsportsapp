@@ -3,11 +3,30 @@ const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const fs = require('fs/promises');
+const compression = require('compression');
+const helmet = require('helmet');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY || 'sk_test_yourkey'); // Replace with your real key
 
 const app = express();
 app.use(cors());
-app.use(bodyParser.json());
+app.use(helmet({
+  contentSecurityPolicy: false // Could be configured more strictly if domains finalized
+}));
+app.use(compression());
+app.use(bodyParser.json({ limit: '100kb' }));
+
+// Static assets caching (1 year for immutable, 1 hour for html)
+app.use((req, res, next) => {
+  if (/\.(?:js|css|png|jpg|jpeg|svg|gif|webp|ico)$/i.test(req.url)) {
+    res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+  } else if (/\.(?:html)$/i.test(req.url)) {
+    res.setHeader('Cache-Control', 'public, max-age=3600');
+  }
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  res.setHeader('X-Frame-Options', 'SAMEORIGIN');
+  res.setHeader('Permissions-Policy', 'geolocation=(), microphone=(), camera=()');
+  next();
+});
 
 // Basic price book (server authoritative)
 const PRODUCTS = {
