@@ -1,38 +1,11 @@
-/* Ensure all content and text fit containers responsively */
-.container, .footer-grid, .about-inner, .category-tiles .tiles, .grid, .banner-row {
-  min-width: 0;
-}
-
-h1, h2, h3, h4, h5, h6, p, .btn, .chip, .tile-head p, .tile-head h3, .card .body h3, .banner .content h3, .about .checks li, .muted, .cart-row strong, .cart-row div, .cart-row button, .cart-row {
-  word-break: break-word;
-  overflow-wrap: break-word;
-  min-width: 0;
-}
-
-.tile .tile-head h3, .tile .tile-head p, .card .body h3, .banner .content h3 {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 100%;
-}
-
-.card .body h3 {
-  white-space: normal;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 100%;
-}
-
-.cart-row strong, .cart-row div {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 100%;
-}
-
-.footer-grid > * {
-  min-width: 0;
-}
+/* Typography (relaxed to prevent unintended truncation) */
+.container, .footer-grid, .about-inner, .category-tiles .tiles, .grid, .banner-row { min-width:0; }
+/* Allow natural wrapping; only truncate where explicitly needed via .truncate */
+.truncate { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+/* Prevent overflow in tight card headings without forcing single-line */
+.card .body h3, .banner .content h3 { overflow-wrap: anywhere; }
+/* Keep cart rows from blowing out but allow wrapping */
+.cart-row strong, .cart-row div { overflow-wrap:anywhere; }
 
 /* Responsive font scaling for all text */
 body, .container, .footer-grid, .about-inner, .category-tiles .tiles, .grid, .banner-row, .card, .tile, .banner, .about, .site-footer {
