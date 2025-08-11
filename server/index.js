@@ -1,5 +1,6 @@
 // Basic Express server with Stripe integration for POS and ordering
 const express = require('express');
+const path = require('path');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const fs = require('fs/promises');
@@ -14,6 +15,9 @@ app.use(helmet({
 }));
 app.use(compression());
 app.use(bodyParser.json({ limit: '100kb' }));
+
+// Serve static frontend (HTML, assets, service worker) from project root
+app.use(express.static(path.join(__dirname, '..')));
 
 // Static assets caching (1 year for immutable, 1 hour for html)
 app.use((req, res, next) => {

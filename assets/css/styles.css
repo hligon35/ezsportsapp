@@ -86,11 +86,11 @@ img{max-width:100%;display:block}
 /* Tiles */
 .section-title{font-size:clamp(22px,3.2vw,30px);font-weight:900;margin:34px 0 14px;text-transform:uppercase;letter-spacing:.6px;color:var(--ink)}
 .category-tiles .tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem}
-.tile{position:relative;border-radius:1.2rem;overflow:hidden;text-decoration:none;color:var(--ink);background:var(--surface);border:1px solid var(--border);padding:1.2rem;display:flex;flex-direction:column;gap:.6rem}
-.tile .tile-head h3{margin:.2rem 0 0;font-size:1.8rem;letter-spacing:.8px;text-transform:uppercase;color:var(--ink);text-align:center}
-.tile .tile-head p{margin:0;color:var(--muted);text-align:center;font-weight:800;letter-spacing:.6px;text-transform:uppercase}
+.tile{position:relative;border-radius:1.1rem;overflow:hidden;text-decoration:none;color:var(--ink);background:var(--surface);border:1px solid var(--border);padding:.85rem .9rem .95rem;display:flex;flex-direction:column;gap:.5rem}
+.tile .tile-head h3{margin:.1rem 0 0;font-size:clamp(1.05rem,2.6vw,1.45rem);letter-spacing:.6px;text-transform:uppercase;color:var(--ink);text-align:center;line-height:1.05}
+.tile .tile-head p{margin:0;color:var(--muted);text-align:center;font-weight:700;letter-spacing:.45px;text-transform:uppercase;font-size:clamp(.55rem,1.7vw,.65rem)}
 .tile .media{position:relative}
-.tile img{aspect-ratio:16/10;object-fit:cover;border-radius:.9rem;box-shadow:0 10px 30px rgba(10,42,74,.12)}
+.tile img{aspect-ratio:2/1;/* wider => shorter */object-fit:cover;border-radius:.75rem;box-shadow:0 8px 22px rgba(10,42,74,.10);max-height:clamp(140px,20vh,200px)}
 .tile .tile-cta{position:absolute;left:50%;bottom:10px;transform:translateX(-50%);}
 .tile:hover img{transform:scale(1.05)}
 .tile-label{display:none}
@@ -144,6 +144,8 @@ img{max-width:100%;display:block}
 }
 @media (max-width: 500px){
   .about-inner img{max-height:300px}
+  .tile{padding:.6rem .65rem .7rem}
+  .tile img{max-height:135px}
   .hero-art img{max-height:360px}
 }
 .banner:hover img {
@@ -278,8 +280,12 @@ img{max-width:100%;display:block}
   .footer-grid{grid-template-columns:1fr 1fr}
 }
 @media (max-width: 640px){
-  .header-bar{flex-wrap:wrap}
+  .tile{padding:.7rem .75rem .8rem;gap:.45rem}
+  .tile .tile-head h3{font-size:clamp(.95rem,4.2vw,1.25rem)}
+  .tile img{max-height:150px}
   .search{order:3;width:100%}
+  .tile{padding:.55rem .55rem .6rem}
+  .tile img{max-height:120px}
   .grid{grid-template-columns:repeat(2,1fr)}
   .category-tiles .tiles{grid-template-columns:1fr}
 }
