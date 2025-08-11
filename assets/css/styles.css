@@ -6,6 +6,13 @@
 .card .body h3, .banner .content h3 { overflow-wrap: anywhere; }
 /* Keep cart rows from blowing out but allow wrapping */
 .cart-row strong, .cart-row div { overflow-wrap:anywhere; }
+/* Restore compact single-line styling for tile & banner headings to match original layout */
+.tile .tile-head h3, .tile .tile-head p, .banner .content h3 { 
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
 
 /* Responsive font scaling for all text */
 body, .container, .footer-grid, .about-inner, .category-tiles .tiles, .grid, .banner-row, .card, .tile, .banner, .about, .site-footer {
@@ -73,6 +80,8 @@ img{max-width:100%;display:block}
 .hero-copy p{color:#cfe5ff;margin:0 0 1rem;font-weight:600}
 .hero-cta{display:flex;gap:.65rem;flex-wrap:wrap}
 .hero-art img{border-radius:1rem;box-shadow:0 20px 60px rgba(6,35,71,.35);border:6px solid #ffffff}
+/* Limit hero image height to avoid excessive vertical space on large/tall screens */
+.hero-art img{max-height:clamp(260px,55vh,560px);width:100%;object-fit:cover}
 
 /* Tiles */
 .section-title{font-size:clamp(22px,3.2vw,30px);font-weight:900;margin:34px 0 14px;text-transform:uppercase;letter-spacing:.6px;color:var(--ink)}
@@ -124,6 +133,18 @@ img{max-width:100%;display:block}
   opacity: 0.22;
   z-index: 1;
   transition: opacity .18s;
+}
+
+/* About image height constraint */
+.about-inner img{max-height:520px;object-fit:cover;width:100%}
+
+@media (max-width: 800px){
+  .about-inner img{max-height:380px}
+  .hero-art img{max-height:420px}
+}
+@media (max-width: 500px){
+  .about-inner img{max-height:300px}
+  .hero-art img{max-height:360px}
 }
 .banner:hover img {
   opacity: 0.28;
