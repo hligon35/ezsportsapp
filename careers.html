@@ -43,22 +43,56 @@
   <main id="main" class="container careers">
     <h2 class="section-title">Careers</h2>
     <p class="muted">We’re a small, fast-moving team of former players, coaches, and builders. If you love the game and solving real customer problems, we’d love to hear from you.</p>
+    <form id="job-filters" class="card" style="margin:1rem 0;display:grid;gap:.75rem;padding:1rem" onsubmit="event.preventDefault()">
+      <div style="display:grid;gap:.75rem;grid-template-columns:repeat(auto-fit,minmax(180px,1fr))">
+        <label style="display:grid;gap:.25rem;font-size:.85rem">Search
+          <input type="search" name="q" placeholder="Search roles" aria-label="Search roles" />
+        </label>
+        <label style="display:grid;gap:.25rem;font-size:.85rem">Location
+          <select name="location" aria-label="Filter by location">
+            <option value="">All</option>
+            <option value="remote">Remote</option>
+            <option value="midwest">Midwest</option>
+            <option value="hybrid-mo">Hybrid (MO)</option>
+          </select>
+        </label>
+        <label style="display:grid;gap:.25rem;font-size:.85rem">Team
+          <select name="team" aria-label="Filter by team">
+            <option value="">All</option>
+            <option value="sales">Sales</option>
+            <option value="operations">Operations</option>
+            <option value="ecommerce">Ecommerce</option>
+          </select>
+        </label>
+        <label style="display:grid;gap:.25rem;font-size:.85rem">Type
+          <select name="type" aria-label="Filter by employment type">
+            <option value="">All</option>
+            <option value="full-time">Full-time</option>
+            <option value="part-time">Part-time</option>
+          </select>
+        </label>
+      </div>
+      <div style="display:flex;gap:.5rem;align-items:center;flex-wrap:wrap;font-size:.85rem">
+        <span id="job-count" aria-live="polite"></span>
+        <button type="reset" class="btn btn-ghost" style="padding:.4rem .8rem;font-size:.75rem" aria-label="Reset filters">Reset</button>
+      </div>
+    </form>
     <section class="jobs">
-      <article class="card job">
+      <article class="card job" data-location="remote" data-type="full-time" data-team="sales" data-title="inside sales specialist">
         <h3>Inside Sales Specialist</h3>
-        <div class="meta">Remote • Full-time</div>
+        <div class="meta">Remote • Full-time • Sales</div>
         <p>Help customers build the perfect setup, from backyard cages to full facilities. Experience with baseball/softball gear a plus.</p>
         <a class="btn btn-primary" href="#">Apply</a>
       </article>
-      <article class="card job">
+      <article class="card job" data-location="midwest" data-type="full-time" data-team="operations" data-title="install technician field netting">
         <h3>Install Technician (Field Netting)</h3>
-        <div class="meta">Midwest • Full-time</div>
+        <div class="meta">Midwest • Full-time • Operations</div>
         <p>Travel to customer sites to install and service backstops, cages, and protective netting systems. Construction or rigging experience preferred.</p>
         <a class="btn btn-primary" href="#">Apply</a>
       </article>
-      <article class="card job">
+      <article class="card job" data-location="hybrid-mo" data-type="full-time" data-team="ecommerce" data-title="ecommerce coordinator">
         <h3>Ecommerce Coordinator</h3>
-        <div class="meta">Hybrid (MO) • Full-time</div>
+        <div class="meta">Hybrid (MO) • Full-time • Ecommerce</div>
         <p>Own product content, merchandising, and promotions across the catalog. Comfort in HTML, spreadsheets, and analytics tools required.</p>
         <a class="btn btn-primary" href="#">Apply</a>
       </article>
@@ -128,5 +162,6 @@
     </section>
   </dialog>
   <script type="module" src="assets/js/app.js"></script>
+  <script type="module" src="assets/js/careers.js"></script>
   </body>
   </html>

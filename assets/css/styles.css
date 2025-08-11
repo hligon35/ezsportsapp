@@ -60,6 +60,8 @@ body{
   font-family:"Outfit",system-ui,-apple-system,Segoe UI,Roboto,Inter,Ubuntu,Helvetica,Arial,sans-serif;
   color:var(--ink);
   background:var(--bg);
+  -webkit-text-size-adjust:100%;
+  overflow-x:hidden; /* prevent accidental horizontal scroll */
 }
 img{max-width:100%;display:block}
 .container{width:min(1200px,92vw);margin-inline:auto}
@@ -286,4 +288,34 @@ img{max-width:100%;display:block}
   .search{order:3;width:100%}
   .grid{grid-template-columns:repeat(2,1fr)}
   .category-tiles .tiles{grid-template-columns:1fr}
+}
+
+/* Extra small devices (portrait phones <480px) */
+@media (max-width:480px){
+  .hero-copy h1{font-size:clamp(26px,9vw,40px)}
+  .grid{grid-template-columns:1fr}
+  .catalog-bar{flex-direction:column;align-items:stretch}
+  .quick-links{flex-wrap:wrap;gap:.5rem;font-size:.85rem}
+  .quick-links a{padding:.25rem .4rem;background:#0b3a67;border-radius:.5rem}
+  .btn{padding:.7rem .9rem;font-size:.8rem}
+  .tile .tile-head h3{font-size:1.3rem}
+  .footer-grid{grid-template-columns:1fr}
+  .subfooter{flex-direction:column;gap:.5rem;text-align:center}
+  .about-inner{gap:.9rem}
+  .mini-cart__panel{width:min(100%,100vw)}
+  #job-filters{padding:.8rem}
+  #job-filters > div:first-child{grid-template-columns:1fr 1fr}
+}
+
+/* Very narrow devices (<360px) */
+@media (max-width:360px){
+  .header-bar{gap:.5rem}
+  .brand span{font-size:.85rem}
+  .search input{padding:.6rem .7rem}
+  .chip{padding:.45rem .7rem;font-size:.7rem}
+  .btn{padding:.6rem .75rem}
+  .cart-btn{padding:.45rem .6rem}
+  #job-filters > div:first-child{grid-template-columns:1fr}
+  .hero-inner{gap:1.2rem}
+  .footer-grid{gap:.6rem}
 }
