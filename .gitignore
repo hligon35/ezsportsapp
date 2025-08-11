@@ -1,0 +1,38 @@
+# Node / package managers
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
+
+# Logs
+logs/
+*.log
+*.log.*
+
+# Env & secrets
+.env
+.env.*
+
+# Build output
+dist/
+build/
+.cache/
+
+# Coverage
+coverage/
+
+# OS / Editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.code-workspace
+
+# Misc
+*.swp
+*.swo
+~$*
