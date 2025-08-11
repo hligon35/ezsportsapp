@@ -1,0 +1,12 @@
+{
+  "name": "EZ Sports Netting",
+  "short_name": "EZ Sports",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#0f2f50",
+  "theme_color": "#0f2f50",
+  "lang": "en",
+  "icons": [
+    {"src": "assets/img/logo.svg", "sizes": "any", "type": "image/svg+xml"}
+  ]
+}
