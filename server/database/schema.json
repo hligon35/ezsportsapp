@@ -2,7 +2,7 @@
   "metadata": {
     "version": "1.0.0",
     "created": "2025-08-12T00:00:00.000Z",
-    "lastModified": "2025-08-13T01:57:03.471Z",
+    "lastModified": "2025-08-13T02:38:59.499Z",
     "autoIncrement": {
       "users": 1000,
       "products": 2000,
@@ -41,6 +41,17 @@
       "shippingAddress": "object",
       "createdAt": "string",
       "updatedAt": "string"
+    },
+    "stock_movements": {
+      "id": "string",
+      "productId": "string",
+      "productName": "string",
+      "oldStock": "number",
+      "newStock": "number",
+      "change": "number",
+      "reason": "string",
+      "notes": "string",
+      "timestamp": "string"
     }
   }
 }

@@ -1,1 +1,90 @@
-[]
+[
+  {
+    "id": "bat-ghost",
+    "name": "Ghost Bat Pro",
+    "price": 399.95,
+    "category": "Baseball",
+    "description": "Professional grade aluminum bat with advanced ghost technology",
+    "image": "/assets/img/bat-ghost.jpg",
+    "stock": 15,
+    "featured": true,
+    "createdAt": "2025-08-12T00:00:00.000Z"
+  },
+  {
+    "id": "bat-hype",
+    "name": "Hype Bat Elite",
+    "price": 349.95,
+    "category": "Baseball",
+    "description": "Elite performance bat for serious players",
+    "image": "/assets/img/bat-hype.jpg",
+    "stock": 3,
+    "featured": true,
+    "createdAt": "2025-08-12T00:00:00.000Z"
+  },
+  {
+    "id": "glove-a2000",
+    "name": "A2000 Baseball Glove",
+    "price": 299.95,
+    "category": "Baseball",
+    "description": "Premium leather baseball glove for infield and outfield",
+    "image": "/assets/img/glove-a2000.jpg",
+    "stock": 12,
+    "featured": false,
+    "createdAt": "2025-08-12T00:00:00.000Z"
+  },
+  {
+    "id": "glove-heart",
+    "name": "Heart of the Hide Glove",
+    "price": 279.95,
+    "category": "Baseball",
+    "description": "Classic leather construction with superior durability",
+    "image": "/assets/img/glove-heart.jpg",
+    "stock": 6,
+    "featured": false,
+    "createdAt": "2025-08-12T00:00:00.000Z"
+  },
+  {
+    "id": "net-pro",
+    "name": "Pro Practice Net",
+    "price": 219.00,
+    "category": "Training",
+    "description": "Professional training net for batting practice",
+    "image": "/assets/img/net-pro.jpg",
+    "stock": 5,
+    "featured": true,
+    "createdAt": "2025-08-12T00:00:00.000Z"
+  },
+  {
+    "id": "net-cage",
+    "name": "Batting Cage Complete",
+    "price": 649.00,
+    "category": "Training",
+    "description": "Complete batting cage setup for backyard training",
+    "image": "/assets/img/net-cage.jpg",
+    "stock": 0,
+    "featured": false,
+    "createdAt": "2025-08-12T00:00:00.000Z"
+  },
+  {
+    "id": "helmet-pro",
+    "name": "Pro Batting Helmet",
+    "price": 89.99,
+    "category": "Safety",
+    "description": "Professional batting helmet with advanced protection",
+    "image": "/assets/img/helmet-pro.jpg",
+    "stock": 25,
+    "featured": false,
+    "createdAt": "2025-08-13T00:00:00.000Z"
+  },
+  {
+    "id": "helmet-lite",
+    "name": "Lite Batting Helmet",
+    "price": 59.99,
+    "category": "Safety",
+    "description": "Lightweight batting helmet for youth players",
+    "image": "/assets/img/helmet-lite.jpg",
+    "stock": 2,
+    "featured": false,
+    "createdAt": "2025-08-13T00:00:00.000Z"
+  }
+]

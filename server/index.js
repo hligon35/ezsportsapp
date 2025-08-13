@@ -25,6 +25,7 @@ db.initialize().catch(console.error);
 const productRoutes = require('./routes/products');
 const userRoutes = require('./routes/users');
 const orderRoutes = require('./routes/orders');
+const inventoryRoutes = require('./routes/inventory');
 const app = express();
 app.use(cors());
 app.use(helmet({
@@ -37,6 +38,7 @@ app.use(bodyParser.json({ limit: '100kb' }));
 app.use('/api/products', productRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/orders', orderRoutes);
+app.use('/api/inventory', inventoryRoutes);
 
 // Serve static frontend (HTML, assets, service worker) from project root
 app.use(express.static(path.join(__dirname, '..')));

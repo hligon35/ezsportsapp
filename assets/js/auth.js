@@ -1,4 +1,4 @@
-// Simple authentication system using localStorage
+// Authentication system using server API
 let isRegisterMode = false;
 
 function getCurrentUser() {
@@ -9,30 +9,57 @@ function getCurrentUser() {
   }
 }
 
-function getUsers() {
-  try {
-    return JSON.parse(localStorage.getItem('users') || '[]');
-  } catch {
-    return [];
-  }
-}
-
-function saveUser(user) {
-  const users = getUsers();
-  users.push(user);
-  localStorage.setItem('users', JSON.stringify(users));
-}
-
-function authenticateUser(email, password) {
-  const users = getUsers();
-  return users.find(u => u.email === email && u.password === password);
-}
-
 function loginUser(user) {
   localStorage.setItem('currentUser', JSON.stringify(user));
   // Redirect to shop or previous page
   const redirectTo = new URLSearchParams(window.location.search).get('redirect') || 'shop.html';
   window.location.href = redirectTo;
+}
+
+// API call to server for login
+async function authenticateUser(email, password) {
+  try {
+    const response = await fetch('/api/users/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email, password })
+    });
+    
+    const data = await response.json();
+    
+    if (response.ok) {
+      return data.user;
+    } else {
+      throw new Error(data.message || 'Login failed');
+    }
+  } catch (error) {
+    throw error;
+  }
+}
+
+// API call to server for registration
+async function registerUser(email, password, name) {
+  try {
+    const response = await fetch('/api/users/register', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email, password, name })
+    });
+    
+    const data = await response.json();
+    
+    if (response.ok) {
+      return data.user;
+    } else {
+      throw new Error(data.message || 'Registration failed');
+    }
+  } catch (error) {
+    throw error;
+  }
 }
 
 function toggleMode() {
@@ -73,40 +100,33 @@ document.addEventListener('DOMContentLoaded', () => {
     toggleMode();
   });
 
-  form.addEventListener('submit', (e) => {
+  form.addEventListener('submit', async (e) => {
     e.preventDefault();
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
     const name = document.getElementById('name').value;
 
-    if (isRegisterMode) {
-      // Registration
-      if (!name.trim()) {
-        showMessage('Please enter your full name');
-        return;
-      }
-      if (getUsers().find(u => u.email === email)) {
-        showMessage('Email already exists');
-        return;
-      }
-      const newUser = { 
-        id: Date.now(), 
-        email, 
-        password, 
-        name: name.trim(),
-        isAdmin: email === 'admin@ezsports.com' // Make first admin
-      };
-      saveUser(newUser);
-      showMessage('Account created successfully!', false);
-      setTimeout(() => loginUser(newUser), 1000);
-    } else {
-      // Login
-      const user = authenticateUser(email, password);
-      if (user) {
-        loginUser(user);
+    try {
+      if (isRegisterMode) {
+        // Registration
+        if (!name.trim()) {
+          showMessage('Please enter your full name');
+          return;
+        }
+        
+        showMessage('Creating account...', false);
+        const newUser = await registerUser(email, password, name.trim());
+        showMessage('Account created successfully!', false);
+        setTimeout(() => loginUser(newUser), 1000);
+        
       } else {
-        showMessage('Invalid email or password');
+        // Login
+        showMessage('Logging in...', false);
+        const user = await authenticateUser(email, password);
+        loginUser(user);
       }
+    } catch (error) {
+      showMessage(error.message || 'An error occurred');
     }
   });
 });
