@@ -32,6 +32,15 @@ Thumbs.db
 .vscode/
 *.code-workspace
 
+# Database backups (keep structure, ignore backups)
+server/database/backups/
+
+# Order files (fallback storage)
+server/orders.ndjson
+
+# Stripe test files
+server/stripe_test_*
+
 # Misc
 *.swp
 *.swo

@@ -1,23 +1,52 @@
-self.addEventListener('install', e => {
-  self.skipWaiting();
-});
-
+// Bumped versions to invalidate old cached layout assets (spacing fixes)
+const CORE_CACHE = 'core-v4';
+const ASSET_CACHE = 'assets-v2';
 const CORE = [
   '/index.html',
   '/assets/css/styles.css',
   '/assets/js/app.js'
 ];
 
+self.addEventListener('install', e => {
+  e.waitUntil(
+    caches.open(CORE_CACHE).then(cache => cache.addAll(CORE)).catch(()=>{})
+  );
+  self.skipWaiting();
+});
+
+self.addEventListener('activate', e => {
+  e.waitUntil(
+    caches.keys().then(keys => Promise.all(keys.filter(k => ![CORE_CACHE, ASSET_CACHE].includes(k)).map(k => caches.delete(k))))
+  );
+  self.clients.claim();
+});
+
 self.addEventListener('fetch', e => {
   const url = new URL(e.request.url);
   if (e.request.method !== 'GET') return;
+
+  // Network-first for CSS & JS so layout/style changes show immediately
+  if (/\.(?:css|js)$/.test(url.pathname)) {
+    e.respondWith(
+      fetch(e.request).then(net => {
+        caches.open(ASSET_CACHE).then(cache => cache.put(e.request, net.clone()));
+        return net;
+      }).catch(()=> caches.match(e.request))
+    );
+    return;
+  }
+
   if (CORE.includes(url.pathname)) {
-    e.respondWith(caches.open('core-v1').then(cache => cache.match(e.request).then(res => {
+    e.respondWith(caches.open(CORE_CACHE).then(cache => cache.match(e.request).then(res => {
       if (res) return res;
       return fetch(e.request).then(net => { cache.put(e.request, net.clone()); return net; });
     })));
-  } else if (url.pathname.startsWith('/assets/')) {
-    e.respondWith(caches.open('assets-v1').then(cache => cache.match(e.request).then(res => {
+    return;
+  }
+
+  if (url.pathname.startsWith('/assets/')) {
+    // Stale-while-revalidate for other assets (images)
+    e.respondWith(caches.open(ASSET_CACHE).then(cache => cache.match(e.request).then(res => {
       const fetchPromise = fetch(e.request).then(net => { cache.put(e.request, net.clone()); return net; });
       return res || fetchPromise;
     })));

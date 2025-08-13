@@ -1,0 +1,46 @@
+{
+  "metadata": {
+    "version": "1.0.0",
+    "created": "2025-08-12T00:00:00.000Z",
+    "lastModified": "2025-08-13T01:57:03.471Z",
+    "autoIncrement": {
+      "users": 1000,
+      "products": 2000,
+      "orders": 3000
+    }
+  },
+  "schema": {
+    "users": {
+      "id": "number",
+      "email": "string",
+      "password": "string",
+      "name": "string",
+      "isAdmin": "boolean",
+      "createdAt": "string",
+      "lastLogin": "string"
+    },
+    "products": {
+      "id": "string",
+      "name": "string",
+      "description": "string",
+      "price": "number",
+      "image": "string",
+      "category": "string",
+      "stock": "number",
+      "isActive": "boolean",
+      "createdAt": "string",
+      "updatedAt": "string"
+    },
+    "orders": {
+      "id": "number",
+      "userId": "number",
+      "userEmail": "string",
+      "items": "array",
+      "total": "number",
+      "status": "string",
+      "shippingAddress": "object",
+      "createdAt": "string",
+      "updatedAt": "string"
+    }
+  }
+}

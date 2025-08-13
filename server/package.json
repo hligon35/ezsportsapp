@@ -4,14 +4,21 @@
   "main": "index.js",
   "type": "commonjs",
   "scripts": {
-    "start": "node index.js"
+    "start": "node index.js",
+    "dev": "node index.js",
+    "init-db": "node init-db.js",
+    "db:stats": "node db-utils.js stats",
+    "db:backup": "node db-utils.js backup",
+    "db:reset": "node db-utils.js reset"
   },
   "dependencies": {
-    "express": "^4.18.2",
-    "cors": "^2.8.5",
+    "bcrypt": "^6.0.0",
     "body-parser": "^1.20.2",
-    "stripe": "^12.0.0",
     "compression": "^1.7.4",
-    "helmet": "^7.1.0"
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "helmet": "^7.1.0",
+    "mongoose": "^8.17.1",
+    "stripe": "^12.0.0"
   }
 }

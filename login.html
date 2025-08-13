@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Login | EZ Sports Netting</title>
+  <link rel="stylesheet" href="assets/css/styles.css" />
+  <style>
+    .auth-container { max-width: 400px; margin: 3rem auto; background: #fff; border-radius: 1.2rem; box-shadow: 0 4px 24px rgba(12,32,64,.10); padding: 2rem; }
+    .auth-form { display: flex; flex-direction: column; gap: 1rem; }
+    .auth-form input { padding: .8rem; border: 1px solid #cfe0f5; border-radius: .6rem; }
+    .auth-toggle { text-align: center; margin-top: 1rem; }
+    .auth-toggle a { color: var(--primary); text-decoration: none; }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-bar">
+      <a class="brand" href="index.html">
+        <img src="assets/img/logo.svg" alt="EZ Sports Netting logo" height="40"/>
+        <span>EZ Sports Netting</span>
+      </a>
+      <nav class="quick-links">
+        <a href="shop.html">Shop</a>
+        <a href="about.html">About</a>
+      </nav>
+    </div>
+  </header>
+  <main id="main">
+    <div class="auth-container">
+      <h2 id="auth-title">Login</h2>
+      <form id="auth-form" class="auth-form">
+        <input type="email" id="email" placeholder="Email" required />
+        <input type="password" id="password" placeholder="Password" required />
+        <div id="name-field" style="display:none;">
+          <input type="text" id="name" placeholder="Full Name" />
+        </div>
+        <button type="submit" class="btn btn-primary">Login</button>
+      </form>
+      <div class="auth-toggle">
+        <span id="toggle-text">Don't have an account?</span>
+        <a href="#" id="toggle-link">Sign up</a>
+      </div>
+      <div id="auth-message" style="margin-top:1rem;color:red;text-align:center;"></div>
+    </div>
+  </main>
+  <script type="module" src="assets/js/auth.js"></script>
+</body>
+</html>

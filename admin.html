@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Admin Panel | EZ Sports Netting</title>
+  <link rel="stylesheet" href="assets/css/styles.css" />
+  <style>
+    .admin-container { max-width: 1000px; margin: 2rem auto; padding: 2rem; }
+    .admin-section { background: #fff; border-radius: 1.2rem; box-shadow: 0 4px 24px rgba(12,32,64,.10); padding: 2rem; margin-bottom: 2rem; }
+    .product-form { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .product-form input, .product-form textarea, .product-form select { padding: .8rem; border: 1px solid #cfe0f5; border-radius: .6rem; }
+    .product-list { display: grid; gap: 1rem; }
+    .product-item { display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: #f7faff; border-radius: .8rem; }
+    .admin-nav { display: flex; gap: 1rem; margin-bottom: 2rem; }
+    .admin-nav button { padding: .8rem 1.5rem; border: none; background: #e6edf6; border-radius: .6rem; cursor: pointer; }
+    .admin-nav button.active { background: var(--primary); color: white; }
+    @media (max-width: 768px) { .product-form { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-bar">
+      <a class="brand" href="index.html">
+        <img src="assets/img/logo.svg" alt="EZ Sports Netting logo" height="40"/>
+        <span>EZ Sports Netting</span>
+      </a>
+      <nav class="quick-links">
+        <a href="shop.html">Shop</a>
+        <a href="admin.html">Admin</a>
+        <button id="logout-btn" class="btn btn-ghost">Logout</button>
+      </nav>
+    </div>
+  </header>
+  <main id="main">
+    <div class="admin-container">
+      <h2>Admin Panel</h2>
+      <div class="admin-nav">
+        <button class="active" onclick="showSection('products')">Products</button>
+        <button onclick="showSection('orders')">Orders</button>
+        <button onclick="showSection('users')">Users</button>
+      </div>
+
+      <!-- Products Section -->
+      <div id="products-section" class="admin-section">
+        <h3>Product Management</h3>
+        <form id="product-form" class="product-form">
+          <input type="text" id="product-name" placeholder="Product Name" required />
+          <input type="number" id="product-price" placeholder="Price" step="0.01" required />
+          <input type="text" id="product-image" placeholder="Image URL" />
+          <select id="product-category" required>
+            <option value="">Select Category</option>
+            <option value="bats">Bats</option>
+            <option value="gloves">Gloves</option>
+            <option value="netting">Netting</option>
+            <option value="helmets">Helmets</option>
+          </select>
+          <textarea id="product-description" placeholder="Product Description" rows="3"></textarea>
+          <input type="number" id="product-stock" placeholder="Stock Quantity" min="0" />
+          <button type="submit" class="btn btn-primary">Add Product</button>
+          <button type="button" id="cancel-edit" class="btn btn-ghost" style="display:none;" onclick="cancelEdit()">Cancel</button>
+        </form>
+        <div id="products-list" class="product-list"></div>
+      </div>
+
+      <!-- Orders Section -->
+      <div id="orders-section" class="admin-section" style="display:none;">
+        <h3>Order Management</h3>
+        <div id="orders-list"></div>
+      </div>
+
+      <!-- Users Section -->
+      <div id="users-section" class="admin-section" style="display:none;">
+        <h3>User Management</h3>
+        <div id="users-list"></div>
+      </div>
+    </div>
+  </main>
+  <script type="module" src="assets/js/admin.js"></script>
+</body>
+</html>

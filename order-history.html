@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Order History | EZ Sports Netting</title>
+  <link rel="stylesheet" href="assets/css/styles.css" />
+  <style>
+    .order-history-container { max-width: 700px; margin: 2rem auto; background: #fff; border-radius: 1.2rem; box-shadow: 0 4px 24px rgba(12,32,64,.10); padding: 2rem; }
+    .order-card { background:#f7faff; border:1px solid #e6edf6; border-radius: .8rem; padding: 1rem; margin-bottom: 1.2rem; }
+    .order-header { display: flex; justify-content: space-between; align-items: center; }
+    .order-items { margin-top: .5rem; }
+    .order-item { display: flex; justify-content: space-between; }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-bar">
+      <a class="brand" href="index.html">
+        <img src="assets/img/logo.svg" alt="EZ Sports Netting logo" height="40"/>
+        <span>EZ Sports Netting</span>
+      </a>
+      <nav id="primary-nav" class="quick-links" aria-label="Primary">
+        <a href="shop.html">Shop</a>
+        <a href="deals.html">Deals</a>
+        <a href="about.html">About</a>
+        <a href="order-history.html">Order History</a>
+      </nav>
+    </div>
+  </header>
+  <main id="main">
+    <div class="order-history-container">
+      <h2>Your Orders</h2>
+      <div id="orders-list"></div>
+    </div>
+  </main>
+  <script type="module" src="assets/js/order-history.js"></script>
+</body>
+</html>

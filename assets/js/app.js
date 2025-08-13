@@ -3,7 +3,7 @@
 
 const currency = new Intl.NumberFormat(undefined, { style: 'currency', currency: 'USD' });
 
-const PRODUCTS = [
+const DEFAULT_PRODUCTS = [
   { id: 'bat-ghost', title: 'Ghost Unlimited Bat -11', price: 399.95, category: 'bats', img: 'https://source.unsplash.com/1200x900/?baseball,bat&sig=1' },
   { id: 'bat-hype', title: 'HYPE Fire -10', price: 349.95, category: 'bats', img: 'https://source.unsplash.com/1200x900/?baseball,bat&sig=2' },
   { id: 'glove-a2000', title: 'Wilson A2000 11.5"', price: 299.95, category: 'gloves', img: 'https://source.unsplash.com/1200x900/?baseball,glove&sig=1' },
@@ -14,12 +14,31 @@ const PRODUCTS = [
   { id: 'helmet-lite', title: 'Lightweight Helmet Youth', price: 59.99, category: 'helmets', img: 'https://source.unsplash.com/1200x900/?baseball,helmet&sig=2' },
 ];
 
+function getProducts() {
+  try {
+    const adminProducts = JSON.parse(localStorage.getItem('shopProducts') || 'null');
+    return adminProducts || DEFAULT_PRODUCTS;
+  } catch {
+    return DEFAULT_PRODUCTS;
+  }
+}
+
+let PRODUCTS = getProducts();
+
 const Store = {
   state: {
     filter: 'all',
     cart: JSON.parse(localStorage.getItem('cart') || '[]'),
+    user: null,
   },
   init() {
+    // Load current user
+    try {
+      this.state.user = JSON.parse(localStorage.getItem('currentUser') || 'null');
+    } catch {
+      this.state.user = null;
+    }
+
     this.ui = {
       grid: document.getElementById('product-grid'),
       count: document.getElementById('cart-count'),
@@ -27,6 +46,31 @@ const Store = {
       subtotal: document.getElementById('cart-subtotal'),
       dialog: document.getElementById('mini-cart')
     };
+
+    // Update navigation for authenticated users
+    this.updateNavigation();
+
+    // Refresh products from admin updates
+    PRODUCTS = getProducts();
+
+    // Mobile nav toggle
+    const toggle = document.querySelector('.menu-toggle');
+    const nav = document.getElementById('primary-nav');
+    if(toggle && nav){
+      toggle.addEventListener('click', ()=>{
+        const open = nav.classList.toggle('is-open');
+        document.body.classList.toggle('nav-open', open);
+        toggle.setAttribute('aria-expanded', String(open));
+      });
+      // Close nav when a link is chosen
+      nav.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>{
+        if(nav.classList.contains('is-open')){
+          nav.classList.remove('is-open');
+          document.body.classList.remove('nav-open');
+          toggle.setAttribute('aria-expanded','false');
+        }
+      }));
+    }
 
     // Render initial views
     if (this.ui.grid) {
@@ -54,6 +98,40 @@ const Store = {
 
     // Expose for console
     window.Store = this;
+    window.PRODUCTS = PRODUCTS;
+  },
+  updateNavigation() {
+    const nav = document.getElementById('primary-nav');
+    if (!nav) return;
+
+    // Remove existing auth elements
+    nav.querySelectorAll('.auth-link, .user-menu').forEach(el => el.remove());
+
+    if (this.state.user) {
+      // User is logged in
+      const userMenu = document.createElement('div');
+      userMenu.className = 'user-menu';
+      userMenu.innerHTML = `
+        <span>Hello, ${this.state.user.name}</span>
+        <a href="order-history.html" class="auth-link">Orders</a>
+        ${this.state.user.isAdmin ? '<a href="admin.html" class="auth-link">Admin</a>' : ''}
+        <button class="auth-link btn btn-ghost" onclick="Store.logout()">Logout</button>
+      `;
+      nav.appendChild(userMenu);
+    } else {
+      // User is not logged in
+      const loginLink = document.createElement('a');
+      loginLink.href = 'login.html';
+      loginLink.className = 'auth-link';
+      loginLink.textContent = 'Login';
+      nav.appendChild(loginLink);
+    }
+  },
+  logout() {
+    localStorage.removeItem('currentUser');
+    this.state.user = null;
+    this.updateNavigation();
+    window.location.href = 'index.html';
   },
   filter(category) {
     this.state.filter = category || 'all';
@@ -83,9 +161,12 @@ const Store = {
         </div>
         <div class="body">
           <h3 style="margin:0 0 .25rem;font-size:1rem">${p.title}</h3>
+          ${p.stock !== undefined ? `<p style="font-size:.8rem;color:#666;margin:.25rem 0;">Stock: ${p.stock}</p>` : ''}
           <div class="price-row">
             <span class="price">${currency.format(p.price)}</span>
-            <button class="btn btn-ghost" data-add="${p.id}">Add</button>
+            <button class="btn btn-ghost" data-add="${p.id}" ${p.stock === 0 ? 'disabled' : ''}>
+              ${p.stock === 0 ? 'Out of Stock' : 'Add'}
+            </button>
           </div>
         </div>
       </article>
@@ -94,7 +175,7 @@ const Store = {
     this.ui.grid.innerHTML = html || `<p>No products found.</p>`;
 
     // Bind add buttons
-    this.ui.grid.querySelectorAll('[data-add]').forEach(btn => btn.addEventListener('click', () => {
+    this.ui.grid.querySelectorAll('[data-add]:not([disabled])').forEach(btn => btn.addEventListener('click', () => {
       const id = btn.dataset.add;
       const product = PRODUCTS.find(p => p.id === id);
       this.add(product);

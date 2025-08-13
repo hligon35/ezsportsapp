@@ -1,0 +1,34 @@
+[
+  {
+    "name": "EZ Ghost Bat",
+    "description": "High-performance baseball bat for power hitters.",
+    "price": 399.95,
+    "image": "/assets/img/bat-ghost.png",
+    "category": "Bats",
+    "stock": 10
+  },
+  {
+    "name": "Hype Aluminum Bat",
+    "description": "Lightweight bat for fast swings.",
+    "price": 349.95,
+    "image": "/assets/img/bat-hype.png",
+    "category": "Bats",
+    "stock": 15
+  },
+  {
+    "name": "A2000 Glove",
+    "description": "Premium leather glove for infielders.",
+    "price": 299.95,
+    "image": "/assets/img/glove-a2000.png",
+    "category": "Gloves",
+    "stock": 8
+  },
+  {
+    "name": "Heart of the Hide Glove",
+    "description": "Classic glove for all positions.",
+    "price": 279.95,
+    "image": "/assets/img/glove-heart.png",
+    "category": "Gloves",
+    "stock": 12
+  }
+]

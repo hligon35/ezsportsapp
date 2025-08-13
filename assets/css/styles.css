@@ -61,6 +61,9 @@ img{max-width:100%;display:block}
 .search input:focus{outline:none;box-shadow:var(--ring);border-color:#7fb4ff}
 .quick-links{display:flex;align-items:center;gap:1rem}
 .quick-links a{color:#e6f0ff;text-decoration:none;opacity:.95}
+.quick-links .auth-link{color:#e6f0ff;text-decoration:none;opacity:.95;background:none;border:none;cursor:pointer;font:inherit;}
+.quick-links .user-menu{display:flex;align-items:center;gap:.8rem;font-size:.9rem;}
+.quick-links .user-menu span{color:#e6f0ff;opacity:.8;}
 .cart-btn{display:inline-flex;align-items:center;gap:.5rem;border:none;background:#0b3a67;color:#fff;padding:.5rem .75rem;border-radius:.75rem;cursor:pointer}
 .cart-count{background:#fff;color:#0a3a66;font-weight:800;min-width:22px;height:22px;display:inline-grid;place-items:center;border-radius:999px}
 .icon-btn{background:#e8f1ff;border:1px solid #cfe2ff;color:#0a3a66;border-radius:.5rem;padding:.35rem .5rem;cursor:pointer}

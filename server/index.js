@@ -8,6 +8,23 @@ const compression = require('compression');
 const helmet = require('helmet');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY || 'sk_test_yourkey'); // Replace with your real key
 
+// Database and services
+const DatabaseManager = require('./database/DatabaseManager');
+const ProductService = require('./services/ProductService');
+const OrderService = require('./services/OrderService');
+
+// Initialize database
+const db = new DatabaseManager();
+const productService = new ProductService();
+const orderService = new OrderService();
+
+// Initialize database on startup
+db.initialize().catch(console.error);
+
+// Routes
+const productRoutes = require('./routes/products');
+const userRoutes = require('./routes/users');
+const orderRoutes = require('./routes/orders');
 const app = express();
 app.use(cors());
 app.use(helmet({
@@ -15,6 +32,11 @@ app.use(helmet({
 }));
 app.use(compression());
 app.use(bodyParser.json({ limit: '100kb' }));
+
+// API routes
+app.use('/api/products', productRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api/orders', orderRoutes);
 
 // Serve static frontend (HTML, assets, service worker) from project root
 app.use(express.static(path.join(__dirname, '..')));
@@ -104,9 +126,25 @@ app.post('/api/create-payment-intent', async (req, res) => {
 // Create order endpoint (save order details)
 app.post('/api/order', async (req, res) => {
   try{
-    const order = { ...req.body, ts: new Date().toISOString() };
-    await fs.appendFile('orders.ndjson', JSON.stringify(order) + "\n");
-    res.json({ status: 'ok' });
+    const orderData = req.body;
+    
+    // Save to database using OrderService
+    if (orderData.items && orderData.items.length > 0) {
+      const order = await orderService.createOrder({
+        userId: orderData.userId || null,
+        userEmail: orderData.customer?.email || 'guest@example.com',
+        items: orderData.items,
+        shippingAddress: orderData.shipping,
+        customerInfo: orderData.customer,
+        paymentInfo: { method: 'stripe' }
+      });
+      res.json({ status: 'ok', orderId: order.id });
+    } else {
+      // Fallback to file logging for incomplete orders
+      const order = { ...orderData, ts: new Date().toISOString() };
+      await fs.appendFile('orders.ndjson', JSON.stringify(order) + "\n");
+      res.json({ status: 'ok' });
+    }
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: err.message });

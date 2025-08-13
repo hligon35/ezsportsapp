@@ -57,6 +57,38 @@ async function initialize() {
   if (params.get('success') === 'true') {
     document.getElementById('payment-message').style.color = 'green';
     document.getElementById('payment-message').textContent = 'Payment successful! Thank you for your order.';
+    // Save order to localStorage for order history
+    try {
+      const cart = readCart();
+      const user = JSON.parse(localStorage.getItem('currentUser') || 'null');
+      if (cart && cart.length) {
+        const orders = JSON.parse(localStorage.getItem('orders') || '[]');
+        // For demo, use id as timestamp
+        const id = Date.now();
+        // For price, use static PRODUCTS from shop page if available
+        let PRODUCTS = window.PRODUCTS;
+        if (!PRODUCTS && window.parent && window.parent.PRODUCTS) PRODUCTS = window.parent.PRODUCTS;
+        if (!PRODUCTS) PRODUCTS = [];
+        const items = cart.map(i => {
+          let price = 0;
+          if (PRODUCTS && PRODUCTS.length) {
+            const prod = PRODUCTS.find(p => p.id === i.id);
+            price = prod ? prod.price : 0;
+          }
+          return { ...i, price };
+        });
+        const total = items.reduce((sum, i) => sum + i.price * i.qty, 0);
+        const order = { 
+          id, 
+          date: new Date().toISOString(), 
+          items, 
+          total,
+          userEmail: user ? user.email : 'guest@example.com' // Associate with user
+        };
+        orders.push(order);
+        localStorage.setItem('orders', JSON.stringify(orders));
+      }
+    } catch(e) { /* ignore */ }
     localStorage.removeItem('checkoutTotalCents');
     localStorage.removeItem('cart');
   }
