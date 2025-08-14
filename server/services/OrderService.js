@@ -96,10 +96,23 @@ class OrderService {
   }
 
   // Get all orders
-  async getAllOrders(status = null) {
+  async getAllOrders(status = null, options = {}) {
     try {
+      const { page = 1, pageSize = 20, sortBy = 'createdAt', sortDir = 'desc' } = options;
       const criteria = status ? { status } : {};
-      return await this.db.find('orders', criteria);
+      const all = await this.db.find('orders', criteria);
+      const sorted = [...all].sort((a, b) => {
+        const av = a[sortBy];
+        const bv = b[sortBy];
+        const cmp = (av instanceof Date || typeof av === 'string') ? (new Date(av) - new Date(bv)) : ((av||0) - (bv||0));
+        return sortDir === 'asc' ? cmp : -cmp;
+      });
+      const total = sorted.length;
+      const p = Math.max(1, parseInt(page));
+      const ps = Math.max(1, parseInt(pageSize));
+      const start = (p - 1) * ps;
+      const items = sorted.slice(start, start + ps);
+      return { items, total, page: p, pageSize: ps };
     } catch (error) {
       throw error;
     }
@@ -108,7 +121,7 @@ class OrderService {
   // Update order status
   async updateOrderStatus(id, status) {
     try {
-      const validStatuses = ['pending', 'processing', 'shipped', 'delivered', 'cancelled'];
+  const validStatuses = ['pending', 'paid', 'fulfilled', 'processing', 'shipped', 'delivered', 'cancelled'];
       if (!validStatuses.includes(status)) {
         throw new Error('Invalid order status');
       }

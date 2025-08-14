@@ -47,8 +47,10 @@ const Store = {
       dialog: document.getElementById('mini-cart')
     };
 
-    // Update navigation for authenticated users
-    this.updateNavigation();
+  // Ensure core nav links exist on all pages and highlight active
+  this.ensureCoreNav();
+  // Update navigation for authenticated users
+  this.updateNavigation();
 
     // Refresh products from admin updates
     PRODUCTS = getProducts();
@@ -126,6 +128,29 @@ const Store = {
       loginLink.textContent = 'Login';
       nav.appendChild(loginLink);
     }
+  },
+  ensureCoreNav(){
+    const nav = document.getElementById('primary-nav') || document.querySelector('nav.quick-links');
+    if (!nav) return;
+    const required = [
+      { href: 'shop.html', text: 'Shop' },
+      { href: 'deals.html', text: 'Deals' },
+      { href: 'about.html', text: 'About' },
+    ];
+    // Insert any missing core links before cart/login controls
+    const existingHrefs = Array.from(nav.querySelectorAll('a')).map(a=>a.getAttribute('href'));
+    const cartBtn = nav.querySelector('.cart-btn');
+    required.forEach(link => {
+      if (!existingHrefs.includes(link.href)){
+        const a = document.createElement('a');
+        a.href = link.href; a.textContent = link.text;
+        if (cartBtn) nav.insertBefore(a, cartBtn); else nav.appendChild(a);
+      }
+    });
+    // Highlight current page
+    const path = location.pathname.split('/').pop() || 'index.html';
+    const active = Array.from(nav.querySelectorAll('a')).find(a => (a.getAttribute('href')||'').endsWith(path));
+    if (active) { active.classList.add('is-active'); active.setAttribute('aria-current','page'); }
   },
   logout() {
     localStorage.removeItem('currentUser');

@@ -97,26 +97,73 @@ function renderProducts() {
 }
 
 function renderOrders() {
-  const orders = getOrders();
   const list = document.getElementById('orders-list');
+  const status = document.getElementById('orders-status-filter')?.value || '';
+  list.innerHTML = '<p>Loading orders…</p>';
   
-  if (!orders.length) {
-    list.innerHTML = '<p>No orders yet.</p>';
-    return;
-  }
-  
-  list.innerHTML = orders.map(order => `
-    <div class="product-item">
-      <div>
-        <strong>Order #${order.id}</strong>
-        <br><small>${new Date(order.date).toLocaleString()}</small>
-        <br>Items: ${order.items.map(i => `${i.qty}x ${i.id}`).join(', ')}
-      </div>
-      <div>
-        <strong>$${order.total.toFixed(2)}</strong>
-      </div>
-    </div>
-  `).join('');
+  const params = new URLSearchParams();
+  if (status) params.set('status', status);
+  params.set('page', window.__ordersPage||1);
+  params.set('pageSize', 10);
+  params.set('sortBy', 'createdAt');
+  params.set('sortDir', 'desc');
+  fetch(`/api/orders/admin/all?${params.toString()}`)
+    .then(res=>{
+      if (!res.ok) throw new Error('Unauthorized or failed');
+      return res.json();
+    })
+    .then(result => {
+      const { items:orders, total, page, pageSize } = Array.isArray(result) ? { items:result, total:result.length, page:1, pageSize:result.length } : result;
+      if (!orders || !orders.length) {
+        list.innerHTML = '<p>No orders found.</p>';
+        return;
+      }
+      const html = orders.map(order => `
+        <div class="product-item">
+          <div>
+            <strong>Order #${order.id}</strong> — <small>${order.status||'pending'}</small>
+            <br><small>${new Date(order.createdAt||order.date).toLocaleString()}</small>
+            <br>Items: ${order.items.map(i => `${(i.quantity||i.qty)}x ${i.productId||i.id}`).join(', ')}
+          </div>
+          <div style="display:flex; gap:.5rem; align-items:center;">
+            <strong>$${(order.total||0).toFixed(2)}</strong>
+            <select data-order-id="${order.id}" class="order-status-select">
+              ${['pending','paid','fulfilled','cancelled'].map(s=>`<option value="${s}" ${s===(order.status||'pending')?'selected':''}>${s}</option>`).join('')}
+            </select>
+            <button class="btn btn-ghost" data-update-status="${order.id}">Update</button>
+          </div>
+        </div>
+      `).join('');
+
+      const pager = `
+        <div style="display:flex; gap:1rem; align-items:center; margin-top:1rem;">
+          <button class="btn btn-ghost" id="orders-prev" ${page<=1?'disabled':''}>Prev</button>
+          <span>Page ${page} of ${Math.max(1, Math.ceil(total/(pageSize||1)))} (${total} total)</span>
+          <button class="btn btn-ghost" id="orders-next" ${(page*pageSize)>=total?'disabled':''}>Next</button>
+        </div>`;
+
+      list.innerHTML = html + pager;
+
+      // Wire updates
+      list.querySelectorAll('[data-update-status]')
+        .forEach(btn => btn.addEventListener('click', () => {
+          const id = btn.getAttribute('data-update-status');
+          const sel = list.querySelector(`select[data-order-id="${id}"]`);
+          const newStatus = sel.value;
+          fetch(`/api/orders/${id}/status`, { method:'PATCH', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify({ status:newStatus }) })
+            .then(r=>{ if(!r.ok) throw new Error('Failed'); return r.json(); })
+            .then(()=>{ renderOrders(); })
+            .catch(()=> alert('Failed to update status. Ensure you are logged in as admin.'));
+        }));
+
+      const prev = document.getElementById('orders-prev');
+      const next = document.getElementById('orders-next');
+      if (prev) prev.addEventListener('click', ()=>{ window.__ordersPage = Math.max(1,(page-1)); renderOrders(); });
+      if (next) next.addEventListener('click', ()=>{ window.__ordersPage = (page+1); renderOrders(); });
+    })
+    .catch(()=>{
+      list.innerHTML = '<p>Failed to load orders. Ensure you are logged in as admin.</p>';
+    });
 }
 
 function renderUsers() {
@@ -230,12 +277,25 @@ document.addEventListener('DOMContentLoaded', () => {
   
   // Logout functionality
   document.getElementById('logout-btn').addEventListener('click', () => {
-    localStorage.removeItem('currentUser');
-    window.location.href = 'index.html';
+    fetch('/api/users/logout', { method:'POST' }).finally(()=>{
+      localStorage.removeItem('currentUser');
+      window.location.href = 'index.html';
+    });
   });
   
   // Load initial data
   renderProducts();
+  // Orders filters
+  const statusFilter = document.getElementById('orders-status-filter');
+  const refreshBtn = document.getElementById('orders-refresh-btn');
+  if (statusFilter) statusFilter.addEventListener('change', renderOrders);
+  if (refreshBtn) refreshBtn.addEventListener('click', renderOrders);
+  // Try to load thresholds from server schema via overview
+  fetch('/api/inventory/overview').then(r=>r.ok?r.json():null).then(data=>{
+    if (data && data.stats) {
+      // thresholds not provided by API; keep defaults
+    }
+  }).catch(()=>{});
   
   // Add stock form event listener
   document.getElementById('stock-form').addEventListener('submit', applyStockAdjustment);
@@ -554,7 +614,32 @@ function processBulkUpdate() {
 }
 
 function showInventoryHistory() {
-  alert('Inventory history feature - this would show detailed stock movement logs');
+  // Fetch recent movements from API, fallback to local (none)
+  fetch('/api/inventory/history?limit=100')
+    .then(async (res)=>{
+      if (!res.ok) throw new Error('status '+res.status);
+      const text = await res.text();
+      return text.trim()? JSON.parse(text): [];
+    })
+    .catch(()=>[])
+    .then((rows)=>{
+      const tbody = document.getElementById('history-rows');
+      if (!rows.length) {
+        tbody.innerHTML = '<tr><td colspan="6" style="padding:1rem;">No history yet.</td></tr>';
+      } else {
+        tbody.innerHTML = rows.map(r=>`
+          <tr>
+            <td style="padding:.5rem;">${new Date(r.timestamp).toLocaleString()}</td>
+            <td style="padding:.5rem;">${r.productName}</td>
+            <td style="padding:.5rem; text-align:right; color:${r.change>=0?'#28a745':'#c0392b'};">${r.change>=0?'+':''}${r.change}</td>
+            <td style="padding:.5rem; text-align:right;">${r.oldStock} → ${r.newStock}</td>
+            <td style="padding:.5rem;">${r.reason}</td>
+            <td style="padding:.5rem;">${r.notes||''}</td>
+          </tr>
+        `).join('');
+      }
+      document.getElementById('history-modal').style.display = 'block';
+    });
 }
 
 // Make functions global for onclick handlers

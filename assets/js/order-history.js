@@ -1,5 +1,5 @@
-// Order History: localStorage-based
-function currencyFmt(n){ return n.toLocaleString(undefined,{style:'currency',currency:'USD'}); }
+// Order History: server-backed with graceful fallback
+function currencyFmt(n){ return Number(n||0).toLocaleString(undefined,{style:'currency',currency:'USD'}); }
 
 function getCurrentUser(){
   try{
@@ -7,17 +7,15 @@ function getCurrentUser(){
   }catch{ return null; }
 }
 
-function getOrders(){
+async function fetchOrdersServer(){
   try{
-    const user = getCurrentUser();
-    if (!user) return [];
-    const allOrders = JSON.parse(localStorage.getItem('orders')||'[]');
-    // Filter orders by user email for user-specific history
-    return allOrders.filter(order => order.userEmail === user.email);
-  }catch{ return []; }
+    const res = await fetch('/api/orders/me');
+    if (!res.ok) throw new Error('Not authorized');
+    return await res.json();
+  }catch(e){ return null; }
 }
 
-function renderOrders(){
+async function renderOrders(){
   const user = getCurrentUser();
   const list = document.getElementById('orders-list');
   
@@ -26,7 +24,8 @@ function renderOrders(){
     return;
   }
   
-  const orders = getOrders();
+  const serverOrders = await fetchOrdersServer();
+  const orders = Array.isArray(serverOrders) ? serverOrders : [];
   if(!orders.length){
     list.innerHTML = '<p>You have no orders yet. <a href="shop.html">Start shopping!</a></p>';
     return;
@@ -35,14 +34,14 @@ function renderOrders(){
     <div class="order-card">
       <div class="order-header">
         <span><strong>Order #${order.id}</strong></span>
-        <span>${new Date(order.date).toLocaleString()}</span>
+        <span>${new Date(order.createdAt || order.date).toLocaleString()}</span>
       </div>
       <div class="order-items">
-        ${order.items.map(i => `<div class="order-item"><span>${i.qty} × ${i.id}</span><span>${currencyFmt(i.price * i.qty)}</span></div>`).join('')}
+        ${order.items.map(i => `<div class="order-item"><span>${i.qty} × ${i.id}</span><span>${currencyFmt((i.price||0) * i.qty)}</span></div>`).join('')}
       </div>
       <div style="margin-top:.5rem;text-align:right"><strong>Total: ${currencyFmt(order.total)}</strong></div>
     </div>
   `).join('');
 }
 
-document.addEventListener('DOMContentLoaded', renderOrders);
+document.addEventListener('DOMContentLoaded', () => { renderOrders(); });

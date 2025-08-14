@@ -6,12 +6,24 @@ class InventoryService {
     this.db = new DatabaseManager();
     this.lowStockThreshold = 10;
     this.criticalStockThreshold = 5;
+    this._loadThresholds();
+  }
+
+  async _loadThresholds() {
+    try {
+      const schema = await this.db.read('schema');
+      const th = schema?.metadata?.inventoryThresholds;
+      if (th) {
+        this.lowStockThreshold = Number(th.low) || this.lowStockThreshold;
+        this.criticalStockThreshold = Number(th.critical) || this.criticalStockThreshold;
+      }
+    } catch {}
   }
 
   // Get inventory overview with stats
   async getInventoryOverview() {
     try {
-      const products = await this.db.findAll('products');
+  const products = await this.db.findAll('products');
       
       const stats = {
         totalProducts: products.length,
@@ -102,9 +114,9 @@ class InventoryService {
   // Record stock movement for history tracking
   async recordStockMovement(movement) {
     try {
-      // Check if stock_movements table exists, create if not
-      const movements = await this.db.findAll('stock_movements').catch(() => []);
-      
+  // Ensure collection exists
+  await this.db.findAll('stock_movements').catch(() => []);
+
       const movementRecord = {
         id: 'mov_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
         ...movement
@@ -137,9 +149,20 @@ class InventoryService {
   }
 
   // Update stock thresholds
-  setStockThresholds(lowThreshold, criticalThreshold) {
+  async setStockThresholds(lowThreshold, criticalThreshold) {
     this.lowStockThreshold = lowThreshold;
     this.criticalStockThreshold = criticalThreshold;
+    try {
+      const schema = await this.db.read('schema');
+      schema.metadata = schema.metadata || {};
+      schema.metadata.inventoryThresholds = { low: lowThreshold, critical: criticalThreshold };
+      const fs = require('fs').promises;
+      const path = require('path');
+      const filePath = path.join(this.db.dbPath, this.db.collections.schema);
+      await fs.writeFile(filePath, JSON.stringify(schema, null, 2), 'utf8');
+    } catch (e) {
+      console.warn('Failed to persist thresholds:', e.message);
+    }
   }
 
   // Get low stock alerts

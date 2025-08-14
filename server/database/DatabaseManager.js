@@ -9,8 +9,14 @@ class DatabaseManager {
       users: 'users.json',
       products: 'products.json',
       orders: 'orders.json',
-      schema: 'schema.json'
+      schema: 'schema.json',
+      stock_movements: 'stock_movements.json'
     };
+  }
+
+  // Convenience: return all records in a collection
+  async findAll(collection) {
+    return this.read(collection);
   }
 
   // Read data from a collection
@@ -45,9 +51,12 @@ class DatabaseManager {
   async updateMetadata() {
     try {
       const schema = await this.read('schema');
-      schema.metadata.lastModified = new Date().toISOString();
-      const filePath = path.join(this.dbPath, this.collections.schema);
-      await fs.writeFile(filePath, JSON.stringify(schema, null, 2), 'utf8');
+      if (schema && typeof schema === 'object') {
+        schema.metadata = schema.metadata || {};
+        schema.metadata.lastModified = new Date().toISOString();
+        const filePath = path.join(this.dbPath, this.collections.schema);
+        await fs.writeFile(filePath, JSON.stringify(schema, null, 2), 'utf8');
+      }
     } catch (error) {
       console.error('Failed to update metadata:', error);
     }
@@ -56,10 +65,13 @@ class DatabaseManager {
   // Get next auto-increment ID
   async getNextId(collection) {
     try {
-      const schema = await this.read('schema');
-      const currentId = schema.metadata.autoIncrement[collection];
-      schema.metadata.autoIncrement[collection] = currentId + 1;
-      await this.write('schema', schema);
+  const schema = await this.read('schema');
+  schema.metadata = schema.metadata || {};
+  schema.metadata.autoIncrement = schema.metadata.autoIncrement || {};
+  const currentId = schema.metadata.autoIncrement[collection] || 0;
+  schema.metadata.autoIncrement[collection] = currentId + 1;
+  const filePath = path.join(this.dbPath, this.collections.schema);
+  await fs.writeFile(filePath, JSON.stringify(schema, null, 2), 'utf8');
       return currentId + 1;
     } catch (error) {
       throw error;
@@ -179,6 +191,10 @@ class DatabaseManager {
                   users: 1000,
                   products: 2000,
                   orders: 3000
+                },
+                inventoryThresholds: {
+                  low: 10,
+                  critical: 5
                 }
               }
             };

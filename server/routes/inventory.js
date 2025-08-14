@@ -1,11 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const InventoryService = require('../services/InventoryService');
+const { requireAdmin } = require('../middleware/auth');
 
 const inventoryService = new InventoryService();
 
 // Get inventory overview and stats
-router.get('/overview', async (req, res) => {
+router.get('/overview', requireAdmin, async (req, res) => {
   try {
     const overview = await inventoryService.getInventoryOverview();
     res.json(overview);
@@ -15,7 +16,7 @@ router.get('/overview', async (req, res) => {
 });
 
 // Adjust stock levels
-router.post('/adjust', async (req, res) => {
+router.post('/adjust', requireAdmin, async (req, res) => {
   try {
     const { productId, adjustment, reason, notes } = req.body;
     
@@ -31,7 +32,7 @@ router.post('/adjust', async (req, res) => {
 });
 
 // Get stock movement history
-router.get('/history/:productId?', async (req, res) => {
+router.get('/history/:productId?', requireAdmin, async (req, res) => {
   try {
     const { productId } = req.params;
     const { limit = 50 } = req.query;
@@ -44,7 +45,7 @@ router.get('/history/:productId?', async (req, res) => {
 });
 
 // Get low stock alerts
-router.get('/alerts', async (req, res) => {
+router.get('/alerts', requireAdmin, async (req, res) => {
   try {
     const alerts = await inventoryService.getLowStockAlerts();
     res.json(alerts);
@@ -54,7 +55,7 @@ router.get('/alerts', async (req, res) => {
 });
 
 // Update stock thresholds
-router.post('/thresholds', async (req, res) => {
+router.post('/thresholds', requireAdmin, async (req, res) => {
   try {
     const { lowThreshold, criticalThreshold } = req.body;
     
@@ -62,7 +63,7 @@ router.post('/thresholds', async (req, res) => {
       return res.status(400).json({ message: 'Both thresholds are required' });
     }
 
-    inventoryService.setStockThresholds(parseInt(lowThreshold), parseInt(criticalThreshold));
+  await inventoryService.setStockThresholds(parseInt(lowThreshold), parseInt(criticalThreshold));
     res.json({ message: 'Thresholds updated successfully' });
   } catch (err) {
     res.status(400).json({ message: err.message });
@@ -70,7 +71,7 @@ router.post('/thresholds', async (req, res) => {
 });
 
 // Generate inventory report
-router.get('/report', async (req, res) => {
+router.get('/report', requireAdmin, async (req, res) => {
   try {
     const report = await inventoryService.generateInventoryReport();
     res.json(report);
@@ -80,7 +81,7 @@ router.get('/report', async (req, res) => {
 });
 
 // Process bulk stock update
-router.post('/bulk-update', async (req, res) => {
+router.post('/bulk-update', requireAdmin, async (req, res) => {
   try {
     const { updates } = req.body;
     

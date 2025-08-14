@@ -20,9 +20,14 @@
         <img src="assets/img/logo.svg" alt="EZ Sports Netting logo" height="40"/>
         <span>EZ Sports Netting</span>
       </a>
-      <nav class="quick-links">
+      <nav id="primary-nav" class="quick-links" aria-label="Primary">
         <a href="shop.html">Shop</a>
+        <a href="deals.html">Deals</a>
         <a href="about.html">About</a>
+        <button class="cart-btn" aria-haspopup="dialog" aria-controls="mini-cart" onclick="Store.toggleCart()">
+          <span class="icon">🛒</span>
+          <span class="cart-count" id="cart-count">0</span>
+        </button>
       </nav>
     </div>
   </header>

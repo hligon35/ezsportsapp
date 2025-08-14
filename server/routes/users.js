@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const UserService = require('../services/UserService');
+const { signToken, requireAdmin, requireAuth } = require('../middleware/auth');
 
 const userService = new UserService();
 
@@ -13,11 +14,12 @@ router.post('/register', async (req, res) => {
       return res.status(400).json({ message: 'Email, password, and name are required' });
     }
 
-    const user = await userService.register({ email, password, name });
-    res.status(201).json({ 
-      message: 'User registered successfully', 
-      user 
-    });
+  const user = await userService.register({ email, password, name });
+  const token = signToken(user);
+  const useSecure = !!(process.env.COOKIE_SECURE === 'true');
+  const sameSite = process.env.COOKIE_SAMESITE || 'lax';
+  res.cookie('token', token, { httpOnly: true, sameSite, secure: useSecure, maxAge: 7*24*60*60*1000 });
+  res.status(201).json({ message: 'User registered successfully', user, token });
   } catch (err) {
     res.status(400).json({ message: err.message });
   }
@@ -32,18 +34,19 @@ router.post('/login', async (req, res) => {
       return res.status(400).json({ message: 'Email and password are required' });
     }
 
-    const user = await userService.login(email, password);
-    res.json({ 
-      message: 'Login successful', 
-      user 
-    });
+  const user = await userService.login(email, password);
+  const token = signToken(user);
+  const useSecure = !!(process.env.COOKIE_SECURE === 'true');
+  const sameSite = process.env.COOKIE_SAMESITE || 'lax';
+  res.cookie('token', token, { httpOnly: true, sameSite, secure: useSecure, maxAge: 7*24*60*60*1000 });
+  res.json({ message: 'Login successful', user, token });
   } catch (err) {
     res.status(401).json({ message: err.message });
   }
 });
 
 // Get user profile
-router.get('/profile/:id', async (req, res) => {
+router.get('/profile/:id', requireAuth, async (req, res) => {
   try {
     const user = await userService.getUserById(parseInt(req.params.id));
     if (!user) {
@@ -56,7 +59,7 @@ router.get('/profile/:id', async (req, res) => {
 });
 
 // Update user profile
-router.put('/profile/:id', async (req, res) => {
+router.put('/profile/:id', requireAuth, async (req, res) => {
   try {
     const updatedUser = await userService.updateUser(parseInt(req.params.id), req.body);
     res.json({
@@ -69,7 +72,7 @@ router.put('/profile/:id', async (req, res) => {
 });
 
 // Change password
-router.post('/change-password/:id', async (req, res) => {
+router.post('/change-password/:id', requireAuth, async (req, res) => {
   try {
     const { oldPassword, newPassword } = req.body;
     
@@ -85,7 +88,7 @@ router.post('/change-password/:id', async (req, res) => {
 });
 
 // Get all users (admin only)
-router.get('/admin/all', async (req, res) => {
+router.get('/admin/all', requireAdmin, async (req, res) => {
   try {
     const users = await userService.getAllUsers();
     res.json(users);
@@ -94,8 +97,17 @@ router.get('/admin/all', async (req, res) => {
   }
 });
 
+// Logout (support CORS preflight as needed)
+router.options('/logout', (req, res) => res.sendStatus(200));
+router.post('/logout', (req, res) => {
+  const useSecure = !!(process.env.COOKIE_SECURE === 'true');
+  const sameSite = process.env.COOKIE_SAMESITE || 'lax';
+  res.clearCookie('token', { httpOnly: true, secure: useSecure, sameSite });
+  res.json({ message: 'Logged out' });
+});
+
 // Delete user (admin only)
-router.delete('/admin/:id', async (req, res) => {
+router.delete('/admin/:id', requireAdmin, async (req, res) => {
   try {
     const success = await userService.deleteUser(parseInt(req.params.id));
     if (!success) {

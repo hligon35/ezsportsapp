@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const ProductService = require('../services/ProductService');
+const { requireAdmin } = require('../middleware/auth');
 
 const productService = new ProductService();
 
@@ -38,7 +39,7 @@ router.get('/:id', async (req, res) => {
 });
 
 // Add a new product (admin only)
-router.post('/', async (req, res) => {
+router.post('/', requireAdmin, async (req, res) => {
   try {
     const { name, description, price, image, category, stock } = req.body;
     
@@ -63,7 +64,7 @@ router.post('/', async (req, res) => {
 });
 
 // Update product (admin only)
-router.put('/:id', async (req, res) => {
+router.put('/:id', requireAdmin, async (req, res) => {
   try {
     const updateData = { ...req.body };
     if (updateData.price) updateData.price = parseFloat(updateData.price);
@@ -77,7 +78,7 @@ router.put('/:id', async (req, res) => {
 });
 
 // Update stock
-router.patch('/:id/stock', async (req, res) => {
+router.patch('/:id/stock', requireAdmin, async (req, res) => {
   try {
     const { stock } = req.body;
     if (stock === undefined) {
@@ -92,7 +93,7 @@ router.patch('/:id/stock', async (req, res) => {
 });
 
 // Deactivate product (admin only)
-router.patch('/:id/deactivate', async (req, res) => {
+router.patch('/:id/deactivate', requireAdmin, async (req, res) => {
   try {
     const success = await productService.deactivateProduct(req.params.id);
     if (!success) {
@@ -105,7 +106,7 @@ router.patch('/:id/deactivate', async (req, res) => {
 });
 
 // Delete product (admin only)
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', requireAdmin, async (req, res) => {
   try {
     const success = await productService.deleteProduct(req.params.id);
     if (!success) {
@@ -118,7 +119,7 @@ router.delete('/:id', async (req, res) => {
 });
 
 // Get product statistics (admin only)
-router.get('/admin/stats', async (req, res) => {
+router.get('/admin/stats', requireAdmin, async (req, res) => {
   try {
     const stats = await productService.getProductStats();
     res.json(stats);
@@ -128,7 +129,7 @@ router.get('/admin/stats', async (req, res) => {
 });
 
 // Get low stock products (admin only)
-router.get('/admin/low-stock', async (req, res) => {
+router.get('/admin/low-stock', requireAdmin, async (req, res) => {
   try {
     const threshold = parseInt(req.query.threshold) || 5;
     const lowStockProducts = await productService.getLowStockProducts(threshold);

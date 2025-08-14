@@ -28,6 +28,7 @@ body, .container, .footer-grid, .about-inner, .category-tiles .tiles, .grid, .ba
   --ink-2:#2b3f59;    /* secondary */
   --brand:#0b64d4;    /* royal */
   --brand-2:#0a84ff;  /* accent */
+  --primary: var(--brand); /* alias used in admin styles */
   --red:#d7263d;
   --blue:#0e7dd8;
   --muted:#6a7c93;
@@ -64,6 +65,13 @@ img{max-width:100%;display:block}
 .quick-links .auth-link{color:#e6f0ff;text-decoration:none;opacity:.95;background:none;border:none;cursor:pointer;font:inherit;}
 .quick-links .user-menu{display:flex;align-items:center;gap:.8rem;font-size:.9rem;}
 .quick-links .user-menu span{color:#e6f0ff;opacity:.8;}
+.quick-links a.is-active, .quick-links a[aria-current="page"]{
+  color:#ffffff;
+  opacity:1;
+  background:rgba(255,255,255,.14);
+  padding:.3rem .5rem;
+  border-radius:.5rem;
+}
 .cart-btn{display:inline-flex;align-items:center;gap:.5rem;border:none;background:#0b3a67;color:#fff;padding:.5rem .75rem;border-radius:.75rem;cursor:pointer}
 .cart-count{background:#fff;color:#0a3a66;font-weight:800;min-width:22px;height:22px;display:inline-grid;place-items:center;border-radius:999px}
 .icon-btn{background:#e8f1ff;border:1px solid #cfe2ff;color:#0a3a66;border-radius:.5rem;padding:.35rem .5rem;cursor:pointer}

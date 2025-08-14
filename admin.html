@@ -13,8 +13,8 @@
     .product-list { display: grid; gap: 1rem; }
     .product-item { display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: #f7faff; border-radius: .8rem; }
     .admin-nav { display: flex; gap: 1rem; margin-bottom: 2rem; }
-    .admin-nav button { padding: .8rem 1.5rem; border: none; background: #e6edf6; border-radius: .6rem; cursor: pointer; }
-    .admin-nav button.active { background: var(--primary); color: white; }
+  .admin-nav button { padding: .8rem 1.5rem; border: none; background: #e6edf6; border-radius: .6rem; cursor: pointer; color:#0b2a4a; font-weight:700; }
+  .admin-nav button.active { background: var(--primary, #0b64d4); color: #ffffff; box-shadow: 0 2px 10px rgba(11,100,212,.25); }
     .inventory-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
     .inventory-card { background: #f7faff; border-radius: .8rem; padding: 1.5rem; border-left: 4px solid var(--primary); }
     .inventory-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
@@ -42,9 +42,15 @@
         <img src="assets/img/logo.svg" alt="EZ Sports Netting logo" height="40"/>
         <span>EZ Sports Netting</span>
       </a>
-      <nav class="quick-links">
+      <nav id="primary-nav" class="quick-links" aria-label="Primary">
         <a href="shop.html">Shop</a>
+        <a href="deals.html">Deals</a>
+        <a href="about.html">About</a>
         <a href="admin.html">Admin</a>
+        <button class="cart-btn" aria-haspopup="dialog" aria-controls="mini-cart" onclick="Store.toggleCart()">
+          <span class="icon">🛒</span>
+          <span class="cart-count" id="cart-count">0</span>
+        </button>
         <button id="logout-btn" class="btn btn-ghost">Logout</button>
       </nav>
     </div>
@@ -138,6 +144,19 @@
       <!-- Orders Section -->
       <div id="orders-section" class="admin-section" style="display:none;">
         <h3>Order Management</h3>
+        <div style="display:flex; gap:1rem; align-items:center; margin-bottom:1rem; flex-wrap:wrap;">
+          <label>
+            <span>Status:</span>
+            <select id="orders-status-filter" style="margin-left:.5rem; padding:.4rem;">
+              <option value="">All</option>
+              <option value="pending">Pending</option>
+              <option value="paid">Paid</option>
+              <option value="fulfilled">Fulfilled</option>
+              <option value="cancelled">Cancelled</option>
+            </select>
+          </label>
+          <button class="btn btn-secondary" id="orders-refresh-btn">Refresh</button>
+        </div>
         <div id="orders-list"></div>
       </div>
 
@@ -220,6 +239,32 @@
           <button onclick="processBulkUpdate()" class="btn btn-primary">Process File</button>
           <button onclick="closeModal('bulk-modal')" class="btn btn-ghost">Cancel</button>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Inventory History Modal -->
+  <div id="history-modal" class="modal">
+    <div class="modal-content" style="max-width: 800px;">
+      <div class="modal-header">
+        <h3>Recent Stock Movements</h3>
+        <button class="close-modal" onclick="closeModal('history-modal')">&times;</button>
+      </div>
+      <div id="history-content" style="max-height: 60vh; overflow: auto;">
+        <table style="width:100%; border-collapse: collapse;">
+          <thead>
+            <tr>
+              <th style="text-align:left; padding:.5rem; border-bottom:1px solid #eee;">When</th>
+              <th style="text-align:left; padding:.5rem; border-bottom:1px solid #eee;">Product</th>
+              <th style="text-align:right; padding:.5rem; border-bottom:1px solid #eee;">Change</th>
+              <th style="text-align:right; padding:.5rem; border-bottom:1px solid #eee;">Old → New</th>
+              <th style="text-align:left; padding:.5rem; border-bottom:1px solid #eee;">Reason</th>
+              <th style="text-align:left; padding:.5rem; border-bottom:1px solid #eee;">Notes</th>
+            </tr>
+          </thead>
+          <tbody id="history-rows">
+          </tbody>
+        </table>
       </div>
     </div>
   </div>
