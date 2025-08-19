@@ -39,19 +39,22 @@ if (process.env.TRUST_PROXY) {
 }
 
 // CORS with optional allowlist and credentials for cookie-based auth
-const corsOrigins = (process.env.CORS_ORIGINS || '').split(',').map(s => s.trim()).filter(Boolean);
-if (corsOrigins.length) {
-  app.use(cors({
-    origin: (origin, cb) => {
-      if (!origin) return cb(null, true);
-      if (corsOrigins.includes(origin)) return cb(null, true);
-      return cb(new Error('CORS not allowed'), false);
-    },
-    credentials: true
-  }));
-} else {
-  app.use(cors());
-}
+const envOrigins = (process.env.CORS_ORIGINS || '').split(',').map(s => s.trim()).filter(Boolean);
+const devOrigins = ['http://127.0.0.1:5500', 'http://localhost:5500', 'http://localhost:4242'];
+const allowList = envOrigins.length ? envOrigins : devOrigins;
+const corsOptions = {
+  origin: (origin, cb) => {
+    if (!origin) return cb(null, true); // non-browser or same-origin
+    if (allowList.includes(origin)) return cb(null, true);
+    return cb(null, false);
+  },
+  credentials: true,
+  methods: ['GET','HEAD','PUT','PATCH','POST','DELETE','OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+};
+app.use(cors(corsOptions));
+// Ensure preflight is handled for any route
+app.options('*', cors(corsOptions));
 app.use(helmet({
   contentSecurityPolicy: false // Keep disabled for now to avoid breaking inline scripts/styles; tighten later
 }));
@@ -107,6 +110,15 @@ app.use('/api/orders', orderRoutes);
 app.use('/api/inventory', inventoryRoutes);
 
 // Serve static frontend (HTML, assets, service worker) from project root
+// Serve favicon explicitly (browsers request /favicon.ico by default)
+app.get('/favicon.ico', (req, res) => {
+  try {
+    return res.sendFile(path.join(__dirname, '..', 'assets', 'img', 'favicon-32.png'));
+  } catch (e) {
+    return res.sendStatus(404);
+  }
+});
+
 app.use(express.static(path.join(__dirname, '..')));
 
 // Static assets caching (1 year for immutable, 1 hour for html)

@@ -2,15 +2,19 @@
   {
     "id": "user_mpd5k67y9",
     "email": "admin@ezsports.com",
-    "password": "$2b$10$XgnqxqgFn6Lz1Qsk0.pD.OO4n9UHWwQfDcjo4rq/nakt5BZBaY29i",
+    "username": "admin",
+    "password": "$2b$10$oTfY/cJ4d20i0USVn9jpKe8QUZdRb5MKwLJTxhs0CDmjuOqIDcGu2",
     "firstName": "Admin",
     "lastName": "User",
     "role": "admin",
-    "createdAt": "2025-08-13T02:57:41.654Z"
+    "createdAt": "2025-08-13T02:57:41.654Z",
+    "lastLogin": "2025-08-19T20:53:23.754Z",
+    "updatedAt": "2025-08-19T20:53:23.755Z"
   },
   {
     "id": "user_vq5r88oy4",
     "email": "demo@user.com",
+    "username": "demo",
     "password": "$2b$10$X4MRiivaiZ7Tu5fk95pSzebALbDW.F1NQR7OnDN2YcTL78.BuwCPu",
     "firstName": "Demo",
     "lastName": "User",

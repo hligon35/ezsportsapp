@@ -25,16 +25,20 @@ router.post('/register', async (req, res) => {
   }
 });
 
-// Login user
+// Login user (accept email or username as "identifier")
+// Support preflight for login from browsers
+router.options('/login', (req, res) => res.sendStatus(200));
+
 router.post('/login', async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { identifier, password, email } = req.body;
+    const loginId = identifier || email; // support both field names from clients
     
-    if (!email || !password) {
-      return res.status(400).json({ message: 'Email and password are required' });
+    if (!loginId || !password) {
+      return res.status(400).json({ message: 'Identifier (email or username) and password are required' });
     }
 
-  const user = await userService.login(email, password);
+  const user = await userService.login(loginId, password);
   const token = signToken(user);
   const useSecure = !!(process.env.COOKIE_SECURE === 'true');
   const sameSite = process.env.COOKIE_SAMESITE || 'lax';

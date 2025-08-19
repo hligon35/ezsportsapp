@@ -1,15 +1,32 @@
 // Stripe Payment Element integration for cards, Apple Pay, Google Pay, PayPal
-const stripe = Stripe('pk_test_your_publishable_key'); // Replace with your real Stripe publishable key
+// Publishable key will be provided by a config endpoint or fallback (dev)
+let stripe;
+async function getStripe() {
+  if (stripe) return stripe;
+  try {
+    const cfg = await fetch('/api/config').then(r=>r.ok?r.json():{ pk: 'pk_test_your_publishable_key' });
+    stripe = Stripe(cfg.pk || 'pk_test_your_publishable_key');
+  } catch {
+    stripe = Stripe('pk_test_your_publishable_key');
+  }
+  return stripe;
+}
 
 function currencyFmt(cents){ return (cents/100).toLocaleString(undefined,{style:'currency',currency:'USD'}); }
 function readCart(){ try{ return JSON.parse(localStorage.getItem('cart')||'[]'); }catch{ return []; } }
+function variantText(i){
+  const parts = [];
+  if ((i.size||'').trim()) parts.push(`Size ${i.size}`);
+  if ((i.color||'').trim()) parts.push(`Color ${i.color}`);
+  return parts.join(', ');
+}
 
 async function initialize() {
   const form = document.getElementById('payment-form');
   const cart = readCart();
 
   // Render order lines (basic id/qty display)
-  const lines = cart.map(i => `<div style="display:flex;justify-content:space-between"><span>${i.id}</span><span>x${i.qty}</span></div>`).join('');
+  const lines = cart.map(i => `<div style="display:flex;justify-content:space-between"><span>${i.id}${variantText(i)?` (${variantText(i)})`:''}</span><span>x${i.qty}</span></div>`).join('');
   document.getElementById('order-lines').innerHTML = lines || '<p>Your cart is empty.</p>';
 
   const getPayload = () => {
@@ -21,7 +38,7 @@ async function initialize() {
   };
 
   // Create PaymentIntent on backend with server-side calculation
-  const intentResp = await fetch('http://68.54.208.207:4242/api/create-payment-intent', {
+  const intentResp = await fetch('/api/create-payment-intent', {
     method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(getPayload())
   }).then(r => r.json());
   if (intentResp.error) {
@@ -33,7 +50,8 @@ async function initialize() {
   document.getElementById('sum-subtotal').textContent = '—';
   document.getElementById('sum-shipping').textContent = '—';
 
-  const elements = stripe.elements({ clientSecret, appearance: { theme: 'stripe' } });
+  const _stripe = await getStripe();
+  const elements = _stripe.elements({ clientSecret, appearance: { theme: 'stripe' } });
   const paymentElement = elements.create('payment', { layout: 'tabs' });
   paymentElement.mount('#payment-element');
 
@@ -41,7 +59,7 @@ async function initialize() {
     e.preventDefault();
     document.getElementById('submit').disabled = true;
     // Record order draft (optional)
-    fetch('http://68.54.208.207:4242/api/order', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(getPayload()) }).catch(()=>{});
+  fetch('/api/order', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(getPayload()) }).catch(()=>{});
     const { error } = await stripe.confirmPayment({
       elements,
       confirmParams: { return_url: window.location.origin + '/checkout.html?success=true' },

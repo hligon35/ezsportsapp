@@ -1,0 +1,16 @@
+{
+  "metadata": {
+    "version": "1.0.0",
+    "created": "2025-08-19T18:58:49.143Z",
+    "lastModified": "2025-08-19T18:58:49.145Z",
+    "autoIncrement": {
+      "users": 1000,
+      "products": 2000,
+      "orders": 3000
+    },
+    "inventoryThresholds": {
+      "low": 10,
+      "critical": 5
+    }
+  }
+}

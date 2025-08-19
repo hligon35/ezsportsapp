@@ -1,5 +1,6 @@
 // Order History: server-backed with graceful fallback
 function currencyFmt(n){ return Number(n||0).toLocaleString(undefined,{style:'currency',currency:'USD'}); }
+const API_BASE = (location.port === '5500') ? 'http://localhost:4242' : '';
 
 function getCurrentUser(){
   try{
@@ -9,7 +10,7 @@ function getCurrentUser(){
 
 async function fetchOrdersServer(){
   try{
-    const res = await fetch('/api/orders/me');
+  const res = await fetch(`${API_BASE}/api/orders/me`, { credentials:'include' });
     if (!res.ok) throw new Error('Not authorized');
     return await res.json();
   }catch(e){ return null; }

@@ -1,5 +1,6 @@
 // Admin panel functionality
 let currentEditingProduct = null;
+const API_BASE = (location.hostname === 'localhost' && location.port === '5500') ? 'http://localhost:4242' : '';
 
 function getCurrentUser() {
   try {
@@ -107,7 +108,7 @@ function renderOrders() {
   params.set('pageSize', 10);
   params.set('sortBy', 'createdAt');
   params.set('sortDir', 'desc');
-  fetch(`/api/orders/admin/all?${params.toString()}`)
+  fetch(`${API_BASE}/api/orders/admin/all?${params.toString()}`, { credentials:'include' })
     .then(res=>{
       if (!res.ok) throw new Error('Unauthorized or failed');
       return res.json();
@@ -150,7 +151,7 @@ function renderOrders() {
           const id = btn.getAttribute('data-update-status');
           const sel = list.querySelector(`select[data-order-id="${id}"]`);
           const newStatus = sel.value;
-          fetch(`/api/orders/${id}/status`, { method:'PATCH', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify({ status:newStatus }) })
+          fetch(`${API_BASE}/api/orders/${id}/status`, { method:'PATCH', headers:{ 'Content-Type':'application/json' }, credentials:'include', body: JSON.stringify({ status:newStatus }) })
             .then(r=>{ if(!r.ok) throw new Error('Failed'); return r.json(); })
             .then(()=>{ renderOrders(); })
             .catch(()=> alert('Failed to update status. Ensure you are logged in as admin.'));
@@ -277,7 +278,7 @@ document.addEventListener('DOMContentLoaded', () => {
   
   // Logout functionality
   document.getElementById('logout-btn').addEventListener('click', () => {
-    fetch('/api/users/logout', { method:'POST' }).finally(()=>{
+  fetch(`${API_BASE}/api/users/logout`, { method:'POST', credentials:'include' }).finally(()=>{
       localStorage.removeItem('currentUser');
       window.location.href = 'index.html';
     });
@@ -291,7 +292,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (statusFilter) statusFilter.addEventListener('change', renderOrders);
   if (refreshBtn) refreshBtn.addEventListener('click', renderOrders);
   // Try to load thresholds from server schema via overview
-  fetch('/api/inventory/overview').then(r=>r.ok?r.json():null).then(data=>{
+  fetch(`${API_BASE}/api/inventory/overview`, { credentials:'include' }).then(r=>r.ok?r.json():null).then(data=>{
     if (data && data.stats) {
       // thresholds not provided by API; keep defaults
     }
@@ -317,7 +318,7 @@ async function renderInventory() {
 
 async function fetchInventoryOverview() {
   try {
-    const response = await fetch('/api/inventory/overview');
+  const response = await fetch(`${API_BASE}/api/inventory/overview`, { credentials:'include' });
     if (!response.ok) {
       console.warn('API not available, using fallback');
       throw new Error('Failed to fetch inventory');
@@ -439,9 +440,10 @@ async function applyStockAdjustment(event) {
 
   try {
     // Try API first
-    const response = await fetch('/api/inventory/adjust', {
+    const response = await fetch(`${API_BASE}/api/inventory/adjust`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
       body: JSON.stringify({
         productId,
         adjustment: { type, quantity },
@@ -505,9 +507,10 @@ function updateThresholds() {
   inventoryThresholds = { low: lowThreshold, critical: criticalThreshold };
   
   // Try to update on server
-  fetch('/api/inventory/thresholds', {
+  fetch(`${API_BASE}/api/inventory/thresholds`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
     body: JSON.stringify({ lowThreshold, criticalThreshold })
   }).then(response => {
     if (response.ok) {
@@ -615,7 +618,7 @@ function processBulkUpdate() {
 
 function showInventoryHistory() {
   // Fetch recent movements from API, fallback to local (none)
-  fetch('/api/inventory/history?limit=100')
+  fetch(`${API_BASE}/api/inventory/history?limit=100`, { credentials:'include' })
     .then(async (res)=>{
       if (!res.ok) throw new Error('status '+res.status);
       const text = await res.text();

@@ -1,5 +1,6 @@
 // Authentication system using server API
 let isRegisterMode = false;
+const API_BASE = (location.hostname === 'localhost' && location.port === '5500') ? 'http://localhost:4242' : '';
 
 function getCurrentUser() {
   try {
@@ -17,14 +18,15 @@ function loginUser(user) {
 }
 
 // API call to server for login
-async function authenticateUser(email, password) {
+async function authenticateUser(identifier, password) {
   try {
-    const response = await fetch('/api/users/login', {
+    const response = await fetch(`${API_BASE}/api/users/login`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ email, password })
+      credentials: 'include',
+  body: JSON.stringify({ identifier, password })
     });
     
     const data = await response.json();
@@ -42,12 +44,13 @@ async function authenticateUser(email, password) {
 // API call to server for registration
 async function registerUser(email, password, name) {
   try {
-    const response = await fetch('/api/users/register', {
+    const response = await fetch(`${API_BASE}/api/users/register`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ email, password, name })
+      credentials: 'include',
+  body: JSON.stringify({ email, password, name })
     });
     
     const data = await response.json();
@@ -102,7 +105,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
-    const email = document.getElementById('email').value;
+  const identifier = document.getElementById('identifier').value;
     const password = document.getElementById('password').value;
     const name = document.getElementById('name').value;
 
@@ -115,14 +118,15 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         
         showMessage('Creating account...', false);
-        const newUser = await registerUser(email, password, name.trim());
+  // Use identifier as email for signup
+  const newUser = await registerUser(identifier, password, name.trim());
         showMessage('Account created successfully!', false);
         setTimeout(() => loginUser(newUser), 1000);
         
       } else {
         // Login
         showMessage('Logging in...', false);
-        const user = await authenticateUser(email, password);
+  const user = await authenticateUser(identifier, password);
         loginUser(user);
       }
     } catch (error) {

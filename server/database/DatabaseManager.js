@@ -3,7 +3,7 @@ const fs = require('fs').promises;
 const path = require('path');
 
 class DatabaseManager {
-  constructor(dbPath = './database') {
+  constructor(dbPath = __dirname) {
     this.dbPath = path.resolve(dbPath);
     this.collections = {
       users: 'users.json',
