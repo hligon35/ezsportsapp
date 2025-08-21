@@ -301,6 +301,7 @@ img{max-width:100%;display:block}
 .cart-row{display:grid;grid-template-columns:64px 1fr auto;gap:.6rem;align-items:center;background:#ffffff;border:1px solid #e6edf6;border-radius:.6rem;padding:.5rem}
 .mini-cart__footer{margin-top:auto;border-top:1px solid #e6edf6;padding:1rem}
 .totals{display:flex;justify-content:space-between;margin-bottom:.6rem}
+.btn-col{display:grid;gap:.5rem}
 
 /* Responsive */
 /* --- Responsive Layout Adjustments --- */

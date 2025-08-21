@@ -137,6 +137,14 @@ const Store = {
     if (!nav) return;
 
     const required = [
+  { href: 'bats.html', text: 'Bats' },
+  { href: 'gloves.html', text: 'Gloves' },
+  { href: 'batting-gloves.html', text: 'Batting Gloves' },
+  { href: 'drip.html', text: 'Drip' },
+  { href: 'gear.html', text: 'Gear' },
+  { href: 'apparel.html', text: 'Apparel' },
+  { href: 'l-screens.html', text: 'L-Screens' },
+  { href: 'facility-field.html', text: 'Facility & Field' },
       { href: 'shop.html', text: 'Shop' },
       { href: 'deals.html', text: 'Deals' },
       { href: 'about.html', text: 'About' },
@@ -196,7 +204,25 @@ const Store = {
     // Resolve current page
     const base = (location.pathname.split('/').pop() || 'index.html').toLowerCase();
     const TITLES = {
-      'index.html': 'Home', 'shop.html': 'Shop', 'deals.html': 'Deals', 'about.html': 'About', 'support.html': 'Support', 'careers.html': 'Careers', 'login.html': 'Login', 'checkout.html': 'Checkout', 'admin.html': 'Admin', 'order-history.html': 'Order History', 'netting-calculator.html': 'Netting Calculator'
+      'index.html': 'Home',
+      'shop.html': 'Shop',
+      'deals.html': 'Deals',
+      'about.html': 'About',
+      'support.html': 'Support',
+      'careers.html': 'Careers',
+      'login.html': 'Login',
+      'checkout.html': 'Checkout',
+      'admin.html': 'Admin',
+      'order-history.html': 'Order History',
+      'netting-calculator.html': 'Netting Calculator',
+      'bats.html': 'Bats',
+      'gloves.html': 'Gloves',
+      'batting-gloves.html': 'Batting Gloves',
+      'drip.html': 'Drip',
+      'gear.html': 'Gear',
+      'apparel.html': 'Apparel',
+      'l-screens.html': 'L-Screens',
+      'facility-field.html': 'Facility & Field'
     };
 
     const crumbs = [];
