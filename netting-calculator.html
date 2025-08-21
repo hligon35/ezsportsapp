@@ -1,0 +1,350 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Custom Netting Calculator — EZ Sports Netting</title>
+  <meta name="description" content="Configure custom sports netting: choose mesh, enter length & width, select rope border, quantity, and fabrication time. Add to cart instantly." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/styles.css?v=5" />
+  <link rel="icon" type="image/svg+xml" href="assets/img/logo.svg" />
+  <link rel="icon" type="image/png" href="assets/img/favicon-32.png" sizes="32x32" />
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+
+  <header class="site-header">
+    <div class="container header-bar">
+      <button class="menu-toggle" aria-label="Toggle menu" aria-expanded="false" aria-controls="primary-nav">☰</button>
+      <a class="brand" href="index.html">
+        <img src="assets/img/logo.svg" alt="EZ Sports Netting logo" height="40"/>
+        <span>EZ Sports Netting</span>
+      </a>
+      <form class="search" role="search" aria-label="Search store" onsubmit="event.preventDefault(); window.Store.search(this.q.value)">
+        <input type="search" name="q" placeholder="Search bats, gloves, helmets…" aria-label="Search"/>
+        <button type="submit" class="btn btn-primary">Search</button>
+      </form>
+      <nav id="primary-nav" class="quick-links" aria-label="Primary">
+        <a href="shop.html">Shop</a>
+        <a href="deals.html">Deals</a>
+        <a href="about.html">About</a>
+        <a href="netting-calculator.html" aria-current="page" class="is-active">Netting Calculator</a>
+        <button class="cart-btn" aria-haspopup="dialog" aria-controls="mini-cart" onclick="Store.toggleCart()">
+          <span class="icon">🛒</span>
+          <span class="cart-count" id="cart-count">0</span>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main" class="container wrap">
+    <h1 class="section-title mt-4">Custom Netting Calculator</h1>
+    <div class="calc-grid">
+      <div class="calc-media">
+        <img src="https://images.unsplash.com/photo-1551892374-5d94925ad893?q=80&w=1400&auto=format&fit=crop" alt="Sports netting example"/>
+        <p class="muted mt-1">Configure your panel on the right. Pricing updates live based on size and options.</p>
+
+        <details class="info-block mt-1">
+          <summary>Netting Gauge Options</summary>
+          <div class="info-content">
+            <article class="gauge">
+              <h3>#18 Square Knotted Nylon</h3>
+              <p class="muted">Break Strength: 155 lbs</p>
+              <ul>
+                <li>Lightweight &amp; Economical</li>
+                <li>Designed for Overhead &amp; Barrier Applications</li>
+                <li>Not Recommended for Direct Impact or High Usage</li>
+              </ul>
+            </article>
+            <article class="gauge">
+              <h3>#21 Square Knotted Nylon</h3>
+              <p class="muted">Break Strength: 185 lbs</p>
+              <ul>
+                <li>Lightweight &amp; Economical</li>
+                <li>Designed for Overhead, Barrier Applications, &amp; Economical Backstops</li>
+                <li>Not Recommended for Direct Impact or High Usage</li>
+              </ul>
+            </article>
+            <article class="gauge">
+              <h3>#30 Square Knotted Nylon</h3>
+              <p class="muted">Break Strength: 269 lbs</p>
+              <ul>
+                <li>Backstop &amp; Barrier Netting</li>
+                <li>Perfect blend of weight, twine diameter, and break strength for backstop applications</li>
+                <li>Not recommended for areas with high impact</li>
+              </ul>
+            </article>
+            <article class="gauge">
+              <h3>NOVA 24 Square Knotted</h3>
+              <p class="muted">Break Strength: 265 lbs</p>
+              <ul>
+                <li>Backstop &amp; Barrier Netting</li>
+                <li>Perfect blend of weight, twine diameter, and break strength for backstop applications</li>
+                <li>Does not absorb moisture, minimal elongation, 15% lighter than #30 nylon, and has 10× more abrasion resistance</li>
+                <li>Not recommended for areas with high impact</li>
+              </ul>
+            </article>
+            <article class="gauge">
+              <h3>#36 Square Knotted Nylon</h3>
+              <p class="muted">Break Strength: 320 lbs</p>
+              <ul>
+                <li>Backstop Netting &amp; High Impact Barrier Netting</li>
+              </ul>
+            </article>
+            <article class="gauge">
+              <h3>#42 Square Knotted Nylon</h3>
+              <p class="muted">Break Strength: 359 lbs</p>
+              <ul>
+                <li>High Impact Netting Panels &amp; Containment Netting</li>
+                <li>Typically used in commercial batting cage netting</li>
+                <li>Not recommended for large outdoor netting systems due to increased weight and twine diameter</li>
+              </ul>
+            </article>
+            <article class="gauge">
+              <h3>NOVA 30 Square Knotted</h3>
+              <p class="muted">Break Strength: 331 lbs</p>
+              <ul>
+                <li>High Impact Netting Panels &amp; Containment Netting</li>
+                <li>Typically used in commercial batting cage netting</li>
+                <li>Does not absorb moisture, minimal elongation, 15% lighter than #42 nylon, and has 10× more abrasion resistance</li>
+              </ul>
+            </article>
+            <article class="gauge">
+              <h3>#60 Square Knotted Nylon</h3>
+              <p class="muted">Break Strength: 502 lbs</p>
+              <ul>
+                <li>Very High Impact Netting Panels &amp; Containment Netting</li>
+                <li>Typically used in high usage commercial &amp; collegiate batting cage netting</li>
+                <li>Not recommended for large outdoor netting systems due to increased weight and twine diameter</li>
+              </ul>
+            </article>
+            <article class="gauge">
+              <h3>#96 Square Knotted Nylon</h3>
+              <p class="muted">Break Strength: 838 lbs</p>
+              <ul>
+                <li>Extreme High Impact Netting Panels, Heavy Duty Containment Netting, &amp; Fall Protection</li>
+                <li>Typically used in high usage Professional batting cage netting</li>
+                <li>Not recommended for large outdoor netting systems due to increased weight and twine diameter</li>
+              </ul>
+            </article>
+            <article class="gauge">
+              <h3>DynaLite Square Knotted</h3>
+              <p class="muted">Break Strength: 176 lbs</p>
+              <ul>
+                <li>Designed for overhead netting to protect spectators</li>
+                <li>Extremely lightweight material without sacrificing break strength or abrasion resistance (1/3 the weight of #18 Nylon with a 15% higher break strength)</li>
+                <li>Minimal elongation and moisture absorption</li>
+              </ul>
+            </article>
+            <article class="gauge">
+              <h3>Dyneema #18 Square Knotted</h3>
+              <p class="muted">Break Strength: 375 lbs</p>
+              <ul>
+                <li>Designed for professional‑style backstop applications</li>
+                <li>Extremely lightweight material without sacrificing break strength or abrasion resistance (½ the weight of #30 Nylon with a 40% higher break strength)</li>
+                <li>Minimal elongation and moisture absorption</li>
+              </ul>
+            </article>
+          </div>
+        </details>
+
+        <details class="info-block mt-1">
+          <summary>Rope Border Options</summary>
+          <div class="info-content">
+            <article class="gauge">
+              <h3>Woven Border</h3>
+              <p>
+                Standard border option. 5/16 Polyester rope hand woven through each individual netting mesh
+                along the entire perimeter of the netting and secured at each corner via heavy-duty UV treated zip tie.
+              </p>
+            </article>
+            <article class="gauge">
+              <h3>Sewn Border</h3>
+              <p>
+                Recommended border option. 5/16 Polyester rope machine sewn and lock stitched (each stitch approx. every 1 cm)
+                around the entire perimeter.
+              </p>
+            </article>
+          </div>
+        </details>
+      </div>
+      <section class="calc-card" aria-labelledby="calc-title">
+        <h2 id="calc-title" class="calc-title">Netting Panel Options</h2>
+
+        <form id="net-form" class="calc-form" onsubmit="event.preventDefault()">
+          <!-- Mesh / Sport -->
+          <label class="form-row">
+            <span>Sport / Mesh Size</span>
+            <select id="mesh" required>
+              <!-- options populated by JS -->
+            </select>
+          </label>
+          <label class="form-row hidden" id="usage-wrap">
+            <span>Usage</span>
+            <select id="usage">
+              <option value="">— Select —</option>
+              <option value="barrier">Barrier / Backstop</option>
+              <option value="impact">Direct Impact</option>
+              <option value="overhead">Overhead</option>
+              <option value="other">Other / All Options</option>
+            </select>
+          </label>
+
+          <!-- Length -->
+          <fieldset class="form-row">
+            <legend>Length</legend>
+            <div class="dims">
+              <input id="len-ft" type="number" min="1" step="1" value="10" aria-label="Length feet"/>
+              <span class="unit">ft</span>
+              <input id="len-in" type="number" min="0" max="11" step="1" value="0" aria-label="Length inches"/>
+              <span class="unit">in</span>
+            </div>
+          </fieldset>
+
+          <!-- Width -->
+          <fieldset class="form-row">
+            <legend>Width</legend>
+            <div class="dims">
+              <input id="wid-ft" type="number" min="1" step="1" value="10" aria-label="Width feet"/>
+              <span class="unit">ft</span>
+              <input id="wid-in" type="number" min="0" max="11" step="1" value="0" aria-label="Width inches"/>
+              <span class="unit">in</span>
+            </div>
+          </fieldset>
+
+          <!-- Rope Border -->
+          <fieldset class="form-row">
+            <legend>Rope Border</legend>
+            <div class="choices">
+              <label class="choice">
+                <input type="radio" name="border" value="regular" checked />
+                <span>Regular</span>
+              </label>
+              <label class="choice">
+                <input type="radio" name="border" value="sewn" />
+                <span>Sewn</span>
+              </label>
+            </div>
+          </fieldset>
+
+          <!-- Quantity -->
+          <label class="form-row">
+            <span>Quantity of Panels</span>
+            <div class="qty">
+              <button type="button" class="icon-btn" id="qty-dec" aria-label="Decrease">−</button>
+              <input id="qty" type="number" min="1" step="1" value="1" aria-label="Quantity"/>
+              <button type="button" class="icon-btn" id="qty-inc" aria-label="Increase">+</button>
+            </div>
+          </label>
+
+          <!-- Fabrication Time -->
+          <fieldset class="form-row">
+            <legend>Estimated Fabrication Time</legend>
+            <label class="radio">
+              <input type="radio" name="fab" value="standard" checked />
+              <span>7–10 Days (FREE)</span>
+            </label>
+            <label class="radio">
+              <input type="radio" name="fab" value="expedited" />
+              <span>3–6 Days (Expedited) <strong>+$25</strong></span>
+            </label>
+          </fieldset>
+
+          <!-- Summary -->
+          <div class="summary" aria-live="polite">
+            <div><span>Area</span><strong id="sum-area">100 sq ft</strong></div>
+            <div><span>Mesh</span><strong id="sum-mesh">—</strong></div>
+            <div><span>Border</span><strong id="sum-border">—</strong></div>
+            <div><span>Perimeter</span><strong id="sum-perim">40 ft</strong></div>
+            <div><span>Qty</span><strong id="sum-qty">1</strong></div>
+            <div class="total"><span>Total</span><strong id="sum-total">$0.00</strong></div>
+          </div>
+
+          <div class="actions">
+            <button id="add-cart" type="button" class="btn btn-primary btn-block">Add Configured Net To Cart</button>
+          </div>
+        </form>
+      </section>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-grid">
+      <div>
+        <a class="brand brand--light" href="index.html">
+          <img src="assets/img/logo.svg" alt="EZ Sports Netting logo" height="36"/>
+          <span>EZ Sports Netting</span>
+        </a>
+        <p class="muted">Better baseball through better gear.</p>
+      </div>
+      <nav aria-label="Footer">
+        <h4>Shop</h4>
+        <ul>
+          <li><a href="shop.html#catalog" onclick="Store.filter('bats')">Bats</a></li>
+          <li><a href="shop.html#catalog" onclick="Store.filter('gloves')">Gloves</a></li>
+          <li><a href="shop.html#catalog" onclick="Store.filter('netting')">Netting</a></li>
+          <li><a href="shop.html#catalog" onclick="Store.filter('helmets')">Helmets</a></li>
+        </ul>
+      </nav>
+      <nav>
+        <h4>Company</h4>
+        <ul>
+          <li><a href="about.html">About</a></li>
+          <li><a href="careers.html">Careers</a></li>
+          <li><a href="support.html">Support</a></li>
+        </ul>
+      </nav>
+      <form class="subscribe" onsubmit="event.preventDefault(); alert('Thanks for subscribing!')">
+        <h4>Get deals in your inbox</h4>
+        <div class="row">
+          <input type="email" placeholder="you@email.com" required />
+          <button class="btn btn-primary" type="submit">Subscribe</button>
+        </div>
+      </form>
+    </div>
+    <div class="subfooter container">
+      <p>© <span id="year"></span> EZ Sports Netting. All rights reserved.</p>
+      <div class="socials" aria-label="social links">
+        <a href="#" aria-label="Instagram">📸</a>
+        <a href="#" aria-label="YouTube">▶️</a>
+        <a href="#" aria-label="X">𝕏</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Mini cart -->
+  <dialog id="mini-cart" class="mini-cart" aria-labelledby="cart-title">
+    <form method="dialog" class="mini-cart__backdrop" onclick="this.closest('dialog').close()"></form>
+    <section class="mini-cart__panel" role="document">
+      <header>
+        <h3 id="cart-title">Your cart</h3>
+        <button class="icon-btn" onclick="document.getElementById('mini-cart').close()" aria-label="Close">✕</button>
+      </header>
+      <div id="cart-items" class="mini-cart__items"></div>
+      <footer class="mini-cart__footer">
+        <div class="totals">
+          <span>Subtotal</span>
+          <strong id="cart-subtotal">$0.00</strong>
+        </div>
+  <div class="stack-05">
+          <button class="btn btn-primary btn-block" onclick="Store.checkout()">Secure Checkout</button>
+          <a class="btn btn-ghost btn-block" href="shop.html#catalog">Continue Shopping</a>
+        </div>
+      </footer>
+    </section>
+  </dialog>
+
+  <script type="module" src="assets/js/app.js"></script>
+  <script type="module" src="assets/js/netting-calculator.js"></script>
+  <script>
+    if('serviceWorker' in navigator){
+      window.addEventListener('load',()=>{
+        navigator.serviceWorker.register('service-worker.js').catch(err=>console.warn('SW registration failed', err));
+      });
+    }
+  </script>
+  <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+</body>
+</html>

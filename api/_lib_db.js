@@ -22,9 +22,20 @@ async function ensureSchema() {
       user_email TEXT,
       items JSONB NOT NULL,
       total_cents INTEGER NOT NULL,
-      created_at TIMESTAMPTZ DEFAULT now()
+    status TEXT DEFAULT 'pending',
+    stripe_pi_id TEXT,
+    customer_name TEXT,
+    shipping JSONB,
+    summary TEXT,
+    created_at TIMESTAMPTZ DEFAULT now()
     );
   `;
+  // Add missing columns if upgrading
+  await sql`ALTER TABLE orders ADD COLUMN IF NOT EXISTS status TEXT DEFAULT 'pending';`;
+  await sql`ALTER TABLE orders ADD COLUMN IF NOT EXISTS stripe_pi_id TEXT;`;
+  await sql`ALTER TABLE orders ADD COLUMN IF NOT EXISTS customer_name TEXT;`;
+  await sql`ALTER TABLE orders ADD COLUMN IF NOT EXISTS shipping JSONB;`;
+  await sql`ALTER TABLE orders ADD COLUMN IF NOT EXISTS summary TEXT;`;
 }
 
 async function findUserByIdentifier(identifier) {
@@ -67,13 +78,25 @@ function publicUser(u){
   };
 }
 
-async function createOrderRecord({ userEmail, items, totalCents }) {
+async function createOrderRecord({ userEmail, items, totalCents, customerName, shipping, stripePiId, status='pending', summary }) {
   const { rows } = await sql`
-    INSERT INTO orders (user_email, items, total_cents)
-    VALUES (${userEmail||null}, ${JSON.stringify(items)}, ${totalCents})
-    RETURNING id, created_at;
+    INSERT INTO orders (user_email, items, total_cents, customer_name, shipping, stripe_pi_id, status, summary)
+    VALUES (${userEmail||null}, ${JSON.stringify(items)}, ${totalCents}, ${customerName||null}, ${shipping?JSON.stringify(shipping):null}, ${stripePiId||null}, ${status}, ${summary||null})
+    RETURNING id, created_at, status;
   `;
   return rows[0];
+}
+
+async function updateOrderStripePi(id, stripePiId) {
+  await sql`UPDATE orders SET stripe_pi_id=${stripePiId} WHERE id=${id};`;
+}
+
+async function updateOrderStatus(id, status) {
+  await sql`UPDATE orders SET status=${status} WHERE id=${id};`;
+}
+
+async function markOrderPaidByPi(piId) {
+  await sql`UPDATE orders SET status='paid' WHERE stripe_pi_id=${piId};`;
 }
 
 module.exports = {
@@ -83,5 +106,8 @@ module.exports = {
   updateLastLogin,
   verifyPassword,
   publicUser,
-  createOrderRecord
+  createOrderRecord,
+  updateOrderStripePi,
+  updateOrderStatus,
+  markOrderPaidByPi
 };

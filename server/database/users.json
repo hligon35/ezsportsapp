@@ -20,5 +20,27 @@
     "lastName": "User",
     "role": "user",
     "createdAt": "2025-08-13T02:57:41.655Z"
+  },
+  {
+    "email": "demo@ezsportsapp.test",
+    "password": "$2b$10$N3QMGeBw295/MLc7BZAroudSadEiBNr.uki9UzbSlaYBsHPTap0f2",
+    "name": "Demo User",
+    "isAdmin": false,
+    "lastLogin": null,
+    "createdAt": "2025-08-21T01:17:02.424Z",
+    "updatedAt": "2025-08-21T01:17:02.424Z",
+    "id": 1001
+  },
+  {
+    "id": "user_demo_admin",
+    "email": "demo.admin@ezsportsapp.test",
+    "username": "demoadmin",
+    "password": "$2b$10$oTfY/cJ4d20i0USVn9jpKe8QUZdRb5MKwLJTxhs0CDmjuOqIDcGu2",
+    "firstName": "Demo",
+    "lastName": "Admin",
+    "role": "admin",
+    "createdAt": "2025-08-21T01:30:00.000Z",
+    "lastLogin": "2025-08-21T01:46:47.797Z",
+    "updatedAt": "2025-08-21T01:46:47.797Z"
   }
 ]

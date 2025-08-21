@@ -31,11 +31,13 @@ const Store = {
     cart: JSON.parse(localStorage.getItem('cart') || '[]'),
     user: null,
   },
-  keyFor(item){
-    const size = (item.size||'').trim() || '-';
-    const color = (item.color||'').trim() || '-';
+
+  keyFor(item) {
+    const size = (item.size || '').trim() || '-';
+    const color = (item.color || '').trim() || '-';
     return `${item.id}__${size}__${color}`;
   },
+
   init() {
     // Load current user
     try {
@@ -49,32 +51,33 @@ const Store = {
       count: document.getElementById('cart-count'),
       items: document.getElementById('cart-items'),
       subtotal: document.getElementById('cart-subtotal'),
-      dialog: document.getElementById('mini-cart')
+      dialog: document.getElementById('mini-cart'),
     };
 
-  // Ensure core nav links exist on all pages and highlight active
-  this.ensureCoreNav();
-  // Update navigation for authenticated users
-  this.updateNavigation();
+    // Ensure layout and nav
+    this.ensureHeaderLayout();
+    this.ensureCoreNav();
+    this.ensureBreadcrumbs();
+    this.updateNavigation();
 
     // Refresh products from admin updates
     PRODUCTS = getProducts();
 
     // Mobile nav toggle
     const toggle = document.querySelector('.menu-toggle');
-    const nav = document.getElementById('primary-nav');
-    if(toggle && nav){
-      toggle.addEventListener('click', ()=>{
+    const nav = document.getElementById('primary-nav') || document.querySelector('nav.quick-links');
+    if (toggle && nav) {
+      toggle.addEventListener('click', () => {
         const open = nav.classList.toggle('is-open');
         document.body.classList.toggle('nav-open', open);
         toggle.setAttribute('aria-expanded', String(open));
       });
       // Close nav when a link is chosen
-      nav.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>{
-        if(nav.classList.contains('is-open')){
+      nav.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+        if (nav.classList.contains('is-open')) {
           nav.classList.remove('is-open');
           document.body.classList.remove('nav-open');
-          toggle.setAttribute('aria-expanded','false');
+          toggle.setAttribute('aria-expanded', 'false');
         }
       }));
     }
@@ -94,7 +97,7 @@ const Store = {
     }));
 
     // Category tiles
-    document.querySelectorAll('.tile').forEach(tile => tile.addEventListener('click', (e) => {
+    document.querySelectorAll('.tile').forEach(tile => tile.addEventListener('click', () => {
       const c = tile.dataset.filter; if (!c) return;
       this.filter(c);
     }));
@@ -102,17 +105,66 @@ const Store = {
     // Footer year
     const y = document.getElementById('year');
     if (y) y.textContent = new Date().getFullYear();
-
-    // Expose for console
-    window.Store = this;
-    window.PRODUCTS = PRODUCTS;
   },
-  updateNavigation() {
-    const nav = document.getElementById('primary-nav');
+
+  ensureHeaderLayout() {
+    const header = document.querySelector('.site-header .header-bar');
+    if (!header) return;
+
+    // Ensure actions container exists
+    let actions = document.getElementById('header-actions');
+    if (!actions) {
+      actions = document.createElement('div');
+      actions.id = 'header-actions';
+      actions.className = 'header-actions';
+      // Insert after search form if present, else at end
+      const search = header.querySelector('.search');
+      if (search && search.nextSibling) {
+        header.insertBefore(actions, search.nextSibling);
+      } else {
+        header.appendChild(actions);
+      }
+    }
+
+    // Move cart button out of nav into actions (if present)
+    const nav = document.getElementById('primary-nav') || header.querySelector('nav.quick-links');
+    const cartBtn = nav ? nav.querySelector('.cart-btn') : null;
+    if (cartBtn) actions.appendChild(cartBtn);
+  },
+
+  ensureCoreNav() {
+    const nav = document.getElementById('primary-nav') || document.querySelector('nav.quick-links');
     if (!nav) return;
 
-    // Remove existing auth elements
-    nav.querySelectorAll('.auth-link, .user-menu').forEach(el => el.remove());
+    const required = [
+      { href: 'shop.html', text: 'Shop' },
+      { href: 'deals.html', text: 'Deals' },
+      { href: 'about.html', text: 'About' },
+      { href: 'netting-calculator.html', text: 'Calculator' },
+    ];
+
+    const existingHrefs = Array.from(nav.querySelectorAll('a')).map(a => a.getAttribute('href'));
+    required.forEach(link => {
+      if (!existingHrefs.includes(link.href)) {
+        const a = document.createElement('a');
+        a.href = link.href;
+        a.textContent = link.text;
+        nav.appendChild(a);
+      }
+    });
+
+    // Highlight current page
+    const path = location.pathname.split('/').pop() || 'index.html';
+    const active = Array.from(nav.querySelectorAll('a')).find(a => (a.getAttribute('href') || '').endsWith(path));
+    if (active) { active.classList.add('is-active'); active.setAttribute('aria-current', 'page'); }
+  },
+
+  updateNavigation() {
+    const actions = document.getElementById('header-actions') || document.querySelector('.header-actions');
+    if (!actions) return;
+
+    // Remove existing auth elements from actions
+    actions.querySelectorAll('.auth-link, .user-menu').forEach(el => el.remove());
 
     if (this.state.user) {
       // User is logged in
@@ -124,61 +176,80 @@ const Store = {
         ${this.state.user.isAdmin ? '<a href="admin.html" class="auth-link">Admin</a>' : ''}
         <button class="auth-link btn btn-ghost" onclick="Store.logout()">Logout</button>
       `;
-      nav.appendChild(userMenu);
+      actions.appendChild(userMenu);
     } else {
       // User is not logged in
       const loginLink = document.createElement('a');
       loginLink.href = 'login.html';
       loginLink.className = 'auth-link';
       loginLink.textContent = 'Login';
-      nav.appendChild(loginLink);
+      actions.appendChild(loginLink);
     }
   },
-  ensureCoreNav(){
-    const nav = document.getElementById('primary-nav') || document.querySelector('nav.quick-links');
-    if (!nav) return;
-    const required = [
-      { href: 'shop.html', text: 'Shop' },
-      { href: 'deals.html', text: 'Deals' },
-      { href: 'about.html', text: 'About' },
-    ];
-    // Insert any missing core links before cart/login controls
-    const existingHrefs = Array.from(nav.querySelectorAll('a')).map(a=>a.getAttribute('href'));
-    const cartBtn = nav.querySelector('.cart-btn');
-    required.forEach(link => {
-      if (!existingHrefs.includes(link.href)){
-        const a = document.createElement('a');
-        a.href = link.href; a.textContent = link.text;
-        if (cartBtn) nav.insertBefore(a, cartBtn); else nav.appendChild(a);
+
+  ensureBreadcrumbs() {
+    // Avoid duplicates
+    if (document.querySelector('nav.breadcrumbs')) return;
+    const main = document.querySelector('main#main') || document.querySelector('main');
+    if (!main) return;
+
+    // Resolve current page
+    const base = (location.pathname.split('/').pop() || 'index.html').toLowerCase();
+    const TITLES = {
+      'index.html': 'Home', 'shop.html': 'Shop', 'deals.html': 'Deals', 'about.html': 'About', 'support.html': 'Support', 'careers.html': 'Careers', 'login.html': 'Login', 'checkout.html': 'Checkout', 'admin.html': 'Admin', 'order-history.html': 'Order History', 'netting-calculator.html': 'Netting Calculator'
+    };
+
+    const crumbs = [];
+    crumbs.push({ label: 'Home', href: 'index.html' });
+    if (base !== 'index.html') {
+      crumbs.push({ label: TITLES[base] || (document.title?.split('—')[0].trim() || 'Current'), href: null });
+    }
+
+    // Build DOM
+    const nav = document.createElement('nav');
+    nav.className = 'breadcrumbs container wrap';
+    nav.setAttribute('aria-label', 'Breadcrumb');
+    const ol = document.createElement('ol');
+    ol.className = 'crumbs';
+    crumbs.forEach((c, idx) => {
+      const li = document.createElement('li');
+      if (c.href && idx < crumbs.length - 1) {
+        const a = document.createElement('a'); a.href = c.href; a.textContent = c.label; li.appendChild(a);
+      } else {
+        const span = document.createElement('span'); span.textContent = c.label; span.setAttribute('aria-current', 'page'); li.appendChild(span);
       }
+      ol.appendChild(li);
     });
-    // Highlight current page
-    const path = location.pathname.split('/').pop() || 'index.html';
-    const active = Array.from(nav.querySelectorAll('a')).find(a => (a.getAttribute('href')||'').endsWith(path));
-    if (active) { active.classList.add('is-active'); active.setAttribute('aria-current','page'); }
+    nav.appendChild(ol);
+    // Insert before main
+    main.parentNode.insertBefore(nav, main);
   },
+
   logout() {
     localStorage.removeItem('currentUser');
     this.state.user = null;
     this.updateNavigation();
     window.location.href = 'index.html';
   },
+
   filter(category) {
     this.state.filter = category || 'all';
     document.querySelectorAll('.chip').forEach(x => x.classList.toggle('is-active', x.dataset.chip === this.state.filter));
-  this.renderProducts();
+    this.renderProducts();
     // Jump to catalog
-  const cat = document.getElementById('catalog');
-  if (cat) cat.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    const cat = document.getElementById('catalog');
+    if (cat) cat.scrollIntoView({ behavior: 'smooth', block: 'start' });
   },
+
   search(q) {
     this.state.filter = 'all';
     this.renderProducts(q);
-  const cat = document.getElementById('catalog');
-  if (cat) cat.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    const cat = document.getElementById('catalog');
+    if (cat) cat.scrollIntoView({ behavior: 'smooth', block: 'start' });
   },
+
   renderProducts(query = '') {
-  if (!this.ui.grid) return;
+    if (!this.ui.grid) return;
     const list = PRODUCTS.filter(p =>
       (this.state.filter === 'all' || p.category === this.state.filter) &&
       p.title.toLowerCase().includes(query.toLowerCase())
@@ -191,16 +262,16 @@ const Store = {
         </div>
         <div class="body">
           <h3 style="margin:0 0 .25rem;font-size:1rem">${p.title}</h3>
-          ${p.stock !== undefined ? `<p style="font-size:.8rem;color:#666;margin:.25rem 0;">Stock: ${p.stock}</p>` : ''}
+          ${p.stock !== undefined ? `<p style=\"font-size:.8rem;color:#666;margin:.25rem 0;\">Stock: ${p.stock}</p>` : ''}
           <div class="variant-row" style="display:flex; gap:.5rem; align-items:center; margin:.25rem 0;">
             <label style="font-size:.8rem; color:#555;">Size
               <select class="sel-size" style="margin-left:.25rem;">
-                ${['XS','S','M','L','XL'].map(s=>`<option value="${s}">${s}</option>`).join('')}
+                ${['XS','S','M','L','XL'].map(s=>`<option value=\"${s}\">${s}</option>`).join('')}
               </select>
             </label>
             <label style="font-size:.8rem; color:#555;">Color
               <select class="sel-color" style="margin-left:.25rem;">
-                ${['Black','White','Red','Blue','Green'].map(c=>`<option value="${c}">${c}</option>`).join('')}
+                ${['Black','White','Red','Blue','Green'].map(c=>`<option value=\"${c}\">${c}</option>`).join('')}
               </select>
             </label>
           </div>
@@ -227,6 +298,7 @@ const Store = {
       this.add(product, opts);
     }));
   },
+
   add(product, opts = {}) {
     const candidate = { id: product.id, size: opts.size, color: opts.color };
     const key = this.keyFor(candidate);
@@ -236,30 +308,35 @@ const Store = {
     this.renderCart();
     this.openCart();
   },
+
   removeByKey(key) {
     this.state.cart = this.state.cart.filter(i => this.keyFor(i) !== key);
     this.persist();
     this.renderCart();
   },
-  persist(){
+
+  persist() {
     localStorage.setItem('cart', JSON.stringify(this.state.cart));
   },
-  get cartDetailed(){
+
+  get cartDetailed() {
     return this.state.cart.map(i => ({ ...i, product: PRODUCTS.find(p => p.id === i.id) }));
   },
-  get subtotal(){
+
+  get subtotal() {
     return this.cartDetailed.reduce((sum, i) => sum + (i.product.price * i.qty), 0);
   },
-  renderCart(){
+
+  renderCart() {
     const rows = this.cartDetailed.map(i => {
       const key = this.keyFor(i);
-      const variant = `${(i.size||'').trim()?`Size: ${i.size} `:''}${(i.color||'').trim()?`Color: ${i.color}`:''}`.trim();
+      const variant = `${(i.size || '').trim() ? `Size: ${i.size} ` : ''}${(i.color || '').trim() ? `Color: ${i.color}` : ''}`.trim();
       return `
       <div class="cart-row">
         <img src="${i.product.img}" alt="${i.product.title}" width="64" height="64" style="border-radius:.4rem;object-fit:cover"/>
         <div>
           <strong>${i.product.title}</strong>
-          ${variant ? `<div style="font-size:.8rem;color:#555;">${variant}</div>` : ''}
+          ${variant ? `<div style=\"font-size:.8rem;color:#555;\">${variant}</div>` : ''}
           <div style="opacity:.8">Qty: <button class="icon-btn" data-dec="${key}">−</button> ${i.qty} <button class="icon-btn" data-inc="${key}">+</button></div>
         </div>
         <div style="text-align:right">
@@ -267,31 +344,39 @@ const Store = {
           <button class="btn btn-ghost" data-remove="${key}">Remove</button>
         </div>
       </div>
-    `}).join('');
+    `;
+    }).join('');
 
-    this.ui.items.innerHTML = rows || '<p>Your cart is empty.</p>';
-    this.ui.count.textContent = String(this.state.cart.reduce((s,i)=>s+i.qty,0));
-    this.ui.subtotal.textContent = currency.format(this.subtotal);
+    if (this.ui.items) this.ui.items.innerHTML = rows || '<p>Your cart is empty.</p>';
+    if (this.ui.count) this.ui.count.textContent = String(this.state.cart.reduce((s, i) => s + i.qty, 0));
+    if (this.ui.subtotal) this.ui.subtotal.textContent = currency.format(this.subtotal);
 
     // Bind buttons
-    this.ui.items.querySelectorAll('[data-remove]').forEach(b=>b.addEventListener('click',()=>this.removeByKey(b.dataset.remove)));
-    this.ui.items.querySelectorAll('[data-inc]').forEach(b=>b.addEventListener('click',()=>{const it=this.state.cart.find(x=>this.keyFor(x)===b.dataset.inc);if(!it)return;it.qty++;this.persist();this.renderCart();}));
-    this.ui.items.querySelectorAll('[data-dec]').forEach(b=>b.addEventListener('click',()=>{const it=this.state.cart.find(x=>this.keyFor(x)===b.dataset.dec);if(!it)return;it.qty=Math.max(0,it.qty-1);if(it.qty===0)this.removeByKey(this.keyFor(it));else{this.persist();this.renderCart();}}));
+    if (this.ui.items) {
+      this.ui.items.querySelectorAll('[data-remove]').forEach(b => b.addEventListener('click', () => this.removeByKey(b.dataset.remove)));
+      this.ui.items.querySelectorAll('[data-inc]').forEach(b => b.addEventListener('click', () => { const it = this.state.cart.find(x => this.keyFor(x) === b.dataset.inc); if (!it) return; it.qty++; this.persist(); this.renderCart(); }));
+      this.ui.items.querySelectorAll('[data-dec]').forEach(b => b.addEventListener('click', () => { const it = this.state.cart.find(x => this.keyFor(x) === b.dataset.dec); if (!it) return; it.qty = Math.max(0, it.qty - 1); if (it.qty === 0) this.removeByKey(this.keyFor(it)); else { this.persist(); this.renderCart(); } }));
+    }
   },
-  toggleCart(){
+
+  toggleCart() {
+    if (!this.ui.dialog) return;
     this.ui.dialog.open ? this.ui.dialog.close() : this.ui.dialog.showModal();
   },
-  openCart(){
-    if(!this.ui.dialog.open) this.ui.dialog.showModal();
+
+  openCart() {
+    if (!this.ui.dialog) return;
+    if (!this.ui.dialog.open) this.ui.dialog.showModal();
   },
-  checkout(){
-    try{
+
+  checkout() {
+    try {
       const cents = Math.round(this.subtotal * 100);
       localStorage.setItem('checkoutTotalCents', String(cents));
       // persist cart for the checkout page
       this.persist();
       window.location.href = 'checkout.html';
-    }catch(e){
+    } catch (e) {
       alert('Unable to proceed to checkout.');
       console.error(e);
     }

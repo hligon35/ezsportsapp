@@ -37,17 +37,23 @@
       <h2 id="auth-title">Login</h2>
       <form id="auth-form" class="auth-form">
         <input type="text" id="identifier" placeholder="Email or username" required />
-        <input type="password" id="password" placeholder="Password" required />
-        <div id="name-field" style="display:none;">
+        <div>
+          <input type="password" id="password" placeholder="Password" required />
+          <label class="auth-peek">
+            <input type="checkbox" id="peek-password" /> Show password
+          </label>
+        </div>
+        <div id="name-field" class="hidden">
           <input type="text" id="name" placeholder="Full Name" />
         </div>
         <button type="submit" class="btn btn-primary">Login</button>
+        <button id="demo-login" type="button" class="btn mt-1">Use demo account</button>
       </form>
       <div class="auth-toggle">
         <span id="toggle-text">Don't have an account?</span>
         <a href="#" id="toggle-link">Sign up</a>
       </div>
-      <div id="auth-message" style="margin-top:1rem;color:red;text-align:center;"></div>
+  <div id="auth-message" class="mt-4 text-error text-center"></div>
     </div>
   </main>
   <script type="module" src="assets/js/auth.js"></script>

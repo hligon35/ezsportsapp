@@ -34,11 +34,14 @@ async function renderOrders(){
   list.innerHTML = orders.map(order => `
     <div class="order-card">
       <div class="order-header">
-        <span><strong>Order #${order.id}</strong></span>
+        <span><strong>Order #${order.id}</strong>${order.status ? ` · <em class="muted">${order.status}</em>` : ''}</span>
         <span>${new Date(order.createdAt || order.date).toLocaleString()}</span>
       </div>
       <div class="order-items">
-        ${order.items.map(i => `<div class="order-item"><span>${i.qty} × ${i.id}</span><span>${currencyFmt((i.price||0) * i.qty)}</span></div>`).join('')}
+        ${order.items.map(i => {
+          const variant = [i.size, i.color].filter(Boolean).join('/');
+          return `<div class="order-item"><span>${i.qty} × ${i.id}${variant ? ` (${variant})` : ''}</span><span>${currencyFmt((i.price||0) * i.qty)}</span></div>`
+        }).join('')}
       </div>
       <div style="margin-top:.5rem;text-align:right"><strong>Total: ${currencyFmt(order.total)}</strong></div>
     </div>

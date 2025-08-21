@@ -1,4 +1,5 @@
 const { ensureSchema, findUserByIdentifier, verifyPassword, updateLastLogin, publicUser } = require('../_lib_db');
+const { signSession, setSessionCookie } = require('../_lib_auth');
 
 module.exports = async function handler(req, res) {
   if (req.method === 'OPTIONS') {
@@ -18,7 +19,10 @@ module.exports = async function handler(req, res) {
     const ok = await verifyPassword(user, password);
     if (!ok) return res.status(401).json({ message: 'Invalid credentials' });
     await updateLastLogin(user.id);
-    const pub = publicUser(user);
+  const pub = publicUser(user);
+  // Set JWT session cookie
+  const token = signSession(pub);
+  setSessionCookie(res, token);
     return res.status(200).json({ user: pub });
   } catch (e) {
     console.error(e);
