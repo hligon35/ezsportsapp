@@ -288,8 +288,10 @@ img{max-width:100%;display:block}
 .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-top:1rem}
 .card{background:var(--surface);border:1px solid var(--border);border-radius:1rem;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 8px 24px rgba(12,32,64,.06)}
 .card .media{background:#ffffff}
-.card .body{padding:.9rem}
-.price-row{display:flex;justify-content:space-between;align-items:center;margin-top:.4rem}
+.card .media img{width:100%;height:auto;aspect-ratio:4/3;object-fit:cover;display:block}
+.card .body{padding:.9rem;display:flex;flex-direction:column;flex:1}
+.price-row{display:flex;justify-content:space-between;align-items:center;margin-top:auto;padding-top:.4rem}
+.price-row .btn{white-space:nowrap}
 .price{font-weight:800;letter-spacing:.2px}
 .was-price{opacity:.7;text-decoration:line-through}
 .badge{background:var(--red);color:#fff;border-radius:.4rem;padding:.15rem .35rem;font-size:.72rem;font-weight:800}
