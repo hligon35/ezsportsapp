@@ -235,9 +235,8 @@ const Store = {
 
     // Resolve current page
     const base = (location.pathname.split('/').pop() || 'index.html').toLowerCase();
-    const TITLES = {
+  const TITLES = {
       'index.html': 'Home',
-      'shop.html': 'Shop',
       'deals.html': 'Deals',
       'about.html': 'About',
       'support.html': 'Support',
@@ -365,6 +364,8 @@ const Store = {
     this.persist();
     this.renderCart();
     this.openCart();
+  // Track add_to_cart event if analytics is present
+  try { window.trackEvent && window.trackEvent('add_to_cart', product.id); } catch {}
   },
 
   removeByKey(key) {

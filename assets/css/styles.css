@@ -461,6 +461,18 @@ img{max-width:100%;display:block}
 .auth-peek { display:inline-flex; align-items:center; gap:.4rem; margin-top:.4rem; }
 .mt-1 { margin-top: .25rem; }
 .mt-4 { margin-top: 1rem; }
+.mt-6 { margin-top: 1.5rem; }
 .hidden { display: none; }
 .text-center { text-align: center; }
 .text-error { color: red; }
+.ml-auto { margin-left: auto; }
+
+/* Analytics dashboard */
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem}
+.card-sm{background:#fff;border-radius:12px;box-shadow:0 4px 24px rgba(12,32,64,.10);padding:1rem}
+.kpi{font-size:1.6rem;font-weight:800}
+.grid-2{display:grid;grid-template-columns:1fr;gap:1rem}
+@media(min-width:900px){.grid-2{grid-template-columns:1fr 1fr}}
+/* Ensure ULs in analytics look neat */
+.product-list{list-style:none;margin:0;padding:0;display:grid;gap:.5rem}
+.product-list li{background:#fff;border:1px solid var(--border);border-radius:.6rem;padding:.5rem .6rem}

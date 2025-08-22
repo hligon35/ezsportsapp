@@ -28,7 +28,7 @@ async function renderOrders(){
   const serverOrders = await fetchOrdersServer();
   const orders = Array.isArray(serverOrders) ? serverOrders : [];
   if(!orders.length){
-    list.innerHTML = '<p>You have no orders yet. <a href="shop.html">Start shopping!</a></p>';
+    list.innerHTML = '<p>You have no orders yet. <a href="index.html#catalog">Start shopping!</a></p>';
     return;
   }
   list.innerHTML = orders.map(order => `

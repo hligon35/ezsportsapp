@@ -1,9 +1,12 @@
 // Authentication system using server API
 let isRegisterMode = false;
-// Prefer same-origin. When using Live Server on 5500, also try local API servers.
+// Prefer same-origin. When using Live Server on 5500, also try local API servers (both 4242 and 4343).
 const isLiveServer = (location.port === '5500') && (location.protocol.startsWith('http'));
 const API_BASE_CANDIDATES = ['']
-  .concat(isLiveServer ? ['http://127.0.0.1:4242', 'http://localhost:4242'] : []);
+  .concat(isLiveServer ? [
+    'http://127.0.0.1:4242', 'http://localhost:4242',
+    'http://127.0.0.1:4343', 'http://localhost:4343'
+  ] : []);
 
 async function fetchWithFallback(path, options) {
   let lastErr;
@@ -11,7 +14,10 @@ async function fetchWithFallback(path, options) {
     try {
       const res = await fetch(`${base}${path}`, options);
       // Treat non-2xx as failure to allow trying next base
-      if (res.ok) return res;
+      if (res.ok) {
+        try { window.__API_BASE = base; } catch {}
+        return res;
+      }
       // If this is the last base, return the response to surface the error
       lastErr = res;
     } catch (e) {
@@ -37,7 +43,7 @@ function loginUser(user) {
     window.location.href = 'admin.html';
     return;
   }
-  const redirectTo = new URLSearchParams(window.location.search).get('redirect') || 'shop.html';
+  const redirectTo = new URLSearchParams(window.location.search).get('redirect') || 'index.html#catalog';
   window.location.href = redirectTo;
 }
 
@@ -54,7 +60,10 @@ async function authenticateUser(identifier, password) {
     });
     
     const data = await response.json();
-    
+    // Store token for cross-origin admin/API calls
+    if (data && data.token) {
+      try { localStorage.setItem('authToken', data.token); } catch {}
+    }
     if (response.ok) {
       return data.user;
     } else {
@@ -78,7 +87,9 @@ async function registerUser(email, password, name) {
     });
     
     const data = await response.json();
-    
+    if (data && data.token) {
+      try { localStorage.setItem('authToken', data.token); } catch {}
+    }
     if (response.ok) {
       return data.user;
     } else {

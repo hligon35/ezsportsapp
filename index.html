@@ -87,7 +87,7 @@
           </div>
         </div>
         <picture class="hero-art">
-          <img src="./assets/img/equipment.jpg" width="1600" height="900" alt="Players using netting, bats and gloves"/>
+          <img src="./assets/img/ezsportslogo.jpg" width="1600" height="900" alt="Players using netting, bats and gloves"/>
         </picture>
       </div>
     </section>
@@ -193,10 +193,10 @@
       <nav aria-label="Footer">
         <h4>Shop</h4>
         <ul>
-          <li><a href="shop.html#catalog" onclick="Store.filter('bats')">Bats</a></li>
-          <li><a href="shop.html#catalog" onclick="Store.filter('gloves')">Gloves</a></li>
-          <li><a href="shop.html#catalog" onclick="Store.filter('netting')">Netting</a></li>
-          <li><a href="shop.html#catalog" onclick="Store.filter('helmets')">Helmets</a></li>
+          <li><a href="#catalog" onclick="Store.filter('bats')">Bats</a></li>
+          <li><a href="#catalog" onclick="Store.filter('gloves')">Gloves</a></li>
+          <li><a href="#catalog" onclick="Store.filter('netting')">Netting</a></li>
+          <li><a href="#catalog" onclick="Store.filter('helmets')">Helmets</a></li>
         </ul>
       </nav>
       <nav>
@@ -236,12 +236,13 @@
         </div>
         <div class="stack-05">
           <button type="button" class="btn btn-primary btn-block" onclick="Store.checkout()">Secure Checkout</button>
-          <a class="btn btn-ghost btn-block" href="shop.html#catalog">Continue Shopping</a>
+          <a class="btn btn-ghost btn-block" href="#catalog">Continue Shopping</a>
         </div>
       </footer>
     </section>
   </dialog>
 
+  <script type="module" src="assets/js/analytics.js"></script>
   <script type="module" src="assets/js/app.js"></script>
   <script>
     if('serviceWorker' in navigator){

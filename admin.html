@@ -15,33 +15,25 @@
     .admin-nav { display: flex; gap: 1rem; margin-bottom: 2rem; }
   .admin-nav button { padding: .8rem 1.5rem; border: none; background: #e6edf6; border-radius: .6rem; cursor: pointer; color:#0b2a4a; font-weight:700; }
   .admin-nav button.active { background: var(--primary, #0b64d4); color: #ffffff; box-shadow: 0 2px 10px rgba(11,100,212,.25); }
-    .inventory-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
-    .inventory-card { background: #f7faff; border-radius: .8rem; padding: 1.5rem; border-left: 4px solid var(--primary); }
-    .inventory-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
-    .stat-card { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 1.5rem; border-radius: .8rem; }
-    .stock-status { padding: .3rem .8rem; border-radius: 1rem; font-size: .85rem; font-weight: 600; }
-    .stock-high { background: #d4edda; color: #155724; }
-    .stock-medium { background: #fff3cd; color: #856404; }
-    .stock-low { background: #f8d7da; color: #721c24; }
-    .stock-out { background: #f5c6cb; color: #721c24; }
-    .inventory-actions { display: flex; gap: .5rem; margin-top: 1rem; }
-    .inventory-actions button { padding: .5rem 1rem; border: none; border-radius: .4rem; cursor: pointer; font-size: .85rem; }
-    .btn-restock { background: #28a745; color: white; }
-    .btn-adjust { background: #17a2b8; color: white; }
-    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; }
-    .modal-content { background: white; margin: 5% auto; padding: 2rem; width: 90%; max-width: 500px; border-radius: 1rem; }
-    .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
-    .close-modal { background: none; border: none; font-size: 1.5rem; cursor: pointer; }
+  /* Inventory UI removed for dropship model */
+    .hidden{display:none;}
+    .toolbar{display:flex; gap:1rem; align-items:center; margin-bottom:1rem; flex-wrap:wrap;}
+    .filter-select{margin-left:.5rem; padding:.4rem;}
     @media (max-width: 768px) { .product-form { grid-template-columns: 1fr; } }
   </style>
 </head>
 <body>
   <header class="site-header">
     <div class="container header-bar">
+      <button class="menu-toggle" aria-label="Toggle menu" aria-expanded="false" aria-controls="primary-nav">☰</button>
       <a class="brand" href="index.html">
     <img src="assets/img/ezsportslogo.jpg" alt="EZ Sports Netting logo" height="40"/>
         <span>EZ Sports Netting</span>
       </a>
+      <form class="search" role="search" aria-label="Search store">
+        <input type="search" name="q" placeholder="Search bats, gloves, helmets…" aria-label="Search"/>
+        <button type="submit" class="btn btn-primary">Search</button>
+      </form>
       <nav id="primary-nav" class="quick-links nav-centered" aria-label="Primary">
         <a href="deals.html">Deals</a>
         <a href="about.html">About</a>
@@ -50,7 +42,6 @@
           <span class="icon">🛒</span>
           <span class="cart-count" id="cart-count">0</span>
         </button>
-        <button id="logout-btn" class="btn btn-ghost">Logout</button>
       </nav>
     </div>
   </header>
@@ -58,10 +49,11 @@
     <div class="admin-container">
       <h2>Admin Panel</h2>
       <div class="admin-nav">
-        <button class="active" onclick="showSection('products')">Products</button>
-        <button onclick="showSection('inventory')">Inventory</button>
-        <button onclick="showSection('orders')">Orders</button>
-        <button onclick="showSection('users')">Users</button>
+    <button class="active" onclick="showSection('products', this)">Products</button>
+  <button onclick="showSection('invoices', this)">Invoices</button>
+    <button onclick="showSection('orders', this)">Orders</button>
+    <button onclick="showSection('users', this)">Users</button>
+  <a class="btn btn-ghost ml-auto" href="analytics.html">Analytics →</a>
       </div>
 
       <!-- Products Section -->
@@ -71,7 +63,7 @@
           <input type="text" id="product-name" placeholder="Product Name" required />
           <input type="number" id="product-price" placeholder="Price" step="0.01" required />
           <input type="text" id="product-image" placeholder="Image URL" />
-          <select id="product-category" required>
+          <select id="product-category" required aria-label="Product Category">
             <option value="">Select Category</option>
             <option value="bats">Bats</option>
             <option value="gloves">Gloves</option>
@@ -81,72 +73,35 @@
           <textarea id="product-description" placeholder="Product Description" rows="3"></textarea>
           <input type="number" id="product-stock" placeholder="Stock Quantity" min="0" />
           <button type="submit" class="btn btn-primary">Add Product</button>
-          <button type="button" id="cancel-edit" class="btn btn-ghost" style="display:none;" onclick="cancelEdit()">Cancel</button>
+          <button type="button" id="cancel-edit" class="btn btn-ghost hidden" onclick="cancelEdit()">Cancel</button>
         </form>
         <div id="products-list" class="product-list"></div>
       </div>
 
-      <!-- Inventory Section -->
-      <div id="inventory-section" class="admin-section" style="display:none;">
-        <h3>Inventory Control & Tracking</h3>
-        
-        <!-- Inventory Statistics -->
-        <div class="inventory-stats">
-          <div class="stat-card">
-            <h4>Total Products</h4>
-            <p id="total-products">0</p>
-          </div>
-          <div class="stat-card">
-            <h4>Low Stock Items</h4>
-            <p id="low-stock-count">0</p>
-          </div>
-          <div class="stat-card">
-            <h4>Out of Stock</h4>
-            <p id="out-of-stock-count">0</p>
-          </div>
-          <div class="stat-card">
-            <h4>Total Inventory Value</h4>
-            <p id="total-inventory-value">$0</p>
-          </div>
+      <!-- Invoices Section -->
+      <div id="invoices-section" class="admin-section hidden">
+        <h3>Invoices</h3>
+        <div class="toolbar">
+          <label>
+            <span>Status:</span>
+            <select id="invoices-status-filter" class="filter-select">
+              <option value="">All</option>
+              <option value="paid">Paid</option>
+              <option value="unpaid">Unpaid</option>
+            </select>
+          </label>
+          <button class="btn btn-secondary" id="invoices-refresh-btn">Refresh</button>
         </div>
-
-        <!-- Stock Level Controls -->
-        <div style="margin-bottom: 2rem;">
-          <h4>Stock Level Thresholds</h4>
-          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
-            <div>
-              <label>Low Stock Warning:</label>
-              <input type="number" id="low-stock-threshold" value="10" min="1" style="width: 100%; padding: .5rem; margin-top: .5rem;">
-            </div>
-            <div>
-              <label>Critical Stock Warning:</label>
-              <input type="number" id="critical-stock-threshold" value="5" min="1" style="width: 100%; padding: .5rem; margin-top: .5rem;">
-            </div>
-            <button onclick="updateThresholds()" class="btn btn-primary" style="align-self: end;">Update Thresholds</button>
-          </div>
-        </div>
-
-        <!-- Inventory List -->
-        <div class="inventory-grid" id="inventory-list"></div>
-
-        <!-- Quick Actions -->
-        <div style="margin-top: 2rem;">
-          <h4>Quick Actions</h4>
-          <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
-            <button onclick="exportInventoryReport()" class="btn btn-primary">Export Inventory Report</button>
-            <button onclick="showBulkStockUpdate()" class="btn btn-secondary">Bulk Stock Update</button>
-            <button onclick="showInventoryHistory()" class="btn btn-ghost">View Stock History</button>
-          </div>
-        </div>
+        <div id="invoices-list"></div>
       </div>
 
       <!-- Orders Section -->
-      <div id="orders-section" class="admin-section" style="display:none;">
+      <div id="orders-section" class="admin-section hidden">
         <h3>Order Management</h3>
-        <div style="display:flex; gap:1rem; align-items:center; margin-bottom:1rem; flex-wrap:wrap;">
+        <div class="toolbar">
           <label>
             <span>Status:</span>
-            <select id="orders-status-filter" style="margin-left:.5rem; padding:.4rem;">
+            <select id="orders-status-filter" class="filter-select">
               <option value="">All</option>
               <option value="pending">Pending</option>
               <option value="paid">Paid</option>
@@ -160,7 +115,7 @@
       </div>
 
       <!-- Users Section -->
-      <div id="users-section" class="admin-section" style="display:none;">
+  <div id="users-section" class="admin-section hidden">
         <h3>User Management</h3>
         <div id="users-list"></div>
       </div>
@@ -183,10 +138,10 @@
       <nav aria-label="Footer">
         <h4>Shop</h4>
         <ul>
-          <li><a href="shop.html#catalog" onclick="Store.filter('bats')">Bats</a></li>
-          <li><a href="shop.html#catalog" onclick="Store.filter('gloves')">Gloves</a></li>
-          <li><a href="shop.html#catalog" onclick="Store.filter('netting')">Netting</a></li>
-          <li><a href="shop.html#catalog" onclick="Store.filter('helmets')">Helmets</a></li>
+          <li><a href="index.html#catalog" onclick="Store.filter('bats')">Bats</a></li>
+          <li><a href="index.html#catalog" onclick="Store.filter('gloves')">Gloves</a></li>
+          <li><a href="index.html#catalog" onclick="Store.filter('netting')">Netting</a></li>
+          <li><a href="index.html#catalog" onclick="Store.filter('helmets')">Helmets</a></li>
         </ul>
       </nav>
       <nav>
@@ -225,114 +180,16 @@
         </div>
         <div class="stack-05">
           <button type="button" class="btn btn-primary btn-block" onclick="Store.checkout()">Secure Checkout</button>
-          <a class="btn btn-ghost btn-block" href="shop.html#catalog">Continue Shopping</a>
+          <a class="btn btn-ghost btn-block" href="deals.html">Continue Shopping</a>
         </div>
       </footer>
     </section>
   </dialog>
 
-  <!-- Stock Adjustment Modal -->
-  <div id="stock-modal" class="modal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h3 id="modal-title">Adjust Stock</h3>
-        <button class="close-modal" onclick="closeModal('stock-modal')">&times;</button>
-      </div>
-      <form id="stock-form">
-        <input type="hidden" id="modal-product-id">
-        <div style="margin-bottom: 1rem;">
-          <label>Product: <span id="modal-product-name"></span></label>
-        </div>
-        <div style="margin-bottom: 1rem;">
-          <label>Current Stock: <span id="modal-current-stock"></span></label>
-        </div>
-        <div style="margin-bottom: 1rem;">
-          <label>Adjustment Type:</label>
-          <select id="adjustment-type" style="width: 100%; padding: .5rem; margin-top: .5rem;">
-            <option value="add">Add Stock (Restock)</option>
-            <option value="remove">Remove Stock (Damage/Loss)</option>
-            <option value="set">Set Exact Amount</option>
-          </select>
-        </div>
-        <div style="margin-bottom: 1rem;">
-          <label>Quantity:</label>
-          <input type="number" id="adjustment-quantity" min="0" required style="width: 100%; padding: .5rem; margin-top: .5rem;">
-        </div>
-        <div style="margin-bottom: 1rem;">
-          <label>Reason:</label>
-          <select id="adjustment-reason" style="width: 100%; padding: .5rem; margin-top: .5rem;">
-            <option value="restock">Restock/Purchase</option>
-            <option value="damage">Damaged Items</option>
-            <option value="theft">Theft/Loss</option>
-            <option value="return">Customer Return</option>
-            <option value="correction">Inventory Correction</option>
-            <option value="other">Other</option>
-          </select>
-        </div>
-        <div style="margin-bottom: 1rem;">
-          <label>Notes:</label>
-          <textarea id="adjustment-notes" placeholder="Additional notes..." style="width: 100%; padding: .5rem; margin-top: .5rem; resize: vertical;"></textarea>
-        </div>
-        <div style="display: flex; gap: 1rem;">
-          <button type="submit" class="btn btn-primary">Apply Adjustment</button>
-          <button type="button" onclick="closeModal('stock-modal')" class="btn btn-ghost">Cancel</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- Bulk Update Modal -->
-  <div id="bulk-modal" class="modal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h3>Bulk Stock Update</h3>
-        <button class="close-modal" onclick="closeModal('bulk-modal')">&times;</button>
-      </div>
-      <div>
-        <p>Upload a CSV file with columns: product_id, new_stock, reason</p>
-        <input type="file" id="bulk-csv" accept=".csv" style="margin: 1rem 0;">
-        <div style="margin: 1rem 0;">
-          <label>Or adjust all products by percentage:</label>
-          <div style="display: flex; gap: 1rem; margin-top: .5rem;">
-            <input type="number" id="bulk-percentage" placeholder="Percentage (e.g., 10 for +10%)" style="flex: 1; padding: .5rem;">
-            <button onclick="applyBulkPercentage()" class="btn btn-secondary">Apply</button>
-          </div>
-        </div>
-        <div style="display: flex; gap: 1rem;">
-          <button onclick="processBulkUpdate()" class="btn btn-primary">Process File</button>
-          <button onclick="closeModal('bulk-modal')" class="btn btn-ghost">Cancel</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Inventory History Modal -->
-  <div id="history-modal" class="modal">
-    <div class="modal-content" style="max-width: 800px;">
-      <div class="modal-header">
-        <h3>Recent Stock Movements</h3>
-        <button class="close-modal" onclick="closeModal('history-modal')">&times;</button>
-      </div>
-      <div id="history-content" style="max-height: 60vh; overflow: auto;">
-        <table style="width:100%; border-collapse: collapse;">
-          <thead>
-            <tr>
-              <th style="text-align:left; padding:.5rem; border-bottom:1px solid #eee;">When</th>
-              <th style="text-align:left; padding:.5rem; border-bottom:1px solid #eee;">Product</th>
-              <th style="text-align:right; padding:.5rem; border-bottom:1px solid #eee;">Change</th>
-              <th style="text-align:right; padding:.5rem; border-bottom:1px solid #eee;">Old → New</th>
-              <th style="text-align:left; padding:.5rem; border-bottom:1px solid #eee;">Reason</th>
-              <th style="text-align:left; padding:.5rem; border-bottom:1px solid #eee;">Notes</th>
-            </tr>
-          </thead>
-          <tbody id="history-rows">
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </div>
+  <!-- Inventory-related modals removed for dropship model -->
 
   <script type="module" src="assets/js/admin.js"></script>
+  <script type="module" src="assets/js/analytics.js"></script>
   <script type="module" src="assets/js/app.js"></script>
 </body>
 </html>

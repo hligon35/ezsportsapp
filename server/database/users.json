@@ -8,8 +8,8 @@
     "lastName": "User",
     "role": "admin",
     "createdAt": "2025-08-13T02:57:41.654Z",
-    "lastLogin": "2025-08-19T20:53:23.754Z",
-    "updatedAt": "2025-08-19T20:53:23.755Z"
+    "lastLogin": "2025-08-22T19:50:20.708Z",
+    "updatedAt": "2025-08-22T19:50:20.709Z"
   },
   {
     "id": "user_vq5r88oy4",
@@ -42,5 +42,23 @@
     "createdAt": "2025-08-21T01:30:00.000Z",
     "lastLogin": "2025-08-21T01:46:47.797Z",
     "updatedAt": "2025-08-21T01:46:47.797Z"
+  },
+  {
+    "email": "casey.hitter@ezsportsapp.test",
+    "password": "$2b$10$X4MRiivaiZ7Tu5fk95pSzebALbDW.F1NQR7OnDN2YcTL78.BuwCPu",
+    "name": "Casey Hitter",
+    "isAdmin": false,
+    "createdAt": "2025-08-20T15:12:00.000Z",
+    "updatedAt": "2025-08-20T15:12:00.000Z",
+    "id": 1002
+  },
+  {
+    "email": "riley.catcher@ezsportsapp.test",
+    "password": "$2b$10$X4MRiivaiZ7Tu5fk95pSzebALbDW.F1NQR7OnDN2YcTL78.BuwCPu",
+    "name": "Riley Catcher",
+    "isAdmin": false,
+    "createdAt": "2025-08-20T16:45:00.000Z",
+    "updatedAt": "2025-08-20T16:45:00.000Z",
+    "id": 1003
   }
 ]
