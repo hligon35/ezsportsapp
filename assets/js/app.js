@@ -147,6 +147,15 @@ const Store = {
       }
       btn.className = 'btn btn-primary';
       btn.textContent = 'Search';
+
+      // Ensure search submission navigates to Search Results page
+      search.removeAttribute('onsubmit');
+      search.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const q = (input?.value || '').trim();
+        const url = 'search-results.html' + (q ? `?q=${encodeURIComponent(q)}` : '');
+        window.location.href = url;
+      }, { once: false });
     }
   },
 
