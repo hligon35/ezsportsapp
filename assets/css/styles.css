@@ -86,7 +86,10 @@ img{max-width:100%;display:block}
 .search input{width:min(680px,100%);padding:.75rem .9rem;border-radius:.75rem;border:1px solid var(--border);background:#fff;color:var(--ink)}
 .search .btn{white-space:nowrap;flex:0 0 auto}
 .search input:focus{outline:none;box-shadow:var(--ring);border-color:var(--brand)}
-.quick-links{display:flex;align-items:center;gap:1rem;order:2;flex:1 0 100%;margin-top:.4rem}
+.quick-links{display:flex;align-items:center;gap:1rem;order:2;flex:1 0 100%;margin-top:.4rem;visibility:hidden}
+.site-header .header-bar{visibility:hidden}
+.nav-ready .quick-links{visibility:visible}
+.nav-ready .site-header .header-bar{visibility:visible}
 .quick-links a{color:#d3d0d7;text-decoration:none;opacity:.95}
 .quick-links .auth-link{color:#d3d0d7;text-decoration:none;opacity:.95;background:none;border:none;cursor:pointer;font:inherit;}
 .quick-links .user-menu{display:flex;align-items:center;gap:.8rem;font-size:.9rem;}

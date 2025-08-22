@@ -4,14 +4,14 @@
 const currency = new Intl.NumberFormat(undefined, { style: 'currency', currency: 'USD' });
 
 const DEFAULT_PRODUCTS = [
-  { id: 'bat-ghost', title: 'Ghost Unlimited Bat -11', price: 399.95, category: 'bats', img: 'https://source.unsplash.com/1200x900/?baseball,bat&sig=1' },
-  { id: 'bat-hype', title: 'HYPE Fire -10', price: 349.95, category: 'bats', img: 'https://source.unsplash.com/1200x900/?baseball,bat&sig=2' },
-  { id: 'glove-a2000', title: 'Wilson A2000 11.5"', price: 299.95, category: 'gloves', img: 'https://source.unsplash.com/1200x900/?baseball,glove&sig=1' },
-  { id: 'glove-heart', title: 'Heart of the Hide 12.25"', price: 279.95, category: 'gloves', img: 'https://source.unsplash.com/1200x900/?baseball,glove&sig=2' },
-  { id: 'net-pro', title: 'Pro Backstop Net 10x30', price: 219.00, category: 'netting', img: 'https://source.unsplash.com/1200x900/?baseball,net&sig=1' },
-  { id: 'net-cage', title: 'Batting Cage Net 12x55', price: 649.00, category: 'netting', img: 'https://source.unsplash.com/1200x900/?baseball,cage,net&sig=2' },
-  { id: 'helmet-pro', title: 'Pro Helmet With Face Guard', price: 89.99, category: 'helmets', img: 'https://source.unsplash.com/1200x900/?baseball,helmet&sig=1' },
-  { id: 'helmet-lite', title: 'Lightweight Helmet Youth', price: 59.99, category: 'helmets', img: 'https://source.unsplash.com/1200x900/?baseball,helmet&sig=2' },
+  { id: 'bat-ghost', title: 'Ghost Unlimited Bat -11', price: 399.95, category: 'bats', img: 'assets/img/bat3.avif' },
+  { id: 'bat-hype', title: 'HYPE Fire -10', price: 349.95, category: 'bats', img: 'assets/img/bat4.avif' },
+  { id: 'glove-a2000', title: 'Wilson A2000 11.5"', price: 299.95, category: 'gloves', img: 'assets/img/glove3.avif' },
+  { id: 'glove-heart', title: 'Heart of the Hide 12.25"', price: 279.95, category: 'gloves', img: 'assets/img/glove4.avif' },
+  { id: 'net-pro', title: 'Pro Backstop Net 10x30', price: 219.00, category: 'netting', img: 'assets/img/netting.jpg' },
+  { id: 'net-cage', title: 'Batting Cage Net 12x55', price: 649.00, category: 'netting', img: 'assets/img/netting3.jpg' },
+  { id: 'helmet-pro', title: 'Pro Helmet With Face Guard', price: 89.99, category: 'helmets', img: 'assets/img/helmet3.avif' },
+  { id: 'helmet-lite', title: 'Lightweight Helmet Youth', price: 59.99, category: 'helmets', img: 'assets/img/helmet3.avif' },
 ];
 
 function getProducts() {
@@ -105,6 +105,9 @@ const Store = {
     // Footer year
     const y = document.getElementById('year');
     if (y) y.textContent = new Date().getFullYear();
+
+    // Reveal header/nav only after everything is standardized
+    document.body.classList.add('nav-ready');
   },
 
   ensureHeaderLayout() {
@@ -130,16 +133,32 @@ const Store = {
     const nav = document.getElementById('primary-nav') || header.querySelector('nav.quick-links');
     const cartBtn = nav ? nav.querySelector('.cart-btn') : null;
     if (cartBtn) actions.appendChild(cartBtn);
+
+    // Standardize search bar (placeholder, button classes/text)
+    const search = header.querySelector('.search');
+    if (search) {
+      const input = search.querySelector('input[type="search"]');
+      if (input) input.placeholder = 'Search bats, gloves, helmets…';
+      let btn = search.querySelector('button[type="submit"]');
+      if (!btn) {
+        btn = document.createElement('button');
+        btn.type = 'submit';
+        search.appendChild(btn);
+      }
+      btn.className = 'btn btn-primary';
+      btn.textContent = 'Search';
+    }
   },
 
   ensureCoreNav() {
     const nav = document.getElementById('primary-nav') || document.querySelector('nav.quick-links');
     if (!nav) return;
 
+    // Canonical nav: rebuild to avoid legacy links and ensure correct order
     const required = [
       { href: 'deals.html', text: 'Deals' },
       { href: 'about.html', text: 'About' },
-      { href: 'netting-calculator.html', text: 'Netting' },
+      { href: 'netting-calculator.html', text: 'Netting Calculator' },
       { href: 'bats.html', text: 'Bats' },
       { href: 'gloves.html', text: 'Gloves' },
       { href: 'batting-gloves.html', text: 'Batting Gloves' },
@@ -147,19 +166,23 @@ const Store = {
       { href: 'gear.html', text: 'Gear' },
       { href: 'apparel.html', text: 'Apparel' },
       { href: 'l-screens.html', text: 'L-Screens' },
-      { href: 'facility-field.html', text: 'Facility & Field' },
-      { href: 'netting-calculator.html', text: 'Calculator' },
+      { href: 'facility-field.html', text: 'Facility & Field' }
     ];
 
-    const existingHrefs = Array.from(nav.querySelectorAll('a')).map(a => a.getAttribute('href'));
+    // Preserve cart button if it sits inside nav (will be moved by ensureHeaderLayout)
+    const cartBtn = nav.querySelector('.cart-btn');
+
+    // Remove all anchor links
+    nav.querySelectorAll('a').forEach(a => a.remove());
+
+    // Append required links in order
     required.forEach(link => {
-      if (!existingHrefs.includes(link.href)) {
-        const a = document.createElement('a');
-        a.href = link.href;
-        a.textContent = link.text;
-        nav.appendChild(a);
-      }
+      const a = document.createElement('a');
+      a.href = link.href;
+      a.textContent = link.text;
+      nav.appendChild(a);
     });
+
 
     // Highlight current page
     const path = location.pathname.split('/').pop() || 'index.html';
