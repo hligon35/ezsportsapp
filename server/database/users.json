@@ -26,9 +26,9 @@
     "password": "$2b$10$N3QMGeBw295/MLc7BZAroudSadEiBNr.uki9UzbSlaYBsHPTap0f2",
     "name": "Demo User",
     "isAdmin": false,
-    "lastLogin": null,
+    "lastLogin": "2025-08-21T22:53:53.143Z",
     "createdAt": "2025-08-21T01:17:02.424Z",
-    "updatedAt": "2025-08-21T01:17:02.424Z",
+    "updatedAt": "2025-08-21T22:53:53.143Z",
     "id": 1001
   },
   {

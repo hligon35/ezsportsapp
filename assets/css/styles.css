@@ -1,3 +1,17 @@
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+/* Pagination controls for product grids */
+.pagination-controls, #bat-pagination, #glove-pagination, #batglo-pagination {
+  display: flex;
+  justify-content: center;
+  gap: .5rem;
+  margin-top: 1.25rem;
+}
+/* Centered nav utility for header */
+.nav-centered {
+  justify-content: center !important;
+}
 /* Typography (relaxed to prevent unintended truncation) */
 .container, .footer-grid, .about-inner, .category-tiles .tiles, .grid, .banner-row { min-width:0; }
 /* Allow natural wrapping; only truncate where explicitly needed via .truncate */
@@ -60,7 +74,11 @@ img{max-width:100%;display:block}
 .site-header{position:sticky;top:0;z-index:30;background:#0f2f50;color:#fff;border-bottom:1px solid rgba(255,255,255,.08)}
 .header-bar{display:flex;align-items:center;gap:1rem;min-height:51px;flex-wrap:wrap}
 .brand{display:flex;align-items:center;gap:.6rem;color:#fff;text-decoration:none;font-weight:900;letter-spacing:.3px}
-.brand img{filter:drop-shadow(0 4px 12px rgba(0,0,0,.25))}
+.brand img{filter:drop-shadow(0 4px 12px rgba(0,0,0,.25));border-radius:0.75rem;}
+
+.footer-brand-block img {
+  border-radius: 0.75rem;
+}
 .search{display:flex;gap:.5rem;flex:1;justify-content:center}
 .search input{width:min(680px,100%);padding:.75rem .9rem;border-radius:.75rem;border:1px solid #cfd9e8;background:#fff;color:var(--ink)}
 .search .btn{white-space:nowrap;flex:0 0 auto}
@@ -286,7 +304,9 @@ img{max-width:100%;display:block}
 .footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr 2fr;gap:1rem;padding:2rem 0}
 .footer-grid h4{margin:.2rem 0 .6rem}
 .footer-grid a{color:#e6f0ff;text-decoration:none;opacity:.95}
-.subfooter{display:flex;justify-content:space-between;align-items:center;border-top:1px solid rgba(255,255,255,.08);padding:1rem 0;color:#d6e4f7}
+.subfooter{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.5rem;text-align:center;border-top:1px solid rgba(255,255,255,.08);padding:1rem 0;color:#d6e4f7}
+.footer-brand-block { display: flex; flex-direction: column; align-items: center; text-align: center; gap: .5rem; }
+.socials { display: flex; justify-content: center; gap: 1rem; }
 .brand--light{opacity:1}
 .subscribe .row{display:flex;gap:.5rem}
 .subscribe input{flex:1;padding:.65rem .8rem;border-radius:.6rem;border:1px solid #cfe0f5;background:#fff;color:var(--ink)}

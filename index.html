@@ -25,14 +25,14 @@
   <meta name="twitter:image" content="https://images.unsplash.com/photo-1521417531039-89f040b8d69e?q=80&w=1200&auto=format&fit=crop" />
   <meta name="theme-color" content="#0f2f50" />
   <link rel="manifest" href="manifest.webmanifest" />
-  <link rel="icon" type="image/svg+xml" href="assets/img/logo.svg" />
+  <link rel="icon" type="image/jpeg" href="assets/img/ezsportslogo.jpg" />
   <link rel="icon" type="image/png" href="assets/img/favicon-32.png" sizes="32x32" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/css/styles.css?v=4" />
   <script type="application/ld+json">{
-    "@context":"https://schema.org","@type":"Organization","name":"EZ Sports Netting","url":"https://ezsportsnetting.com/","logo":"https://ezsportsnetting.com/assets/img/logo.svg","sameAs":[]
+  "@context":"https://schema.org","@type":"Organization","name":"EZ Sports Netting","url":"https://ezsportsnetting.com/","logo":"https://ezsportsnetting.com/assets/img/ezsportslogo.jpg","sameAs":[]
   }</script>
   <script type="application/ld+json">{
     "@context": "https://schema.org",
@@ -56,21 +56,22 @@
     <div class="container header-bar">
       <button class="menu-toggle" aria-label="Toggle menu" aria-expanded="false" aria-controls="primary-nav">☰</button>
   <a class="brand" href="index.html">
-  <img src="assets/img/logo.svg" alt="EZ Sports Netting logo" height="40"/>
+  <img src="assets/img/ezsportslogo.jpg" alt="EZ Sports Netting logo" height="40"/>
         <span>EZ Sports Netting</span>
       </a>
       <form class="search" role="search" aria-label="Search store" onsubmit="event.preventDefault(); window.Store.search(this.q.value)">
         <input type="search" name="q" placeholder="Search bats, gloves, helmets…" aria-label="Search"/>
         <button type="submit" class="btn btn-primary">Search</button>
       </form>
-  <nav id="primary-nav" class="quick-links" aria-label="Primary">
-  <a href="shop.html">Shop</a>
-  <a href="deals.html">Deals</a>
-  <a href="about.html">About</a>
-        <button class="cart-btn" aria-haspopup="dialog" aria-controls="mini-cart" onclick="Store.toggleCart()">
-          <span class="icon">🛒</span>
-          <span class="cart-count" id="cart-count">0</span>
-        </button>
+  <nav id="primary-nav" class="quick-links nav-centered" aria-label="Primary">
+    <a href="deals.html">Deals</a>
+    <a href="about.html">About</a>
+    <a href="netting-calculator.html">Netting Calculator</a>
+    <button class="cart-btn" aria-haspopup="dialog" aria-controls="mini-cart" onclick="Store.toggleCart()">
+      <span class="icon">🛒</span>
+      <span class="cart-count" id="cart-count">0</span>
+    </button>
+  </nav>
         <!-- Auth links will be dynamically added by app.js -->
       </nav>
     </div>
@@ -179,12 +180,17 @@
 
   <footer class="site-footer">
     <div class="container footer-grid">
-      <div>
-  <a class="brand brand--light" href="index.html">
-          <img src="assets/img/logo.svg" alt="EZ Sports Netting logo" height="36"/>
+      <div class="footer-brand-block">
+        <a class="brand brand--light" href="index.html">
+          <img src="assets/img/ezsportslogo.jpg" alt="EZ Sports Netting logo" height="36"/>
           <span>EZ Sports Netting</span>
         </a>
         <p class="muted">Better baseball through better gear.</p>
+        <div class="socials" aria-label="social links">
+          <a href="#" aria-label="Instagram">📸</a>
+          <a href="#" aria-label="YouTube">▶️</a>
+          <a href="#" aria-label="X">𝕏</a>
+        </div>
       </div>
       <nav aria-label="Footer">
         <h4>Shop</h4>
@@ -212,12 +218,7 @@
       </form>
     </div>
     <div class="subfooter container">
-      <p>© <span id="year"></span> EZ Sports Netting. All rights reserved.</p>
-      <div class="socials" aria-label="social links">
-        <a href="#" aria-label="Instagram">📸</a>
-        <a href="#" aria-label="YouTube">▶️</a>
-        <a href="#" aria-label="X">𝕏</a>
-      </div>
+  <p>© <span id="year"></span> EZ Sports Netting. All rights reserved.</p>
     </div>
   </footer>
 

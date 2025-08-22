@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Help Center: Warranty | EZ Sports Netting</title>
   <link rel="stylesheet" href="assets/css/styles.css" />
-   <link rel="icon" type="image/svg+xml" href="assets/img/logo.svg" />
+  <link rel="icon" type="image/jpeg" href="assets/img/ezsportslogo.jpg" />
    <link rel="icon" type="image/png" href="assets/img/favicon-32.png" sizes="32x32" />
 </head>
 <body>
@@ -14,39 +14,58 @@
     <div class="container header-bar">
       <button class="menu-toggle" aria-label="Toggle menu" aria-expanded="false" aria-controls="primary-nav">☰</button>
   <a class="brand" href="index.html">
-        <img src="assets/img/logo.svg" alt="EZ Sports Netting logo" height="40"/>
+  <img src="assets/img/ezsportslogo.jpg" alt="EZ Sports Netting logo" height="40"/>
         <span>EZ Sports Netting</span>
       </a>
       <form class="search" role="search" aria-label="Search store" onsubmit="event.preventDefault(); window.Store.search(this.q.value)">
         <input type="search" name="q" placeholder="Search bats, gloves, helmets…" aria-label="Search"/>
         <button type="submit" class="btn btn-primary">Search</button>
       </form>
-  <nav id="primary-nav" class="quick-links" aria-label="Primary">
-        <a href="shop.html">Shop</a>
-        <a href="deals.html">Deals</a>
-        <a href="about.html">About</a>
-        <button class="cart-btn" aria-haspopup="dialog" aria-controls="mini-cart" onclick="Store.toggleCart()">
-          <span class="icon">🛒</span>
-          <span class="cart-count" id="cart-count">0</span>
-        </button>
-      </nav>
+  <nav id="primary-nav" class="quick-links nav-centered" aria-label="Primary">
+    <a href="deals.html">Deals</a>
+    <a href="about.html">About</a>
+    <a href="netting-calculator.html">Netting Calculator</a>
+    <button class="cart-btn" aria-haspopup="dialog" aria-controls="mini-cart" onclick="Store.toggleCart()">
+      <span class="icon">🛒</span>
+      <span class="cart-count" id="cart-count">0</span>
+    </button>
+  </nav>
     </div>
   </header>
   <main id="main" class="container" style="margin-top:1rem">
     <h2 class="section-title">Warranty</h2>
     <div class="card" style="padding:1rem">
-      <p class="muted">Placeholder for warranty coverage and claim process. Clarify eligible products and documentation required.</p>
+      <h3>EZ Sports Netting Warranty Policy</h3>
+      <p>We stand behind the quality of our products. Most netting and gear purchased from EZ Sports Netting is covered by a <strong>1-year limited warranty</strong> against defects in materials and workmanship, effective from the date of delivery.</p>
+      <ul>
+        <li><strong>What’s covered:</strong> Manufacturing defects, premature breakage, and abnormal wear under normal, intended use.</li>
+        <li><strong>What’s not covered:</strong> Damage from misuse, improper installation, vandalism, weather events, or normal wear and tear from heavy/abusive use.</li>
+        <li><strong>Eligible products:</strong> Custom and stock netting, L-screens, and select gear. Bats, gloves, and apparel may be covered by manufacturer warranties—see product page or contact us for details.</li>
+      </ul>
+      <h4>How to File a Warranty Claim</h4>
+      <ol>
+        <li>Contact our support team at <a href="mailto:support@ezsportsnetting.com">support@ezsportsnetting.com</a> or <a href="support.html">submit a request</a>.</li>
+        <li>Provide your order number, product details, and a description of the issue. Photos of the defect are required for netting claims.</li>
+        <li>Our team will review your claim and respond within 2 business days with next steps.</li>
+      </ol>
+      <p>If your claim is approved, we’ll repair, replace, or refund the item at our discretion. Shipping costs for warranty replacements are covered by us within the continental U.S.</p>
+      <p class="muted" style="margin-top:.5rem">Questions? <a href="support.html">Contact support</a> for help with warranty eligibility or the claim process.</p>
     </div>
     <p style="margin-top:1rem"><a class="btn btn-ghost" href="support.html">← Back to Support</a></p>
   </main>
   <footer class="site-footer">
     <div class="container footer-grid">
-      <div>
-  <a class="brand brand--light" href="index.html">
-          <img src="assets/img/logo.svg" alt="EZ Sports Netting logo" height="36"/>
+      <div class="footer-brand-block">
+        <a class="brand brand--light" href="index.html">
+          <img src="assets/img/ezsportslogo.jpg" alt="EZ Sports Netting logo" height="36"/>
           <span>EZ Sports Netting</span>
         </a>
         <p class="muted">Better baseball through better gear.</p>
+        <div class="socials" aria-label="social links">
+          <a href="#" aria-label="Instagram">📸</a>
+          <a href="#" aria-label="YouTube">▶️</a>
+          <a href="#" aria-label="X">𝕏</a>
+        </div>
       </div>
       <nav aria-label="Footer">
         <h4>Shop</h4>
@@ -74,12 +93,7 @@
       </form>
     </div>
     <div class="subfooter container">
-      <p>© <span id="year"></span> EZ Sports Netting. All rights reserved.</p>
-      <div class="socials" aria-label="social links">
-        <a href="#" aria-label="Instagram">📸</a>
-        <a href="#" aria-label="YouTube">▶️</a>
-        <a href="#" aria-label="X">𝕏</a>
-      </div>
+  <p>© <span id="year"></span> EZ Sports Netting. All rights reserved.</p>
     </div>
   </footer>
   <dialog id="mini-cart" class="mini-cart" aria-labelledby="cart-title">

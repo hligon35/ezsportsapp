@@ -18,18 +18,27 @@
   <header class="site-header">
     <div class="container header-bar">
       <a class="brand" href="index.html">
-        <img src="assets/img/logo.svg" alt="EZ Sports Netting logo" height="40"/>
+  <img src="assets/img/ezsportslogo.jpg" alt="EZ Sports Netting logo" height="40"/>
         <span>EZ Sports Netting</span>
       </a>
-      <nav id="primary-nav" class="quick-links" aria-label="Primary">
-        <a href="shop.html">Shop</a>
+      <nav id="primary-nav" class="quick-links nav-centered" aria-label="Primary">
         <a href="deals.html">Deals</a>
         <a href="about.html">About</a>
+        <a href="netting-calculator.html">Netting Calculator</a>
         <button class="cart-btn" aria-haspopup="dialog" aria-controls="mini-cart" onclick="Store.toggleCart()">
           <span class="icon">🛒</span>
           <span class="cart-count" id="cart-count">0</span>
         </button>
       </nav>
+        <nav id="duplicate-nav" class="quick-links nav-centered" aria-label="Duplicate">
+          <a href="deals.html">Deals</a>
+          <a href="about.html">About</a>
+          <a href="netting-calculator.html">Netting Calculator</a>
+          <button class="cart-btn" aria-haspopup="dialog" aria-controls="mini-cart" onclick="Store.toggleCart()">
+            <span class="icon">🛒</span>
+            <span class="cart-count" id="cart-count">0</span>
+          </button>
+        </nav>
     </div>
   </header>
   <main id="main">

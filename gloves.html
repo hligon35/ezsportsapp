@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Gloves | EZ Sports Netting</title>
   <meta name="description" content="Shop baseball gloves at EZ Sports Netting." />
-  <link rel="icon" type="image/svg+xml" href="assets/img/logo.svg" />
+  <link rel="icon" type="image/jpeg" href="assets/img/ezsportslogo.jpg" />
   <link rel="icon" type="image/png" href="assets/img/favicon-32.png" sizes="32x32" />
   <link rel="stylesheet" href="assets/css/styles.css" />
 </head>
@@ -15,15 +15,17 @@
     <div class="container header-bar">
       <button class="menu-toggle" aria-label="Toggle menu" aria-expanded="false" aria-controls="primary-nav">☰</button>
       <a class="brand" href="index.html">
-        <img src="assets/img/logo.svg" alt="EZ Sports Netting logo" height="40"/>
+  <img src="assets/img/ezsportslogo.jpg" alt="EZ Sports Netting logo" height="40"/>
         <span>EZ Sports Netting</span>
       </a>
       <form class="search" role="search" aria-label="Search store" onsubmit="event.preventDefault(); window.Store.search(this.q.value)">
         <input type="search" name="q" placeholder="Search bats, gloves, helmets…" aria-label="Search"/>
         <button type="submit" class="btn btn-primary">Search</button>
       </form>
-      <nav id="primary-nav" class="quick-links" aria-label="Primary">
-        <!-- Links populated by app.js -->
+      <nav id="primary-nav" class="quick-links nav-centered" aria-label="Primary">
+        <a href="deals.html">Deals</a>
+        <a href="about.html">About</a>
+        <a href="netting-calculator.html">Netting Calculator</a>
         <button class="cart-btn" aria-haspopup="dialog" aria-controls="mini-cart" onclick="Store.toggleCart()">
           <span class="icon">🛒</span>
           <span class="cart-count" id="cart-count">0</span>
@@ -33,11 +35,126 @@
   </header>
   <main id="main" class="container">
     <h1>Gloves</h1>
-    <p class="muted">Category placeholder. Build your content or product grid here.</p>
+    <div id="glove-grid" class="grid"></div>
+  <div id="glove-pagination" class="mt-4 pagination-controls"></div>
+    <script>
+      // List of actual glove images found in assets/img (15 total)
+      const gloveImages = [
+        "assets/img/glove1.avif","assets/img/glove2.avif","assets/img/glove3.avif","assets/img/glove4.avif","assets/img/glove5.avif","assets/img/glove6.avif","assets/img/glove7.avif","assets/img/glove8.avif","assets/img/glove9.avif","assets/img/glove10.avif",
+        "assets/img/glove11.avif","assets/img/glove12.avif","assets/img/glove13.avif","assets/img/glove14.avif","assets/img/glove15.avif"
+      ];
+      const gloveNames = [
+        "EZ Pro Infield Glove","EZ Outfield Glove","EZ Youth Glove","EZ Catcher's Mitt","EZ First Base Mitt",
+        "EZ Fastpitch Glove","EZ Elite Series Glove","EZ Stealth Glove","EZ Thunder Glove","EZ Lightning Glove",
+        "EZ Supreme Glove","EZ Ultra Glove","EZ Victory Glove","EZ Champion Glove","EZ Dominator Glove"
+      ];
+      const gloveDescs = [
+        "Premium steerhide leather, quick break-in, perfect for infielders seeking control.",
+        "Deep pocket and long reach, ideal for outfielders. Durable and comfortable fit.",
+        "Lightweight, flexible glove for young players. Easy to close and control.",
+        "Reinforced padding and deep pocket for catchers. Built for high-impact play.",
+        "Wide, scooped design for first basemen. Soft leather, quick break-in.",
+        "Fastpitch model, snug fit, pro webbing.",
+        "Elite series, premium materials, pro feel.",
+        "Stealth design, quick response.",
+        "Thunder: strong, durable, and reliable.",
+        "Lightning: fast break-in, lightweight.",
+        "Supreme comfort, pro taper fit.",
+        "Ultra-durable, all-weather performance.",
+        "Victory model, balanced for all fielders.",
+        "Champion’s choice, classic look.",
+        "Dominator: for the serious fielder."
+      ];
+      const glovePrices = [159.99,179.99,69.99,189.99,149.99,139.99,159.99,169.99,109.99,119.99,129.99,139.99,149.99,159.99,169.99];
+      function renderGloves(page=1) {
+        const perPage = 12;
+        const start = (page-1)*perPage;
+        // Only as many products as there are images
+        const gloves = gloveImages.map((img,i)=>({img,name:gloveNames[i]||`EZ Glove ${i+1}`,desc:gloveDescs[i]||"Pro-grade glove.",price:glovePrices[i]||159.99}));
+        const pageGloves = gloves.slice(start,start+perPage);
+        document.getElementById('glove-grid').innerHTML = pageGloves.map((glove, idx)=>`
+          <div class="card">
+            <img src="${glove.img}" alt="${glove.name}" />
+            <div class="body">
+              <h3>${glove.name}</h3>
+              <p>${glove.desc}</p>
+              <div class="price-row">
+                <span class="price">$${glove.price.toFixed(2)}</span>
+                <button class="btn btn-ghost" data-add-glove="${start+idx}">Add</button>
+              </div>
+            </div>
+          </div>
+        `).join('');
+        // Add to cart button logic
+        document.querySelectorAll('[data-add-glove]').forEach(btn => {
+          btn.addEventListener('click', function() {
+            const i = parseInt(btn.getAttribute('data-add-glove'));
+            const glove = gloves[i];
+            if (window.Store && window.Store.add) {
+              window.Store.add({
+                id: 'glove-' + (i+1),
+                title: glove.name,
+                price: glove.price,
+                img: glove.img,
+                category: 'gloves'
+              });
+            } else {
+              alert('Cart not available.');
+            }
+          });
+        });
+        // Pagination controls
+        const totalPages = Math.ceil(gloves.length/perPage);
+        let pagHtml = '';
+        for(let i=1;i<=totalPages;i++){
+          pagHtml += `<button onclick=\"renderGloves(${i})\" class=\"btn btn-ghost\" style=\"${i===page?'background:#0b64d4;color:#fff;':''}\">${i}</button>`;
+        }
+        document.getElementById('glove-pagination').innerHTML = pagHtml;
+      }
+      renderGloves();
+    </script>
   </main>
   <footer class="site-footer">
-    <div class="container subfooter">
-      <p>© <span id="year"></span> EZ Sports Netting. All rights reserved.</p>
+    <div class="container footer-grid">
+      <div class="footer-brand-block">
+        <a class="brand brand--light" href="index.html">
+          <img src="assets/img/ezsportslogo.jpg" alt="EZ Sports Netting logo" height="36"/>
+          <span>EZ Sports Netting</span>
+        </a>
+        <p class="muted">Better baseball through better gear.</p>
+        <div class="socials" aria-label="social links">
+          <a href="#" aria-label="Instagram">📸</a>
+          <a href="#" aria-label="YouTube">▶️</a>
+          <a href="#" aria-label="X">𝕏</a>
+        </div>
+      </div>
+      <nav aria-label="Footer">
+        <h4>Shop</h4>
+        <ul>
+          <li><a href="shop.html#catalog" onclick="Store.filter('bats')">Bats</a></li>
+          <li><a href="shop.html#catalog" onclick="Store.filter('gloves')">Gloves</a></li>
+          <li><a href="shop.html#catalog" onclick="Store.filter('netting')">Netting</a></li>
+          <li><a href="shop.html#catalog" onclick="Store.filter('helmets')">Helmets</a></li>
+        </ul>
+      </nav>
+      <nav>
+        <h4>Company</h4>
+        <ul>
+          <li><a href="about.html">About</a></li>
+          <li><a href="careers.html">Careers</a></li>
+          <li><a href="support.html">Support</a></li>
+        </ul>
+      </nav>
+      <form class="subscribe" onsubmit="event.preventDefault(); alert('Thanks for subscribing!')">
+        <h4>Get deals in your inbox</h4>
+        <div class="row">
+          <input type="email" placeholder="you@email.com" required />
+          <button class="btn btn-primary" type="submit">Subscribe</button>
+        </div>
+      </form>
+    </div>
+    <div class="subfooter container">
+  <p>© <span id="year"></span> EZ Sports Netting. All rights reserved.</p>
     </div>
   </footer>
 

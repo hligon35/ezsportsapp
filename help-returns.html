@@ -7,7 +7,7 @@
   <meta name="description" content="Return & exchange policy: timelines, condition requirements, and how to start a return at EZ Sports Netting." />
   <meta name="robots" content="index,follow" />
   <link rel="canonical" href="https://ezsportsnetting.com/help-returns.html" />
-  <link rel="icon" type="image/svg+xml" href="assets/img/logo.svg" />
+  <link rel="icon" type="image/jpeg" href="assets/img/ezsportslogo.jpg" />
   <link rel="icon" type="image/png" href="assets/img/favicon-32.png" sizes="32x32" />
   <link rel="stylesheet" href="assets/css/styles.css" />
   <meta property="og:title" content="Returns & Exchanges Policy" />
@@ -22,39 +22,54 @@
     <div class="container header-bar">
       <button class="menu-toggle" aria-label="Toggle menu" aria-expanded="false" aria-controls="primary-nav">☰</button>
   <a class="brand" href="index.html">
-  <img src="assets/img/logo.svg" alt="EZ Sports Netting logo" height="40"/>
+  <img src="assets/img/ezsportslogo.jpg" alt="EZ Sports Netting logo" height="40"/>
         <span>EZ Sports Netting</span>
       </a>
       <form class="search" role="search" aria-label="Search store" onsubmit="event.preventDefault(); window.Store.search(this.q.value)">
         <input type="search" name="q" placeholder="Search bats, gloves, helmets…" aria-label="Search"/>
         <button type="submit" class="btn btn-primary">Search</button>
       </form>
-  <nav id="primary-nav" class="quick-links" aria-label="Primary">
-        <a href="shop.html">Shop</a>
-        <a href="deals.html">Deals</a>
-        <a href="about.html">About</a>
-        <button class="cart-btn" aria-haspopup="dialog" aria-controls="mini-cart" onclick="Store.toggleCart()">
-          <span class="icon">🛒</span>
-          <span class="cart-count" id="cart-count">0</span>
-        </button>
-      </nav>
+  <nav id="primary-nav" class="quick-links nav-centered" aria-label="Primary">
+    <a href="deals.html">Deals</a>
+    <a href="about.html">About</a>
+    <a href="netting-calculator.html">Netting Calculator</a>
+    <button class="cart-btn" aria-haspopup="dialog" aria-controls="mini-cart" onclick="Store.toggleCart()">
+      <span class="icon">🛒</span>
+      <span class="cart-count" id="cart-count">0</span>
+    </button>
+  </nav>
     </div>
   </header>
   <main id="main" class="container" style="margin-top:1rem">
     <h2 class="section-title">Returns & Exchanges</h2>
-    <div class="card" style="padding:1rem">
-      <p class="muted">Placeholder policy for returns and exchanges. Include timelines, condition requirements, and how to initiate a return.</p>
-    </div>
-    <p style="margin-top:1rem"><a class="btn btn-ghost" href="support.html">← Back to Support</a></p>
+      <div class="card" style="padding:1rem">
+        <h3>EZ Sports Returns & Exchanges</h3>
+        <ul>
+          <li><strong>Return Window:</strong> Most items can be returned or exchanged within 30 days of delivery. Custom netting and special orders are non-returnable unless defective.</li>
+          <li><strong>Eligibility:</strong> Items must be unused, in original packaging, and in resellable condition. Used, worn, or altered items are not eligible.</li>
+          <li><strong>How to Start a Return:</strong> Contact us at <a href="mailto:support@ezsportsnetting.com">support@ezsportsnetting.com</a> or <a href="support.html">submit a request</a> with your order number and reason for return.</li>
+          <li><strong>Return Shipping:</strong> Customers are responsible for return shipping costs unless the item is defective or we made an error. We recommend using a trackable shipping method.</li>
+          <li><strong>Refunds:</strong> Issued to your original payment method within 5 business days of receiving and inspecting the return. Shipping charges are non-refundable.</li>
+          <li><strong>Exchanges:</strong> For size or product exchanges, please initiate a return and place a new order for the desired item.</li>
+          <li><strong>Restocking Fee:</strong> A 10% restocking fee may apply to non-defective returns of custom or bulk orders.</li>
+        </ul>
+        <p class="muted" style="margin-top:.5rem">Questions about returns or exchanges? <a href="support.html">Contact support</a> for help with your order.</p>
+      </div>
+      <p style="margin-top:1rem"><a class="btn btn-ghost" href="support.html">← Back to Support</a></p>
   </main>
   <footer class="site-footer">
     <div class="container footer-grid">
-      <div>
-  <a class="brand brand--light" href="index.html">
-          <img src="assets/img/logo.svg" alt="EZ Sports Netting logo" height="36"/>
+      <div class="footer-brand-block">
+        <a class="brand brand--light" href="index.html">
+          <img src="assets/img/ezsportslogo.jpg" alt="EZ Sports Netting logo" height="36"/>
           <span>EZ Sports Netting</span>
         </a>
         <p class="muted">Better baseball through better gear.</p>
+        <div class="socials" aria-label="social links">
+          <a href="#" aria-label="Instagram">📸</a>
+          <a href="#" aria-label="YouTube">▶️</a>
+          <a href="#" aria-label="X">𝕏</a>
+        </div>
       </div>
       <nav aria-label="Footer">
         <h4>Shop</h4>
@@ -82,12 +97,7 @@
       </form>
     </div>
     <div class="subfooter container">
-      <p>© <span id="year"></span> EZ Sports Netting. All rights reserved.</p>
-      <div class="socials" aria-label="social links">
-        <a href="#" aria-label="Instagram">📸</a>
-        <a href="#" aria-label="YouTube">▶️</a>
-        <a href="#" aria-label="X">𝕏</a>
-      </div>
+  <p>© <span id="year"></span> EZ Sports Netting. All rights reserved.</p>
     </div>
   </footer>
   <dialog id="mini-cart" class="mini-cart" aria-labelledby="cart-title">

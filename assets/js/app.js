@@ -137,17 +137,17 @@ const Store = {
     if (!nav) return;
 
     const required = [
-  { href: 'bats.html', text: 'Bats' },
-  { href: 'gloves.html', text: 'Gloves' },
-  { href: 'batting-gloves.html', text: 'Batting Gloves' },
-  { href: 'drip.html', text: 'Drip' },
-  { href: 'gear.html', text: 'Gear' },
-  { href: 'apparel.html', text: 'Apparel' },
-  { href: 'l-screens.html', text: 'L-Screens' },
-  { href: 'facility-field.html', text: 'Facility & Field' },
-      { href: 'shop.html', text: 'Shop' },
       { href: 'deals.html', text: 'Deals' },
       { href: 'about.html', text: 'About' },
+      { href: 'netting-calculator.html', text: 'Netting' },
+      { href: 'bats.html', text: 'Bats' },
+      { href: 'gloves.html', text: 'Gloves' },
+      { href: 'batting-gloves.html', text: 'Batting Gloves' },
+      { href: 'drip.html', text: 'Drip' },
+      { href: 'gear.html', text: 'Gear' },
+      { href: 'apparel.html', text: 'Apparel' },
+      { href: 'l-screens.html', text: 'L-Screens' },
+      { href: 'facility-field.html', text: 'Facility & Field' },
       { href: 'netting-calculator.html', text: 'Calculator' },
     ];
 
