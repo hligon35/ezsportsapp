@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const UserService = require('../services/UserService');
-const { signToken, requireAdmin, requireAuth } = require('../middleware/auth');
+const { signToken, requireAdmin, requireAuth, authenticateToken } = require('../middleware/auth'); // Added authenticateToken
 
 const userService = new UserService();
 
@@ -9,7 +9,7 @@ const userService = new UserService();
 router.post('/register', async (req, res) => {
   try {
     const { email, password, name } = req.body;
-    
+
     if (!email || !password || !name) {
       return res.status(400).json({ message: 'Email, password, and name are required' });
     }
@@ -33,7 +33,7 @@ router.post('/login', async (req, res) => {
   try {
     const { identifier, password, email } = req.body;
     const loginId = identifier || email; // support both field names from clients
-    
+
     if (!loginId || !password) {
       return res.status(400).json({ message: 'Identifier (email or username) and password are required' });
     }
@@ -79,7 +79,7 @@ router.put('/profile/:id', requireAuth, async (req, res) => {
 router.post('/change-password/:id', requireAuth, async (req, res) => {
   try {
     const { oldPassword, newPassword } = req.body;
-    
+
     if (!oldPassword || !newPassword) {
       return res.status(400).json({ message: 'Old and new passwords are required' });
     }
@@ -91,13 +91,19 @@ router.post('/change-password/:id', requireAuth, async (req, res) => {
   }
 });
 
-// Get all users (admin only)
-router.get('/admin/all', requireAdmin, async (req, res) => {
+// Admin: Get all users
+router.get('/admin/all', authenticateToken, requireAdmin, async (req, res) => {
   try {
     const users = await userService.getAllUsers();
-    res.json(users);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
+    // Remove password hashes from response
+    const safeUsers = users.map(user => ({
+      ...user,
+      password: undefined
+    }));
+    res.json(safeUsers);
+  } catch (error) {
+    console.error('Error fetching users:', error);
+    res.status(500).json({ error: 'Failed to fetch users' });
   }
 });
 

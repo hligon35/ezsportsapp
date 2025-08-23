@@ -9,7 +9,7 @@ const orderService = new OrderService();
 router.post('/', requireAuth, async (req, res) => {
   try {
     const orderData = req.body;
-    
+
     if (!orderData.items || !Array.isArray(orderData.items) || orderData.items.length === 0) {
       return res.status(400).json({ message: 'Order must contain at least one item' });
     }

@@ -106,12 +106,12 @@ function showSection(section, btn) {
 function renderProducts() {
   const products = getProducts();
   const list = document.getElementById('products-list');
-  
+
   if (!products.length) {
     list.innerHTML = '<p>No products yet. Add your first product above.</p>';
     return;
   }
-  
+
   list.innerHTML = products.map(p => `
     <div class="product-item">
       <div>
@@ -130,7 +130,7 @@ function renderOrders() {
   const list = document.getElementById('orders-list');
   const status = document.getElementById('orders-status-filter')?.value || '';
   list.innerHTML = '<p>Loading orders…</p>';
-  
+
   const params = new URLSearchParams();
   if (status) params.set('status', status);
   params.set('page', window.__ordersPage||1);
@@ -146,6 +146,7 @@ function renderOrders() {
       return res.json();
     })
     .then(result => {
+      console.log('Loaded orders:', result); // Debug logging
       const { items:orders, total, page, pageSize } = Array.isArray(result) ? { items:result, total:result.length, page:1, pageSize:result.length } : result;
       if (!orders || !orders.length) {
         list.innerHTML = '<p>No orders found.</p>';
@@ -206,6 +207,7 @@ function renderUsers() {
   fetchAdmin(`/api/users/admin/all`)
     .then(async res=>{ if(!res.ok){ const txt=await res.text().catch(()=> ''); throw new Error(txt||'Unauthorized or failed'); } return res.json(); })
     .then(users => {
+      console.log('Loaded users:', users); // Debug logging
       if (!users || !users.length) { list.innerHTML = '<p>No users found.</p>'; return; }
       list.innerHTML = users.map(user => `
         <div class="product-item">
@@ -238,7 +240,7 @@ function editProduct(id) {
   const products = getProducts();
   const product = products.find(p => p.id === id);
   if (!product) return;
-  
+
   currentEditingProduct = id;
   document.getElementById('product-name').value = product.name;
   document.getElementById('product-price').value = product.price;
@@ -246,7 +248,7 @@ function editProduct(id) {
   document.getElementById('product-category').value = product.category;
   document.getElementById('product-description').value = product.description || '';
   document.getElementById('product-stock').value = product.stock || 0;
-  
+
   document.querySelector('#product-form button[type="submit"]').textContent = 'Update Product';
   document.getElementById('cancel-edit').style.display = 'block';
 }
@@ -263,7 +265,7 @@ function updateProduct(id, productData) {
 
 function deleteProduct(id) {
   if (!confirm('Are you sure you want to delete this product?')) return;
-  
+
   const products = getProducts().filter(p => p.id !== id);
   saveProducts(products);
   renderProducts();
@@ -279,7 +281,7 @@ function cancelEdit() {
 // Initialize admin panel
 document.addEventListener('DOMContentLoaded', () => {
   const user = getCurrentUser();
-  
+
   // Check if user is admin
   if (!user || !user.isAdmin) {
     alert('Access denied. Admin privileges required.');
@@ -295,11 +297,11 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
   } catch {}
-  
+
   // Product form submission
   document.getElementById('product-form').addEventListener('submit', (e) => {
     e.preventDefault();
-    
+
     const productData = {
       name: document.getElementById('product-name').value,
       price: parseFloat(document.getElementById('product-price').value),
@@ -308,7 +310,7 @@ document.addEventListener('DOMContentLoaded', () => {
       description: document.getElementById('product-description').value,
       stock: parseInt(document.getElementById('product-stock').value) || 0
     };
-    
+
     if (currentEditingProduct) {
       updateProduct(currentEditingProduct, productData);
       cancelEdit();
@@ -317,7 +319,7 @@ document.addEventListener('DOMContentLoaded', () => {
       document.getElementById('product-form').reset();
     }
   });
-  
+
   // Logout functionality
   const logoutBtn = document.getElementById('logout-btn');
   if (logoutBtn) {
@@ -329,7 +331,7 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     });
   }
-  
+
   // Load initial data
   // Ensure the default tab (Products) is visible on load
   showSection('products', document.querySelector('.admin-nav button'));
@@ -338,7 +340,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const refreshBtn = document.getElementById('orders-refresh-btn');
   if (statusFilter) statusFilter.addEventListener('change', renderOrders);
   if (refreshBtn) refreshBtn.addEventListener('click', renderOrders);
-  
+
   // Invoices filters
   const invStatusFilter = document.getElementById('invoices-status-filter');
   const invRefreshBtn = document.getElementById('invoices-refresh-btn');
