@@ -1,47 +1,4 @@
-[
-	{
-		"id": 3001,
-		"userId": 1001,
-		"userEmail": "demo@ezsportsapp.test",
-		"items": [
-			{ "productId": "bat-ghost", "productName": "Ghost Bat Pro", "price": 399.95, "quantity": 1, "subtotal": 399.95 },
-			{ "productId": "helmet-pro", "productName": "Pro Batting Helmet", "price": 89.99, "quantity": 1, "subtotal": 89.99 }
-		],
-		"total": 489.94,
-		"status": "paid",
-		"shippingAddress": { "line1": "123 Diamond Way", "city": "Balltown", "state": "CA", "zip": "90210" },
-		"createdAt": "2025-08-20T14:05:00.000Z",
-		"updatedAt": "2025-08-20T14:15:00.000Z"
-	},
-	{
-		"id": 3002,
-		"userId": 1002,
-		"userEmail": "casey.hitter@ezsportsapp.test",
-		"items": [
-			{ "productId": "glove-a2000", "productName": "A2000 Baseball Glove", "price": 299.95, "quantity": 1, "subtotal": 299.95 },
-			{ "productId": "net-pro", "productName": "Pro Practice Net", "price": 219.00, "quantity": 1, "subtotal": 219.00 }
-		],
-		"total": 518.95,
-		"status": "pending",
-		"shippingAddress": { "line1": "77 Infield Rd", "city": "Slugger", "state": "TX", "zip": "73301" },
-		"createdAt": "2025-08-21T09:30:00.000Z",
-		"updatedAt": "2025-08-21T09:30:00.000Z"
-	},
-	{
-		"id": 3003,
-		"userId": 1003,
-		"userEmail": "riley.catcher@ezsportsapp.test",
-		"items": [
-			{ "productId": "helmet-lite", "productName": "Lite Batting Helmet", "price": 59.99, "quantity": 2, "subtotal": 119.98 },
-			{ "productId": "glove-heart", "productName": "Heart of the Hide Glove", "price": 279.95, "quantity": 1, "subtotal": 279.95 }
-		],
-		"total": 399.93,
-		"status": "fulfilled",
-		"shippingAddress": { "line1": "9 Backstop Ave", "city": "Catcher", "state": "FL", "zip": "33101" },
-		"createdAt": "2025-08-22T10:10:00.000Z",
-		"updatedAt": "2025-08-22T12:00:00.000Z"
-	}
-]
+
 [
   {
     "id": 3001,
@@ -49,11 +6,11 @@
     "userEmail": "demo@ezsportsapp.test",
     "items": [
       {
-        "id": "bat-ghost",
-        "name": "Louisville Slugger Ghost",
+        "productId": "bat-ghost",
+        "productName": "Louisville Slugger Ghost",
         "price": 399.95,
-        "qty": 1,
-        "category": "bats"
+        "quantity": 1,
+        "subtotal": 399.95
       }
     ],
     "total": 409.95,
@@ -75,18 +32,18 @@
     "userEmail": "casey.hitter@ezsportsapp.test",
     "items": [
       {
-        "id": "glove-a2000",
-        "name": "Wilson A2000 Glove",
+        "productId": "glove-a2000",
+        "productName": "Wilson A2000 Glove",
         "price": 299.95,
-        "qty": 1,
-        "category": "gloves"
+        "quantity": 1,
+        "subtotal": 299.95
       },
       {
-        "id": "helmet-pro",
-        "name": "Rawlings Pro Helmet",
+        "productId": "helmet-pro",
+        "productName": "Rawlings Pro Helmet",
         "price": 89.99,
-        "qty": 1,
-        "category": "helmets"
+        "quantity": 1,
+        "subtotal": 89.99
       }
     ],
     "total": 399.94,
@@ -101,5 +58,31 @@
     },
     "createdAt": "2025-01-16T14:20:00.000Z",
     "updatedAt": "2025-01-16T14:20:00.000Z"
+  },
+  {
+    "id": 3003,
+    "userId": 1003,
+    "userEmail": "riley.catcher@ezsportsapp.test",
+    "items": [
+      {
+        "productId": "bat-ghost",
+        "productName": "Louisville Slugger Ghost",
+        "price": 399.95,
+        "quantity": 1,
+        "subtotal": 399.95
+      }
+    ],
+    "total": 399.95,
+    "status": "fulfilled",
+    "shippingAddress": {
+      "name": "Riley Catcher",
+      "address1": "789 Pine St",
+      "city": "Baseball Town",
+      "state": "FL",
+      "postal": "33101",
+      "country": "US"
+    },
+    "createdAt": "2025-01-17T16:45:00.000Z",
+    "updatedAt": "2025-01-17T16:45:00.000Z"
   }
 ]

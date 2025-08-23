@@ -1,15 +1,14 @@
 // Admin panel functionality
 let currentEditingProduct = null;
 const API_BASES = (() => {
-  const ports = [4242, 4343];
-  const bases = [];
   const isHttp = location.protocol.startsWith('http');
-  const sameHost = isHttp ? `${location.protocol}//${location.hostname}` : '';
-  // Try localhost/127.0.0.1 first for Live Server or file://
-  ['localhost', '127.0.0.1'].forEach(h => ports.forEach(p => bases.push(`http://${h}:${p}`)));
-  // Also try same host:port if served over http(s)
-  if (isHttp) ports.forEach(p => bases.push(`${sameHost}:${p}`));
-  return Array.from(new Set(bases));
+  // For Replit, use same-origin (empty string) first, then fallback to localhost for development
+  const bases = [''];
+  if (location.port === '5500') {
+    // Live Server development
+    bases.push('http://localhost:4242', 'http://127.0.0.1:4242');
+  }
+  return bases;
 })();
 
 function authHeaders() {
