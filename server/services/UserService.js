@@ -43,7 +43,7 @@ class UserService {
 
       // Insert user
       const user = await this.db.insert('users', newUser);
-      
+
       // Return user without password
       const { password, ...userWithoutPassword } = user;
       return userWithoutPassword;
@@ -96,7 +96,7 @@ class UserService {
       if (!user) {
         return null;
       }
-      
+
       const { password, ...userWithoutPassword } = user;
       return userWithoutPassword;
     } catch (error) {
