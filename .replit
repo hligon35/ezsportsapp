@@ -10,3 +10,15 @@ run = ["sh", "-c", "npm run dev"]
 [[ports]]
 localPort = 4242
 externalPort = 80
+
+[workflows]
+runButton = "Run"
+
+[[workflows.workflow]]
+name = "Run"
+author = 46775484
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd server && npm install && npm start"
