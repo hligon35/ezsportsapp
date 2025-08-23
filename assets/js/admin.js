@@ -1,18 +1,14 @@
 // Admin panel functionality
 let currentEditingProduct = null;
 const API_BASES = (() => {
-  const bases = [''];
   const ports = [4242, 4343];
-  const hosts = [location.hostname, 'localhost', '127.0.0.1'];
-  if (location.protocol.startsWith('http')) {
-    // Prefer same host with common ports
-    ports.forEach(p => bases.push(`${location.protocol}//${location.hostname}:${p}`));
-    // Explicit common hosts
-    hosts.forEach(h => ports.forEach(p => bases.push(`http://${h}:${p}`)));
-  } else {
-    // file:// fallback
-    hosts.forEach(h => ports.forEach(p => bases.push(`http://${h}:${p}`)));
-  }
+  const bases = [];
+  const isHttp = location.protocol.startsWith('http');
+  const sameHost = isHttp ? `${location.protocol}//${location.hostname}` : '';
+  // Try localhost/127.0.0.1 first for Live Server or file://
+  ['localhost', '127.0.0.1'].forEach(h => ports.forEach(p => bases.push(`http://${h}:${p}`)));
+  // Also try same host:port if served over http(s)
+  if (isHttp) ports.forEach(p => bases.push(`${sameHost}:${p}`));
   return Array.from(new Set(bases));
 })();
 
@@ -89,13 +85,15 @@ function generateId() {
 }
 
 function showSection(section, btn) {
-  // Hide all sections
-  document.querySelectorAll('.admin-section').forEach(s => s.style.display = 'none');
+  // Hide all sections (use class since .hidden has !important and overrides inline styles)
+  const sections = document.querySelectorAll('.admin-section');
+  sections.forEach(s => s.classList.add('hidden'));
+  // Update tab active state
   document.querySelectorAll('.admin-nav button').forEach(b => b.classList.remove('active'));
 
   // Show selected section and mark active tab
   const el = document.getElementById(section + '-section');
-  if (el) el.style.display = 'block';
+  if (el) el.classList.remove('hidden');
   if (btn) btn.classList.add('active');
 
   // Load data for section
@@ -324,7 +322,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const logoutBtn = document.getElementById('logout-btn');
   if (logoutBtn) {
     logoutBtn.addEventListener('click', () => {
-      fetch(`${(window.__API_BASE||'')}/api/users/logout`, { method:'POST', credentials:'include' }).finally(()=>{
+  const base = window.__API_BASE || API_BASES[0] || '';
+  fetch(`${base}/api/users/logout`, { method:'POST', credentials:'include', headers: authHeaders() }).finally(()=>{
         localStorage.removeItem('currentUser');
         window.location.href = 'index.html';
       });
@@ -332,7 +331,8 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   
   // Load initial data
-  renderProducts();
+  // Ensure the default tab (Products) is visible on load
+  showSection('products', document.querySelector('.admin-nav button'));
   // Orders filters
   const statusFilter = document.getElementById('orders-status-filter');
   const refreshBtn = document.getElementById('orders-refresh-btn');
@@ -378,7 +378,7 @@ function renderInvoices() {
           </div>
           <div style="display:flex; gap:.5rem; align-items:center;">
             <strong>$${Number(inv.total||0).toFixed(2)}</strong>
-            <a class="btn btn-ghost" href="${(window.__API_BASE||'')}/api/invoices/${inv.id}/print" target="_blank" rel="noopener">View</a>
+                <a class="btn btn-ghost" href="${(window.__API_BASE||API_BASES[0]||'')}/api/invoices/${inv.id}/print" target="_blank" rel="noopener">View</a>
             <button class="btn btn-ghost" data-print="${inv.id}">Print</button>
           </div>
         </div>

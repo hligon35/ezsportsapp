@@ -24,12 +24,19 @@ class UserService {
       // Hash password
       const hashedPassword = await bcrypt.hash(userData.password, this.saltRounds);
 
+      // Normalize name: accept either single name or first/last
+      const fullName = (userData.name || [userData.firstName, userData.lastName].filter(Boolean).join(' ')).trim();
+      const [firstName, ...rest] = fullName.split(' ');
+      const lastName = rest.join(' ').trim() || undefined;
+
       // Create user object
       const newUser = {
         email: userData.email,
         username: userData.username || undefined,
         password: hashedPassword,
-        name: userData.name,
+        name: fullName || undefined,
+        firstName: firstName || undefined,
+        lastName: lastName,
         isAdmin: userData.email === 'admin@ezsports.com', // Auto-admin for specific email
         lastLogin: null
       };

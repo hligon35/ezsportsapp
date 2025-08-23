@@ -110,13 +110,13 @@ function toggleMode() {
 
   if (isRegisterMode) {
     title.textContent = 'Sign Up';
-    nameField.style.display = 'block';
+  nameField.classList.remove('hidden');
     submitBtn.textContent = 'Sign Up';
     toggleText.textContent = 'Already have an account?';
     toggleLink.textContent = 'Login';
   } else {
     title.textContent = 'Login';
-    nameField.style.display = 'none';
+  nameField.classList.add('hidden');
     submitBtn.textContent = 'Login';
     toggleText.textContent = "Don't have an account?";
     toggleLink.textContent = 'Sign up';
@@ -178,26 +178,28 @@ document.addEventListener('DOMContentLoaded', () => {
     e.preventDefault();
   const identifier = document.getElementById('identifier').value;
     const password = document.getElementById('password').value;
-    const name = document.getElementById('name').value;
+  const firstName = (document.getElementById('firstName')?.value || '').trim();
+  const lastName = (document.getElementById('lastName')?.value || '').trim();
+  const password2 = (document.getElementById('password2')?.value || '').trim();
 
     try {
       if (isRegisterMode) {
         // Registration
-        if (!name.trim()) {
-          showMessage('Please enter your full name');
-          return;
-        }
+    if (!firstName || !lastName) return showMessage('Please enter first and last name');
+    if (password.length < 6) return showMessage('Password must be at least 6 characters');
+    if (password !== password2) return showMessage('Passwords do not match');
         
         showMessage('Creating account...', false);
-  // Use identifier as email for signup
-  const newUser = await registerUser(identifier, password, name.trim());
+    // Use identifier as email for signup
+    const fullName = `${firstName} ${lastName}`.trim();
+    const newUser = await registerUser(identifier, password, fullName);
         showMessage('Account created successfully!', false);
         setTimeout(() => loginUser(newUser), 1000);
         
       } else {
         // Login
         showMessage('Logging in...', false);
-  const user = await authenticateUser(identifier, password);
+    const user = await authenticateUser(identifier, password);
         loginUser(user);
       }
     } catch (error) {

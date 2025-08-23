@@ -1,6 +1,3 @@
-  display: flex;
-  justify-content: center;
-  gap: 1rem;
 /* Pagination controls for product grids */
 .pagination-controls, #bat-pagination, #glove-pagination, #batglo-pagination {
   display: flex;
@@ -61,6 +58,7 @@ body{
 .muted{ color: var(--muted); }
 .mt-4{ margin-top: 1.25rem; }
 .mt-1{ margin-top: .5rem; }
+.mt-6{ margin-top: 1.5rem; }
 .stack-05{ display:grid; gap:.5rem; }
 .stack-04{ display:grid; gap:.4rem; }
 .stack-03{ display:grid; gap:.3rem; }
@@ -321,6 +319,7 @@ img{max-width:100%;display:block}
 .subfooter{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.5rem;text-align:center;border-top:1px solid rgba(255,255,255,.08);padding:1rem 0;color:#d3d0d7}
 .footer-brand-block { display: flex; flex-direction: column; align-items: center; text-align: center; gap: .5rem; }
 .socials { display: flex; justify-content: center; gap: 1rem; }
+.socials img { height: 20px; width: 20px; display: block; object-fit: contain; }
 .brand--light{opacity:1}
 .subscribe .row{display:flex;gap:.5rem}
 .subscribe input{flex:1;padding:.65rem .8rem;border-radius:.6rem;border:1px solid var(--border);background:#fff;color:var(--ink)}

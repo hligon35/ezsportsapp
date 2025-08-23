@@ -16,11 +16,16 @@ const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY || 'sk_test_yourk
 const DatabaseManager = require('./database/DatabaseManager');
 const ProductService = require('./services/ProductService');
 const OrderService = require('./services/OrderService');
+const InvoiceService = require('./services/InvoiceService');
+const AnalyticsService = require('./services/AnalyticsService');
+const { requireAdmin } = require('./middleware/auth');
 
 // Initialize database
 const db = new DatabaseManager();
 const productService = new ProductService();
 const orderService = new OrderService();
+const invoiceService = new InvoiceService();
+const analyticsService = new AnalyticsService();
 
 // Initialize database on startup
 db.initialize().catch(console.error);
@@ -44,7 +49,8 @@ const devOrigins = ['http://127.0.0.1:5500', 'http://localhost:5500', 'http://lo
 const allowList = envOrigins.length ? envOrigins : devOrigins;
 const corsOptions = {
   origin: (origin, cb) => {
-    if (!origin) return cb(null, true); // non-browser or same-origin
+    // Allow non-browser/same-origin requests, and file:// (Origin: 'null') during development
+    if (!origin || origin === 'null') return cb(null, true);
     if (allowList.includes(origin)) return cb(null, true);
     return cb(null, false);
   },
@@ -117,6 +123,35 @@ app.use('/api/orders', orderRoutes);
 app.use('/api/inventory', inventoryRoutes);
 app.use('/api/invoices', invoiceRoutes);
 app.use('/api/analytics', analyticsRoutes);
+
+// Fallback endpoints (defensive): ensure core routes respond in dev even if router mounting is altered
+app.post('/api/analytics/track', async (req, res) => {
+  try {
+    const { path, referrer, visitorId, userId, ts } = req.body || {};
+    const ev = await analyticsService.trackPageView({ path, referrer, visitorId, userId, ts });
+    res.json({ ok: true, id: ev?.id });
+  } catch (e) {
+    res.status(400).json({ message: e.message });
+  }
+});
+app.post('/api/analytics/event', async (req, res) => {
+  try {
+    const { type, productId, visitorId, userId, ts } = req.body || {};
+    const ev = await analyticsService.trackEvent({ type, productId, visitorId, userId, ts });
+    res.json({ ok: true, id: ev?.id });
+  } catch (e) {
+    res.status(400).json({ message: e.message });
+  }
+});
+app.get('/api/invoices/admin/all', requireAdmin, async (req, res) => {
+  try {
+    const { status, page, pageSize, sortBy, sortDir } = req.query;
+    const result = await invoiceService.getAllInvoices(status, { page, pageSize, sortBy, sortDir });
+    res.json(result);
+  } catch (e) {
+    res.status(500).json({ message: e.message });
+  }
+});
 
 // Serve static frontend (HTML, assets, service worker) from project root
 // Serve favicon explicitly (browsers request /favicon.ico by default)

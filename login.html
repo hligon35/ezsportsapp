@@ -50,8 +50,12 @@
             <input type="checkbox" id="peek-password" /> Show password
           </label>
         </div>
-        <div id="name-field" class="hidden">
-          <input type="text" id="name" placeholder="Full Name" />
+        <div id="name-field" class="hidden" style="display:none">
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:.6rem;">
+            <input type="text" id="firstName" placeholder="First name" />
+            <input type="text" id="lastName" placeholder="Last name" />
+          </div>
+          <input type="password" id="password2" placeholder="Confirm password" style="margin-top:.6rem;" />
         </div>
         <button type="submit" class="btn btn-primary">Login</button>
         <button id="demo-login" type="button" class="btn mt-1">Use demo account</button>
@@ -73,9 +77,11 @@
         </a>
         <p class="muted">Better baseball through better gear.</p>
         <div class="socials" aria-label="social links">
-          <a href="#" aria-label="Instagram">📸</a>
-          <a href="#" aria-label="YouTube">▶️</a>
-          <a href="#" aria-label="X">𝕏</a>
+          <a href="https://www.facebook.com/Ezsportsnetting/" aria-label="Facebook" target="_blank" rel="noopener">
+            <img src="assets/img/facebook.png" alt="Facebook" />
+          </a>
+          <a href="#" aria-label="Instagram"><img src="assets/img/instagram.png" alt="Instagram" /></a>
+          <a href="#" aria-label="X"><img src="assets/img/xwhite.png" alt="X" /></a>
         </div>
       </div>
       <nav aria-label="Footer">
