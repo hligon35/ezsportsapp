@@ -42,3 +42,64 @@
 		"updatedAt": "2025-08-22T12:00:00.000Z"
 	}
 ]
+[
+  {
+    "id": 3001,
+    "userId": 1001,
+    "userEmail": "demo@ezsportsapp.test",
+    "items": [
+      {
+        "id": "bat-ghost",
+        "name": "Louisville Slugger Ghost",
+        "price": 399.95,
+        "qty": 1,
+        "category": "bats"
+      }
+    ],
+    "total": 409.95,
+    "status": "completed",
+    "shippingAddress": {
+      "name": "Demo User",
+      "address1": "123 Main St",
+      "city": "Anytown",
+      "state": "CA",
+      "postal": "90210",
+      "country": "US"
+    },
+    "createdAt": "2025-01-15T10:30:00.000Z",
+    "updatedAt": "2025-01-15T10:30:00.000Z"
+  },
+  {
+    "id": 3002,
+    "userId": 1002,
+    "userEmail": "casey.hitter@ezsportsapp.test",
+    "items": [
+      {
+        "id": "glove-a2000",
+        "name": "Wilson A2000 Glove",
+        "price": 299.95,
+        "qty": 1,
+        "category": "gloves"
+      },
+      {
+        "id": "helmet-pro",
+        "name": "Rawlings Pro Helmet",
+        "price": 89.99,
+        "qty": 1,
+        "category": "helmets"
+      }
+    ],
+    "total": 399.94,
+    "status": "pending",
+    "shippingAddress": {
+      "name": "Casey Hitter",
+      "address1": "456 Oak Ave",
+      "city": "Sports City",
+      "state": "TX",
+      "postal": "75001",
+      "country": "US"
+    },
+    "createdAt": "2025-01-16T14:20:00.000Z",
+    "updatedAt": "2025-01-16T14:20:00.000Z"
+  }
+]
