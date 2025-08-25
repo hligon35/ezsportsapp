@@ -16,13 +16,16 @@ const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY || 'sk_test_yourk
 const DatabaseManager = require('./database/DatabaseManager');
 const ProductService = require('./services/ProductService');
 const OrderService = require('./services/OrderService');
-const InventoryService = require('./services/InventoryService');
+const InvoiceService = require('./services/InvoiceService');
+const AnalyticsService = require('./services/AnalyticsService');
+const { requireAdmin } = require('./middleware/auth');
 
 // Initialize database
 const db = new DatabaseManager();
 const productService = new ProductService();
 const orderService = new OrderService();
-const inventoryService = new InventoryService();
+const invoiceService = new InvoiceService();
+const analyticsService = new AnalyticsService();
 
 // Initialize database on startup
 db.initialize().catch(console.error);
@@ -32,6 +35,8 @@ const productRoutes = require('./routes/products');
 const userRoutes = require('./routes/users');
 const orderRoutes = require('./routes/orders');
 const inventoryRoutes = require('./routes/inventory');
+const invoiceRoutes = require('./routes/invoices');
+const analyticsRoutes = require('./routes/analytics');
 const app = express();
 // Respect reverse proxy (needed for secure cookies and correct IPs when behind nginx/Heroku)
 if (process.env.TRUST_PROXY) {
@@ -39,19 +44,23 @@ if (process.env.TRUST_PROXY) {
 }
 
 // CORS with optional allowlist and credentials for cookie-based auth
-const corsOrigins = (process.env.CORS_ORIGINS || '').split(',').map(s => s.trim()).filter(Boolean);
-if (corsOrigins.length) {
-  app.use(cors({
-    origin: (origin, cb) => {
-      if (!origin) return cb(null, true);
-      if (corsOrigins.includes(origin)) return cb(null, true);
-      return cb(new Error('CORS not allowed'), false);
-    },
-    credentials: true
-  }));
-} else {
-  app.use(cors());
-}
+const envOrigins = (process.env.CORS_ORIGINS || '').split(',').map(s => s.trim()).filter(Boolean);
+const devOrigins = ['http://127.0.0.1:5500', 'http://localhost:5500', 'http://localhost:4242'];
+const allowList = envOrigins.length ? envOrigins : devOrigins;
+const corsOptions = {
+  origin: (origin, cb) => {
+    // Allow non-browser/same-origin requests, and file:// (Origin: 'null') during development
+    if (!origin || origin === 'null') return cb(null, true);
+    if (allowList.includes(origin)) return cb(null, true);
+    return cb(null, false);
+  },
+  credentials: true,
+  methods: ['GET','HEAD','PUT','PATCH','POST','DELETE','OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+};
+app.use(cors(corsOptions));
+// Ensure preflight is handled for any route
+app.options('*', cors(corsOptions));
 app.use(helmet({
   contentSecurityPolicy: false // Keep disabled for now to avoid breaking inline scripts/styles; tighten later
 }));
@@ -59,9 +68,20 @@ app.use(compression());
 app.use(cookieParser());
 // Basic request logging
 app.use(morgan('tiny'));
-// Simple rate limiting on API routes
-const apiLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 100 });
-app.use('/api/', apiLimiter);
+// Simple rate limiting (avoid blocking analytics tracking in dev)
+const isProd = process.env.NODE_ENV === 'production';
+if (isProd) {
+  const generalLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 300 });
+  app.use('/api/users', generalLimiter);
+  app.use('/api/orders', generalLimiter);
+  app.use('/api/invoices', generalLimiter);
+  app.use('/api/products', generalLimiter);
+  app.use('/api/inventory', generalLimiter);
+  // Admin analytics endpoints can be limited too
+  app.use('/api/analytics/admin', generalLimiter);
+} else {
+  // No limiter in development to simplify testing
+}
 
 // Stripe webhook must be registered BEFORE JSON parser to preserve raw body
 app.post('/webhook/stripe', express.raw({ type: 'application/json' }), async (req, res) => {
@@ -81,14 +101,10 @@ app.post('/webhook/stripe', express.raw({ type: 'application/json' }), async (re
   }
 
   try {
+    // For dropship model, do not mutate stock on payment events
+    // Optionally, mark related order as paid via metadata in the future
     if (event.type === 'payment_intent.succeeded') {
-      const pi = event.data.object;
-      const itemsMeta = (pi.metadata?.items || '').split('|')
-        .map(s => s.split(':')).filter(a => a.length === 2)
-        .map(([id, qty]) => ({ id, qty: Number(qty) || 0 }));
-      for (const it of itemsMeta) {
-        await inventoryService.adjustStock(it.id, { type: 'remove', quantity: it.qty }, 'order', `Order paid PI ${pi.id}`);
-      }
+      // no-op for inventory
     }
     res.json({ received: true });
   } catch (e) {
@@ -105,8 +121,48 @@ app.use('/api/products', productRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/inventory', inventoryRoutes);
+app.use('/api/invoices', invoiceRoutes);
+app.use('/api/analytics', analyticsRoutes);
+
+// Fallback endpoints (defensive): ensure core routes respond in dev even if router mounting is altered
+app.post('/api/analytics/track', async (req, res) => {
+  try {
+    const { path, referrer, visitorId, userId, ts } = req.body || {};
+    const ev = await analyticsService.trackPageView({ path, referrer, visitorId, userId, ts });
+    res.json({ ok: true, id: ev?.id });
+  } catch (e) {
+    res.status(400).json({ message: e.message });
+  }
+});
+app.post('/api/analytics/event', async (req, res) => {
+  try {
+    const { type, productId, visitorId, userId, ts } = req.body || {};
+    const ev = await analyticsService.trackEvent({ type, productId, visitorId, userId, ts });
+    res.json({ ok: true, id: ev?.id });
+  } catch (e) {
+    res.status(400).json({ message: e.message });
+  }
+});
+app.get('/api/invoices/admin/all', requireAdmin, async (req, res) => {
+  try {
+    const { status, page, pageSize, sortBy, sortDir } = req.query;
+    const result = await invoiceService.getAllInvoices(status, { page, pageSize, sortBy, sortDir });
+    res.json(result);
+  } catch (e) {
+    res.status(500).json({ message: e.message });
+  }
+});
 
 // Serve static frontend (HTML, assets, service worker) from project root
+// Serve favicon explicitly (browsers request /favicon.ico by default)
+app.get('/favicon.ico', (req, res) => {
+  try {
+    return res.sendFile(path.join(__dirname, '..', 'assets', 'img', 'favicon-32.png'));
+  } catch (e) {
+    return res.sendStatus(404);
+  }
+});
+
 app.use(express.static(path.join(__dirname, '..')));
 
 // Static assets caching (1 year for immutable, 1 hour for html)
@@ -237,7 +293,7 @@ app.post('/api/order', async (req, res) => {
 });
 
 const PORT = process.env.PORT || 4242;
-const server = app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+const server = app.listen(PORT, '0.0.0.0', () => console.log(`Server running on port ${PORT}`));
 
 // Graceful shutdown
 process.on('SIGINT', () => { server.close(() => process.exit(0)); });

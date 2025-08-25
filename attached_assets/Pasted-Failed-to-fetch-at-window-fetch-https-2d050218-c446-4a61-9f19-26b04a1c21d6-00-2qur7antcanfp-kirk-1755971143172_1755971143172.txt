@@ -1,0 +1,31 @@
+Failed to fetch
+at window.fetch (https://2d050218-c446-4a61-9f19-26b04a1c21d6-00-2qur7antcanfp.kirk.replit.dev/__replco/static/devtools/eruda/3.2.3/eruda.js:2:218642)
+at Object.apply (https://2d050218-c446-4a61-9f19-26b04a1c21d6-00-2qur7antcanfp.kirk.replit.dev/__replco/static/devtools/injected.js:253:39)
+at postWithFallback (https://2d050218-c446-4a61-9f19-26b04a1c21d6-00-2qur7antcanfp.kirk.replit.dev/assets/js/analytics.js?v=20250822:30:25)
+at trackPageview (https://2d050218-c446-4a61-9f19-26b04a1c21d6-00-2qur7antcanfp.kirk.replit.dev/assets/js/analytics.js?v=20250822:51:9)
+at HTMLDocument.<anonymous> (https://2d050218-c446-4a61-9f19-26b04a1c21d6-00-2qur7antcanfp.kirk.replit.dev/assets/js/analytics.js?v=20250822:124:3)
+Failed to fetch
+at window.fetch (https://2d050218-c446-4a61-9f19-26b04a1c21d6-00-2qur7antcanfp.kirk.replit.dev/__replco/static/devtools/eruda/3.2.3/eruda.js:2:218642)
+at Object.apply (https://2d050218-c446-4a61-9f19-26b04a1c21d6-00-2qur7antcanfp.kirk.replit.dev/__replco/static/devtools/injected.js:253:39)
+at fetchAdmin (https://2d050218-c446-4a61-9f19-26b04a1c21d6-00-2qur7antcanfp.kirk.replit.dev/assets/js/admin.js?v=20250822:28:21)
+at renderOrders (https://2d050218-c446-4a61-9f19-26b04a1c21d6-00-2qur7antcanfp.kirk.replit.dev/assets/js/admin.js?v=20250822:140:3)
+at showSection (https://2d050218-c446-4a61-9f19-26b04a1c21d6-00-2qur7antcanfp.kirk.replit.dev/assets/js/admin.js?v=20250822:101:29)
+at HTMLButtonElement.onclick (https://2d050218-c446-4a61-9f19-26b04a1c21d6-00-2qur7antcanfp.kirk.replit.dev/admin.html:56:51)
+Failed to fetch
+at window.fetch (https://2d050218-c446-4a61-9f19-26b04a1c21d6-00-2qur7antcanfp.kirk.replit.dev/__replco/static/devtools/eruda/3.2.3/eruda.js:2:218642)
+at Object.apply (https://2d050218-c446-4a61-9f19-26b04a1c21d6-00-2qur7antcanfp.kirk.replit.dev/__replco/static/devtools/injected.js:253:39)
+at postWithFallback (https://2d050218-c446-4a61-9f19-26b04a1c21d6-00-2qur7antcanfp.kirk.replit.dev/assets/js/analytics.js?v=20250822:30:25)
+at async trackPageview (https://2d050218-c446-4a61-9f19-26b04a1c21d6-00-2qur7antcanfp.kirk.replit.dev/assets/js/analytics.js?v=20250822:51:3)
+Failed to fetch
+at window.fetch (https://2d050218-c446-4a61-9f19-26b04a1c21d6-00-2qur7antcanfp.kirk.replit.dev/__replco/static/devtools/eruda/3.2.3/eruda.js:2:218642)
+at Object.apply (https://2d050218-c446-4a61-9f19-26b04a1c21d6-00-2qur7antcanfp.kirk.replit.dev/__replco/static/devtools/injected.js:253:39)
+at fetchAdmin (https://2d050218-c446-4a61-9f19-26b04a1c21d6-00-2qur7antcanfp.kirk.replit.dev/assets/js/admin.js?v=20250822:28:21)
+Failed to fetch
+at window.fetch (https://2d050218-c446-4a61-9f19-26b04a1c21d6-00-2qur7antcanfp.kirk.replit.dev/__replco/static/devtools/eruda/3.2.3/eruda.js:2:218642)
+at Object.apply (https://2d050218-c446-4a61-9f19-26b04a1c21d6-00-2qur7antcanfp.kirk.replit.dev/__replco/static/devtools/injected.js:253:39)
+at postWithFallback (https://2d050218-c446-4a61-9f19-26b04a1c21d6-00-2qur7antcanfp.kirk.replit.dev/assets/js/analytics.js?v=20250822:30:25)
+at async trackPageview (https://2d050218-c446-4a61-9f19-26b04a1c21d6-00-2qur7antcanfp.kirk.replit.dev/assets/js/analytics.js?v=20250822:51:3)
+Failed to fetch
+at window.fetch (https://2d050218-c446-4a61-9f19-26b04a1c21d6-00-2qur7antcanfp.kirk.replit.dev/__replco/static/devtools/eruda/3.2.3/eruda.js:2:218642)
+at Object.apply (https://2d050218-c446-4a61-9f19-26b04a1c21d6-00-2qur7antcanfp.kirk.replit.dev/__replco/static/devtools/injected.js:253:39)
+at fetchAdmin (https://2d050218-c446-4a61-9f19-26b04a1c21d6-00-2qur7antcanfp.kirk.replit.dev/assets/js/admin.js?v=20250822:28:21)

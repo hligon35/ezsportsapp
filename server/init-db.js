@@ -21,11 +21,12 @@ async function initializeDatabase() {
     console.log(`Found ${existingProducts.length} products and ${existingUsers.length} users`);
     
     // Create admin user if it doesn't exist
-    const adminExists = existingUsers.find(u => u.email === 'admin@ezsports.com');
+  const adminExists = existingUsers.find(u => u.email === 'admin@ezsports.com' || u.username === 'admin');
     if (!adminExists) {
       console.log('Creating admin user...');
       await userService.register({
-        email: 'admin@ezsports.com',
+    email: 'admin@ezsports.com',
+    username: 'admin',
         password: 'admin123',
         name: 'Admin User'
       });
@@ -35,11 +36,12 @@ async function initializeDatabase() {
     }
     
     // Create demo user if it doesn't exist
-    const demoExists = existingUsers.find(u => u.email === 'demo@user.com');
+  const demoExists = existingUsers.find(u => u.email === 'demo@user.com' || u.username === 'demo');
     if (!demoExists) {
       console.log('Creating demo user...');
       await userService.register({
-        email: 'demo@user.com',
+    email: 'demo@user.com',
+    username: 'demo',
         password: 'demo123',
         name: 'Demo User'
       });

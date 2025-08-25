@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Bats | EZ Sports Netting</title>
+  <meta name="description" content="Shop baseball bats at EZ Sports Netting." />
+  <link rel="icon" type="image/jpeg" href="assets/img/ezsportslogo.jpg" />
+  <link rel="icon" type="image/png" href="assets/img/favicon-32.png" sizes="32x32" />
+  <link rel="stylesheet" href="assets/css/styles.css" />
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <header class="site-header">
+    <div class="container header-bar">
+      <button class="menu-toggle" aria-label="Toggle menu" aria-expanded="false" aria-controls="primary-nav">☰</button>
+      <a class="brand" href="index.html">
+  <img src="assets/img/ezsportslogo.jpg" alt="EZ Sports Netting logo" height="40"/>
+        <span>EZ Sports Netting</span>
+      </a>
+      <form class="search" role="search" aria-label="Search store" onsubmit="event.preventDefault(); window.Store.search(this.q.value)">
+        <input type="search" name="q" placeholder="Search bats, gloves, helmets…" aria-label="Search"/>
+        <button type="submit" class="btn btn-primary">Search</button>
+      </form>
+      <nav id="primary-nav" class="quick-links nav-centered" aria-label="Primary">
+        <a href="deals.html">Deals</a>
+        <a href="about.html">About</a>
+        <a href="netting-calculator.html">Netting Calculator</a>
+        <button class="cart-btn" aria-haspopup="dialog" aria-controls="mini-cart" onclick="Store.toggleCart()">
+          <span class="icon">🛒</span>
+          <span class="cart-count" id="cart-count">0</span>
+        </button>
+      </nav>
+    </div>
+  </header>
+  <main id="main" class="container">
+    <h1>Bats</h1>
+    <div id="bat-grid" class="grid"></div>
+    <div id="bat-pagination" class="mt-4 pagination-controls"></div>
+    <script>
+      // List of actual unique bat images found in assets/img (15 total)
+      const batImages = [
+        "assets/img/bat1.avif","assets/img/bat2.avif","assets/img/bat3.avif","assets/img/bat4.avif","assets/img/bat5.avif","assets/img/bat6.avif","assets/img/bat7.avif","assets/img/bat8.avif","assets/img/bat9.avif","assets/img/bat10.avif",
+        "assets/img/bat11.avif","assets/img/bat12.avif","assets/img/bat13.avif","assets/img/bat14.avif","assets/img/bat15.avif"
+      ];
+      const batNames = [
+        "EZ Pro Maple Bat","EZ Alloy BBCOR Bat","EZ Youth Composite Bat","EZ Power Slugger","EZ Classic Ash Bat",
+        "EZ Speedster Bat","EZ Elite Wood Bat","EZ Powerline Bat","EZ Stealth Bat","EZ Thunder Bat",
+        "EZ Lightning Bat","EZ Supreme Bat","EZ Ultra Bat","EZ Victory Bat","EZ Champion Bat"
+      ];
+      const batDescs = [
+        "Handcrafted maple wood bat for power hitters. Balanced feel, pro-grade finish.",
+        "High-performance alloy bat, BBCOR certified for all levels. Lightweight swing.",
+        "Durable composite bat for youth leagues. Large sweet spot, easy grip.",
+        "End-loaded bat for maximum distance. Ideal for home run hitters.",
+        "Traditional ash wood bat with a classic look and feel. Great for all players.",
+        "Ultra-lightweight for fast swings. Great for contact hitters.",
+        "Elite-grade wood, pro balanced, premium finish.",
+        "Powerline tech for max pop and distance.",
+        "Stealth design, vibration dampening handle.",
+        "Thunderous hits, reinforced barrel strength.",
+        "Lightning-fast swing, precision barrel.",
+        "Supreme comfort grip, pro taper handle.",
+        "Ultra-durable, all-weather performance.",
+        "Victory model, balanced for all hitters.",
+        "Champion’s choice, classic look."
+      ];
+      const batPrices = [129.99,179.99,99.99,149.99,119.99,139.99,159.99,169.99,109.99,119.99,129.99,139.99,149.99,159.99,169.99];
+      function renderBats(page=1) {
+        const perPage = 12;
+        const start = (page-1)*perPage;
+        // Only as many products as there are images
+        const bats = batImages.map((img,i)=>({img,name:batNames[i]||`EZ Bat ${i+1}`,desc:batDescs[i]||"Pro-grade bat.",price:batPrices[i]||129.99}));
+        const pageBats = bats.slice(start,start+perPage);
+        document.getElementById('bat-grid').innerHTML = pageBats.map((bat, idx)=>`
+          <div class="card">
+            <img src="${bat.img}" alt="${bat.name}" />
+            <div class="body">
+              <h3>${bat.name}</h3>
+              <p>${bat.desc}</p>
+              <div class="price-row">
+                <span class="price">$${bat.price.toFixed(2)}</span>
+                <button class="btn btn-ghost" data-add-bat="${start+idx}">Add</button>
+              </div>
+            </div>
+          </div>
+        `).join('');
+        // Add to cart button logic
+        document.querySelectorAll('[data-add-bat]').forEach(btn => {
+          btn.addEventListener('click', function() {
+            const i = parseInt(btn.getAttribute('data-add-bat'));
+            const bat = bats[i];
+            if (window.Store && window.Store.add) {
+              window.Store.add({
+                id: 'bat-' + (i+1),
+                title: bat.name,
+                price: bat.price,
+                img: bat.img,
+                category: 'bats'
+              });
+            } else {
+              alert('Cart not available.');
+            }
+          });
+        });
+        // Pagination controls
+        const totalPages = Math.ceil(bats.length/perPage);
+        let pagHtml = '';
+        for(let i=1;i<=totalPages;i++){
+          pagHtml += `<button onclick=\"renderBats(${i})\" class=\"btn btn-ghost\" style=\"${i===page?'background:#0b64d4;color:#fff;':''}\">${i}</button>`;
+        }
+        document.getElementById('bat-pagination').innerHTML = pagHtml;
+      }
+      renderBats();
+    </script>
+  </main>
+  <footer class="site-footer">
+    <div class="container footer-grid">
+      <div class="footer-brand-block">
+        <a class="brand brand--light" href="index.html">
+          <img src="assets/img/ezsportslogo.jpg" alt="EZ Sports Netting logo" height="36"/>
+          <span>EZ Sports Netting</span>
+        </a>
+        <p class="muted">Better baseball through better gear.</p>
+        <div class="socials" aria-label="social links">
+          <a href="https://www.facebook.com/Ezsportsnetting/" aria-label="Facebook" target="_blank" rel="noopener">
+            <img src="assets/img/facebook.png" alt="Facebook" />
+          </a>
+          <a href="#" aria-label="Instagram"><img src="assets/img/instagram.png" alt="Instagram" /></a>
+          <a href="#" aria-label="X"><img src="assets/img/xwhite.png" alt="X" /></a>
+        </div>
+      </div>
+      <nav aria-label="Footer">
+        <h4>Shop</h4>
+        <ul>
+          <li><a href="index.html#catalog" onclick="Store.filter('bats')">Bats</a></li>
+          <li><a href="index.html#catalog" onclick="Store.filter('gloves')">Gloves</a></li>
+          <li><a href="index.html#catalog" onclick="Store.filter('netting')">Netting</a></li>
+          <li><a href="index.html#catalog" onclick="Store.filter('helmets')">Helmets</a></li>
+        </ul>
+      </nav>
+      <nav>
+        <h4>Company</h4>
+        <ul>
+          <li><a href="about.html">About</a></li>
+          <li><a href="careers.html">Careers</a></li>
+          <li><a href="support.html">Support</a></li>
+        </ul>
+      </nav>
+      <form class="subscribe" onsubmit="event.preventDefault(); alert('Thanks for subscribing!')">
+        <h4>Get deals in your inbox</h4>
+        <div class="row">
+          <input type="email" placeholder="you@email.com" required />
+          <button class="btn btn-primary" type="submit">Subscribe</button>
+        </div>
+      </form>
+    </div>
+    <div class="subfooter container">
+  <p>© <span id="year"></span> EZ Sports Netting. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <!-- Mini cart -->
+  <dialog id="mini-cart" class="mini-cart" aria-labelledby="cart-title">
+    <form method="dialog" class="mini-cart__backdrop" onclick="this.closest('dialog').close()"></form>
+    <section class="mini-cart__panel" role="document">
+      <header>
+        <h3 id="cart-title">Your cart</h3>
+        <button class="icon-btn" onclick="document.getElementById('mini-cart').close()" aria-label="Close">✕</button>
+      </header>
+      <div id="cart-items" class="mini-cart__items"></div>
+      <footer class="mini-cart__footer">
+        <div class="totals">
+          <span>Subtotal</span>
+          <strong id="cart-subtotal">$0.00</strong>
+        </div>
+  <div class="btn-col">
+          <button class="btn btn-primary btn-block" onclick="Store.checkout()">Secure Checkout</button>
+          <a class="btn btn-ghost btn-block" href="index.html#catalog">Continue Shopping</a>
+        </div>
+      </footer>
+    </section>
+  </dialog>
+
+  <script type="module" src="assets/js/analytics.js"></script>
+  <script type="module" src="assets/js/app.js"></script>
+</body>
+</html>

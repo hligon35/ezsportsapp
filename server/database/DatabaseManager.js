@@ -3,14 +3,15 @@ const fs = require('fs').promises;
 const path = require('path');
 
 class DatabaseManager {
-  constructor(dbPath = './database') {
+  constructor(dbPath = __dirname) {
     this.dbPath = path.resolve(dbPath);
     this.collections = {
       users: 'users.json',
       products: 'products.json',
       orders: 'orders.json',
       schema: 'schema.json',
-      stock_movements: 'stock_movements.json'
+  stock_movements: 'stock_movements.json',
+  analytics: 'analytics.json'
     };
   }
 
@@ -68,6 +69,12 @@ class DatabaseManager {
   const schema = await this.read('schema');
   schema.metadata = schema.metadata || {};
   schema.metadata.autoIncrement = schema.metadata.autoIncrement || {};
+  // Ensure key exists for this collection
+  if (typeof schema.metadata.autoIncrement[collection] !== 'number') {
+    // sensible defaults
+    const defaults = { users: 1000, products: 2000, orders: 3000, analytics: 1 };
+    schema.metadata.autoIncrement[collection] = defaults[collection] || 1;
+  }
   const currentId = schema.metadata.autoIncrement[collection] || 0;
   schema.metadata.autoIncrement[collection] = currentId + 1;
   const filePath = path.join(this.dbPath, this.collections.schema);
@@ -190,7 +197,8 @@ class DatabaseManager {
                 autoIncrement: {
                   users: 1000,
                   products: 2000,
-                  orders: 3000
+                  orders: 3000,
+                  analytics: 1
                 },
                 inventoryThresholds: {
                   low: 10,

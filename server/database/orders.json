@@ -1,1 +1,88 @@
-[]
+
+[
+  {
+    "id": 3001,
+    "userId": 1001,
+    "userEmail": "demo@ezsportsapp.test",
+    "items": [
+      {
+        "productId": "bat-ghost",
+        "productName": "Louisville Slugger Ghost",
+        "price": 399.95,
+        "quantity": 1,
+        "subtotal": 399.95
+      }
+    ],
+    "total": 409.95,
+    "status": "completed",
+    "shippingAddress": {
+      "name": "Demo User",
+      "address1": "123 Main St",
+      "city": "Anytown",
+      "state": "CA",
+      "postal": "90210",
+      "country": "US"
+    },
+    "createdAt": "2025-01-15T10:30:00.000Z",
+    "updatedAt": "2025-01-15T10:30:00.000Z"
+  },
+  {
+    "id": 3002,
+    "userId": 1002,
+    "userEmail": "casey.hitter@ezsportsapp.test",
+    "items": [
+      {
+        "productId": "glove-a2000",
+        "productName": "Wilson A2000 Glove",
+        "price": 299.95,
+        "quantity": 1,
+        "subtotal": 299.95
+      },
+      {
+        "productId": "helmet-pro",
+        "productName": "Rawlings Pro Helmet",
+        "price": 89.99,
+        "quantity": 1,
+        "subtotal": 89.99
+      }
+    ],
+    "total": 399.94,
+    "status": "pending",
+    "shippingAddress": {
+      "name": "Casey Hitter",
+      "address1": "456 Oak Ave",
+      "city": "Sports City",
+      "state": "TX",
+      "postal": "75001",
+      "country": "US"
+    },
+    "createdAt": "2025-01-16T14:20:00.000Z",
+    "updatedAt": "2025-01-16T14:20:00.000Z"
+  },
+  {
+    "id": 3003,
+    "userId": 1003,
+    "userEmail": "riley.catcher@ezsportsapp.test",
+    "items": [
+      {
+        "productId": "bat-ghost",
+        "productName": "Louisville Slugger Ghost",
+        "price": 399.95,
+        "quantity": 1,
+        "subtotal": 399.95
+      }
+    ],
+    "total": 399.95,
+    "status": "fulfilled",
+    "shippingAddress": {
+      "name": "Riley Catcher",
+      "address1": "789 Pine St",
+      "city": "Baseball Town",
+      "state": "FL",
+      "postal": "33101",
+      "country": "US"
+    },
+    "createdAt": "2025-01-17T16:45:00.000Z",
+    "updatedAt": "2025-01-17T16:45:00.000Z"
+  }
+]

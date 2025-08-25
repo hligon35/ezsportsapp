@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Help Center: Payment Methods | EZ Sports Netting</title>
   <link rel="stylesheet" href="assets/css/styles.css" />
-  <link rel="icon" type="image/svg+xml" href="assets/img/logo.svg" />
+  <link rel="icon" type="image/jpeg" href="assets/img/ezsportslogo.jpg" />
   <link rel="icon" type="image/png" href="assets/img/favicon-32.png" sizes="32x32" />
 </head>
 <body>
@@ -14,47 +14,62 @@
     <div class="container header-bar">
       <button class="menu-toggle" aria-label="Toggle menu" aria-expanded="false" aria-controls="primary-nav">☰</button>
   <a class="brand" href="index.html">
-        <img src="assets/img/logo.svg" alt="EZ Sports Netting logo" height="40"/>
+  <img src="assets/img/ezsportslogo.jpg" alt="EZ Sports Netting logo" height="40"/>
         <span>EZ Sports Netting</span>
       </a>
       <form class="search" role="search" aria-label="Search store" onsubmit="event.preventDefault(); window.Store.search(this.q.value)">
         <input type="search" name="q" placeholder="Search bats, gloves, helmets…" aria-label="Search"/>
         <button type="submit" class="btn btn-primary">Search</button>
       </form>
-  <nav id="primary-nav" class="quick-links" aria-label="Primary">
-        <a href="shop.html">Shop</a>
-        <a href="deals.html">Deals</a>
-        <a href="about.html">About</a>
-        <button class="cart-btn" aria-haspopup="dialog" aria-controls="mini-cart" onclick="Store.toggleCart()">
-          <span class="icon">🛒</span>
-          <span class="cart-count" id="cart-count">0</span>
-        </button>
-      </nav>
+  <nav id="primary-nav" class="quick-links nav-centered" aria-label="Primary">
+    <a href="deals.html">Deals</a>
+    <a href="about.html">About</a>
+    <a href="netting-calculator.html">Netting Calculator</a>
+    <button class="cart-btn" aria-haspopup="dialog" aria-controls="mini-cart" onclick="Store.toggleCart()">
+      <span class="icon">🛒</span>
+      <span class="cart-count" id="cart-count">0</span>
+    </button>
+  </nav>
     </div>
   </header>
   <main id="main" class="container" style="margin-top:1rem">
     <h2 class="section-title">Payment Methods</h2>
     <div class="card" style="padding:1rem">
-      <p class="muted">Placeholder for accepted payment types. Mention cards, wallets, and purchase orders if supported.</p>
+        <h3>EZ Sports Payment Information</h3>
+        <ul>
+          <li><strong>Accepted Payment Methods:</strong> We accept Visa, MasterCard, American Express, Discover, PayPal, and Apple Pay. For large orders, we also accept ACH and wire transfers—contact us for details.</li>
+          <li><strong>Secure Checkout:</strong> All payments are processed using SSL encryption and PCI-compliant providers. Your card details are never stored on our servers.</li>
+          <li><strong>Sales Tax:</strong> Collected where required by law. Tax is calculated at checkout based on your shipping address.</li>
+          <li><strong>Payment Issues:</strong> If your payment is declined, double-check your card details, billing address, and available funds. For persistent issues, try a different payment method or <a href="support.html">contact support</a>.</li>
+          <li><strong>Order Confirmation:</strong> You’ll receive an email confirmation after successful payment. If you don’t receive one, check your spam folder or <a href="support.html">contact us</a>.</li>
+        </ul>
+        <p class="muted" style="margin-top:.5rem">Questions about payments? <a href="support.html">Contact support</a> for help with billing, refunds, or payment troubleshooting.</p>
     </div>
     <p style="margin-top:1rem"><a class="btn btn-ghost" href="support.html">← Back to Support</a></p>
   </main>
   <footer class="site-footer">
     <div class="container footer-grid">
-      <div>
-  <a class="brand brand--light" href="index.html">
-          <img src="assets/img/logo.svg" alt="EZ Sports Netting logo" height="36"/>
+      <div class="footer-brand-block">
+        <a class="brand brand--light" href="index.html">
+          <img src="assets/img/ezsportslogo.jpg" alt="EZ Sports Netting logo" height="36"/>
           <span>EZ Sports Netting</span>
         </a>
         <p class="muted">Better baseball through better gear.</p>
+        <div class="socials" aria-label="social links">
+          <a href="https://www.facebook.com/Ezsportsnetting/" aria-label="Facebook" target="_blank" rel="noopener">
+            <img src="assets/img/facebook.png" alt="Facebook" />
+          </a>
+          <a href="#" aria-label="Instagram"><img src="assets/img/instagram.png" alt="Instagram" /></a>
+          <a href="#" aria-label="X"><img src="assets/img/xwhite.png" alt="X" /></a>
+        </div>
       </div>
       <nav aria-label="Footer">
         <h4>Shop</h4>
         <ul>
-          <li><a href="shop.html#catalog" onclick="Store.filter('bats')">Bats</a></li>
-          <li><a href="shop.html#catalog" onclick="Store.filter('gloves')">Gloves</a></li>
-          <li><a href="shop.html#catalog" onclick="Store.filter('netting')">Netting</a></li>
-          <li><a href="shop.html#catalog" onclick="Store.filter('helmets')">Helmets</a></li>
+          <li><a href="index.html#catalog" onclick="Store.filter('bats')">Bats</a></li>
+          <li><a href="index.html#catalog" onclick="Store.filter('gloves')">Gloves</a></li>
+          <li><a href="index.html#catalog" onclick="Store.filter('netting')">Netting</a></li>
+          <li><a href="index.html#catalog" onclick="Store.filter('helmets')">Helmets</a></li>
         </ul>
       </nav>
       <nav>
@@ -74,12 +89,7 @@
       </form>
     </div>
     <div class="subfooter container">
-      <p>© <span id="year"></span> EZ Sports Netting. All rights reserved.</p>
-      <div class="socials" aria-label="social links">
-        <a href="#" aria-label="Instagram">📸</a>
-        <a href="#" aria-label="YouTube">▶️</a>
-        <a href="#" aria-label="X">𝕏</a>
-      </div>
+  <p>© <span id="year"></span> EZ Sports Netting. All rights reserved.</p>
     </div>
   </footer>
   <dialog id="mini-cart" class="mini-cart" aria-labelledby="cart-title">
@@ -95,13 +105,14 @@
           <span>Subtotal</span>
           <strong id="cart-subtotal">$0.00</strong>
         </div>
-        <div style="display:grid;gap:.5rem">
-          <button class="btn btn-primary btn-block" onclick="Store.checkout()">Secure Checkout</button>
-          <a class="btn btn-ghost btn-block" href="shop.html#catalog">Continue Shopping</a>
+        <div class="stack-05">
+          <button type="button" class="btn btn-primary btn-block" onclick="Store.checkout()">Secure Checkout</button>
+          <a class="btn btn-ghost btn-block" href="index.html#catalog">Continue Shopping</a>
         </div>
       </footer>
     </section>
   </dialog>
+  <script type="module" src="assets/js/analytics.js"></script>
   <script type="module" src="assets/js/app.js"></script>
 </body>
 </html>

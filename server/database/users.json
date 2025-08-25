@@ -2,19 +2,63 @@
   {
     "id": "user_mpd5k67y9",
     "email": "admin@ezsports.com",
-    "password": "$2b$10$XgnqxqgFn6Lz1Qsk0.pD.OO4n9UHWwQfDcjo4rq/nakt5BZBaY29i",
+    "username": "admin",
+    "password": "$2b$10$oTfY/cJ4d20i0USVn9jpKe8QUZdRb5MKwLJTxhs0CDmjuOqIDcGu2",
     "firstName": "Admin",
     "lastName": "User",
     "role": "admin",
-    "createdAt": "2025-08-13T02:57:41.654Z"
+    "createdAt": "2025-08-13T02:57:41.654Z",
+    "lastLogin": "2025-08-23T18:02:09.844Z",
+    "updatedAt": "2025-08-23T18:02:09.849Z"
   },
   {
     "id": "user_vq5r88oy4",
     "email": "demo@user.com",
+    "username": "demo",
     "password": "$2b$10$X4MRiivaiZ7Tu5fk95pSzebALbDW.F1NQR7OnDN2YcTL78.BuwCPu",
     "firstName": "Demo",
     "lastName": "User",
     "role": "user",
     "createdAt": "2025-08-13T02:57:41.655Z"
+  },
+  {
+    "email": "demo@ezsportsapp.test",
+    "password": "$2b$10$N3QMGeBw295/MLc7BZAroudSadEiBNr.uki9UzbSlaYBsHPTap0f2",
+    "name": "Demo User",
+    "isAdmin": false,
+    "lastLogin": "2025-08-21T22:53:53.143Z",
+    "createdAt": "2025-08-21T01:17:02.424Z",
+    "updatedAt": "2025-08-21T22:53:53.143Z",
+    "id": 1001
+  },
+  {
+    "id": "user_demo_admin",
+    "email": "demo.admin@ezsportsapp.test",
+    "username": "demoadmin",
+    "password": "$2b$10$oTfY/cJ4d20i0USVn9jpKe8QUZdRb5MKwLJTxhs0CDmjuOqIDcGu2",
+    "firstName": "Demo",
+    "lastName": "Admin",
+    "role": "admin",
+    "createdAt": "2025-08-21T01:30:00.000Z",
+    "lastLogin": "2025-08-21T01:46:47.797Z",
+    "updatedAt": "2025-08-21T01:46:47.797Z"
+  },
+  {
+    "email": "casey.hitter@ezsportsapp.test",
+    "password": "$2b$10$X4MRiivaiZ7Tu5fk95pSzebALbDW.F1NQR7OnDN2YcTL78.BuwCPu",
+    "name": "Casey Hitter",
+    "isAdmin": false,
+    "createdAt": "2025-08-20T15:12:00.000Z",
+    "updatedAt": "2025-08-20T15:12:00.000Z",
+    "id": 1002
+  },
+  {
+    "email": "riley.catcher@ezsportsapp.test",
+    "password": "$2b$10$X4MRiivaiZ7Tu5fk95pSzebALbDW.F1NQR7OnDN2YcTL78.BuwCPu",
+    "name": "Riley Catcher",
+    "isAdmin": false,
+    "createdAt": "2025-08-20T16:45:00.000Z",
+    "updatedAt": "2025-08-20T16:45:00.000Z",
+    "id": 1003
   }
 ]

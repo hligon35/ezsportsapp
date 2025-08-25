@@ -1,6 +1,6 @@
-// Bumped versions to invalidate old cached layout assets (spacing fixes)
-const CORE_CACHE = 'core-v4';
-const ASSET_CACHE = 'assets-v2';
+// Bumped versions to invalidate old cached layout assets (and SW bugfixes)
+const CORE_CACHE = 'core-v5';
+const ASSET_CACHE = 'assets-v3';
 const CORE = [
   '/index.html',
   '/assets/css/styles.css',
@@ -28,27 +28,50 @@ self.addEventListener('fetch', e => {
   // Network-first for CSS & JS so layout/style changes show immediately
   if (/\.(?:css|js)$/.test(url.pathname)) {
     e.respondWith(
-      fetch(e.request).then(net => {
-        caches.open(ASSET_CACHE).then(cache => cache.put(e.request, net.clone()));
-        return net;
-      }).catch(()=> caches.match(e.request))
+      fetch(e.request)
+        .then(net => {
+          // Only cache successful same-origin basic responses
+          if (net && net.ok && net.type === 'basic') {
+            caches.open(ASSET_CACHE).then(cache => cache.put(e.request, net.clone())).catch(()=>{});
+          }
+          return net;
+        })
+        .catch(() => caches.match(e.request))
     );
     return;
   }
 
   if (CORE.includes(url.pathname)) {
-    e.respondWith(caches.open(CORE_CACHE).then(cache => cache.match(e.request).then(res => {
-      if (res) return res;
-      return fetch(e.request).then(net => { cache.put(e.request, net.clone()); return net; });
-    })));
+    e.respondWith(
+      caches.open(CORE_CACHE).then(cache =>
+        cache.match(e.request).then(res => {
+          if (res) return res;
+          return fetch(e.request).then(net => {
+            if (net && net.ok && net.type === 'basic') {
+              cache.put(e.request, net.clone()).catch(()=>{});
+            }
+            return net;
+          });
+        })
+      )
+    );
     return;
   }
 
   if (url.pathname.startsWith('/assets/')) {
     // Stale-while-revalidate for other assets (images)
-    e.respondWith(caches.open(ASSET_CACHE).then(cache => cache.match(e.request).then(res => {
-      const fetchPromise = fetch(e.request).then(net => { cache.put(e.request, net.clone()); return net; });
-      return res || fetchPromise;
-    })));
+    e.respondWith(
+      caches.open(ASSET_CACHE).then(cache =>
+        cache.match(e.request).then(res => {
+          const fetchPromise = fetch(e.request).then(net => {
+            if (net && net.ok && net.type === 'basic') {
+              cache.put(e.request, net.clone()).catch(()=>{});
+            }
+            return net;
+          }).catch(()=>res);
+          return res || fetchPromise;
+        })
+      )
+    );
   }
 });

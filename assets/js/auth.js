@@ -1,5 +1,32 @@
 // Authentication system using server API
 let isRegisterMode = false;
+// Prefer same-origin. When using Live Server on 5500, also try local API servers (both 4242 and 4343).
+const isLiveServer = (location.port === '5500') && (location.protocol.startsWith('http'));
+const API_BASE_CANDIDATES = ['']
+  .concat(isLiveServer ? [
+    'http://127.0.0.1:4242', 'http://localhost:4242',
+    'http://127.0.0.1:4343', 'http://localhost:4343'
+  ] : []);
+
+async function fetchWithFallback(path, options) {
+  let lastErr;
+  for (const base of API_BASE_CANDIDATES) {
+    try {
+      const res = await fetch(`${base}${path}`, options);
+      // Treat non-2xx as failure to allow trying next base
+      if (res.ok) {
+        try { window.__API_BASE = base; } catch {}
+        return res;
+      }
+      // If this is the last base, return the response to surface the error
+      lastErr = res;
+    } catch (e) {
+      lastErr = e;
+    }
+  }
+  if (lastErr instanceof Response) return lastErr;
+  throw lastErr || new Error('Network error');
+}
 
 function getCurrentUser() {
   try {
@@ -11,24 +38,32 @@ function getCurrentUser() {
 
 function loginUser(user) {
   localStorage.setItem('currentUser', JSON.stringify(user));
-  // Redirect to shop or previous page
-  const redirectTo = new URLSearchParams(window.location.search).get('redirect') || 'shop.html';
+  // Admins go straight to dashboard; others follow redirect param or shop
+  if (user && (user.isAdmin === true || user.is_admin === true)) {
+    window.location.href = 'admin.html';
+    return;
+  }
+  const redirectTo = new URLSearchParams(window.location.search).get('redirect') || 'index.html#catalog';
   window.location.href = redirectTo;
 }
 
 // API call to server for login
-async function authenticateUser(email, password) {
+async function authenticateUser(identifier, password) {
   try {
-    const response = await fetch('/api/users/login', {
+    const response = await fetchWithFallback(`/api/users/login`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ email, password })
+      credentials: 'include',
+  body: JSON.stringify({ identifier, password })
     });
     
     const data = await response.json();
-    
+    // Store token for cross-origin admin/API calls
+    if (data && data.token) {
+      try { localStorage.setItem('authToken', data.token); } catch {}
+    }
     if (response.ok) {
       return data.user;
     } else {
@@ -42,16 +77,19 @@ async function authenticateUser(email, password) {
 // API call to server for registration
 async function registerUser(email, password, name) {
   try {
-    const response = await fetch('/api/users/register', {
+    const response = await fetchWithFallback(`/api/users/register`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ email, password, name })
+      credentials: 'include',
+  body: JSON.stringify({ email, password, name })
     });
     
     const data = await response.json();
-    
+    if (data && data.token) {
+      try { localStorage.setItem('authToken', data.token); } catch {}
+    }
     if (response.ok) {
       return data.user;
     } else {
@@ -72,16 +110,35 @@ function toggleMode() {
 
   if (isRegisterMode) {
     title.textContent = 'Sign Up';
-    nameField.style.display = 'block';
+  nameField.classList.remove('hidden');
     submitBtn.textContent = 'Sign Up';
     toggleText.textContent = 'Already have an account?';
     toggleLink.textContent = 'Login';
   } else {
     title.textContent = 'Login';
-    nameField.style.display = 'none';
+  nameField.classList.add('hidden');
     submitBtn.textContent = 'Login';
     toggleText.textContent = "Don't have an account?";
     toggleLink.textContent = 'Sign up';
+  }
+}
+
+// Demo account helper: logs in, or creates then logs in
+async function useDemoAccount() {
+  const demoEmail = 'demo@ezsportsapp.test';
+  const demoPass = 'demo1234';
+  try {
+    const user = await authenticateUser(demoEmail, demoPass);
+    loginUser(user);
+    return;
+  } catch (e) {
+    // try to register then login
+    try {
+      const user = await registerUser(demoEmail, demoPass, 'Demo User');
+      loginUser(user);
+    } catch (e2) {
+      showMessage('Unable to use demo account');
+    }
   }
 }
 
@@ -94,35 +151,55 @@ function showMessage(text, isError = true) {
 document.addEventListener('DOMContentLoaded', () => {
   const form = document.getElementById('auth-form');
   const toggleLink = document.getElementById('toggle-link');
+  const peek = document.getElementById('peek-password');
+  const demoBtn = document.getElementById('demo-login');
 
   toggleLink.addEventListener('click', (e) => {
     e.preventDefault();
     toggleMode();
   });
 
+  if (peek) {
+    peek.addEventListener('change', () => {
+      const pw = document.getElementById('password');
+      pw.type = peek.checked ? 'text' : 'password';
+    });
+  }
+
+  if (demoBtn) {
+    demoBtn.addEventListener('click', async (e) => {
+      e.preventDefault();
+      showMessage('Signing in to demo...', false);
+      await useDemoAccount();
+    });
+  }
+
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
-    const email = document.getElementById('email').value;
+  const identifier = document.getElementById('identifier').value;
     const password = document.getElementById('password').value;
-    const name = document.getElementById('name').value;
+  const firstName = (document.getElementById('firstName')?.value || '').trim();
+  const lastName = (document.getElementById('lastName')?.value || '').trim();
+  const password2 = (document.getElementById('password2')?.value || '').trim();
 
     try {
       if (isRegisterMode) {
         // Registration
-        if (!name.trim()) {
-          showMessage('Please enter your full name');
-          return;
-        }
+    if (!firstName || !lastName) return showMessage('Please enter first and last name');
+    if (password.length < 6) return showMessage('Password must be at least 6 characters');
+    if (password !== password2) return showMessage('Passwords do not match');
         
         showMessage('Creating account...', false);
-        const newUser = await registerUser(email, password, name.trim());
+    // Use identifier as email for signup
+    const fullName = `${firstName} ${lastName}`.trim();
+    const newUser = await registerUser(identifier, password, fullName);
         showMessage('Account created successfully!', false);
         setTimeout(() => loginUser(newUser), 1000);
         
       } else {
         // Login
         showMessage('Logging in...', false);
-        const user = await authenticateUser(email, password);
+    const user = await authenticateUser(identifier, password);
         loginUser(user);
       }
     } catch (error) {

@@ -11,14 +11,7 @@ class OrderService {
   // Create a new order
   async createOrder(orderData) {
     try {
-      // Validate stock availability for all items
-      for (const item of orderData.items) {
-        const hasStock = await this.productService.checkStock(item.id, item.qty);
-        if (!hasStock) {
-          const product = await this.productService.getProductById(item.id);
-          throw new Error(`Insufficient stock for ${product?.name || item.id}`);
-        }
-      }
+  // Dropship model: skip stock availability validation
 
       // Calculate total
       let total = 0;
@@ -57,10 +50,7 @@ class OrderService {
       // Insert order
       const order = await this.db.insert('orders', newOrder);
 
-      // Decrease stock for all items
-      for (const item of orderData.items) {
-        await this.productService.decreaseStock(item.id, item.qty);
-      }
+  // Dropship model: do not decrease stock
 
       return order;
     } catch (error) {
@@ -145,17 +135,12 @@ class OrderService {
         throw new Error('Order not found');
       }
 
-      if (order.status !== 'pending') {
-        throw new Error('Cannot cancel order that is already processed');
+      // Allow cancel if not fulfilled/delivered
+      if (['fulfilled','delivered'].includes(order.status)) {
+        throw new Error('Cannot cancel order that is already fulfilled/delivered');
       }
 
-      // Restore stock
-      for (const item of order.items) {
-        const product = await this.productService.getProductById(item.productId);
-        if (product) {
-          await this.productService.updateStock(item.productId, product.stock + item.quantity);
-        }
-      }
+      // Dropship model: no stock restoration needed
 
       // Update status
       return await this.updateOrderStatus(id, 'cancelled');
@@ -167,8 +152,9 @@ class OrderService {
   // Get order statistics
   async getOrderStats(timeframe = 'all') {
     try {
-      const orders = await this.getAllOrders();
-      let filteredOrders = orders;
+  const res = await this.getAllOrders(null, { page: 1, pageSize: 100000, sortBy: 'createdAt', sortDir: 'desc' });
+  const orders = Array.isArray(res) ? res : (res.items || []);
+  let filteredOrders = orders;
 
       // Apply time filter
       if (timeframe !== 'all') {
@@ -189,7 +175,7 @@ class OrderService {
             startDate = new Date(0);
         }
 
-        filteredOrders = orders.filter(order => new Date(order.createdAt) >= startDate);
+  filteredOrders = orders.filter(order => new Date(order.createdAt) >= startDate);
       }
 
       const totalOrders = filteredOrders.length;

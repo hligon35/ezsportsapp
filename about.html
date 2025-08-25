@@ -7,7 +7,7 @@
   <meta name="description" content="Learn the history, mission, and timeline milestones of EZ Sports Netting, founded in 2011 to build safer, more durable baseball training environments." />
   <meta name="robots" content="index,follow" />
   <link rel="canonical" href="https://ezsportsnetting.com/about.html" />
-  <link rel="icon" type="image/svg+xml" href="assets/img/logo.svg" />
+  <link rel="icon" type="image/jpeg" href="assets/img/ezsportslogo.jpg" />
   <link rel="icon" type="image/png" href="assets/img/favicon-32.png" sizes="32x32" />
   <link rel="stylesheet" href="assets/css/styles.css" />
   <meta property="og:title" content="About EZ Sports Netting" />
@@ -23,22 +23,22 @@
     <div class="container header-bar">
       <button class="menu-toggle" aria-label="Toggle menu" aria-expanded="false" aria-controls="primary-nav">☰</button>
   <a class="brand" href="index.html">
-  <img src="assets/img/logo.svg" alt="EZ Sports Netting logo" height="40"/>
+  <img src="assets/img/ezsportslogo.jpg" alt="EZ Sports Netting logo" height="40"/>
         <span>EZ Sports Netting</span>
       </a>
       <form class="search" role="search" aria-label="Search store" onsubmit="event.preventDefault(); window.Store.search(this.q.value)">
         <input type="search" name="q" placeholder="Search bats, gloves, helmets…" aria-label="Search"/>
         <button type="submit" class="btn btn-primary">Search</button>
       </form>
-  <nav id="primary-nav" class="quick-links" aria-label="Primary">
-        <a href="shop.html">Shop</a>
-        <a href="deals.html">Deals</a>
-        <a href="about.html">About</a>
-        <button class="cart-btn" aria-haspopup="dialog" aria-controls="mini-cart" onclick="Store.toggleCart()">
-          <span class="icon">🛒</span>
-          <span class="cart-count" id="cart-count">0</span>
-        </button>
-      </nav>
+  <nav id="primary-nav" class="quick-links nav-centered" aria-label="Primary">
+    <a href="deals.html">Deals</a>
+    <a href="about.html" aria-current="page" class="is-active">About</a>
+    <a href="netting-calculator.html">Netting Calculator</a>
+    <button class="cart-btn" aria-haspopup="dialog" aria-controls="mini-cart" onclick="Store.toggleCart()">
+      <span class="icon">🛒</span>
+      <span class="cart-count" id="cart-count">0</span>
+    </button>
+  </nav>
     </div>
   </header>
   <main id="main">
@@ -61,34 +61,41 @@
           <h3 style="margin-top:1rem">Today</h3>
           <p>Today, we pair field‑tested nets with bats, gloves, helmets, and protective gear trusted by youth programs, schools, facilities, and pros—backed by U.S.‑based support.</p>
         </div>
-  <img src="https://placehold.co/1200x900?text=EZ+Sports+Netting" alt="EZ Sports Netting team and facility" loading="lazy" width="1200" height="900"/>
+  <img src="assets/img/ezsportslogo.jpg" alt="EZ Sports Netting team and facility" loading="lazy" width="1200" height="900"/>
       </div>
     </section>
   </main>
   <footer class="site-footer">
     <div class="container footer-grid">
-      <div>
-  <a class="brand brand--light" href="index.html">
-          <img src="assets/img/logo.svg" alt="EZ Sports Netting logo" height="36"/>
+      <div class="footer-brand-block">
+        <a class="brand brand--light" href="index.html">
+          <img src="assets/img/ezsportslogo.jpg" alt="EZ Sports Netting logo" height="36"/>
           <span>EZ Sports Netting</span>
         </a>
         <p class="muted">Better baseball through better gear.</p>
+        <div class="socials" aria-label="social links">
+          <a href="https://www.facebook.com/Ezsportsnetting/" aria-label="Facebook" target="_blank" rel="noopener">
+            <img src="assets/img/facebook.png" alt="Facebook" />
+          </a>
+          <a href="#" aria-label="Instagram"><img src="assets/img/instagram.png" alt="Instagram" /></a>
+          <a href="#" aria-label="X"><img src="assets/img/xwhite.png" alt="X" /></a>
+        </div>
       </div>
       <nav aria-label="Footer">
         <h4>Shop</h4>
         <ul>
-          <li><a href="shop.html#catalog" onclick="Store.filter('bats')">Bats</a></li>
-          <li><a href="shop.html#catalog" onclick="Store.filter('gloves')">Gloves</a></li>
-          <li><a href="shop.html#catalog" onclick="Store.filter('netting')">Netting</a></li>
-          <li><a href="shop.html#catalog" onclick="Store.filter('helmets')">Helmets</a></li>
+          <li><a href="index.html#catalog" onclick="Store.filter('bats')">Bats</a></li>
+          <li><a href="index.html#catalog" onclick="Store.filter('gloves')">Gloves</a></li>
+          <li><a href="index.html#catalog" onclick="Store.filter('netting')">Netting</a></li>
+          <li><a href="index.html#catalog" onclick="Store.filter('helmets')">Helmets</a></li>
         </ul>
       </nav>
-    <nav>
+      <nav>
         <h4>Company</h4>
         <ul>
           <li><a href="about.html">About</a></li>
-      <li><a href="careers.html">Careers</a></li>
-      <li><a href="support.html">Support</a></li>
+          <li><a href="careers.html">Careers</a></li>
+          <li><a href="support.html">Support</a></li>
         </ul>
       </nav>
       <form class="subscribe" onsubmit="event.preventDefault(); alert('Thanks for subscribing!')">
@@ -100,12 +107,7 @@
       </form>
     </div>
     <div class="subfooter container">
-      <p>© <span id="year"></span> EZ Sports Netting. All rights reserved.</p>
-      <div class="socials" aria-label="social links">
-        <a href="#" aria-label="Instagram">📸</a>
-        <a href="#" aria-label="YouTube">▶️</a>
-        <a href="#" aria-label="X">𝕏</a>
-      </div>
+  <p>© <span id="year"></span> EZ Sports Netting. All rights reserved.</p>
     </div>
   </footer>
   <dialog id="mini-cart" class="mini-cart" aria-labelledby="cart-title">
@@ -121,13 +123,14 @@
           <span>Subtotal</span>
           <strong id="cart-subtotal">$0.00</strong>
         </div>
-        <div style="display:grid;gap:.5rem">
-          <button class="btn btn-primary btn-block" onclick="Store.checkout()">Secure Checkout</button>
-          <a class="btn btn-ghost btn-block" href="shop.html#catalog">Continue Shopping</a>
+        <div class="stack-05">
+          <button type="button" class="btn btn-primary btn-block" onclick="Store.checkout()">Secure Checkout</button>
+          <a class="btn btn-ghost btn-block" href="index.html#catalog">Continue Shopping</a>
         </div>
       </footer>
     </section>
   </dialog>
+  <script type="module" src="assets/js/analytics.js"></script>
   <script type="module" src="assets/js/app.js"></script>
 </body>
 </html>

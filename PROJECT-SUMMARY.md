@@ -59,7 +59,7 @@ server/
 ### Frontend (HTML/CSS/JavaScript)
 ```
 ├── index.html            # Homepage with featured products
-├── shop.html             # Product catalog
+<!-- shop.html removed: catalog now lives on index.html#catalog -->
 ├── checkout.html         # Secure checkout process
 ├── login.html            # User authentication
 ├── admin.html            # Administrative panel

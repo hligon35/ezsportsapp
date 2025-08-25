@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Help Center: Sizing & Fit | EZ Sports Netting</title>
   <link rel="stylesheet" href="assets/css/styles.css" />
-   <link rel="icon" type="image/svg+xml" href="assets/img/logo.svg" />
+  <link rel="icon" type="image/jpeg" href="assets/img/ezsportslogo.jpg" />
    <link rel="icon" type="image/png" href="assets/img/favicon-32.png" sizes="32x32" />
 </head>
 <body>
@@ -14,47 +14,73 @@
     <div class="container header-bar">
       <button class="menu-toggle" aria-label="Toggle menu" aria-expanded="false" aria-controls="primary-nav">☰</button>
   <a class="brand" href="index.html">
-        <img src="assets/img/logo.svg" alt="EZ Sports Netting logo" height="40"/>
+  <img src="assets/img/ezsportslogo.jpg" alt="EZ Sports Netting logo" height="40"/>
         <span>EZ Sports Netting</span>
       </a>
       <form class="search" role="search" aria-label="Search store" onsubmit="event.preventDefault(); window.Store.search(this.q.value)">
         <input type="search" name="q" placeholder="Search bats, gloves, helmets…" aria-label="Search"/>
         <button type="submit" class="btn btn-primary">Search</button>
       </form>
-  <nav id="primary-nav" class="quick-links" aria-label="Primary">
-        <a href="shop.html">Shop</a>
-        <a href="deals.html">Deals</a>
-        <a href="about.html">About</a>
-        <button class="cart-btn" aria-haspopup="dialog" aria-controls="mini-cart" onclick="Store.toggleCart()">
-          <span class="icon">🛒</span>
-          <span class="cart-count" id="cart-count">0</span>
-        </button>
-      </nav>
+  <nav id="primary-nav" class="quick-links nav-centered" aria-label="Primary">
+    <a href="deals.html">Deals</a>
+    <a href="about.html">About</a>
+    <a href="netting-calculator.html">Netting Calculator</a>
+    <button class="cart-btn" aria-haspopup="dialog" aria-controls="mini-cart" onclick="Store.toggleCart()">
+      <span class="icon">🛒</span>
+      <span class="cart-count" id="cart-count">0</span>
+    </button>
+  </nav>
     </div>
   </header>
   <main id="main" class="container" style="margin-top:1rem">
     <h2 class="section-title">Sizing & Fit</h2>
-    <div class="card" style="padding:1rem">
-      <p class="muted">Placeholder for sizing guidelines and measurement tips. Include charts for bats, gloves, and helmets as needed.</p>
-    </div>
-    <p style="margin-top:1rem"><a class="btn btn-ghost" href="support.html">← Back to Support</a></p>
+     <div class="card" style="padding:1rem">
+       <h3>EZ Sports Sizing Guide</h3>
+       <p>Choosing the right size is key for safety, performance, and satisfaction. Use the tips below to find the best fit for netting, gear, and apparel.</p>
+       <h4>Netting Sizing</h4>
+       <ul>
+         <li><strong>Custom Netting:</strong> Measure the width, height, and depth of your space. Add 6-12 inches to each dimension for proper fit and tensioning.</li>
+         <li><strong>Batting Cages:</strong> Standard sizes are 12'W x 12'H x 55'L, but we can custom-build to your specs. Contact us for help with unique layouts.</li>
+         <li><strong>Replacement Panels:</strong> Measure the area to be covered and match the mesh size and twine gauge to your existing net.</li>
+       </ul>
+       <h4>Gear Sizing</h4>
+       <ul>
+         <li><strong>Bats:</strong> Use our <a href="bats.html">bat sizing chart</a> or consult your coach. Most youth players use 27-31"; adults 32-34".</li>
+         <li><strong>Gloves:</strong> Measure from the tip of your index finger to the start of your wrist. Infielders: 11-11.75"; Outfielders: 12-13".</li>
+         <li><strong>Batting Gloves:</strong> Measure hand circumference just below the knuckles. See product page for size chart.</li>
+       </ul>
+       <h4>Apparel Sizing</h4>
+       <ul>
+         <li>Refer to the size chart on each product page. Most apparel runs true to size unless noted.</li>
+         <li>If between sizes, size up for a looser fit or down for a tighter fit.</li>
+       </ul>
+       <p class="muted" style="margin-top:.5rem">Still unsure? <a href="support.html">Contact support</a> for personalized sizing help or custom netting advice.</p>
+     </div>
+     <p style="margin-top:1rem"><a class="btn btn-ghost" href="support.html">← Back to Support</a></p>
   </main>
   <footer class="site-footer">
     <div class="container footer-grid">
-      <div>
-  <a class="brand brand--light" href="index.html">
-          <img src="assets/img/logo.svg" alt="EZ Sports Netting logo" height="36"/>
+      <div class="footer-brand-block">
+        <a class="brand brand--light" href="index.html">
+          <img src="assets/img/ezsportslogo.jpg" alt="EZ Sports Netting logo" height="36"/>
           <span>EZ Sports Netting</span>
         </a>
         <p class="muted">Better baseball through better gear.</p>
+        <div class="socials" aria-label="social links">
+          <a href="https://www.facebook.com/Ezsportsnetting/" aria-label="Facebook" target="_blank" rel="noopener">
+            <img src="assets/img/facebook.png" alt="Facebook" />
+          </a>
+          <a href="#" aria-label="Instagram"><img src="assets/img/instagram.png" alt="Instagram" /></a>
+          <a href="#" aria-label="X"><img src="assets/img/xwhite.png" alt="X" /></a>
+        </div>
       </div>
       <nav aria-label="Footer">
         <h4>Shop</h4>
         <ul>
-          <li><a href="shop.html#catalog" onclick="Store.filter('bats')">Bats</a></li>
-          <li><a href="shop.html#catalog" onclick="Store.filter('gloves')">Gloves</a></li>
-          <li><a href="shop.html#catalog" onclick="Store.filter('netting')">Netting</a></li>
-          <li><a href="shop.html#catalog" onclick="Store.filter('helmets')">Helmets</a></li>
+          <li><a href="index.html#catalog" onclick="Store.filter('bats')">Bats</a></li>
+          <li><a href="index.html#catalog" onclick="Store.filter('gloves')">Gloves</a></li>
+          <li><a href="index.html#catalog" onclick="Store.filter('netting')">Netting</a></li>
+          <li><a href="index.html#catalog" onclick="Store.filter('helmets')">Helmets</a></li>
         </ul>
       </nav>
       <nav>
@@ -74,12 +100,7 @@
       </form>
     </div>
     <div class="subfooter container">
-      <p>© <span id="year"></span> EZ Sports Netting. All rights reserved.</p>
-      <div class="socials" aria-label="social links">
-        <a href="#" aria-label="Instagram">📸</a>
-        <a href="#" aria-label="YouTube">▶️</a>
-        <a href="#" aria-label="X">𝕏</a>
-      </div>
+  <p>© <span id="year"></span> EZ Sports Netting. All rights reserved.</p>
     </div>
   </footer>
   <dialog id="mini-cart" class="mini-cart" aria-labelledby="cart-title">
@@ -95,13 +116,14 @@
           <span>Subtotal</span>
           <strong id="cart-subtotal">$0.00</strong>
         </div>
-        <div style="display:grid;gap:.5rem">
-          <button class="btn btn-primary btn-block" onclick="Store.checkout()">Secure Checkout</button>
-          <a class="btn btn-ghost btn-block" href="shop.html#catalog">Continue Shopping</a>
+        <div class="stack-05">
+          <button type="button" class="btn btn-primary btn-block" onclick="Store.checkout()">Secure Checkout</button>
+          <a class="btn btn-ghost btn-block" href="index.html#catalog">Continue Shopping</a>
         </div>
       </footer>
     </section>
   </dialog>
+  <script type="module" src="assets/js/analytics.js"></script>
   <script type="module" src="assets/js/app.js"></script>
 </body>
 </html>
