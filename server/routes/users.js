@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const UserService = require('../services/UserService');
-const { signToken, requireAdmin, requireAuth } = require('../middleware/auth');
+const { signToken, requireAdmin, requireAuth, setAuthCookie, clearAuthCookie, getUserFromRequest } = require('../middleware/auth');
 
 const userService = new UserService();
 
@@ -16,9 +16,7 @@ router.post('/register', async (req, res) => {
 
   const user = await userService.register({ email, password, name });
   const token = signToken(user);
-  const useSecure = !!(process.env.COOKIE_SECURE === 'true');
-  const sameSite = process.env.COOKIE_SAMESITE || 'lax';
-  res.cookie('token', token, { httpOnly: true, sameSite, secure: useSecure, maxAge: 7*24*60*60*1000 });
+  setAuthCookie(res, token);
   res.status(201).json({ message: 'User registered successfully', user, token });
   } catch (err) {
     res.status(400).json({ message: err.message });
@@ -36,9 +34,7 @@ router.post('/login', async (req, res) => {
 
   const user = await userService.login(email, password);
   const token = signToken(user);
-  const useSecure = !!(process.env.COOKIE_SECURE === 'true');
-  const sameSite = process.env.COOKIE_SAMESITE || 'lax';
-  res.cookie('token', token, { httpOnly: true, sameSite, secure: useSecure, maxAge: 7*24*60*60*1000 });
+  setAuthCookie(res, token);
   res.json({ message: 'Login successful', user, token });
   } catch (err) {
     res.status(401).json({ message: err.message });
@@ -100,10 +96,22 @@ router.get('/admin/all', requireAdmin, async (req, res) => {
 // Logout (support CORS preflight as needed)
 router.options('/logout', (req, res) => res.sendStatus(200));
 router.post('/logout', (req, res) => {
-  const useSecure = !!(process.env.COOKIE_SECURE === 'true');
-  const sameSite = process.env.COOKIE_SAMESITE || 'lax';
-  res.clearCookie('token', { httpOnly: true, secure: useSecure, sameSite });
+  clearAuthCookie(res);
   res.json({ message: 'Logged out' });
+});
+
+// Current session info (for SSO-enabled apps)
+router.get('/me', (req, res) => {
+  const user = getUserFromRequest(req);
+  if (!user) return res.status(401).json({ message: 'Unauthorized' });
+  res.json({ user });
+});
+
+// Refresh token (rotate without changing user payload)
+router.post('/refresh', requireAuth, (req, res) => {
+  const token = signToken({ id: req.user.id, email: req.user.email, isAdmin: req.user.isAdmin });
+  setAuthCookie(res, token);
+  res.json({ token });
 });
 
 // Delete user (admin only)
