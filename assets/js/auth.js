@@ -1,25 +1,20 @@
 // Authentication system using server API
 let isRegisterMode = false;
-// Prefer same-origin. When using Live Server on 5500, also try local API servers (both 4242 and 4343).
+// Detect Live Server (static 5500) so we don't POST to it
 const isLiveServer = (location.port === '5500') && (location.protocol.startsWith('http'));
-const API_BASE_CANDIDATES = ['']
-  .concat(isLiveServer ? [
-    'http://127.0.0.1:4242', 'http://localhost:4242',
-    'http://127.0.0.1:4343', 'http://localhost:4343'
-  ] : []);
+// In Live Server mode, only try the API server(s) on 4242 to avoid 405s on 5500
+const API_BASE_CANDIDATES = isLiveServer
+  ? ['http://127.0.0.1:4242', 'http://localhost:4242']
+  : [''];
 
 async function fetchWithFallback(path, options) {
   let lastErr;
   for (const base of API_BASE_CANDIDATES) {
     try {
       const res = await fetch(`${base}${path}`, options);
-      // Treat non-2xx as failure to allow trying next base
-      if (res.ok) {
-        try { window.__API_BASE = base; } catch {}
-        return res;
-      }
-      // If this is the last base, return the response to surface the error
-      lastErr = res;
+      // On any HTTP response, stop retrying and return it (avoid duplicate logs)
+      try { window.__API_BASE = base; } catch {}
+      return res;
     } catch (e) {
       lastErr = e;
     }
@@ -108,6 +103,7 @@ function toggleMode() {
   isRegisterMode = !isRegisterMode;
   const title = document.getElementById('auth-title');
   const nameField = document.getElementById('name-field');
+  const confirmField = document.getElementById('confirm-field');
   const submitBtn = document.querySelector('button[type="submit"]');
   const toggleText = document.getElementById('toggle-text');
   const toggleLink = document.getElementById('toggle-link');
@@ -121,6 +117,10 @@ function toggleMode() {
   try { document.title = 'Sign Up | EZ Sports Netting'; } catch {}
   nameField.classList.remove('hidden');
     nameField.style.removeProperty('display');
+    if (confirmField) {
+      confirmField.classList.remove('hidden');
+      confirmField.style.removeProperty('display');
+    }
     submitBtn.textContent = 'Sign Up';
     toggleText.textContent = 'Already have an account?';
     toggleLink.textContent = 'Login';
@@ -133,6 +133,10 @@ function toggleMode() {
   try { document.title = 'Login | EZ Sports Netting'; } catch {}
   nameField.classList.add('hidden');
     nameField.style.removeProperty('display');
+    if (confirmField) {
+      confirmField.classList.add('hidden');
+      confirmField.style.removeProperty('display');
+    }
     submitBtn.textContent = 'Login';
     toggleText.textContent = "Don't have an account?";
     toggleLink.textContent = 'Sign up';
@@ -154,7 +158,7 @@ async function useDemoAccount() {
   } catch (e) {
     // try to register then login
     try {
-      const user = await registerUser(demoEmail, demoPass, 'Demo User');
+  const user = await registerUser(demoEmail, demoPass, 'Demo User', 'Demo', 'User', demoPass);
       loginUser(user);
     } catch (e2) {
       showMessage('Unable to use demo account');

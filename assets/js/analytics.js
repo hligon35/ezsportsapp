@@ -1,13 +1,17 @@
 // Frontend analytics: admin dashboard rendering and client-side tracking hooks
 const API_BASE_ANALYTICS = (() => {
-  const ports = [4242, 4343];
+  const ports = [4242];
   const bases = [];
   const isHttp = location.protocol.startsWith('http');
-  const sameHost = isHttp ? `${location.protocol}//${location.hostname}` : '';
-  // Try localhost/127.0.0.1 first for Live Server or file://
-  ['localhost', '127.0.0.1'].forEach(h => ports.forEach(p => bases.push(`http://${h}:${p}`)));
-  // Also try same host:port if served over http(s)
-  if (isHttp) ports.forEach(p => bases.push(`${sameHost}:${p}`));
+  const onLiveServer = isHttp && location.port === '5500';
+  // Try only localhost/127.0.0.1 when on Live Server to avoid POSTing to 5500
+  if (onLiveServer) {
+    ['127.0.0.1', 'localhost'].forEach(h => ports.forEach(p => bases.push(`http://${h}:${p}`)));
+  } else {
+    // Same-origin first, then localhost fallbacks
+    if (isHttp) bases.push(`${location.protocol}//${location.host}`);
+    ['127.0.0.1', 'localhost'].forEach(h => ports.forEach(p => bases.push(`http://${h}:${p}`)));
+  }
   return Array.from(new Set(bases));
 })();
 
@@ -33,7 +37,9 @@ async function postWithFallback(path, data) {
         credentials: 'include',
         body: JSON.stringify(data)
       });
-      if (res.ok) { try { window.__API_BASE = base; } catch {} return true; }
+      // Stop retrying after first HTTP response to avoid duplicate 400 logs
+      try { window.__API_BASE = base; } catch {}
+      return res.ok;
     } catch {}
   }
   return false;

@@ -40,7 +40,18 @@
     <div class="auth-container">
       <h2 id="auth-title">Login</h2>
       <form id="auth-form" class="auth-form">
+        <!-- Sign Up: First & Last Name (shown only in Sign Up mode) -->
+        <div id="name-field" class="hidden">
+          <div class="grid-2">
+            <input type="text" id="firstName" placeholder="First name" />
+            <input type="text" id="lastName" placeholder="Last name" />
+          </div>
+        </div>
+
+        <!-- Email / Identifier -->
         <input type="text" id="identifier" placeholder="Email or username" required />
+
+        <!-- Password -->
         <div class="auth-field">
           <input type="password" id="password" placeholder="Password" required />
           <label class="auth-peek" for="peek-password" title="Show/hide password">
@@ -56,11 +67,9 @@
             </svg>
           </label>
         </div>
-        <div id="name-field" class="hidden">
-          <div class="grid-2">
-            <input type="text" id="firstName" placeholder="First name" />
-            <input type="text" id="lastName" placeholder="Last name" />
-          </div>
+
+        <!-- Confirm Password (shown only in Sign Up mode) -->
+        <div id="confirm-field" class="hidden">
           <input type="password" id="password2" placeholder="Confirm password" class="mt-1" />
         </div>
         <button type="submit" class="btn btn-primary">Login</button>

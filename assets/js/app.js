@@ -360,7 +360,21 @@ const Store = {
     const candidate = { id: product.id, size: opts.size, color: opts.color };
     const key = this.keyFor(candidate);
     const exists = this.state.cart.find(i => this.keyFor(i) === key);
-    if (exists) exists.qty += 1; else this.state.cart.push({ id: product.id, qty: 1, size: opts.size, color: opts.color });
+    if (exists) {
+      exists.qty += 1;
+    } else {
+      // Store a snapshot for items that may not exist in PRODUCTS (e.g., dynamic pages like gloves)
+      this.state.cart.push({
+        id: product.id,
+        qty: 1,
+        size: opts.size,
+        color: opts.color,
+        title: product.title || product.name,
+        price: typeof product.price === 'number' ? product.price : Number(product.price) || 0,
+        img: product.img,
+        category: product.category
+      });
+    }
     this.persist();
     this.renderCart();
     this.openCart();
@@ -379,27 +393,40 @@ const Store = {
   },
 
   get cartDetailed() {
-    return this.state.cart.map(i => ({ ...i, product: PRODUCTS.find(p => p.id === i.id) }));
+    return this.state.cart.map(i => {
+      const found = PRODUCTS.find(p => p.id === i.id);
+      const product = found || {
+        id: i.id,
+        title: i.title || 'Item',
+        price: typeof i.price === 'number' ? i.price : Number(i.price) || 0,
+        img: i.img || 'assets/img/logo.svg',
+        category: i.category || 'misc'
+      };
+      return { ...i, product };
+    });
   },
 
   get subtotal() {
-    return this.cartDetailed.reduce((sum, i) => sum + (i.product.price * i.qty), 0);
+    return this.cartDetailed.reduce((sum, i) => sum + ((i.product?.price || 0) * i.qty), 0);
   },
 
   renderCart() {
     const rows = this.cartDetailed.map(i => {
       const key = this.keyFor(i);
       const variant = `${(i.size || '').trim() ? `Size: ${i.size} ` : ''}${(i.color || '').trim() ? `Color: ${i.color}` : ''}`.trim();
+      const img = i.product?.img || 'assets/img/logo.svg';
+      const title = i.product?.title || 'Item';
+      const price = typeof i.product?.price === 'number' ? i.product.price : 0;
       return `
       <div class="cart-row">
-        <img src="${i.product.img}" alt="${i.product.title}" width="64" height="64" style="border-radius:.4rem;object-fit:cover"/>
+        <img src="${img}" alt="${title}" width="64" height="64" style="border-radius:.4rem;object-fit:cover"/>
         <div>
-          <strong>${i.product.title}</strong>
+          <strong>${title}</strong>
           ${variant ? `<div style=\"font-size:.8rem;color:#555;\">${variant}</div>` : ''}
           <div style="opacity:.8">Qty: <button class="icon-btn" data-dec="${key}">−</button> ${i.qty} <button class="icon-btn" data-inc="${key}">+</button></div>
         </div>
         <div style="text-align:right">
-          <div>${currency.format(i.product.price * i.qty)}</div>
+          <div>${currency.format(price * i.qty)}</div>
           <button class="btn btn-ghost" data-remove="${key}">Remove</button>
         </div>
       </div>

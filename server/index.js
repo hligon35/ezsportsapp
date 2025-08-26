@@ -3,7 +3,6 @@ require('dotenv').config();
 const express = require('express');
 const path = require('path');
 const cors = require('cors');
-const bodyParser = require('body-parser');
 const fs = require('fs/promises');
 const compression = require('compression');
 const helmet = require('helmet');
@@ -114,7 +113,7 @@ app.post('/webhook/stripe', express.raw({ type: 'application/json' }), async (re
 });
 
 // JSON parser AFTER webhook route
-app.use(bodyParser.json({ limit: '100kb' }));
+app.use(express.json({ limit: '100kb' }));
 
 // API routes
 app.use('/api/products', productRoutes);

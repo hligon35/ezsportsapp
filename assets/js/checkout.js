@@ -92,8 +92,9 @@ async function initialize() {
         }
         // Save for confirmation page
         try{ sessionStorage.setItem('lastOrder', JSON.stringify(order)); }catch{}
-        localStorage.removeItem('cart');
-        window.location.href = '/order-confirmation.html?id=' + encodeURIComponent(order.id);
+  localStorage.removeItem('cart');
+  const dest = new URL('order-confirmation.html?id=' + encodeURIComponent(order.id), window.location.href);
+  window.location.href = dest.href;
       } catch (err) {
         document.getElementById('payment-message').textContent = err.message || 'Checkout failed.';
         document.getElementById('submit').disabled = false;
@@ -104,7 +105,7 @@ async function initialize() {
     // Real Stripe flow (kept for future use)
     const { error } = await stripe.confirmPayment({
       elements,
-      confirmParams: { return_url: window.location.origin + '/checkout.html?success=true' },
+      confirmParams: { return_url: new URL('checkout.html?success=true', window.location.href).href },
     });
     if (error) {
       document.getElementById('payment-message').textContent = error.message;
