@@ -35,20 +35,7 @@ async function initializeDatabase() {
       console.log('Admin user already exists');
     }
     
-    // Create demo user if it doesn't exist
-    const demoExists = existingUsers.find(u => u.email === 'demo@user.com' || u.username === 'demo');
-    if (!demoExists) {
-      console.log('Creating demo user...');
-      await userService.register({
-        email: 'demo@user.com',
-        username: 'demo',
-        password: 'demo123',
-        name: 'Demo User'
-      });
-      console.log('Demo user created: demo@user.com / demo123');
-    } else {
-      console.log('Demo user already exists');
-    }
+  // Demo user no longer seeded
 
     // Create requested test customer if it doesn't exist (username-based login)
     const customerExists = existingUsers.find(u => u.username === 'customer' || u.email === 'customer@ezsports.com');
@@ -70,7 +57,6 @@ async function initializeDatabase() {
   console.log('Admin (username login): admin / admin123');
   console.log('Admin (email login): admin@ezsports.com / admin123');
   console.log('Customer (username login): customer / custom123');
-  console.log('Demo User: demo@user.com / demo123');
     
   } catch (error) {
     console.error('Database initialization failed:', error);
