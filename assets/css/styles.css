@@ -339,8 +339,8 @@ img{max-width:100%;display:block}
 
 /* Footer */
 .site-footer{margin-top:40px;background:#000000;border-top:1px solid rgba(255,255,255,.08);color:#d3d0d7}
-.site-footer .container{max-width:1400px}
-.footer-grid{display:grid;grid-template-columns:1.6fr 1fr 1fr 1.6fr 1.8fr;gap:1rem;padding:2rem 0}
+.site-footer .container{max-width:1200px}
+.footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr 2fr;gap:1rem;padding:2rem 0}
 .footer-grid h4{margin:.2rem 0 .6rem}
 .footer-grid a{color:#d3d0d7;text-decoration:none;opacity:.95}
 .subfooter{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.5rem;text-align:center;border-top:1px solid rgba(255,255,255,.08);padding:1rem 0;color:#d3d0d7}
@@ -352,15 +352,6 @@ img{max-width:100%;display:block}
 .subscribe input{flex:1;padding:.65rem .8rem;border-radius:.6rem;border:1px solid var(--border);background:#fff;color:var(--ink)}
 
 /* Expert help footer form */
-.expert-help{margin-top:0}
-.expert-help h4{margin:.2rem 0 .6rem}
-.expert-form{display:grid;gap:.5rem}
-.expert-form .row{display:flex;gap:.5rem;flex-wrap:wrap}
-.expert-form input,.expert-form textarea{flex:1;min-width:0;padding:.65rem .8rem;border-radius:.6rem;border:1px solid var(--border);background:#fff;color:var(--ink)}
-.expert-form textarea{resize:vertical}
-.expert-form .btn{align-self:start}
-.expert-form .form-msg{font-size:.9rem;margin-top:.25rem}
-
 /* Ensure all footer columns align to the top */
 .footer-grid > *{align-self:start}
 
@@ -524,3 +515,20 @@ img{max-width:100%;display:block}
 /* Ensure ULs in analytics look neat */
 .product-list{list-style:none;margin:0;padding:0;display:grid;gap:.5rem}
 .product-list li{background:#fff;border:1px solid var(--border);border-radius:.6rem;padding:.5rem .6rem}
+
+/* Expert Help Section */
+.expert-help-section{margin-top:1.75rem}
+.expert-hero{background:linear-gradient(135deg, rgba(211,208,215,.88) 55%, rgba(0,0,0,.65) 100%), url('assets/img/netting.jpg') center/cover no-repeat; color:#fff}
+.expert-hero-inner{padding:1.25rem 0}
+.expert-hero .expert-hero-copy{display:grid;place-items:center;text-align:center}
+.expert-hero h2{margin:.25rem 0;font-size:clamp(1.4rem,3.2vw,2.2rem);font-weight:900;letter-spacing:.6px}
+.expert-hero p{margin:.25rem 0 1rem;opacity:.95;font-weight:600}
+.expert-form-wrap{max-width:760px}
+.expert-form-wrap h3{margin:1rem 0 .5rem}
+.expert-form{max-width:660px;margin:0 auto;display:grid;gap:.65rem}
+.expert-form input,.expert-form textarea{width:100%;padding:.75rem .9rem;border-radius:.75rem;border:1px solid var(--border);background:#fff;color:var(--ink)}
+.expert-form input:focus,.expert-form textarea:focus{outline:none;box-shadow:var(--ring);border-color:var(--brand)}
+.expert-form textarea{border-radius:.75rem}
+.expert-form .btn{border-radius:1.2rem;font-weight:900}
+.expert-form .btn:hover{filter:brightness(1.05)}
+.expert-form .form-msg{min-height:1.25rem}

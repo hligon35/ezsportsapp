@@ -76,11 +76,11 @@ const Store = {
     };
 
     // Ensure layout and nav
-    this.ensureHeaderLayout();
-    this.ensureCoreNav();
-  this.ensureFooterHelp();
+  this.ensureHeaderLayout();
+  this.ensureCoreNav();
     this.ensureBreadcrumbs();
     this.updateNavigation();
+  this.wireExpertHelpForm();
 
     // Refresh products from admin updates
     PRODUCTS = getProducts();
@@ -221,67 +221,38 @@ const Store = {
     if (active) { active.classList.add('is-active'); active.setAttribute('aria-current', 'page'); }
   },
 
-  // Add a small expert help contact form into the footer (once, across all pages)
-  ensureFooterHelp() {
+  // Wire the dedicated expert help form (on pages that include it)
+  wireExpertHelpForm() {
     try {
-      const footer = document.querySelector('.site-footer .footer-grid');
-      if (!footer) return;
-      // Avoid duplicate insertions
-      if (footer.querySelector('.expert-help')) return;
-
-      // Place at the far right end by appending as the last column in the footer grid
-      const host = footer;
-
-      const wrap = document.createElement('div');
-      wrap.className = 'expert-help';
-      wrap.innerHTML = `
-        <h4>Get expert help</h4>
-        <form class="expert-form" aria-label="Get expert help" novalidate>
-          <div class="row">
-            <input type="text" name="name" placeholder="Your name" autocomplete="name" required />
-            <input type="email" name="email" placeholder="Email" autocomplete="email" required />
-          </div>
-          <textarea name="message" rows="3" placeholder="How can we help?" required></textarea>
-          <button class="btn btn-primary" type="submit">Ask an expert</button>
-          <div class="form-msg" aria-live="polite"></div>
-        </form>
-      `;
-
-      host.appendChild(wrap);
-
-      const form = wrap.querySelector('form');
+      const form = document.getElementById('expert-help-form');
+      if (!form) return;
       form.addEventListener('submit', async (e) => {
         e.preventDefault();
         const fd = new FormData(form);
         const name = String(fd.get('name') || '').trim();
         const email = String(fd.get('email') || '').trim();
+        const phone = String(fd.get('phone') || '').trim();
         const message = String(fd.get('message') || '').trim();
         const btn = form.querySelector('button[type="submit"]');
         const msgEl = form.querySelector('.form-msg');
 
-        // Basic validation
         if (!name || !email || !message) {
-          msgEl.textContent = 'Please fill out all fields.';
+          msgEl.textContent = 'Please complete name, email, and your needs.';
           msgEl.style.color = 'red';
           return;
         }
 
-        // Submit UX
         btn.disabled = true;
-        const prevLabel = btn.textContent;
+        const prev = btn.textContent;
         btn.textContent = 'Sending…';
-
-        // Lightweight, client-only handling — show success and reset.
-        // Optionally, this can be wired to a backend endpoint later.
         try {
-          // No-op network by default to keep dev stable; just simulate a quick success.
-          await new Promise(r => setTimeout(r, 350));
-          msgEl.textContent = "Thanks! We'll reach out shortly.";
+          await new Promise(r => setTimeout(r, 400));
+          msgEl.textContent = "Thanks! Our netting experts will contact you shortly.";
           msgEl.style.color = 'green';
           form.reset();
         } finally {
           btn.disabled = false;
-          btn.textContent = prevLabel;
+          btn.textContent = prev;
         }
       });
     } catch {}
