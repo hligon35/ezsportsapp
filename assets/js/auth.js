@@ -147,24 +147,6 @@ function toggleMode() {
   }
 }
 
-// Demo account helper: logs in, or creates then logs in
-async function useDemoAccount() {
-  const demoEmail = 'demo@ezsportsapp.test';
-  const demoPass = 'demo1234';
-  try {
-    const user = await authenticateUser(demoEmail, demoPass);
-    loginUser(user);
-    return;
-  } catch (e) {
-    // try to register then login
-    try {
-  const user = await registerUser(demoEmail, demoPass, 'Demo User', 'Demo', 'User', demoPass);
-      loginUser(user);
-    } catch (e2) {
-      showMessage('Unable to use demo account');
-    }
-  }
-}
 
 function showMessage(text, isError = true) {
   const msg = document.getElementById('auth-message');
@@ -176,7 +158,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const form = document.getElementById('auth-form');
   const toggleLink = document.getElementById('toggle-link');
   const peek = document.getElementById('peek-password');
-  const demoBtn = document.getElementById('demo-login');
+  const demoBtn = null;
 
   // start clean in Login mode
   isRegisterMode = false;
@@ -208,13 +190,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  if (demoBtn) {
-    demoBtn.addEventListener('click', async (e) => {
-      e.preventDefault();
-      showMessage('Signing in to demo...', false);
-      await useDemoAccount();
-    });
-  }
+  // demo login removed
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();

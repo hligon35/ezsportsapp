@@ -96,20 +96,9 @@ router.post('/change-password/:id', requireAuth, async (req, res) => {
   }
 });
 
-// Admin: Get all users
-router.get('/admin/all', requireAuth, async (req, res) => {
+// Admin: Get all users (use shared admin middleware)
+router.get('/admin/all', requireAdmin, async (req, res) => {
   try {
-    // Check if user is admin
-    const token = req.headers.authorization?.replace('Bearer ', '') || req.cookies?.token;
-    if (!token) {
-      return res.status(401).json({ error: 'No token provided' });
-    }
-    
-    const decoded = require('jsonwebtoken').verify(token, process.env.JWT_SECRET);
-    if (!decoded.isAdmin && !decoded.is_admin && decoded.role !== 'admin') {
-      return res.status(403).json({ error: 'Admin access required' });
-    }
-    
     const users = await userService.getAllUsers();
     // Remove password hashes from response
     const safeUsers = users.map(user => ({

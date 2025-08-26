@@ -73,9 +73,8 @@ body{
 .auth-form .auth-peek{
   position:absolute;
   right:.5rem;
-  top:0;
-  bottom:0;
-  height:100%;
+  top:50%;
+  transform: translateY(-52%);
   display:flex;
   align-items:center;
   gap:.35rem;
@@ -85,9 +84,8 @@ body{
   padding:0 .35rem;
   border-radius:.4rem;
   cursor:pointer;
-  transform: translateY(-1px); /* subtle optical alignment with input text */
 }
-.auth-form .auth-peek input{ width:auto; margin:0; vertical-align:middle; }
+.auth-form .auth-peek input{ width:auto; margin:0; vertical-align:middle; position:relative; top:-1px; }
 .auth-form .auth-peek .peek-label{ font-size:.8rem; opacity:.75; line-height:1; }
 .auth-form .grid-2{ display:grid; grid-template-columns:1fr 1fr; gap:.6rem; }
 .auth-form .btn{ height: 44px; }
@@ -341,7 +339,8 @@ img{max-width:100%;display:block}
 
 /* Footer */
 .site-footer{margin-top:40px;background:#000000;border-top:1px solid rgba(255,255,255,.08);color:#d3d0d7}
-.footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr 2fr;gap:1rem;padding:2rem 0}
+.site-footer .container{max-width:1400px}
+.footer-grid{display:grid;grid-template-columns:1.6fr 1fr 1fr 1.6fr 1.8fr;gap:1rem;padding:2rem 0}
 .footer-grid h4{margin:.2rem 0 .6rem}
 .footer-grid a{color:#d3d0d7;text-decoration:none;opacity:.95}
 .subfooter{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.5rem;text-align:center;border-top:1px solid rgba(255,255,255,.08);padding:1rem 0;color:#d3d0d7}
@@ -351,6 +350,19 @@ img{max-width:100%;display:block}
 .brand--light{opacity:1}
 .subscribe .row{display:flex;gap:.5rem}
 .subscribe input{flex:1;padding:.65rem .8rem;border-radius:.6rem;border:1px solid var(--border);background:#fff;color:var(--ink)}
+
+/* Expert help footer form */
+.expert-help{margin-top:0}
+.expert-help h4{margin:.2rem 0 .6rem}
+.expert-form{display:grid;gap:.5rem}
+.expert-form .row{display:flex;gap:.5rem;flex-wrap:wrap}
+.expert-form input,.expert-form textarea{flex:1;min-width:0;padding:.65rem .8rem;border-radius:.6rem;border:1px solid var(--border);background:#fff;color:var(--ink)}
+.expert-form textarea{resize:vertical}
+.expert-form .btn{align-self:start}
+.expert-form .form-msg{font-size:.9rem;margin-top:.25rem}
+
+/* Ensure all footer columns align to the top */
+.footer-grid > *{align-self:start}
 
 /* Mini cart */
 .mini-cart{border:none;padding:0;background:transparent}
