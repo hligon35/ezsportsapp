@@ -21,12 +21,50 @@ function variantText(i){
   return parts.join(', ');
 }
 
+function toCents(n){ return Math.round(Number(n||0) * 100); }
+function fromCents(c){ return Math.max(0, Math.round(Number(c||0))); }
+function calcSubtotalCents(cart){
+  return cart.reduce((sum,i)=> sum + (toCents(i.price||0) * (i.qty||0)), 0);
+}
+function calcShippingCents(subtotalCents, method){
+  if (subtotalCents >= 7500) return 0; // free over $75
+  if (method === 'express') return 2500;
+  return 1000; // standard
+}
+function updateSummary(cart, shippingMethod){
+  const sub = calcSubtotalCents(cart);
+  const ship = calcShippingCents(sub, shippingMethod);
+  const total = sub + ship;
+  const el = (id) => document.getElementById(id);
+  if (el('sum-subtotal')) el('sum-subtotal').textContent = currencyFmt(fromCents(sub));
+  if (el('sum-shipping')) el('sum-shipping').textContent = currencyFmt(fromCents(ship));
+  if (el('sum-total')) el('sum-total').textContent = currencyFmt(fromCents(total));
+  return { sub, ship, total };
+}
+
 async function initialize() {
   const form = document.getElementById('payment-form');
   const cart = readCart();
 
-  // Render order lines (basic id/qty display)
-  const lines = cart.map(i => `<div style="display:flex;justify-content:space-between"><span>${i.id}${variantText(i)?` (${variantText(i)})`:''}</span><span>x${i.qty}</span></div>`).join('');
+  // Render order lines with price and quantity
+  const lines = cart.map(i => {
+    const title = i.title || i.id;
+    const unit = Number(i.price) || 0;
+    const qty = i.qty || 0;
+    const unitCents = toCents(unit);
+    const lineCents = unitCents * qty;
+    const variant = variantText(i);
+    return `
+      <div style="display:flex;justify-content:space-between;gap:.75rem;align-items:flex-start">
+        <div>
+          <strong>${title}</strong>
+          ${variant ? `<div class="muted">${variant}</div>` : ''}
+          <div class="muted">${currencyFmt(unitCents)} × ${qty}</div>
+        </div>
+        <div><strong>${currencyFmt(lineCents)}</strong></div>
+      </div>
+    `;
+  }).join('');
   document.getElementById('order-lines').innerHTML = lines || '<p>Your cart is empty.</p>';
 
   const getPayload = () => {
@@ -34,7 +72,9 @@ async function initialize() {
     const customer = { name: fd.get('name'), email: fd.get('email') };
     const shipping = { address1: fd.get('address1'), address2: fd.get('address2'), city: fd.get('city'), state: fd.get('state'), postal: fd.get('postal'), country: fd.get('country') };
     const shippingMethod = fd.get('shippingMethod');
-    return { items: cart, customer, shipping, shippingMethod };
+    // Send minimal items shape to backend
+    const items = cart.map(i=>({ id: i.id, qty: i.qty }));
+    return { items, customer, shipping, shippingMethod };
   };
 
   // Create PaymentIntent on backend with server-side calculation (optional in test mode)
@@ -57,11 +97,15 @@ async function initialize() {
     // ignore; test mode fallback will handle
   }
 
+  // Always show a computed summary (even in test mode)
+  const fd0 = new FormData(form);
+  const shipMethod0 = fd0.get('shippingMethod') || 'standard';
+  const { total: computedTotal } = updateSummary(cart, shipMethod0);
   if (amount > 0) {
     document.getElementById('sum-total').textContent = currencyFmt(amount);
+  } else {
+    document.getElementById('sum-total').textContent = currencyFmt(fromCents(computedTotal));
   }
-  document.getElementById('sum-subtotal').textContent = '—';
-  document.getElementById('sum-shipping').textContent = '—';
   if (!clientSecret) {
     // Hide payment UI in test mode without Stripe
     const pe = document.getElementById('payment-element');
@@ -69,6 +113,14 @@ async function initialize() {
     const submit = document.getElementById('submit');
     if (submit) submit.textContent = 'Place Order';
   }
+
+  // Recompute totals on shipping method change
+  const shipRadios = form.querySelectorAll('input[name="shippingMethod"]');
+  shipRadios.forEach(r => r.addEventListener('change', () => {
+    const fd = new FormData(form);
+    const method = fd.get('shippingMethod') || 'standard';
+    updateSummary(cart, method);
+  }));
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -78,18 +130,22 @@ async function initialize() {
     if (testMode) {
       try {
         const payload = getPayload();
-        // Try to create real order via authenticated API; if not authenticated, fall back to local order record
-  const resp = await fetch('/api/order', { method:'POST', headers:{'Content-Type':'application/json'}, credentials:'include', body: JSON.stringify(payload) });
-        let order;
+        // Try to create order via backend (unauthenticated endpoint)
+        const resp = await fetch('/api/order', { method:'POST', headers:{'Content-Type':'application/json'}, credentials:'include', body: JSON.stringify(payload) });
+        // Compute totals locally for confirmation
+        const fd = new FormData(form);
+        const shipMethod = fd.get('shippingMethod') || 'standard';
+        const sub = calcSubtotalCents(cart);
+        const ship = calcShippingCents(sub, shipMethod);
+        const total = sub + ship;
+        let orderId = Date.now();
         if (resp.ok) {
           const data = await resp.json();
-          order = data.order;
-        } else {
-          // Fallback local order
-          const cartItems = readCart();
-          const items = cartItems.map(i=>({ id:i.id, qty:i.qty }));
-          order = { id: Date.now(), items: items.map(i=>({ productName: i.id, quantity: i.qty })), total: 0 };
+          orderId = data.orderId || orderId;
         }
+        // Build a local order snapshot for confirmation
+        const items = cart.map(i=>({ productName: i.title || i.id, id: i.id, quantity: i.qty, price: Number(i.price)||0, subtotal: (Number(i.price)||0) * (i.qty||0) }));
+        const order = { id: orderId, items, total: Math.round(total)/100 };
         // Save for confirmation page
         try{ sessionStorage.setItem('lastOrder', JSON.stringify(order)); }catch{}
   localStorage.removeItem('cart');

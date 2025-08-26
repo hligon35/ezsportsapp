@@ -35,7 +35,78 @@
   </header>
   <main id="main" class="container">
     <h1>L-Screens</h1>
-    <p class="muted">Category placeholder. Build your content or product grid here.</p>
+    <p class="muted">Protect your pitchers and coaches with durable L-Screens. Tap Add to drop items into your cart.</p>
+
+    <section class="stack-1">
+      <h2>Shop L-Screens</h2>
+      <div class="grid grid-3 product-grid">
+        <article class="card">
+          <div class="media"><img src="assets/img/screen1.avif" alt="Pro L-Screen" loading="lazy" /></div>
+          <div class="body">
+            <h3 style="margin:0 0 .25rem;font-size:1rem">Pro L-Screen</h3>
+            <div class="price-row">
+              <span class="price">$399.00</span>
+              <button class="btn btn-ghost js-add" data-id="ls-pro" data-title="Pro L-Screen" data-price="399.00" data-category="l-screens" data-img="assets/img/screen1.avif">Add</button>
+            </div>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="media"><img src="assets/img/screen2.avif" alt="Portable L-Screen" loading="lazy" /></div>
+          <div class="body">
+            <h3 style="margin:0 0 .25rem;font-size:1rem">Portable L-Screen</h3>
+            <div class="price-row">
+              <span class="price">$329.00</span>
+              <button class="btn btn-ghost js-add" data-id="ls-portable" data-title="Portable L-Screen" data-price="329.00" data-category="l-screens" data-img="assets/img/screen2.avif">Add</button>
+            </div>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="media"><img src="assets/img/screen3.avif" alt="Heavy-Duty L-Screen" loading="lazy" /></div>
+          <div class="body">
+            <h3 style="margin:0 0 .25rem;font-size:1rem">Heavy-Duty L-Screen</h3>
+            <div class="price-row">
+              <span class="price">$499.00</span>
+              <button class="btn btn-ghost js-add" data-id="ls-heavy" data-title="Heavy-Duty L-Screen" data-price="499.00" data-category="l-screens" data-img="assets/img/screen3.avif">Add</button>
+            </div>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="media"><img src="assets/img/screen4.avif" alt="Junior L-Screen" loading="lazy" /></div>
+          <div class="body">
+            <h3 style="margin:0 0 .25rem;font-size:1rem">Junior L-Screen</h3>
+            <div class="price-row">
+              <span class="price">$249.00</span>
+              <button class="btn btn-ghost js-add" data-id="ls-junior" data-title="Junior L-Screen" data-price="249.00" data-category="l-screens" data-img="assets/img/screen4.avif">Add</button>
+            </div>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="media"><img src="assets/img/screen5.avif" alt="Foldable L-Screen" loading="lazy" /></div>
+          <div class="body">
+            <h3 style="margin:0 0 .25rem;font-size:1rem">Foldable L-Screen</h3>
+            <div class="price-row">
+              <span class="price">$289.00</span>
+              <button class="btn btn-ghost js-add" data-id="ls-foldable" data-title="Foldable L-Screen" data-price="289.00" data-category="l-screens" data-img="assets/img/screen5.avif">Add</button>
+            </div>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="media"><img src="assets/img/screen6.avif" alt="Pro Net Replacement" loading="lazy" /></div>
+          <div class="body">
+            <h3 style="margin:0 0 .25rem;font-size:1rem">Pro Net Replacement</h3>
+            <div class="price-row">
+              <span class="price">$149.00</span>
+              <button class="btn btn-ghost js-add" data-id="ls-net-replacement" data-title="Pro Net Replacement" data-price="149.00" data-category="l-screens" data-img="assets/img/screen6.avif">Add</button>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
   </main>
   <footer class="site-footer">
     <div class="container footer-grid">
@@ -107,5 +178,18 @@
 
   <script type="module" src="assets/js/analytics.js"></script>
   <script type="module" src="assets/js/app.js"></script>
+  <script>
+    // Bind Add buttons to Store.add using inline product snapshots
+    window.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('.js-add').forEach(btn => {
+        if (btn._bound) return; btn._bound = true;
+        btn.addEventListener('click', () => {
+          const d = btn.dataset;
+          const product = { id: d.id, title: d.title, price: Number(d.price)||0, category: d.category||'l-screens', img: d.img };
+          try { window.Store && window.Store.add(product); } catch (e) { console.error(e); }
+        });
+      });
+    });
+  </script>
 </body>
 </html>
