@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Thank you for your order | EZ Sports Netting</title>
+  <link rel="stylesheet" href="assets/css/styles.css" />
+  <style>
+    .confirm-card{max-width:760px;margin:2rem auto;background:#fff;border:1px solid #e6edf6;border-radius:1rem;padding:2rem;box-shadow:0 4px 24px rgba(12,32,64,.08)}
+    .muted{color:#516173}
+  </style>
+  <script>
+    function currency(n){return n.toLocaleString(undefined,{style:'currency',currency:'USD'})}
+    function load(){
+      try{
+        const params=new URLSearchParams(location.search);
+        const id=params.get('id');
+        const order=JSON.parse(sessionStorage.getItem('lastOrder')||'null');
+        if(order){
+          document.getElementById('order-id').textContent = order.id || id || '—';
+          document.getElementById('total').textContent = currency(order.total||0);
+          const lines=(order.items||[]).map(i=>`<li>${i.productName||i.id} × ${i.quantity||i.qty}</li>`).join('');
+          document.getElementById('lines').innerHTML = lines || '<li>No items</li>';
+        } else {
+          document.getElementById('order-id').textContent = id || '—';
+        }
+      }catch{}
+    }
+  </script>
+  </head>
+  <body onload="load()">
+    <main class="container">
+      <div class="confirm-card">
+        <h2>Thank you for your order!</h2>
+        <p class="muted">Your order <strong>#<span id="order-id">—</span></strong> has been received. A confirmation email will be sent shortly.</p>
+        <h3>Order details</h3>
+        <ul id="lines"></ul>
+        <p><strong>Total:</strong> <span id="total">$0.00</span></p>
+        <div class="row gap-04">
+          <a class="btn btn-primary" href="order-history.html">View your orders</a>
+          <a class="btn btn-ghost" href="index.html">Continue shopping</a>
+        </div>
+      </div>
+    </main>
+  </body>
+  </html>

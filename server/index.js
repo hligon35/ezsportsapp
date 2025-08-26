@@ -124,6 +124,14 @@ app.use('/api/inventory', inventoryRoutes);
 app.use('/api/invoices', invoiceRoutes);
 app.use('/api/analytics', analyticsRoutes);
 
+// Lightweight config endpoint for frontend checkout/test mode
+app.get('/api/config', (req, res) => {
+  res.json({
+    pk: process.env.STRIPE_PUBLISHABLE_KEY || 'pk_test_your_publishable_key',
+    testMode: true
+  });
+});
+
 // Fallback endpoints (defensive): ensure core routes respond in dev even if router mounting is altered
 app.post('/api/analytics/track', async (req, res) => {
   try {

@@ -43,7 +43,11 @@ function loginUser(user) {
     window.location.href = 'admin.html';
     return;
   }
-  const redirectTo = new URLSearchParams(window.location.search).get('redirect') || 'index.html#catalog';
+  let redirectTo = new URLSearchParams(window.location.search).get('redirect') || 'index.html#catalog';
+  // Avoid loops: if a non-admin is sent to admin.html, route to catalog instead
+  if (/^\/?admin\.html$/i.test(redirectTo)) {
+    redirectTo = 'index.html#catalog';
+  }
   window.location.href = redirectTo;
 }
 
@@ -75,7 +79,7 @@ async function authenticateUser(identifier, password) {
 }
 
 // API call to server for registration
-async function registerUser(email, password, name) {
+async function registerUser(email, password, name, firstName, lastName, password2) {
   try {
     const response = await fetchWithFallback(`/api/users/register`, {
       method: 'POST',
@@ -83,7 +87,7 @@ async function registerUser(email, password, name) {
         'Content-Type': 'application/json',
       },
       credentials: 'include',
-  body: JSON.stringify({ email, password, name })
+  body: JSON.stringify({ email, password, name, firstName, lastName, password2 })
     });
     
     const data = await response.json();
@@ -191,8 +195,8 @@ document.addEventListener('DOMContentLoaded', () => {
         
         showMessage('Creating account...', false);
     // Use identifier as email for signup
-    const fullName = `${firstName} ${lastName}`.trim();
-    const newUser = await registerUser(identifier, password, fullName);
+  const fullName = `${firstName} ${lastName}`.trim();
+  const newUser = await registerUser(identifier, password, fullName, firstName, lastName, password2);
         showMessage('Account created successfully!', false);
         setTimeout(() => loginUser(newUser), 1000);
         

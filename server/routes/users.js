@@ -5,19 +5,28 @@ const { signToken, requireAdmin, requireAuth, setAuthCookie, clearAuthCookie, ge
 
 const userService = new UserService();
 
-// Register new user
+// Register new user (requires firstName, lastName, email, password; optional password2 for confirmation)
 router.post('/register', async (req, res) => {
   try {
-    const { email, password, name } = req.body;
+    const { email, password, password2, firstName, lastName, name } = req.body;
+    const fn = (firstName || '').trim();
+    const ln = (lastName || '').trim();
 
-    if (!email || !password || !name) {
-      return res.status(400).json({ message: 'Email, password, and name are required' });
+    if (!email || !password || !(fn && ln)) {
+      return res.status(400).json({ message: 'First name, last name, email, and password are required' });
+    }
+    if (typeof password2 === 'string' && password2 !== password) {
+      return res.status(400).json({ message: 'Passwords do not match' });
+    }
+    if (String(password).length < 6) {
+      return res.status(400).json({ message: 'Password must be at least 6 characters' });
     }
 
-  const user = await userService.register({ email, password, name });
-  const token = signToken(user);
-  setAuthCookie(res, token);
-  res.status(201).json({ message: 'User registered successfully', user, token });
+    const fullName = (name && name.trim()) || `${fn} ${ln}`.trim();
+    const user = await userService.register({ email, password, name: fullName, firstName: fn, lastName: ln });
+    const token = signToken(user);
+    setAuthCookie(res, token);
+    res.status(201).json({ message: 'User registered successfully', user, token });
   } catch (err) {
     res.status(400).json({ message: err.message });
   }

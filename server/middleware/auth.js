@@ -6,7 +6,8 @@ const JWT_SECRET = process.env.JWT_SECRET || 'dev_insecure_secret_change_me';
 const JWT_ISS = process.env.JWT_ISS || 'ezsports';
 const JWT_AUD = process.env.JWT_AUD || 'ezsports-apps';
 const COOKIE_SAMESITE = process.env.COOKIE_SAMESITE || 'None';
-const COOKIE_SECURE = String(process.env.COOKIE_SECURE || 'true') === 'true';
+const isProd = process.env.NODE_ENV === 'production';
+const COOKIE_SECURE = String(process.env.COOKIE_SECURE ?? (isProd ? 'true' : 'false')) === 'true';
 const COOKIE_DOMAIN = process.env.COOKIE_DOMAIN || undefined; // e.g., .yourdomain.com
 
 function getTokenFromReq(req) {
@@ -54,7 +55,7 @@ function requireAdmin(req, res, next) {
 function signToken(user) {
   const computedIsAdmin = Boolean(user.isAdmin || user.role === 'admin' || user.email === 'admin@ezsports.com');
   const payload = { id: user.id, email: user.email, isAdmin: computedIsAdmin };
-  return jwt.sign(payload, JWT_SECRET, { expiresIn: '7d' });
+  return jwt.sign(payload, JWT_SECRET, { expiresIn: '7d', issuer: JWT_ISS, audience: JWT_AUD });
 }
 
 function setAuthCookie(res, token) {
