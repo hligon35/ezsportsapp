@@ -111,19 +111,35 @@ function toggleMode() {
   const submitBtn = document.querySelector('button[type="submit"]');
   const toggleText = document.getElementById('toggle-text');
   const toggleLink = document.getElementById('toggle-link');
+  const identifierInput = document.getElementById('identifier');
+  const fnInput = document.getElementById('firstName');
+  const lnInput = document.getElementById('lastName');
+  const pw2Input = document.getElementById('password2');
 
   if (isRegisterMode) {
     title.textContent = 'Sign Up';
+  try { document.title = 'Sign Up | EZ Sports Netting'; } catch {}
   nameField.classList.remove('hidden');
+    nameField.style.removeProperty('display');
     submitBtn.textContent = 'Sign Up';
     toggleText.textContent = 'Already have an account?';
     toggleLink.textContent = 'Login';
+  if (identifierInput) identifierInput.placeholder = 'Email';
+  if (fnInput) fnInput.required = true;
+  if (lnInput) lnInput.required = true;
+  if (pw2Input) pw2Input.required = true;
   } else {
     title.textContent = 'Login';
+  try { document.title = 'Login | EZ Sports Netting'; } catch {}
   nameField.classList.add('hidden');
+    nameField.style.removeProperty('display');
     submitBtn.textContent = 'Login';
     toggleText.textContent = "Don't have an account?";
     toggleLink.textContent = 'Sign up';
+  if (identifierInput) identifierInput.placeholder = 'Email or username';
+  if (fnInput) fnInput.required = false;
+  if (lnInput) lnInput.required = false;
+  if (pw2Input) pw2Input.required = false;
   }
 }
 
@@ -158,16 +174,34 @@ document.addEventListener('DOMContentLoaded', () => {
   const peek = document.getElementById('peek-password');
   const demoBtn = document.getElementById('demo-login');
 
+  // start clean in Login mode
+  isRegisterMode = false;
+  try { document.title = 'Login | EZ Sports Netting'; } catch {}
+  const idInput = document.getElementById('identifier');
+  if (idInput) idInput.placeholder = 'Email or username';
+  const fn = document.getElementById('firstName'); if (fn) fn.required = false;
+  const ln = document.getElementById('lastName'); if (ln) ln.required = false;
+  const pw2 = document.getElementById('password2'); if (pw2) pw2.required = false;
+
   toggleLink.addEventListener('click', (e) => {
     e.preventDefault();
     toggleMode();
   });
 
   if (peek) {
-    peek.addEventListener('change', () => {
-      const pw = document.getElementById('password');
-      pw.type = peek.checked ? 'text' : 'password';
-    });
+    const pw = document.getElementById('password');
+    const label = document.querySelector('label.auth-peek');
+    const setType = () => { pw.type = peek.checked ? 'text' : 'password'; };
+    peek.addEventListener('change', setType);
+    if (label) {
+      label.addEventListener('click', (e) => {
+        if (e.target !== peek) {
+          e.preventDefault();
+          peek.checked = !peek.checked;
+          setType();
+        }
+      });
+    }
   }
 
   if (demoBtn) {
