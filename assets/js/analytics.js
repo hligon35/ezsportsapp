@@ -1,4 +1,6 @@
 // Frontend analytics: admin dashboard rendering and client-side tracking hooks
+// Guard: When running under Live Server (port 5500), disable tracking to avoid DB writes that trigger live-reload loops
+const __DEV_DISABLE_TRACKING__ = (location.protocol.startsWith('http') && location.port === '5500');
 const API_BASE_ANALYTICS = (() => {
   const ports = [4242];
   const bases = [];
@@ -47,6 +49,16 @@ async function postWithFallback(path, data) {
 
 // Lightweight pageview tracking on all pages that include this script
 export async function trackPageview() {
+  if (__DEV_DISABLE_TRACKING__) {
+    try { console.warn('[analytics] tracking disabled in Live Server dev'); } catch {}
+    return;
+  }
+  // Prevent duplicate sends within the same tab for the same URL
+  try {
+    const key = `pv_sent_${location.pathname}${location.search}`;
+    if (sessionStorage.getItem(key)) return;
+    sessionStorage.setItem(key, '1');
+  } catch {}
   const user = (function(){ try { return JSON.parse(localStorage.getItem('currentUser')||'null'); } catch { return null; } })();
   const payload = {
     path: location.pathname.replace(/^\\\\/,'/') + location.search,
@@ -58,6 +70,7 @@ export async function trackPageview() {
 }
 
 export async function trackEvent(type, productId) {
+  if (__DEV_DISABLE_TRACKING__) return;
   const user = (function(){ try { return JSON.parse(localStorage.getItem('currentUser')||'null'); } catch { return null; } })();
   const payload = { type, productId, visitorId: getVisitorId(), userId: user?.id };
   await postWithFallback(`/api/analytics/event`, payload);

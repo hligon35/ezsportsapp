@@ -8,6 +8,11 @@ const analytics = new AnalyticsService();
 // Track a page view (public)
 router.post('/track', async (req, res) => {
   try {
+    const origin = req.headers.origin || '';
+    // When running front-end via Live Server (port 5500), skip writing analytics to avoid dev reload loops
+    if (/^http:\/\/(localhost|127\.0\.0\.1):5500$/i.test(origin)) {
+      return res.json({ ok: true, devSkipped: true });
+    }
     const { path, referrer, visitorId, userId, ts } = req.body || {};
     await analytics.trackPageView({ path, referrer, visitorId, userId, ts });
     res.json({ ok: true });
@@ -19,6 +24,10 @@ router.post('/track', async (req, res) => {
 // Track a generic event (public) - e.g., favorite, add_to_cart
 router.post('/event', async (req, res) => {
   try {
+    const origin = req.headers.origin || '';
+    if (/^http:\/\/(localhost|127\.0\.0\.1):5500$/i.test(origin)) {
+      return res.json({ ok: true, devSkipped: true });
+    }
     const { type, productId, visitorId, userId, ts } = req.body || {};
     await analytics.trackEvent({ type, productId, visitorId, userId, ts });
     res.json({ ok: true });
