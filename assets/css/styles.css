@@ -311,6 +311,7 @@ img{max-width:100%;display:block}
 .card .media img{width:100%;height:auto;aspect-ratio:4/3;object-fit:cover;display:block}
 .card .body{padding:.9rem;display:flex;flex-direction:column;flex:1}
 .price-row{display:flex;justify-content:space-between;align-items:center;margin-top:auto;padding-top:.4rem}
+.price-row{gap:.5rem;flex-wrap:wrap}
 .price-row .btn{white-space:nowrap}
 .price{font-weight:800;letter-spacing:.2px}
 .was-price{opacity:.7;text-decoration:line-through}
@@ -351,6 +352,15 @@ img{max-width:100%;display:block}
 
 /* Responsive */
 /* --- Responsive Layout Adjustments --- */
+/* Product grid (3-up) override on wide screens for custom section pages */
+@media (min-width:1025px){
+  .product-grid.grid-3{ grid-template-columns: repeat(3, minmax(0,1fr)); }
+}
+/* Subtle tightening for very narrow screens so cards/bars don’t overflow */
+@media (max-width:420px){
+  .price-row{ justify-content:space-between; gap:.35rem; }
+  .card .body{ padding:.75rem; }
+}
 @media (max-width:1024px){
   .hero-inner{grid-template-columns:1fr;}
   .category-tiles .tiles{grid-template-columns:repeat(2,1fr)}
