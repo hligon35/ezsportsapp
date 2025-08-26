@@ -32,7 +32,8 @@ const DEFAULT_PRODUCTS = [
 function getProducts() {
   try {
     const adminProducts = JSON.parse(localStorage.getItem('shopProducts') || 'null');
-    return adminProducts || DEFAULT_PRODUCTS;
+    if (Array.isArray(adminProducts) && adminProducts.length > 0) return adminProducts;
+    return DEFAULT_PRODUCTS;
   } catch {
     return DEFAULT_PRODUCTS;
   }
@@ -45,6 +46,11 @@ const Store = {
     filter: 'all',
     cart: JSON.parse(localStorage.getItem('cart') || '[]'),
     user: null,
+  },
+
+  // Expose a way to retrieve the current products list (admin-managed or defaults)
+  getProducts() {
+    return getProducts();
   },
 
   keyFor(item) {

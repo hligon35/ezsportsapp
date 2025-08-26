@@ -70,11 +70,25 @@ body{
 .auth-form input{ width:100%; padding:.85rem 1rem; border:1px solid var(--border); border-radius:.7rem; }
 .auth-form .auth-field{ position:relative; display:block; }
 .auth-form .auth-field input[type="password"]{ padding-right:4.5rem; }
-.auth-form .auth-peek{ position:absolute; right:.4rem; top:50%; transform:translateY(-50%); display:inline-flex; align-items:center; gap:.35rem; font-size:.85rem; color:var(--muted); background:#fff; padding:.2rem .4rem; border-radius:.4rem; cursor:pointer; }
-.auth-form .auth-peek input{ width:auto; }
-.auth-form .auth-peek .icon-eye-off{ display:none; }
-.auth-form .auth-peek input:checked ~ .icon-eye{ display:none; }
-.auth-form .auth-peek input:checked ~ .icon-eye-off{ display:inline-block; }
+.auth-form .auth-peek{
+  position:absolute;
+  right:.5rem;
+  top:0;
+  bottom:0;
+  height:100%;
+  display:flex;
+  align-items:center;
+  gap:.35rem;
+  font-size:.85rem;
+  color:var(--muted);
+  background:transparent;
+  padding:0 .35rem;
+  border-radius:.4rem;
+  cursor:pointer;
+  transform: translateY(-1px); /* subtle optical alignment with input text */
+}
+.auth-form .auth-peek input{ width:auto; margin:0; vertical-align:middle; }
+.auth-form .auth-peek .peek-label{ font-size:.8rem; opacity:.75; line-height:1; }
 .auth-form .grid-2{ display:grid; grid-template-columns:1fr 1fr; gap:.6rem; }
 .auth-form .btn{ height: 44px; }
 img{max-width:100%;display:block}
