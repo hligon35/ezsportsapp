@@ -343,9 +343,17 @@
   <script type="module" src="assets/js/app.js"></script>
   <script type="module" src="assets/js/netting-calculator.js"></script>
   <script>
-    if('serviceWorker' in navigator){
-      window.addEventListener('load',()=>{
-        navigator.serviceWorker.register('service-worker.js').catch(err=>console.warn('SW registration failed', err));
+    // Register SW only in production HTTPS; in dev, aggressively unregister to avoid live-reload loops
+    if ('serviceWorker' in navigator) {
+      const isProd = (location.protocol === 'https:') && !/^(localhost|127\.0\.0\.1)$/i.test(location.hostname);
+      window.addEventListener('load', () => {
+        if (isProd) {
+          navigator.serviceWorker.register('service-worker.js').catch(err => console.warn('SW registration failed', err));
+        } else {
+          navigator.serviceWorker.getRegistrations()
+            .then(regs => regs.forEach(r => r.unregister()))
+            .catch(() => {});
+        }
       });
     }
   </script>

@@ -1,6 +1,21 @@
 // EZ Sports Netting — tiny storefront demo (no backend)
 // Lightweight state + rendering so you can drop this in and it just works.
 
+// During local development, ensure any previously-registered Service Worker is disabled to avoid live-reload loops
+try {
+  if ('serviceWorker' in navigator) {
+    const isProd = (location.protocol === 'https:') && !/^(localhost|127\.0\.0\.1)$/i.test(location.hostname);
+    if (!isProd) {
+      navigator.serviceWorker.getRegistrations()
+        .then(regs => regs.forEach(r => r.unregister()))
+        .catch(() => {});
+      if (window.caches && caches.keys) {
+        caches.keys().then(keys => Promise.all(keys.map(k => caches.delete(k)))).catch(() => {});
+      }
+    }
+  }
+} catch {}
+
 const currency = new Intl.NumberFormat(undefined, { style: 'currency', currency: 'USD' });
 
 const DEFAULT_PRODUCTS = [

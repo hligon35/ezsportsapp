@@ -247,10 +247,19 @@
   <script type="module" src="assets/js/analytics.js"></script>
   <script type="module" src="assets/js/app.js"></script>
   <script>
-    if('serviceWorker' in navigator){
-      window.addEventListener('load',()=>{
-        // Use relative path so it works when site is served from a subfolder (e.g. /ezsports/ on GitHub Pages or live-server)
-        navigator.serviceWorker.register('service-worker.js').catch(err=>console.warn('SW registration failed', err));
+    // Register Service Worker only in production HTTPS, and actively unregister in dev to avoid live-reload loops
+    if ('serviceWorker' in navigator) {
+      const isProd = (location.protocol === 'https:') && !/^(localhost|127\.0\.0\.1)$/i.test(location.hostname);
+      window.addEventListener('load', () => {
+        if (isProd) {
+          // Use relative path so it works when site is served from a subfolder
+          navigator.serviceWorker.register('service-worker.js').catch(err => console.warn('SW registration failed', err));
+        } else {
+          // During local development, ensure any existing SW is unregistered to prevent caching/reload conflicts
+          navigator.serviceWorker.getRegistrations()
+            .then(regs => regs.forEach(r => r.unregister()))
+            .catch(() => {});
+        }
       });
     }
   </script>
