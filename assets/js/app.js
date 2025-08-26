@@ -266,16 +266,36 @@ const Store = {
     actions.querySelectorAll('.auth-link, .user-menu').forEach(el => el.remove());
 
     if (this.state.user) {
-      // User is logged in
+      // User is logged in — show compact profile avatar with dropdown
       const userMenu = document.createElement('div');
       userMenu.className = 'user-menu';
+      const initials = (this.state.user.name || this.state.user.email || 'U').split(/\s+/).map(s=>s[0]).slice(0,2).join('').toUpperCase();
       userMenu.innerHTML = `
-        <span>Hello, ${this.state.user.name}</span>
-        <a href="order-history.html" class="auth-link">Orders</a>
-        ${this.state.user.isAdmin ? '<a href="admin.html" class="auth-link">Admin</a>' : ''}
-        <button class="auth-link btn btn-ghost" onclick="Store.logout()">Logout</button>
-      `;
+        <button class="profile-btn" id="profile-btn" aria-haspopup="menu" aria-expanded="false" title="Account">
+          <span class="avatar">${initials}</span>
+        </button>
+        <div class="user-dropdown" id="user-dropdown" role="menu" aria-hidden="true">
+          <div class="user-summary">
+            <strong>${this.state.user.name || this.state.user.email}</strong><br/>
+            <small>${this.state.user.email || ''}</small>
+          </div>
+          <a href="account.html" role="menuitem">Account</a>
+          <a href="order-history.html" role="menuitem">Orders</a>
+          ${this.state.user.isAdmin ? '<a href="admin.html" role="menuitem">Admin</a>' : ''}
+          <button type="button" data-logout role="menuitem">Logout</button>
+        </div>`;
       actions.appendChild(userMenu);
+
+      // Wire dropdown toggle and outside click
+      const btn = userMenu.querySelector('#profile-btn');
+      const dd = userMenu.querySelector('#user-dropdown');
+      const close = () => { dd.classList.remove('open'); btn.setAttribute('aria-expanded','false'); dd.setAttribute('aria-hidden','true'); };
+      const open = () => { dd.classList.add('open'); btn.setAttribute('aria-expanded','true'); dd.setAttribute('aria-hidden','false'); };
+      btn.addEventListener('click', (e)=>{ e.stopPropagation(); dd.classList.contains('open')?close():open(); });
+      document.addEventListener('click', (e)=>{ if (!userMenu.contains(e.target)) close(); }, { capture:true });
+      // Logout wiring
+      const logoutBtn = userMenu.querySelector('[data-logout]');
+      if (logoutBtn) logoutBtn.addEventListener('click', ()=> this.logout());
     } else {
       // User is not logged in
       const loginLink = document.createElement('a');
@@ -342,7 +362,18 @@ const Store = {
   },
 
   logout() {
+    try {
+      const bases = [];
+      if (location.port === '5500') { bases.push('http://localhost:4242','http://127.0.0.1:4242'); }
+      bases.unshift(window.__API_BASE || '');
+      const tried = new Set();
+      bases.forEach(base => {
+        if (tried.has(base)) return; tried.add(base);
+        fetch(`${base}/api/users/logout`, { method:'POST', credentials:'include' }).catch(()=>{});
+      });
+    } catch {}
     localStorage.removeItem('currentUser');
+    localStorage.removeItem('authToken');
     this.state.user = null;
     this.updateNavigation();
     window.location.href = 'index.html';
