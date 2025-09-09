@@ -19149,5 +19149,16 @@
     "createdAt": "2025-09-09T23:02:40.619Z",
     "updatedAt": "2025-09-09T23:02:40.619Z",
     "id": 1741
+  },
+  {
+    "type": "pageview",
+    "path": "/gloves.html",
+    "referrer": "",
+    "visitorId": "v_nadgudyl5l8mfd6hjf1",
+    "userId": null,
+    "timestamp": "2025-09-09T23:25:01.755Z",
+    "createdAt": "2025-09-09T23:25:02.069Z",
+    "updatedAt": "2025-09-09T23:25:02.069Z",
+    "id": 1742
   }
 ]
