@@ -80,7 +80,12 @@ const Store = {
   this.ensureCoreNav();
     this.ensureBreadcrumbs();
     this.updateNavigation();
-  this.wireExpertHelpForm();
+  this.ensureNettingSubnav();
+  this.ensureNettingCarousel();
+  this.ensureExpertCTA();
+  this.ensureQuoteButtons();
+  this.ensureBrandLogos();
+  this.ensureFooterNettingLink();
 
     // Refresh products from admin updates
     PRODUCTS = getProducts();
@@ -187,9 +192,10 @@ const Store = {
 
     // Canonical nav: rebuild to avoid legacy links and ensure correct order
     const required = [
+      { href: 'index.html', text: 'Home' },
       { href: 'deals.html', text: 'Deals' },
       { href: 'about.html', text: 'About' },
-      { href: 'netting-calculator.html', text: 'Netting Calculator' },
+      { href: 'ez-nets.html', text: 'EZ Nets' },
       { href: 'bats.html', text: 'Bats' },
       { href: 'gloves.html', text: 'Gloves' },
       { href: 'batting-gloves.html', text: 'Batting Gloves' },
@@ -197,7 +203,8 @@ const Store = {
       { href: 'gear.html', text: 'Gear' },
       { href: 'apparel.html', text: 'Apparel' },
       { href: 'l-screens.html', text: 'L-Screens' },
-      { href: 'facility-field.html', text: 'Facility & Field' }
+      { href: 'facility-field.html', text: 'Facility & Field' },
+      { href: 'contactus.html', text: 'Contact Us' }
     ];
 
     // Preserve cart button if it sits inside nav (will be moved by ensureHeaderLayout)
@@ -214,6 +221,8 @@ const Store = {
       nav.appendChild(a);
     });
 
+  // Removed EZ Nets mega menu per request
+
 
     // Highlight current page
     const path = location.pathname.split('/').pop() || 'index.html';
@@ -221,42 +230,6 @@ const Store = {
     if (active) { active.classList.add('is-active'); active.setAttribute('aria-current', 'page'); }
   },
 
-  // Wire the dedicated expert help form (on pages that include it)
-  wireExpertHelpForm() {
-    try {
-      const form = document.getElementById('expert-help-form');
-      if (!form) return;
-      form.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const fd = new FormData(form);
-        const name = String(fd.get('name') || '').trim();
-        const email = String(fd.get('email') || '').trim();
-        const phone = String(fd.get('phone') || '').trim();
-        const message = String(fd.get('message') || '').trim();
-        const btn = form.querySelector('button[type="submit"]');
-        const msgEl = form.querySelector('.form-msg');
-
-        if (!name || !email || !message) {
-          msgEl.textContent = 'Please complete name, email, and your needs.';
-          msgEl.style.color = 'red';
-          return;
-        }
-
-        btn.disabled = true;
-        const prev = btn.textContent;
-        btn.textContent = 'Sending…';
-        try {
-          await new Promise(r => setTimeout(r, 400));
-          msgEl.textContent = "Thanks! Our netting experts will contact you shortly.";
-          msgEl.style.color = 'green';
-          form.reset();
-        } finally {
-          btn.disabled = false;
-          btn.textContent = prev;
-        }
-      });
-    } catch {}
-  },
 
   updateNavigation() {
     const actions = document.getElementById('header-actions') || document.querySelector('.header-actions');
@@ -325,6 +298,43 @@ const Store = {
       'admin.html': 'Admin',
       'order-history.html': 'Order History',
       'netting-calculator.html': 'Netting Calculator',
+  'hitting-facility.html':'Hitting Facility',
+  'batting-cage.html':'Batting Cage',
+  'foul-ball.html':'Foul Ball Netting',
+  'overhead.html':'Overhead Netting',
+  'backstop.html':'Backstop Netting',
+  'baseball-l-screen.html':'Baseball L-Screen',
+  'pitchers-pocket.html':"Pitcher's Pocket",
+  'training-facility.html':'Training Facility',
+  'diving-range.html':'Diving Range',
+  'golf-course.html':'Golf Course Netting',
+  'golf-cube.html':'Golf Cube',
+  'residential-golf.html':'Residential Golf Netting',
+  'sports-netting.html':'Sports Netting',
+  'sports-baseball.html':'Sports: Baseball',
+  'basketball.html':'Basketball Netting',
+  'cricket-football.html':'Cricket Football',
+  'sports-golf.html':'Sports: Golf',
+  'hockey.html':'Hockey Netting',
+  'sports-lacrosse.html':'Sports: Lacrosse',
+  'multi-sport.html':'Multi-Sport',
+  'sports-soccer.html':'Sports: Soccer',
+  'softball.html':'Softball Netting',
+  'tennis.html':'Tennis Netting',
+  'volleyball.html':'Volleyball Netting',
+  'commercial-netting.html':'Commercial Netting',
+  'auto-drone.html':'Auto-Drone',
+  'drone-enclosure.html':'Drone Enclosure',
+  'warehouse.html':'Warehouse Netting',
+  'safety-netting.html':'Safety Netting',
+  'debris-netting.html':'Debris Netting',
+  'landfill-netting.html':'Landfill Netting',
+      'ez-nets.html': 'EZ Nets',
+      'baseball-netting.html': 'Baseball Netting',
+      'golf-netting.html': 'Golf Netting',
+      'lacrosse-netting.html': 'Lacrosse Netting',
+      'soccer-netting.html': 'Soccer Netting',
+      'contactus.html': 'Contact Us',
       'bats.html': 'Bats',
       'gloves.html': 'Gloves',
       'batting-gloves.html': 'Batting Gloves',
@@ -359,6 +369,216 @@ const Store = {
     nav.appendChild(ol);
     // Insert before main
     main.parentNode.insertBefore(nav, main);
+  },
+
+  // Standardize the EZ Nets sub-navigation across all netting-related pages and append Expert CTA action
+  ensureNettingSubnav() {
+    try {
+      const container = document.getElementById('netting-subnav');
+      if (!container) return;
+      // Canonical order for EZ Nets category navigation
+      const TOP = [
+        { label: 'Overview', href: 'ez-nets.html' },
+        { label: 'Baseball', href: 'baseball-netting.html' },
+        { label: 'Training Facility', href: 'training-facility.html' },
+        { label: 'Golf', href: 'golf-netting.html' },
+        { label: 'Sports', href: 'sports-netting.html' },
+        { label: 'Commercial', href: 'commercial-netting.html' },
+        { label: 'Calculator', href: 'netting-calculator.html' }
+      ];
+      // Rebuild only if markup differs from expected list
+  const base = (location.pathname.split('/').pop() || '').toLowerCase();
+  const html = TOP.map(i => `<a href="${i.href}">${i.label}</a>`).join('');
+  container.innerHTML = html;
+      [...container.querySelectorAll('a')].forEach(a => {
+        if ((a.getAttribute('href') || '').toLowerCase() === base) a.classList.add('is-active');
+      });
+  // No extra button per uniform sub-nav requirement
+    } catch {}
+  },
+
+  // Build a simple carousel on netting category pages using former sub‑sub page labels as slide titles
+  ensureNettingCarousel() {
+    try {
+      const base = (location.pathname.split('/').pop() || '').toLowerCase();
+      const DATA = {
+  'baseball-netting.html': [ 'Hitting Facility','Batting Cage','Foul Ball','Overhead','Backstop','L-Screen','Pitcher Pocket' ],
+  'golf-netting.html': [ 'Driving Range','Golf Course','Golf Cube','Residential' ],
+  'commercial-netting.html': [ 'Auto-Drone','Drone Enclosure','Warehouse','Safety','Debris','Landfill' ],
+  'sports-netting.html': [ 'Baseball','Basketball','Cricket Football','Golf','Hockey','Lacrosse','Multi-Sport','Soccer','Softball','Tennis','Volleyball' ],
+        'training-facility.html': [
+          'Lane Divider Systems','Ceiling Track','Retractable Shell','Impact Panels'
+        ]
+      };
+      if (!DATA[base] || DATA[base].length === 0) return;
+      // Avoid duplicate build
+      if (document.querySelector('.net-carousel')) return;
+      // Find hero section to insert after
+      const hero = document.querySelector('.net-hero, .netting-hero');
+      if (!hero) return;
+      const section = document.createElement('section');
+      section.className = 'carousel-section';
+      section.innerHTML = `
+        <div class="net-carousel" data-autoplay="5500" aria-roledescription="carousel">
+          <div class="carousel-track" role="group"></div>
+          <button class="carousel-arrow prev" aria-label="Previous slide" type="button">‹</button>
+          <button class="carousel-arrow next" aria-label="Next slide" type="button">›</button>
+          <div class="carousel-dots" role="tablist"></div>
+        </div>`;
+      hero.insertAdjacentElement('afterend', section);
+      const track = section.querySelector('.carousel-track');
+      const dotsWrap = section.querySelector('.carousel-dots');
+      const slides = DATA[base];
+      slides.forEach((title, idx) => {
+        const slide = document.createElement('div');
+        slide.className = 'carousel-slide';
+        slide.setAttribute('data-index', String(idx));
+        slide.innerHTML = `
+          <div class="slide-media" role="img" aria-label="${title} image placeholder">
+            <span>${title}</span>
+          </div>
+          <h3 class="slide-title">${title}</h3>`;
+        track.appendChild(slide);
+        const dot = document.createElement('button');
+        dot.type = 'button';
+        dot.className = 'carousel-dot';
+        dot.setAttribute('role','tab');
+        dot.setAttribute('aria-label', `Slide ${idx+1}: ${title}`);
+        dot.dataset.index = String(idx);
+        dotsWrap.appendChild(dot);
+      });
+
+      const carousel = section.querySelector('.net-carousel');
+      const prevBtn = section.querySelector('.carousel-arrow.prev');
+      const nextBtn = section.querySelector('.carousel-arrow.next');
+      let index = 0;
+      const total = slides.length;
+      const update = () => {
+        track.style.transform = `translateX(-${index*100}%)`;
+        dotsWrap.querySelectorAll('button').forEach(b => {
+          const active = Number(b.dataset.index) === index;
+            b.setAttribute('aria-selected', active ? 'true':'false');
+            b.classList.toggle('is-active', active);
+        });
+      };
+      const go = (i) => { index = (i+total)%total; update(); };
+      prevBtn?.addEventListener('click', ()=> go(index-1));
+      nextBtn?.addEventListener('click', ()=> go(index+1));
+      dotsWrap.addEventListener('click', (e) => {
+        const btn = e.target.closest('button');
+        if (!btn) return;
+        go(Number(btn.dataset.index));
+      });
+      // Autoplay
+      const delay = Number(carousel?.dataset.autoplay) || 0;
+      let timer = null;
+      if (delay && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        timer = setInterval(()=> go(index+1), delay);
+        carousel.addEventListener('mouseenter', ()=> timer && clearInterval(timer));
+        carousel.addEventListener('mouseleave', ()=> { if (delay) timer = setInterval(()=> go(index+1), delay); });
+        document.addEventListener('visibilitychange', ()=>{
+          if (document.hidden) { timer && clearInterval(timer); timer=null; }
+          else if (!timer) { timer = setInterval(()=> go(index+1), delay); }
+        });
+      }
+      // Initialize
+      update();
+    } catch(e) { /* silent */ }
+  },
+
+  // Inject a bottom "Connect with a Netting Expert" CTA on all pages except contact page (now also appears on EZ Nets pages)
+  ensureExpertCTA() {
+    try {
+      const base = (location.pathname.split('/').pop() || '').toLowerCase();
+      const EXCLUDE = new Set(['contactus.html']);
+      if (EXCLUDE.has(base)) return; // skip contact page
+      // If already present, normalize its paragraph text for uniformity
+      const existing = document.querySelector('.expert-cta');
+      if (existing) {
+        const p = existing.querySelector('p');
+        if (p) p.textContent = 'Planning a facility or multi-field build? Talk with a netting expert for layout optimization, span design, hardware selection, and realistic lead times.';
+        return;
+      }
+      const main = document.getElementById('main');
+      const footer = document.querySelector('footer.site-footer');
+      if (!main || !footer) return;
+      const section = document.createElement('section');
+      section.className = 'expert-cta container';
+      section.innerHTML = `
+        <h2>Talk with a Netting Expert</h2>
+        <p>Planning a facility or multi-field build? Talk with a netting expert for layout optimization, span design, hardware selection, and realistic lead times.</p>
+        <button type="button" class="cta-btn" data-open-expert>Connect Now <span aria-hidden="true">›</span></button>
+      `;
+      footer.parentNode.insertBefore(section, footer);
+      section.querySelector('[data-open-expert]')?.addEventListener('click', () => {
+        // Focus any existing expert/help form if present on the page
+        const nameField = document.querySelector('#contact-name, #expert-name');
+        if (nameField) { nameField.scrollIntoView({ behavior:'smooth', block:'center' }); nameField.focus(); }
+        // Fallback: navigate to contact page
+        else { window.location.href = 'contactus.html'; }
+      });
+    } catch {}
+  },
+
+  // Standardize all "Request Quote" / "Get Quote" buttons on netting pages to a black style
+  ensureQuoteButtons() {
+    try {
+      // Only run on netting related pages (presence of netting hero or subnav)
+      const isNettingPage = !!document.querySelector('.netting-hero, .net-hero, #netting-subnav');
+      if (!isNettingPage) return;
+      const buttons = Array.from(document.querySelectorAll('button'));
+      buttons.forEach(btn => {
+        const label = (btn.textContent || '').trim().toLowerCase();
+        if (label === 'request quote' || label === 'get quote') {
+          btn.textContent = 'Request Quote';
+          // Ensure navigation to contact page if no explicit handler
+          if (!btn.getAttribute('onclick')) {
+            btn.addEventListener('click', () => { window.location.href = 'contactus.html'; });
+          }
+          // Normalize classes
+          const classes = new Set((btn.className || '').split(/\s+/).filter(Boolean));
+          classes.delete('btn-primary');
+          classes.add('btn');
+            classes.add('btn-quote');
+          btn.className = Array.from(classes).join(' ');
+        }
+      });
+    } catch {}
+  },
+
+  // Replace placeholder logo.svg with brand ezsportslogo.jpg in header & footer
+  ensureBrandLogos() {
+    try {
+      const BRAND_SRC = 'assets/img/ezsportslogo.jpg';
+      const targets = [
+        ...document.querySelectorAll('.site-header .brand img, .footer-brand-block img')
+      ];
+      targets.forEach(img => {
+        const src = img.getAttribute('src') || '';
+        if (/logo\.svg$/i.test(src) || /\/logo\.svg$/i.test(src)) {
+          img.setAttribute('src', BRAND_SRC);
+        }
+        img.setAttribute('alt', 'EZ Sports Netting logo');
+        // Standardize size if missing explicit height
+        if (!img.getAttribute('height')) img.setAttribute('height', '40');
+      });
+    } catch {}
+  },
+
+  // Ensure footer "Netting" link (generic category) points to EZ Nets overview, not calculator
+  ensureFooterNettingLink() {
+    try {
+      const footer = document.querySelector('footer');
+      if (!footer) return;
+      // Find links inside any footer Shop section whose text is exactly "Netting"
+      const links = Array.from(footer.querySelectorAll('a'));
+      links.forEach(a => {
+        const label = (a.textContent || '').trim().toLowerCase();
+        if (label === 'netting' && /netting-calculator\.html$/i.test(a.getAttribute('href')||'')) {
+          a.setAttribute('href', 'ez-nets.html');
+        }
+      });
+    } catch {}
   },
 
   logout() {

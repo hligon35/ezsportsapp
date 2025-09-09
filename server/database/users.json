@@ -21,5 +21,17 @@
     "updatedAt": "2025-08-26T17:33:29.277Z",
     "id": 1001,
     "lastLogin": "2025-08-26T17:33:29.276Z"
+  },
+  {
+    "email": "hligon35@gmail.com",
+    "password": "$2b$10$zUVX/nCKy8zVKNxZbuKzAOO95YFTVp4YhN/prS2UOIVDeQhPuO02e",
+    "name": "Harold Ligon",
+    "firstName": "Harold",
+    "lastName": "Ligon",
+    "isAdmin": false,
+    "lastLogin": null,
+    "createdAt": "2025-09-09T23:01:30.004Z",
+    "updatedAt": "2025-09-09T23:01:30.004Z",
+    "id": 1004
   }
 ]
