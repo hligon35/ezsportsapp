@@ -20,13 +20,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
-  <style>
-    .careers{margin-top:1rem}
-    .jobs{display:grid;gap:.8rem}
-    .job{padding:1rem}
-    .job h3{margin:0 0 .25rem}
-    .meta{color:var(--muted);font-size:.9rem}
-  </style>
+  
 </head>
 <body>
   <a class="skip" href="#main">Skip to content</a>
@@ -55,12 +49,12 @@
   <main id="main" class="container careers">
     <h2 class="section-title">Careers</h2>
     <p class="muted">We’re a small, fast-moving team of former players, coaches, and builders. If you love the game and solving real customer problems, we’d love to hear from you.</p>
-    <form id="job-filters" class="card" style="margin:1rem 0;display:grid;gap:.75rem;padding:1rem" onsubmit="event.preventDefault()">
-      <div style="display:grid;gap:.75rem;grid-template-columns:repeat(auto-fit,minmax(180px,1fr))">
-        <label style="display:grid;gap:.25rem;font-size:.85rem">Search
+    <form id="job-filters" class="card" onsubmit="event.preventDefault()">
+      <div class="grid">
+        <label>Search
           <input type="search" name="q" placeholder="Search roles" aria-label="Search roles" />
         </label>
-        <label style="display:grid;gap:.25rem;font-size:.85rem">Location
+        <label>Location
           <select name="location" aria-label="Filter by location">
             <option value="">All</option>
             <option value="remote">Remote</option>
@@ -68,7 +62,7 @@
             <option value="hybrid-mo">Hybrid (MO)</option>
           </select>
         </label>
-        <label style="display:grid;gap:.25rem;font-size:.85rem">Team
+        <label>Team
           <select name="team" aria-label="Filter by team">
             <option value="">All</option>
             <option value="sales">Sales</option>
@@ -76,7 +70,7 @@
             <option value="ecommerce">Ecommerce</option>
           </select>
         </label>
-        <label style="display:grid;gap:.25rem;font-size:.85rem">Type
+        <label>Type
           <select name="type" aria-label="Filter by employment type">
             <option value="">All</option>
             <option value="full-time">Full-time</option>
@@ -84,9 +78,9 @@
           </select>
         </label>
       </div>
-      <div style="display:flex;gap:.5rem;align-items:center;flex-wrap:wrap;font-size:.85rem">
+      <div class="actions">
         <span id="job-count" aria-live="polite"></span>
-        <button type="reset" class="btn btn-ghost" style="padding:.4rem .8rem;font-size:.75rem" aria-label="Reset filters">Reset</button>
+        <button type="reset" class="btn btn-ghost btn-sm" aria-label="Reset filters">Reset</button>
       </div>
     </form>
     <section class="jobs">

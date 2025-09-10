@@ -817,16 +817,16 @@ const Store = {
           <img src="${p.img}" alt="${p.title}" loading="lazy" onerror="this.onerror=null;this.src='https://placehold.co/600x400?text=Image+Unavailable';"/>
         </div>
         <div class="body">
-          <h3 style="margin:0 0 .25rem;font-size:1rem">${p.title}</h3>
-          ${p.stock !== undefined ? `<p style=\"font-size:.8rem;color:#666;margin:.25rem 0;\">Stock: ${p.stock}</p>` : ''}
-          <div class="variant-row" style="display:flex; gap:.5rem; align-items:center; margin:.25rem 0;">
-            <label style="font-size:.8rem; color:#555;">Size
-              <select class="sel-size" style="margin-left:.25rem;">
+          <h3 class="h3-tight">${p.title}</h3>
+          ${p.stock !== undefined ? `<p class=\"text-sm text-muted my-025\">Stock: ${p.stock}</p>` : ''}
+          <div class="variant-row">
+            <label class="text-sm text-muted">Size
+              <select class="sel-size ml-025">
                 ${['XS','S','M','L','XL'].map(s=>`<option value=\"${s}\">${s}</option>`).join('')}
               </select>
             </label>
-            <label style="font-size:.8rem; color:#555;">Color
-              <select class="sel-color" style="margin-left:.25rem;">
+            <label class="text-sm text-muted">Color
+              <select class="sel-color ml-025">
                 ${['Black','White','Red','Blue','Green'].map(c=>`<option value=\"${c}\">${c}</option>`).join('')}
               </select>
             </label>
@@ -949,13 +949,13 @@ const Store = {
       const price = typeof i.product?.price === 'number' ? i.product.price : 0;
       return `
       <div class="cart-row">
-        <img src="${img}" alt="${title}" width="64" height="64" style="border-radius:.4rem;object-fit:cover"/>
+        <img src="${img}" alt="${title}" width="64" height="64" class="rounded-xs object-cover"/>
         <div>
           <strong>${title}</strong>
-          ${variant ? `<div style=\"font-size:.8rem;color:#555;\">${variant}</div>` : ''}
-          <div style="opacity:.8">Qty: <button class="icon-btn" data-dec="${key}">−</button> ${i.qty} <button class="icon-btn" data-inc="${key}">+</button></div>
+          ${variant ? `<div class=\"text-sm text-muted\">${variant}</div>` : ''}
+          <div class="opacity-80">Qty: <button class="icon-btn" data-dec="${key}">−</button> ${i.qty} <button class="icon-btn" data-inc="${key}">+</button></div>
         </div>
-        <div style="text-align:right">
+        <div class="text-right">
           <div>${currency.format(price * i.qty)}</div>
           <button class="btn btn-ghost" data-remove="${key}">Remove</button>
         </div>

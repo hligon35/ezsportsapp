@@ -682,7 +682,7 @@ img{max-width:100%;display:block}
 .placeholder-img { background:#f3f5f8; border:2px dashed var(--border); border-radius:1rem; aspect-ratio:4/3; display:grid; place-items:center; font-weight:700; color:#555 }
 .spec-block { background:#fff; border:1px solid var(--border); padding:1rem; border-radius:1rem; box-shadow:0 4px 18px rgba(12,32,64,.06) }
 .spec-block h3 { margin:.1rem 0 .5rem; font-size:1rem }
-.net-hero h1{margin:0 0 .5rem;font-size:clamp(1.9rem,4.5vw,3rem);font-weight:900;text-transform:uppercase;color:#fff}
+.net-hero h1{margin:0 0 .5rem;font-size:clamp(1.9rem,4.5vw,3rem);font-weight:900;text-transform:uppercase;letter-spacing:.5px;color:#fff}
 .net-hero p{margin:0 0 1rem;max-width:760px;font-weight:600;color:#fff;opacity:.95}
 .choices{display:flex;gap:.6rem}
 .choice{display:inline-flex;align-items:center;gap:.35rem;border:1px solid var(--border);padding:.45rem .6rem;border-radius:.6rem;background:#ffffff}
@@ -800,3 +800,68 @@ img{max-width:100%;display:block}
   .carousel-arrow{width:36px;height:36px;font-size:1.4rem}
   .carousel-slide .slide-media{aspect-ratio:4/3}
 }
+
+/* Careers (filters and list) */
+.careers { margin-top: 1rem; }
+.jobs { display: grid; gap: .8rem; }
+.job { padding: 1rem; }
+.job h3 { margin: 0 0 .25rem; }
+.job .meta { color: var(--muted); font-size: .9rem; }
+#job-filters { margin: 1rem 0; display: grid; gap: .75rem; padding: 1rem; }
+#job-filters .grid { display: grid; gap: .75rem; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
+#job-filters label { display: grid; gap: .25rem; font-size: .85rem; }
+#job-filters .actions { display: flex; gap: .5rem; align-items: center; flex-wrap: wrap; font-size: .85rem; }
+#job-filters .btn-sm { padding: .4rem .8rem; font-size: .75rem; }
+
+/* Inline-style replacement utilities */
+.mb-025 { margin-bottom: .25rem; }
+.my-025 { margin-top: .25rem; margin-bottom: .25rem; }
+.ml-025 { margin-left: .25rem; }
+.text-sm { font-size: .8rem; }
+.text-muted { color: #555; }
+.flex-row { display: flex; }
+.gap-05 { gap: .5rem; }
+.items-center { align-items: center; }
+.rounded-xs { border-radius: .4rem; }
+.object-cover { object-fit: cover; }
+.opacity-80 { opacity: .8; }
+.text-right { text-align: right; }
+.h3-tight { margin: 0 0 .25rem; font-size: 1rem; }
+.mt-05 { margin-top: .5rem; }
+.mt-1 { margin-top: 1rem; }
+.section-spaced { margin: 2rem 0 3rem; }
+
+/* Variant row used in product cards */
+.variant-row { display:flex; gap:.5rem; align-items:center; margin:.25rem 0; }
+
+/* Page-specific net hero gradients (replaces per-page inline styles) */
+.net-hero.nh-training-facility { background: linear-gradient(135deg,#0f2f50,#093150) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
+.net-hero.nh-sports-netting { background: linear-gradient(135deg,#162a44,#0f2f50) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
+.net-hero.nh-commercial-netting { background: linear-gradient(135deg,#102535,#0b1b28) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
+.net-hero.nh-hitting-facility { background: linear-gradient(135deg,#0f2f50,#23496c) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
+.net-hero.nh-batting-cage { background: linear-gradient(135deg,#16324c,#214d72) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
+.net-hero.nh-foul-ball { background: linear-gradient(135deg,#132a40,#1c4768) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
+.net-hero.nh-overhead { background: linear-gradient(135deg,#0d2539,#153a56) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
+.net-hero.nh-backstop { background: linear-gradient(135deg,#0c253e,#114061) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
+.net-hero.nh-baseball-l-screen { background: linear-gradient(135deg,#102d46,#1c4d70) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
+.net-hero.nh-pitchers-pocket { background: linear-gradient(135deg,#0f2f50,#1d4d72) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
+.net-hero.nh-diving-range { background: linear-gradient(135deg,#15324b,#214b6a) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
+.net-hero.nh-golf-course { background: linear-gradient(135deg,#142c42,#1f4866) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
+.net-hero.nh-golf-cube { background: linear-gradient(135deg,#132d43,#1e4a68) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
+.net-hero.nh-sports-baseball { background: linear-gradient(135deg,#142f46,#1f4b6a) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
+.net-hero.nh-basketball { background: linear-gradient(135deg,#132e44,#1d4a69) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
+.net-hero.nh-cricket-football { background: linear-gradient(135deg,#122b42,#1c4765) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
+.net-hero.nh-sports-golf { background: linear-gradient(135deg,#112b41,#1d4764) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
+.net-hero.nh-hockey { background: linear-gradient(135deg,#102a40,#1a4562) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
+.net-hero.nh-sports-lacrosse { background: linear-gradient(135deg,#10283d,#1a435f) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
+.net-hero.nh-multi-sport { background: linear-gradient(135deg,#0f273b,#183f59) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
+.net-hero.nh-sports-soccer { background: linear-gradient(135deg,#11283c,#1b425d) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
+.net-hero.nh-softball { background: linear-gradient(135deg,#10273b,#1a425d) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
+.net-hero.nh-tennis { background: linear-gradient(135deg,#0f2539,#193f59) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
+.net-hero.nh-volleyball { background: linear-gradient(135deg,#0e2539,#183d56) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
+.net-hero.nh-auto-drone { background: linear-gradient(135deg,#0f2437,#173b54) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
+.net-hero.nh-drone-enclosure { background: linear-gradient(135deg,#0f2234,#16374d) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
+.net-hero.nh-warehouse { background: linear-gradient(135deg,#0e2233,#15374d) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
+.net-hero.nh-safety-netting { background: linear-gradient(135deg,#0d2232,#15384e) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
+.net-hero.nh-debris-netting { background: linear-gradient(135deg,#0c2232,#14374c) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
+.net-hero.nh-landfill-netting { background: linear-gradient(135deg,#0b2130,#133549) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
