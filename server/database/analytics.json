@@ -19160,5 +19160,137 @@
     "createdAt": "2025-09-09T23:25:02.069Z",
     "updatedAt": "2025-09-09T23:25:02.069Z",
     "id": 1742
+  },
+  {
+    "type": "pageview",
+    "path": "/about.html",
+    "referrer": "",
+    "visitorId": "v_nadgudyl5l8mfd6hjf1",
+    "userId": null,
+    "timestamp": "2025-09-10T00:00:05.862Z",
+    "createdAt": "2025-09-10T00:00:05.903Z",
+    "updatedAt": "2025-09-10T00:00:05.903Z",
+    "id": 1743
+  },
+  {
+    "type": "pageview",
+    "path": "/batting-gloves.html",
+    "referrer": "",
+    "visitorId": "v_nadgudyl5l8mfd6hjf1",
+    "userId": null,
+    "timestamp": "2025-09-10T00:00:07.739Z",
+    "createdAt": "2025-09-10T00:00:07.768Z",
+    "updatedAt": "2025-09-10T00:00:07.768Z",
+    "id": 1744
+  },
+  {
+    "type": "pageview",
+    "path": "/apparel.html",
+    "referrer": "",
+    "visitorId": "v_nadgudyl5l8mfd6hjf1",
+    "userId": null,
+    "timestamp": "2025-09-10T00:00:10.736Z",
+    "createdAt": "2025-09-10T00:00:10.801Z",
+    "updatedAt": "2025-09-10T00:00:10.801Z",
+    "id": 1745
+  },
+  {
+    "type": "pageview",
+    "path": "/index.html",
+    "referrer": "",
+    "visitorId": "v_nadgudyl5l8mfd6hjf1",
+    "userId": null,
+    "timestamp": "2025-09-10T00:00:25.983Z",
+    "createdAt": "2025-09-10T00:00:25.996Z",
+    "updatedAt": "2025-09-10T00:00:25.996Z",
+    "id": 1746
+  },
+  {
+    "type": "pageview",
+    "path": "/index.html",
+    "referrer": "",
+    "visitorId": "v_rktw5h12sxdmfd7ro0g",
+    "userId": null,
+    "timestamp": "2025-09-10T00:00:53.672Z",
+    "createdAt": "2025-09-10T00:00:53.715Z",
+    "updatedAt": "2025-09-10T00:00:53.715Z",
+    "id": 1747
+  },
+  {
+    "type": "pageview",
+    "path": "/about.html",
+    "referrer": "",
+    "visitorId": "v_rktw5h12sxdmfd7ro0g",
+    "userId": null,
+    "timestamp": "2025-09-10T00:01:03.850Z",
+    "createdAt": "2025-09-10T00:01:03.889Z",
+    "updatedAt": "2025-09-10T00:01:03.889Z",
+    "id": 1748
+  },
+  {
+    "type": "pageview",
+    "path": "/batting-gloves.html",
+    "referrer": "",
+    "visitorId": "v_rktw5h12sxdmfd7ro0g",
+    "userId": null,
+    "timestamp": "2025-09-10T00:01:05.852Z",
+    "createdAt": "2025-09-10T00:01:05.950Z",
+    "updatedAt": "2025-09-10T00:01:05.950Z",
+    "id": 1749
+  },
+  {
+    "type": "pageview",
+    "path": "/deals.html",
+    "referrer": "",
+    "visitorId": "v_rktw5h12sxdmfd7ro0g",
+    "userId": null,
+    "timestamp": "2025-09-10T00:05:40.765Z",
+    "createdAt": "2025-09-10T00:05:40.823Z",
+    "updatedAt": "2025-09-10T00:05:40.823Z",
+    "id": 1750
+  },
+  {
+    "type": "pageview",
+    "path": "/netting-calculator.html",
+    "referrer": "",
+    "visitorId": "v_rktw5h12sxdmfd7ro0g",
+    "userId": null,
+    "timestamp": "2025-09-10T00:17:14.999Z",
+    "createdAt": "2025-09-10T00:17:15.056Z",
+    "updatedAt": "2025-09-10T00:17:15.056Z",
+    "id": 1751
+  },
+  {
+    "type": "pageview",
+    "path": "/support.html",
+    "referrer": "",
+    "visitorId": "v_rktw5h12sxdmfd7ro0g",
+    "userId": null,
+    "timestamp": "2025-09-10T00:17:48.039Z",
+    "createdAt": "2025-09-10T00:17:48.054Z",
+    "updatedAt": "2025-09-10T00:17:48.054Z",
+    "id": 1752
+  },
+  {
+    "type": "pageview",
+    "path": "/help-warranty.html",
+    "referrer": "",
+    "visitorId": "v_rktw5h12sxdmfd7ro0g",
+    "userId": null,
+    "timestamp": "2025-09-10T00:17:53.883Z",
+    "createdAt": "2025-09-10T00:17:53.920Z",
+    "updatedAt": "2025-09-10T00:17:53.920Z",
+    "id": 1753
+  },
+  {
+    "type": "pageview",
+    "path": "/l-screens.html",
+    "referrer": "",
+    "visitorId": "v_rktw5h12sxdmfd7ro0g",
+    "userId": null,
+    "timestamp": "2025-09-10T00:39:36.765Z",
+    "createdAt": "2025-09-10T00:39:36.905Z",
+    "updatedAt": "2025-09-10T00:39:36.905Z",
+    "id": 1754
   }
 ]

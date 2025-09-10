@@ -86,6 +86,10 @@ const Store = {
   this.ensureQuoteButtons();
   this.ensureBrandLogos();
   this.ensureFooterNettingLink();
+  this.ensureSkipLink();
+  this.ensureSEO();
+  this.ensurePerformanceOptimizations();
+  this.ensureServiceWorkerRegistered();
 
     // Refresh products from admin updates
     PRODUCTS = getProducts();
@@ -135,6 +139,191 @@ const Store = {
 
     // Reveal header/nav only after everything is standardized
     document.body.classList.add('nav-ready');
+  },
+
+  // Accessibility: ensure a skip link exists for keyboard users
+  ensureSkipLink() {
+    try {
+      if (document.querySelector('a.skip')) return;
+      const a = document.createElement('a');
+      a.className = 'skip';
+      a.href = '#main';
+      a.textContent = 'Skip to content';
+      // Insert as the first child of body
+      document.body.insertAdjacentElement('afterbegin', a);
+    } catch {}
+  },
+
+  // SEO: canonical/robots/OG/Twitter and JSON-LD (Organization + Breadcrumbs)
+  ensureSEO() {
+    try {
+      const head = document.head;
+      // Canonical
+      if (!head.querySelector('link[rel="canonical"]')) {
+        const link = document.createElement('link');
+        link.rel = 'canonical';
+        const base = location.origin || (location.protocol + '//' + location.host);
+        link.href = base + location.pathname;
+        head.appendChild(link);
+      }
+      // Robots
+      if (!head.querySelector('meta[name="robots"]')) {
+        const m = document.createElement('meta');
+        m.name = 'robots';
+        m.content = 'index,follow';
+        head.appendChild(m);
+      }
+      // OG/Twitter fallback
+      const title = document.title || 'EZ Sports Netting';
+      const descEl = head.querySelector('meta[name="description"]');
+      const desc = (descEl && descEl.getAttribute('content')) || 'Shop premium baseball nets, bats, gloves, helmets & training gear.';
+      const url = (head.querySelector('link[rel="canonical"]')?.getAttribute('href')) || location.href;
+      const defaultImage = (location.origin || '') + '/assets/img/ezsportslogo.jpg';
+      const og = {
+        'og:site_name': 'EZ Sports Netting',
+        'og:type': 'website',
+        'og:title': title,
+        'og:description': desc,
+        'og:url': url,
+        'og:image': defaultImage
+      };
+      Object.entries(og).forEach(([p, v]) => {
+        if (!head.querySelector(`meta[property="${p}"]`)) {
+          const m = document.createElement('meta');
+          m.setAttribute('property', p);
+          m.setAttribute('content', v);
+          head.appendChild(m);
+        }
+      });
+      const tw = {
+        'twitter:card': 'summary_large_image',
+        'twitter:title': title,
+        'twitter:description': desc,
+        'twitter:image': defaultImage
+      };
+      Object.entries(tw).forEach(([n, v]) => {
+        if (!head.querySelector(`meta[name="${n}"]`)) {
+          const m = document.createElement('meta');
+          m.setAttribute('name', n);
+          m.setAttribute('content', v);
+          head.appendChild(m);
+        }
+      });
+      // JSON-LD Organization (if not already present)
+      const hasOrg = Array.from(head.querySelectorAll('script[type="application/ld+json"]')).some(s => /"@type"\s*:\s*"Organization"/i.test(s.textContent || ''));
+      if (!hasOrg) {
+        const s = document.createElement('script');
+        s.type = 'application/ld+json';
+        s.text = JSON.stringify({
+          '@context': 'https://schema.org',
+          '@type': 'Organization',
+          name: 'EZ Sports Netting',
+          url: (location.origin || '') + '/',
+          logo: (location.origin || '') + '/assets/img/ezsportslogo.jpg',
+          sameAs: []
+        });
+        head.appendChild(s);
+      }
+      // JSON-LD Breadcrumbs when breadcrumbs nav exists
+      const crumbsNav = document.querySelector('nav.breadcrumbs .crumbs');
+      if (crumbsNav) {
+        const items = Array.from(crumbsNav.querySelectorAll('li'));
+        const list = items.map((li, idx) => {
+          const a = li.querySelector('a');
+          return {
+            '@type': 'ListItem',
+            position: idx + 1,
+            name: (a ? a.textContent : li.textContent || '').trim(),
+            item: a ? (new URL(a.getAttribute('href'), location.href)).href : (location.href)
+          };
+        });
+        const hasBreadcrumb = Array.from(head.querySelectorAll('script[type="application/ld+json"]')).some(s => /"@type"\s*:\s*"BreadcrumbList"/i.test(s.textContent || ''));
+        if (!hasBreadcrumb) {
+          const s = document.createElement('script');
+          s.type = 'application/ld+json';
+          s.text = JSON.stringify({ '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: list });
+          head.appendChild(s);
+        }
+      }
+
+      // Manifest and theme-color for PWA hints
+      if (!head.querySelector('link[rel="manifest"]')) {
+        const link = document.createElement('link');
+        link.rel = 'manifest';
+        link.href = 'manifest.webmanifest';
+        head.appendChild(link);
+      }
+      if (!head.querySelector('meta[name="theme-color"]')) {
+        const m = document.createElement('meta');
+        m.name = 'theme-color';
+        m.content = '#0f2f50';
+        head.appendChild(m);
+      }
+    } catch {}
+  },
+
+  // Performance: fonts/stripe preconnect, stylesheet preload, image lazy loading with LCP protection
+  ensurePerformanceOptimizations() {
+    try {
+      const head = document.head;
+      const ensureLink = (attrs) => {
+        const selector = Object.entries(attrs).map(([k, v]) => `[${k}="${v}"]`).join('');
+        if (!head.querySelector(`link${selector}`)) {
+          const l = document.createElement('link');
+          Object.entries(attrs).forEach(([k, v]) => l.setAttribute(k, v));
+          head.appendChild(l);
+        }
+      };
+      // Preconnects
+      ensureLink({ rel: 'preconnect', href: 'https://fonts.googleapis.com' });
+      ensureLink({ rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' });
+      // Stripe only where likely used; add generically as it’s cheap
+      ensureLink({ rel: 'preconnect', href: 'https://js.stripe.com' });
+
+      // Ensure Google Fonts CSS present (Outfit) to reduce FOUT inconsistencies
+      const hasOutfit = Array.from(head.querySelectorAll('link[href*="fonts.googleapis.com"]')).some(l => /Outfit/i.test(l.href));
+      if (!hasOutfit) {
+        const l = document.createElement('link');
+        l.rel = 'stylesheet';
+        l.href = 'https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&display=swap';
+        head.appendChild(l);
+      }
+
+      // Preload main stylesheet
+      const cssLink = head.querySelector('link[rel="stylesheet"][href*="assets/css/styles.css"]');
+      if (cssLink && !head.querySelector('link[rel="preload"][as="style"][href="' + cssLink.getAttribute('href') + '"]')) {
+        ensureLink({ rel: 'preload', as: 'style', href: cssLink.getAttribute('href') });
+      }
+
+      // Image loading tweaks
+      const isHero = (img) => img.closest('.hero, .hero-art, .net-hero, .netting-hero, .turf-hero');
+      // Promote first hero/primary image
+      const lcpCandidate = document.querySelector('.hero-art img, .net-hero img, .netting-hero img, main img');
+      if (lcpCandidate) {
+        lcpCandidate.setAttribute('fetchpriority', 'high');
+        lcpCandidate.setAttribute('loading', 'eager');
+        lcpCandidate.setAttribute('decoding', 'async');
+      }
+      // Lazy load all other images
+      document.querySelectorAll('img').forEach(img => {
+        if (img === lcpCandidate) return;
+        if (!isHero(img)) {
+          if (!img.hasAttribute('loading')) img.setAttribute('loading', 'lazy');
+          img.setAttribute('decoding', 'async');
+        }
+      });
+    } catch {}
+  },
+
+  // PWA: register Service Worker for production only
+  ensureServiceWorkerRegistered() {
+    try {
+      const isProd = (location.protocol === 'https:') && !/^(localhost|127\.0\.0\.1)$/i.test(location.hostname);
+      if (!('serviceWorker' in navigator) || !isProd) return;
+      navigator.serviceWorker.getRegistration().then(reg => {
+        if (!reg) navigator.serviceWorker.register('/service-worker.js').catch(()=>{});
+      }).catch(()=>{});
+    } catch {}
   },
 
   ensureHeaderLayout() {
@@ -487,7 +676,7 @@ const Store = {
     } catch(e) { /* silent */ }
   },
 
-  // Inject a bottom "Connect with a Netting Expert" CTA on all pages except contact page (now also appears on EZ Nets pages)
+  // Inject a bottom "Talk with a Netting Expert" CTA on all pages except contact page
   ensureExpertCTA() {
     try {
       const base = (location.pathname.split('/').pop() || '').toLowerCase();
@@ -500,9 +689,8 @@ const Store = {
         if (p) p.textContent = 'Planning a facility or multi-field build? Talk with a netting expert for layout optimization, span design, hardware selection, and realistic lead times.';
         return;
       }
-      const main = document.getElementById('main');
       const footer = document.querySelector('footer.site-footer');
-      if (!main || !footer) return;
+      if (!footer) return;
       const section = document.createElement('section');
       section.className = 'expert-cta container';
       section.innerHTML = `
@@ -654,6 +842,37 @@ const Store = {
     `).join('');
 
     this.ui.grid.innerHTML = html || `<p>No products found.</p>`;
+
+    // Inject/update JSON-LD ItemList for SEO based on currently rendered products
+    try {
+      const head = document.head;
+      const existing = document.getElementById('jsonld-itemlist');
+      if (existing) existing.remove();
+      if (list.length > 0) {
+        const script = document.createElement('script');
+        script.type = 'application/ld+json';
+        script.id = 'jsonld-itemlist';
+        const itemListElement = list.map((p, i) => ({
+          '@type': 'ListItem',
+          position: i + 1,
+          item: {
+            '@type': 'Product',
+            name: p.title,
+            sku: p.id,
+            category: p.category,
+            image: (p.img ? new URL(p.img, location.href).href : undefined),
+            offers: {
+              '@type': 'Offer',
+              priceCurrency: 'USD',
+              price: String(p.price ?? ''),
+              availability: 'https://schema.org/InStock'
+            }
+          }
+        }));
+        script.text = JSON.stringify({ '@context': 'https://schema.org', '@type': 'ItemList', itemListElement });
+        head.appendChild(script);
+      }
+    } catch {}
 
     // Bind add buttons
     this.ui.grid.querySelectorAll('[data-add]:not([disabled])').forEach(btn => btn.addEventListener('click', (ev) => {

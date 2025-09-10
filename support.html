@@ -20,14 +20,6 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
-  <style>
-    .support{margin-top:1rem}
-    .support .card{padding:1rem}
-    .support form{display:grid;gap:.6rem}
-    .support input,.support textarea, .support select{padding:.7rem .9rem;border:1px solid #cfe0f5;border-radius:.6rem;background:#fff;color:var(--ink)}
-    .support .grid{grid-template-columns:1fr 1fr}
-    @media (max-width: 800px){ .support .grid{grid-template-columns:1fr} }
-  </style>
 </head>
 <body>
   <a class="skip" href="#main">Skip to content</a>
@@ -60,11 +52,12 @@
         <h3>Contact Us</h3>
         <p class="muted">Questions about an order, return, or product? Send us a note.</p>
         <form onsubmit="event.preventDefault(); alert('Thanks, we\'ll get back to you shortly.');">
-          <div class="grid" style="grid-template-columns:1fr 1fr;gap:.6rem">
+          <div class="grid two-col">
             <input name="name" placeholder="Full name" required />
             <input name="email" type="email" placeholder="Email" required />
           </div>
-          <select name="topic">
+          <label for="topic">Topic</label>
+          <select id="topic" name="topic">
             <option value="order">Order issue</option>
             <option value="returns">Returns</option>
             <option value="warranty">Warranty</option>
@@ -84,7 +77,7 @@
           <li><a href="help-sizing.html">Sizing & fit</a></li>
           <li><a href="help-payments.html">Payment methods</a></li>
         </ul>
-        <h3 style="margin-top:1rem">Business & Teams</h3>
+        <h3 class="mt-4">Business & Teams</h3>
         <p>Need bulk pricing or facility installs? Email <a href="mailto:sales@ezsportsnetting.com">sales@ezsportsnetting.com</a>.</p>
       </aside>
     </div>
@@ -110,7 +103,7 @@
         <ul>
           <li><a href="index.html#catalog" onclick="Store.filter('bats')">Bats</a></li>
           <li><a href="index.html#catalog" onclick="Store.filter('gloves')">Gloves</a></li>
-          <li><a href="index.html#catalog" onclick="Store.filter('netting')">Netting</a></li>
+          <li><a href="ez-nets.html">Netting</a></li>
           <li><a href="index.html#catalog" onclick="Store.filter('helmets')">Helmets</a></li>
         </ul>
       </nav>

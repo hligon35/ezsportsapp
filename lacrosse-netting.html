@@ -1,2 +1,121 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"/><title>Lacrosse Netting — EZ Nets</title><meta name="viewport" content="width=device-width,initial-scale=1"/><link rel="stylesheet" href="assets/css/styles.css"/><script type="module" src="assets/js/app.js" defer></script><style>.netting-hero{background:linear-gradient(135deg,#102b1f 0%,var(--brand) 100%);color:#fff;padding:1.9rem 0;border-radius:1.1rem;margin-top:1rem}.netting-hero h1{margin:0 0 .4rem;font-size:clamp(1.7rem,4.2vw,2.8rem);text-transform:uppercase;letter-spacing:.6px;font-weight:900}.netting-subnav{display:flex;flex-wrap:wrap;gap:.6rem;margin:.75rem 0 1.1rem}.netting-subnav a{padding:.5rem .85rem;border:1px solid var(--border);border-radius:2rem;font-weight:700;text-decoration:none;color:var(--ink);background:#fff;font-size:.8rem}.netting-subnav a.is-active,.netting-subnav a:hover{background:var(--brand);color:#fff;border-color:var(--brand)}.net-cols{display:grid;gap:1.25rem;margin:1.25rem 0 2.25rem;grid-template-columns:1fr 1fr}.placeholder-img{background:#f3f5f8;border:2px dashed var(--border);border-radius:1rem;aspect-ratio:4/3;display:grid;place-items:center;font-weight:700;color:#555}.spec-block{background:#fff;border:1px solid var(--border);padding:1rem;border-radius:1rem;box-shadow:0 4px 18px rgba(12,32,64,.06)}.spec-block h3{margin:.1rem 0 .5rem;font-size:1rem} @media(max-width:860px){.net-cols{grid-template-columns:1fr}}</style></head><body><header class="site-header"><div class="header-bar container"><a href="index.html" class="brand"><img src="assets/img/logo.svg" width="40" height="40" alt="Logo"/><span>EZ Sports Netting</span></a><form class="search" role="search"><input type="search" aria-label="Search"/><button type="submit" class="btn btn-primary">Search</button></form><nav class="quick-links" id="primary-nav"></nav><button class="menu-toggle" aria-expanded="false" aria-label="Menu">☰</button></div></header><main id="main" class="container"><section class="netting-hero"><h1>Lacrosse Netting</h1><p>High impact containment and barrier solutions. (Placeholder intro.)</p><div class="netting-subnav" id="netting-subnav"><a href="baseball-netting.html">Baseball</a><a href="golf-netting.html">Golf</a><a href="lacrosse-netting.html">Lacrosse</a><a href="soccer-netting.html">Soccer</a><a href="netting-calculator.html">Calculator</a><a href="ez-nets.html">Overview</a></div><button class="btn btn-primary" onclick="location.href='contactus.html'">Request Quote</button></section><div class="net-cols"><div class="placeholder-img">IMAGE / LACROSSE
-<!-- client image placeholder --></div><div class="spec-block"><h3>Strength & Durability</h3><p>High-tenacity knotless mesh (placeholder).</p><h3>Use Cases</h3><ul><li>Sideline barriers</li><li>Practice cages</li><li>Spectator protection</li></ul><h3>CTAs</h3><button class="btn btn-primary" type="button">Get Quote</button> <button class="btn btn-ghost" type="button" onclick="location.href='netting-calculator.html'">Use Calculator</button></div></div></main><footer class="site-footer"><div class="container footer-grid"><div class="footer-brand-block"><img src="assets/img/logo.svg" width="64" height="64" alt="Logo"/><strong>EZ Sports Netting</strong><p>Better baseball through better gear.</p></div><div><h4>Shop</h4><a href="bats.html">Bats</a><br/><a href="gloves.html">Gloves</a><br/><a href="netting-calculator.html">Netting</a><br/><a href="helmets.html">Helmets</a></div><div><h4>Company</h4><a href="about.html">About</a><br/><a href="careers.html">Careers</a><br/><a href="support.html">Support</a></div><div class="subscribe"><h4>Get deals in your inbox</h4><div class="row"><input type="email" placeholder="you@email.com"/><button class="btn btn-primary" type="button">Subscribe</button></div></div></div><div class="subfooter">&copy; <span id="year"></span> EZ Sports Netting. All rights reserved.</div></footer><script>const sn=document.getElementById('netting-subnav');if(sn){const b=location.pathname.split('/').pop();[...sn.querySelectorAll('a')].forEach(a=>{if(a.getAttribute('href')===b)a.classList.add('is-active')})}</script></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<title>Lacrosse Netting | EZ Nets</title>
+	<link rel="stylesheet" href="assets/css/styles.css" />
+	<link rel="icon" type="image/png" href="assets/img/favicon-32.png" sizes="32x32" />
+	<script type="module" src="assets/js/app.js" defer></script>
+	<link rel="canonical" href="https://ezsportsnetting.com/lacrosse-netting.html" />
+	<meta name="description" content="High impact containment and barrier lacrosse netting. Custom and stock." />
+	<meta property="og:title" content="Lacrosse Netting — EZ Nets" />
+	<meta property="og:type" content="website" />
+	<meta property="og:url" content="https://ezsportsnetting.com/lacrosse-netting.html" />
+	<meta property="og:description" content="High impact containment and barrier netting solutions." />
+	<meta name="twitter:card" content="summary_large_image" />
+</head>
+<body>
+	<a class="skip" href="#main">Skip to content</a>
+	<header class="site-header">
+		<div class="header-bar container">
+			<button class="menu-toggle" aria-label="Toggle menu" aria-expanded="false" aria-controls="primary-nav">☰</button>
+			<a href="index.html" class="brand">
+				<img src="assets/img/ezsportslogo.jpg" height="40" alt="EZ Sports Netting logo" />
+				<span>EZ Sports Netting</span>
+			</a>
+			<form class="search" role="search" aria-label="Search store" onsubmit="event.preventDefault(); window.Store.search(this.q.value)">
+				<input type="search" name="q" placeholder="Search bats, gloves, helmets…" aria-label="Search"/>
+				<button type="submit" class="btn btn-primary">Search</button>
+			</form>
+			<nav id="primary-nav" class="quick-links" aria-label="Primary"></nav>
+		</div>
+	</header>
+	<main id="main" class="container">
+		<section class="netting-hero netting-hero--lacrosse">
+			<h1>Lacrosse Netting</h1>
+			<p>High impact containment and barrier solutions.</p>
+			<div class="netting-subnav" id="netting-subnav">
+				<a href="baseball-netting.html">Baseball</a>
+				<a href="golf-netting.html">Golf</a>
+				<a href="lacrosse-netting.html">Lacrosse</a>
+				<a href="soccer-netting.html">Soccer</a>
+				<a href="netting-calculator.html">Calculator</a>
+				<a href="ez-nets.html">Overview</a>
+			</div>
+			<button class="btn btn-dark" type="button" onclick="location.href='support.html'">Request Quote</button>
+		</section>
+
+		<div class="net-cols">
+			<div class="placeholder-img">IMAGE / LACROSSE</div>
+			<div class="spec-block">
+				<h3>Strength & Durability</h3>
+				<p>High-tenacity knotless mesh.</p>
+				<h3>Use Cases</h3>
+				<ul>
+					<li>Sideline barriers</li>
+					<li>Practice cages</li>
+					<li>Spectator protection</li>
+				</ul>
+				<h3>CTAs</h3>
+				<button class="btn btn-dark" type="button" onclick="location.href='support.html'">Get Quote</button>
+				<button class="btn btn-ghost" type="button" onclick="location.href='netting-calculator.html'">Use Calculator</button>
+			</div>
+		</div>
+	</main>
+	<footer class="site-footer">
+		<div class="container footer-grid">
+			<div class="footer-brand-block">
+				<a class="brand brand--light" href="index.html">
+					<img src="assets/img/ezsportslogo.jpg" height="36" alt="EZ Sports Netting logo" />
+					<span>EZ Sports Netting</span>
+				</a>
+				<p class="muted">Better baseball through better gear.</p>
+				<div class="socials" aria-label="social links">
+					<a href="https://www.facebook.com/Ezsportsnetting/" aria-label="Facebook" target="_blank" rel="noopener">
+						<img src="assets/img/facebook.png" alt="Facebook" />
+					</a>
+					<a href="#" aria-label="Instagram"><img src="assets/img/instagram.png" alt="Instagram" /></a>
+					<a href="#" aria-label="X"><img src="assets/img/xwhite.png" alt="X" /></a>
+				</div>
+			</div>
+			<nav aria-label="Footer">
+				<h4>Shop</h4>
+				<ul>
+					<li><a href="index.html#catalog" onclick="Store.filter('bats')">Bats</a></li>
+					<li><a href="index.html#catalog" onclick="Store.filter('gloves')">Gloves</a></li>
+					<li><a href="ez-nets.html">Netting</a></li>
+					<li><a href="index.html#catalog" onclick="Store.filter('helmets')">Helmets</a></li>
+				</ul>
+			</nav>
+			<nav>
+				<h4>Company</h4>
+				<ul>
+					<li><a href="about.html">About</a></li>
+					<li><a href="careers.html">Careers</a></li>
+					<li><a href="support.html">Support</a></li>
+				</ul>
+			</nav>
+			<form class="subscribe" onsubmit="event.preventDefault(); alert('Thanks for subscribing!')">
+				<h4>Get deals in your inbox</h4>
+				<div class="row">
+					<input type="email" placeholder="you@email.com" required />
+					<button class="btn btn-primary" type="submit">Subscribe</button>
+				</div>
+			</form>
+		</div>
+		<div class="subfooter container">
+			<p>© <span id="year"></span> EZ Sports Netting. All rights reserved.</p>
+		</div>
+	</footer>
+	<script>
+		(function(){
+			const sn = document.getElementById('netting-subnav');
+			if (sn) {
+				const b = location.pathname.split('/').pop();
+				[...sn.querySelectorAll('a')].forEach(a => { if (a.getAttribute('href') === b) a.classList.add('is-active') });
+			}
+		})();
+	</script>
+</body>
+</html>

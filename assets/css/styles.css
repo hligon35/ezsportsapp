@@ -108,7 +108,7 @@ body, .container, .footer-grid, .about-inner, .category-tiles .tiles, .grid, .ba
   padding-right:clamp(.85rem,2.5vw,1.75rem) !important;
 }
 
-/* Global bottom expert CTA (injected on non-netting pages) */
+/* Global bottom expert CTA (injected on non-contact pages) */
 .expert-cta { 
   --cta-bg-dark:#221104; 
   --cta-bg-accent:#ea8631; 
@@ -194,6 +194,7 @@ body, .container, .footer-grid, .about-inner, .category-tiles .tiles, .grid, .ba
   .expert-cta p { font-size:.9rem; }
   .expert-cta .cta-btn { width:100%; justify-content:center; }
 }
+
 
 /* Netting subnav expert button */
 *{box-sizing:border-box}
@@ -309,6 +310,8 @@ img{max-width:100%;display:block}
 
 /* Buttons */
 .btn{display:inline-flex;align-items:center;justify-content:center;padding:.8rem 1.1rem;border-radius:.9rem;font-weight:800;letter-spacing:.3px;border:1px solid var(--brand);text-decoration:none;cursor:pointer;transition:.18s ease-in-out;text-transform:uppercase;background:var(--brand);color:#fff}
+.btn-quote{background:#000000;border-color:#000000;color:#fff}
+.btn-quote:hover{filter:brightness(1.12)}
 .btn.btn-dark{background:#000000;border-color:#000000;color:#fff}
 .btn.btn-dark:hover{filter:brightness(1.15)}
 .btn:hover{filter:brightness(1.05)}
@@ -621,12 +624,66 @@ img{max-width:100%;display:block}
 .calc-form fieldset{border:1px solid var(--border);border-radius:.75rem;padding:.65rem}
 .calc-form legend{padding:0 .25rem;font-weight:800;color:var(--ink-2)}
 
+/* Support/help pages */
+.support { margin-top: 1rem; }
+.support .card { padding: 1rem; }
+.support form { display: grid; gap: .6rem; }
+.support input, .support textarea, .support select { padding: .7rem .9rem; border: 1px solid #cfe0f5; border-radius: .6rem; background: #fff; color: var(--ink); }
+.support .grid.two-col { grid-template-columns: 1fr 1fr; }
+@media (max-width: 800px){ .support .grid.two-col { grid-template-columns: 1fr; } }
+
+/* Turf page */
+.turf-hero{background:linear-gradient(135deg,#041c04 0%, var(--brand) 95%);color:#fff;padding:2.1rem 0;border-radius:1.25rem;margin-top:1rem}
+.turf-hero h1{margin:0 0 .6rem;font-size:clamp(1.9rem,4.2vw,3rem);letter-spacing:.6px;text-transform:uppercase;font-weight:900}
+.turf-hero p{margin:0 0 1rem;font-weight:600;max-width:760px}
+.turf-grid{display:grid;gap:1.1rem;margin:1.75rem 0 2.5rem;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+.turf-card{background:#fff;border:1px solid var(--border);border-radius:1rem;padding:1rem;box-shadow:0 4px 18px rgba(12,32,64,.06);display:flex;flex-direction:column;gap:.55rem;position:relative}
+.turf-card h3{margin:.2rem 0 .3rem;font-size:1rem;text-transform:uppercase;letter-spacing:.5px;font-weight:900}
+.badge-turf{position:absolute;top:.65rem;right:.65rem;background:var(--brand);color:#fff;font-size:.6rem;font-weight:800;padding:.3rem .5rem;border-radius:.45rem;letter-spacing:.5px}
+.inventory-callouts{display:grid;gap:1rem;margin:2.5rem 0 3rem;grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+.inventory-box{background:#ffffff;border:2px dashed var(--border);border-radius:1rem;padding:1.1rem;display:flex;flex-direction:column;gap:.65rem;align-items:flex-start;box-shadow:0 2px 10px rgba(0,0,0,.04)}
+.inventory-box h3{margin:.15rem 0;font-size:1rem;text-transform:uppercase;letter-spacing:.55px}
+.inventory-box p{margin:0;font-size:.85rem;line-height:1.45;opacity:.85}
+.turf-list{list-style:disc;margin:.25rem 0 .25rem 1.1rem;padding:0;display:grid;gap:.25rem;font-size:.8rem}
+.legend{display:flex;flex-wrap:wrap;gap:.75rem;margin:.75rem 0 0;font-size:.65rem;text-transform:uppercase;font-weight:800;letter-spacing:.5px}
+.legend span{display:inline-flex;align-items:center;gap:.4rem;background:#fff;border:1px solid var(--border);padding:.3rem .55rem;border-radius:2rem}
+.legend i{display:inline-block;width:14px;height:14px;border-radius:4px;background:var(--brand)}
+.turf-section-heading{margin-top:2rem}
+
+/* Contact page */
+.contact-hero{background:linear-gradient(135deg,#000,var(--brand));color:#fff;padding:2rem 0;border-radius:1.1rem;margin-top:1rem}
+.contact-hero h1{margin:0 0 .6rem;font-size:clamp(1.8rem,4.5vw,3rem);text-transform:uppercase;letter-spacing:.6px;font-weight:900}
+.contact-grid{display:grid;gap:1.2rem;margin:1.5rem 0 2.5rem;grid-template-columns:1fr 1fr}
+.contact-form{background:#fff;border:1px solid var(--border);border-radius:1rem;padding:1rem;display:grid;gap:.75rem;box-shadow:0 4px 18px rgba(12,32,64,.06)}
+.contact-form input,.contact-form textarea{padding:.75rem .85rem;border:1px solid var(--border);border-radius:.75rem}
+.contact-form textarea{min-height:140px;resize:vertical}
+.contact-side{background:#fff;border:1px solid var(--border);border-radius:1rem;padding:1rem;box-shadow:0 4px 18px rgba(12,32,64,.06)}
+.contact-side h3{margin:.2rem 0 .5rem;font-size:1rem}
+.contact-side ul{margin:.4rem 0 1rem;padding-left:1.1rem}
+.contact-side p{margin:.4rem 0}
+@media(max-width:860px){.contact-grid{grid-template-columns:1fr}}
+
 /* --------------------------------------------- */
 /* Hero horizontal spacing normalization         */
 /* Ensures all hero variants have consistent     */
 /* left/right breathing room across pages        */
 /* --------------------------------------------- */
 .netting-hero, .net-hero, .contact-hero, .turf-hero { padding-inline:clamp(.9rem,4vw,2rem) !important; }
+/* Sport-specific netting hero variants */
+.netting-hero--baseball { background: linear-gradient(135deg,#111 0%,var(--brand) 100%) !important; color:#fff; border-radius:1.1rem; }
+.netting-hero--golf { background: linear-gradient(135deg,#061b2f 0%,var(--brand) 100%) !important; color:#fff; border-radius:1.1rem; }
+.netting-hero--lacrosse { background: linear-gradient(135deg,#102b1f 0%,var(--brand) 100%) !important; color:#fff; border-radius:1.1rem; }
+.netting-hero--soccer { background: linear-gradient(135deg,#091b33 0%,var(--brand) 100%) !important; color:#fff; border-radius:1.1rem; }
+.netting-hero h1 { margin:0 0 .4rem; font-size:clamp(1.7rem,4.2vw,2.8rem); text-transform:uppercase; letter-spacing:.6px; font-weight:900 }
+
+/* Netting layout helpers */
+.net-cols { display:grid; gap:1.25rem; margin:1.25rem 0 2.25rem; grid-template-columns:1fr 1fr }
+@media (max-width: 860px){ .net-cols { grid-template-columns:1fr } }
+.placeholder-img { background:#f3f5f8; border:2px dashed var(--border); border-radius:1rem; aspect-ratio:4/3; display:grid; place-items:center; font-weight:700; color:#555 }
+.spec-block { background:#fff; border:1px solid var(--border); padding:1rem; border-radius:1rem; box-shadow:0 4px 18px rgba(12,32,64,.06) }
+.spec-block h3 { margin:.1rem 0 .5rem; font-size:1rem }
+.net-hero h1{margin:0 0 .5rem;font-size:clamp(1.9rem,4.5vw,3rem);font-weight:900;text-transform:uppercase;color:#fff}
+.net-hero p{margin:0 0 1rem;max-width:760px;font-weight:600;color:#fff;opacity:.95}
 .choices{display:flex;gap:.6rem}
 .choice{display:inline-flex;align-items:center;gap:.35rem;border:1px solid var(--border);padding:.45rem .6rem;border-radius:.6rem;background:#ffffff}
 .qty{display:inline-flex;align-items:center;gap:.5rem}
@@ -691,6 +748,10 @@ img{max-width:100%;display:block}
 .text-center { text-align: center; }
 .text-error { color: red; }
 .ml-auto { margin-left: auto; }
+
+/* Small utilities */
+.mt-05 { margin-top: .5rem; }
+.gap-06 { gap: .6rem; }
 
 /* Analytics dashboard */
 .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem}
