@@ -52,17 +52,18 @@ router.get('/:invoiceId/print', requireAuth, async (req, res) => {
     const rows = (invoice.items||[]).map(it => `
       <tr>
         <td>${it.productName||it.productId}</td>
-        <td style="text-align:right;">${it.quantity||it.qty}</td>
-        <td style="text-align:right;">$${Number(it.price||0).toFixed(2)}</td>
-        <td style="text-align:right;">$${Number(it.subtotal||((it.price||0)*(it.quantity||1))).toFixed(2)}</td>
+        <td class="num">${it.quantity||it.qty}</td>
+        <td class="num">$${Number(it.price||0).toFixed(2)}</td>
+        <td class="num">$${Number(it.subtotal||((it.price||0)*(it.quantity||1))).toFixed(2)}</td>
       </tr>`).join('');
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
     res.send(`<!doctype html>
       <html><head><meta charset="utf-8" />
       <title>${invoice.id}</title>
-      <style>body{font-family:Arial,Helvetica,sans-serif;padding:24px;color:#111}
-      h1{margin:0 0 8px} table{width:100%;border-collapse:collapse;margin-top:12px}
-      th,td{padding:8px;border-bottom:1px solid #eee;text-align:left}
+  <style>body{font-family:Arial,Helvetica,sans-serif;padding:24px;color:#111}
+  h1{margin:0 0 8px} table{width:100%;border-collapse:collapse;margin-top:12px}
+  th,td{padding:8px;border-bottom:1px solid #eee;text-align:left}
+  th.num, td.num{ text-align:right; }
       .totals{margin-top:12px;text-align:right}
       .meta{color:#555;margin:0 0 12px}
       .actions{margin-top:16px;text-align:right}
@@ -72,7 +73,7 @@ router.get('/:invoiceId/print', requireAuth, async (req, res) => {
         <p class="meta">Date: ${new Date(invoice.createdAt).toLocaleString()}</p>
         <p class="meta">Customer: ${invoice.customer?.name || ''} (${invoice.customer?.email || ''})</p>
         <table>
-          <thead><tr><th>Item</th><th style="text-align:right;">Qty</th><th style="text-align:right;">Price</th><th style="text-align:right;">Subtotal</th></tr></thead>
+          <thead><tr><th>Item</th><th class="num">Qty</th><th class="num">Price</th><th class="num">Subtotal</th></tr></thead>
           <tbody>${rows}</tbody>
         </table>
         <div class="totals">

@@ -119,7 +119,7 @@ function renderProducts() {
       </div>
       <div>
         <button class="btn btn-ghost" onclick="editProduct('${p.id}')">Edit</button>
-        <button class="btn btn-ghost" onclick="deleteProduct('${p.id}')" style="color:red;">Delete</button>
+        <button class="btn btn-ghost text-red" onclick="deleteProduct('${p.id}')">Delete</button>
       </div>
     </div>
   `).join('');
@@ -158,7 +158,7 @@ function renderOrders() {
             <br><small>${new Date(order.createdAt||order.date).toLocaleString()}</small>
             <br>Items: ${order.items.map(i => `${(i.quantity||i.qty)}x ${i.productId||i.id}`).join(', ')}
           </div>
-          <div style="display:flex; gap:.5rem; align-items:center;">
+          <div class="flex-row gap-05 items-center">
             <strong>$${(order.total||0).toFixed(2)}</strong>
             <a class="btn btn-ghost" href="${(window.__API_BASE||'')}/api/invoices/INV-${order.id}/print" target="_blank" rel="noopener">View Invoice</a>
             <select data-order-id="${order.id}" class="order-status-select">
@@ -170,7 +170,7 @@ function renderOrders() {
       `).join('');
 
       const pager = `
-        <div style="display:flex; gap:1rem; align-items:center; margin-top:1rem;">
+        <div class="flex-row gap-1 items-center mt-1">
           <button class="btn btn-ghost" id="orders-prev" ${page<=1?'disabled':''}>Prev</button>
           <span>Page ${page} of ${Math.max(1, Math.ceil(total/(pageSize||1)))} (${total} total)</span>
           <button class="btn btn-ghost" id="orders-next" ${(page*pageSize)>=total?'disabled':''}>Next</button>
@@ -377,7 +377,7 @@ function renderInvoices() {
             <br><small>${new Date(inv.createdAt).toLocaleString()}</small>
             <br>${inv.customer?.name || 'Customer'} (${inv.customer?.email || ''})
           </div>
-          <div style="display:flex; gap:.5rem; align-items:center;">
+          <div class="flex-row gap-05 items-center">
             <strong>$${Number(inv.total||0).toFixed(2)}</strong>
                 <a class="btn btn-ghost" href="${(window.__API_BASE||API_BASES[0]||'')}/api/invoices/${inv.id}/print" target="_blank" rel="noopener">View</a>
             <button class="btn btn-ghost" data-print="${inv.id}">Print</button>
@@ -386,7 +386,7 @@ function renderInvoices() {
       `).join('');
 
       const pager = `
-        <div style="display:flex; gap:1rem; align-items:center; margin-top:1rem;">
+        <div class="flex-row gap-1 items-center mt-1">
           <button class="btn btn-ghost" id="invoices-prev" ${page<=1?'disabled':''}>Prev</button>
           <span>Page ${page} of ${Math.max(1, Math.ceil(total/(pageSize||1)))} (${total} total)</span>
           <button class="btn btn-ghost" id="invoices-next" ${(page*pageSize)>=total?'disabled':''}>Next</button>
@@ -413,16 +413,16 @@ function printInvoice(invoiceId) {
     .then(inv => {
       const w = window.open('', '_blank');
       if (!w) return alert('Popup blocked. Allow popups to print invoice.');
-      const rows = (inv.items||[]).map(it => `<tr><td>${it.productName||it.productId}</td><td style="text-align:right;">${it.quantity||it.qty}</td><td style="text-align:right;">$${Number(it.price||0).toFixed(2)}</td><td style="text-align:right;">$${Number(it.subtotal||((it.price||0)*(it.quantity||1))).toFixed(2)}</td></tr>`).join('');
+  const rows = (inv.items||[]).map(it => `<tr><td>${it.productName||it.productId}</td><td class="num">${it.quantity||it.qty}</td><td class="num">$${Number(it.price||0).toFixed(2)}</td><td class="num">$${Number(it.subtotal||((it.price||0)*(it.quantity||1))).toFixed(2)}</td></tr>`).join('');
       w.document.write(`
         <html><head><title>${inv.id}</title>
-        <style>body{font-family: Arial, sans-serif; padding:20px;} table{width:100%; border-collapse: collapse;} th,td{padding:8px; border-bottom:1px solid #eee;} h1{margin:0 0 10px;} .totals{margin-top:10px; text-align:right;} </style>
+  <style>body{font-family: Arial, sans-serif; padding:20px;} table{width:100%; border-collapse: collapse;} th,td{padding:8px; border-bottom:1px solid #eee;} th.num,td.num{text-align:right;} h1{margin:0 0 10px;} .totals{margin-top:10px; text-align:right;} </style>
         </head><body>
           <h1>Invoice ${inv.id}</h1>
           <p>Date: ${new Date(inv.createdAt).toLocaleString()}</p>
           <p>Customer: ${inv.customer?.name || ''} (${inv.customer?.email || ''})</p>
           <table>
-            <thead><tr><th>Item</th><th style="text-align:right;">Qty</th><th style="text-align:right;">Price</th><th style="text-align:right;">Subtotal</th></tr></thead>
+            <thead><tr><th>Item</th><th class="num">Qty</th><th class="num">Price</th><th class="num">Subtotal</th></tr></thead>
             <tbody>${rows}</tbody>
           </table>
           <div class="totals">

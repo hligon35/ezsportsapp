@@ -42,12 +42,12 @@ function renderDeals(){
         <img src="${d.img}" alt="${d.title}" loading="lazy" onerror="this.onerror=null;this.src='${FALLBACK}';"/>
       </div>
       <div class="body">
-        <h3 style="margin:0 0 .25rem;font-size:1rem">${d.title}</h3>
+    <h3 class="h3-tight">${d.title}</h3>
         <div class="price-row">
           <span class="price">
             <span class="was-price">${currency.format(d.was)}</span>
-            <strong style="margin-left:.35rem">${currency.format(d.now)}</strong>
-            <span class="badge" style="margin-left:.35rem">SAVE ${Math.round(100*(1 - d.now/d.was))}%</span>
+      <strong class="ml-035">${currency.format(d.now)}</strong>
+      <span class="badge ml-035">SAVE ${Math.round(100*(1 - d.now/d.was))}%</span>
           </span>
           <button class="btn btn-ghost" data-add="${d.add}">Add</button>
         </div>

@@ -817,15 +817,21 @@ img{max-width:100%;display:block}
 .mb-025 { margin-bottom: .25rem; }
 .my-025 { margin-top: .25rem; margin-bottom: .25rem; }
 .ml-025 { margin-left: .25rem; }
+.ml-035 { margin-left: .35rem; }
 .text-sm { font-size: .8rem; }
 .text-muted { color: #555; }
 .flex-row { display: flex; }
 .gap-05 { gap: .5rem; }
+.gap-075 { gap: .75rem; }
+.gap-1 { gap: 1rem; }
 .items-center { align-items: center; }
+.items-start { align-items: flex-start; }
+.space-between { justify-content: space-between; }
 .rounded-xs { border-radius: .4rem; }
 .object-cover { object-fit: cover; }
 .opacity-80 { opacity: .8; }
 .text-right { text-align: right; }
+.text-red { color: red; }
 .h3-tight { margin: 0 0 .25rem; font-size: 1rem; }
 .mt-05 { margin-top: .5rem; }
 .mt-1 { margin-top: 1rem; }

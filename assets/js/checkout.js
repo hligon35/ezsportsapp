@@ -55,13 +55,13 @@ async function initialize() {
     const lineCents = unitCents * qty;
     const variant = variantText(i);
     return `
-      <div style="display:flex;justify-content:space-between;gap:.75rem;align-items:flex-start">
+      <div class="flex-row items-start gap-075 space-between">
         <div>
           <strong>${title}</strong>
           ${variant ? `<div class="muted">${variant}</div>` : ''}
           <div class="muted">${currencyFmt(unitCents)} × ${qty}</div>
         </div>
-        <div><strong>${currencyFmt(lineCents)}</strong></div>
+        <div class="text-right"><strong>${currencyFmt(lineCents)}</strong></div>
       </div>
     `;
   }).join('');

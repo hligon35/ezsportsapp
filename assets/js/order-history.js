@@ -43,7 +43,7 @@ async function renderOrders(){
           return `<div class="order-item"><span>${i.qty} × ${i.id}${variant ? ` (${variant})` : ''}</span><span>${currencyFmt((i.price||0) * i.qty)}</span></div>`
         }).join('')}
       </div>
-      <div style="margin-top:.5rem;text-align:right"><strong>Total: ${currencyFmt(order.total)}</strong></div>
+  <div class="mt-05 text-right"><strong>Total: ${currencyFmt(order.total)}</strong></div>
     </div>
   `).join('');
 }
