@@ -348,10 +348,10 @@ const Store = {
       }
     }
 
-    // Move cart button out of nav into actions (if present)
-    const nav = document.getElementById('primary-nav') || header.querySelector('nav.quick-links');
-    const cartBtn = nav ? nav.querySelector('.cart-btn') : null;
-    if (cartBtn) actions.appendChild(cartBtn);
+      // Move cart button out of nav directly into header (not actions) for flexible row placement
+      const nav = document.getElementById('primary-nav') || header.querySelector('nav.quick-links');
+      const cartBtn = nav ? nav.querySelector('.cart-btn') : null;
+      if (cartBtn) header.appendChild(cartBtn);
 
     // Standardize search bar (placeholder, button classes/text)
     const search = header.querySelector('.search');
@@ -361,11 +361,14 @@ const Store = {
       let btn = search.querySelector('button[type="submit"]');
       if (!btn) {
         btn = document.createElement('button');
-        btn.type = 'submit';
+        // Decorative search icon sits inside input; submission still via Enter key
+        btn.type = 'button';
         search.appendChild(btn);
       }
-      btn.className = 'btn btn-primary';
-      btn.textContent = 'Search';
+  btn.className = 'btn btn-primary search-icon-btn';
+  btn.textContent = '';
+  btn.setAttribute('aria-hidden','true');
+  btn.tabIndex = -1;
 
       // Ensure search submission navigates to Search Results page
       search.removeAttribute('onsubmit');
@@ -375,6 +378,12 @@ const Store = {
         const url = 'search-results.html' + (q ? `?q=${encodeURIComponent(q)}` : '');
         window.location.href = url;
       }, { once: false });
+    }
+
+    // Ensure menu toggle has aria-label when icon-only on very small screens
+    const menuToggle = header.querySelector('.menu-toggle');
+    if (menuToggle && !menuToggle.getAttribute('aria-label')) {
+      menuToggle.setAttribute('aria-label','Toggle navigation');
     }
   },
 
@@ -470,8 +479,22 @@ const Store = {
       loginLink.textContent = 'Login';
       actions.appendChild(loginLink);
     }
+    // Ensure a header break element exists to force second row for toggle/search/cart (only once)
+    (function(){
+        try {
+          const header = document.querySelector('.site-header .header-bar');
+          if (!header) return;
+          if (!header.querySelector('.header-break')) {
+            const br = document.createElement('span');
+            br.className = 'header-break';
+            br.setAttribute('aria-hidden','true');
+            const menu = header.querySelector('.menu-toggle');
+            if (menu) header.insertBefore(br, menu);
+            else header.appendChild(br);
+          }
+        } catch {}
+      })();
   },
-
   ensureBreadcrumbs() {
     // Avoid duplicates
     if (document.querySelector('nav.breadcrumbs')) return;
@@ -622,14 +645,43 @@ const Store = {
       const track = section.querySelector('.carousel-track');
       const dotsWrap = section.querySelector('.carousel-dots');
       const slides = DATA[base];
+      // Title->image heuristic mapping (best available match from assets/img/netting)
+      const IMG_BASE = 'assets/img/netting/';
+      const AVAILABLE = [
+        'backstopnetting.jpg','cage.jpg','cage2.jpg','netting.jpg','netting2.jpg','netting3.jpg','overheadnetting.webp','screen6.avif','equip6.avif'
+      ];
+      const IMG_MAP = {
+        'Hitting Facility':'cage2.jpg',
+        'Batting Cage':'cage.jpg',
+        'Foul Ball':'backstopnetting.jpg',
+        'Overhead':'overheadnetting.webp',
+        'Backstop':'backstopnetting.jpg',
+        'L-Screen':'screen6.avif',
+        'Pitcher Pocket':'screen6.avif',
+        'Golf Cube':'netting2.jpg',
+        'Residential':'netting3.jpg',
+        'Ceiling Track':'overheadnetting.webp',
+        'Retractable Shell':'overheadnetting.webp',
+        'Impact Panels':'netting3.jpg'
+      };
+      function pickImage(title){
+        const direct = IMG_MAP[title];
+        if (direct && AVAILABLE.includes(direct)) return direct;
+        // Random fallback for any unmapped title
+        return AVAILABLE[Math.floor(Math.random()*AVAILABLE.length)];
+      }
       slides.forEach((title, idx) => {
+        const imgFile = pickImage(title);
         const slide = document.createElement('div');
         slide.className = 'carousel-slide';
         slide.setAttribute('data-index', String(idx));
+        // First image eager, others lazy
+        const loading = idx === 0 ? 'eager' : 'lazy';
         slide.innerHTML = `
-          <div class="slide-media" role="img" aria-label="${title} image placeholder">
-            <span>${title}</span>
-          </div>
+          <figure class="slide-media">
+            <img src="${IMG_BASE + imgFile}" alt="${title} netting solution" loading="${loading}" width="480" height="320" />
+            <figcaption class="visually-hidden">${title}</figcaption>
+          </figure>
           <h3 class="slide-title">${title}</h3>`;
         track.appendChild(slide);
         const dot = document.createElement('button');

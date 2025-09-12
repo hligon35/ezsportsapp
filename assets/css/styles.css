@@ -322,8 +322,11 @@ img{max-width:100%;display:block}
   border-radius: 0.75rem;
 }
 .search{display:flex;gap:.5rem;flex:1;justify-content:center}
-.search input{width:min(680px,100%);padding:.75rem .9rem;border-radius:.75rem;border:1px solid var(--border);background:#fff;color:var(--ink)}
-.search .btn{white-space:nowrap;flex:0 0 auto}
+.search{position:relative;gap:0}
+.search input{width:min(680px,100%);padding:.75rem 1rem .75rem 2.9rem;border-radius:.75rem;border:1px solid var(--border);background:#fff;color:var(--ink)}
+/* Embed icon inside input on LEFT (omnibox style) */
+.search .btn{position:absolute;left:.55rem;top:50%;transform:translateY(-50%);width:42px;height:42px;display:inline-flex;align-items:center;justify-content:center;padding:0;border-radius:.65rem;white-space:nowrap;font-size:0;pointer-events:none;background:transparent;border:none}
+.search .btn:before{content:'🔍';font-size:1.05rem;line-height:1;opacity:.75}
 .search input:focus{outline:none;box-shadow:var(--ring);border-color:var(--brand)}
 .quick-links{display:flex;align-items:center;justify-content:center;gap:1rem;order:2;flex:1 0 100%;margin-top:.4rem;visibility:hidden}
 .site-header .header-bar{visibility:hidden}
@@ -361,6 +364,66 @@ img{max-width:100%;display:block}
 
 /* Top-row actions container */
 .header-actions{margin-left:auto;display:flex;align-items:center;gap:.75rem}
+/* Header break element to create second row in mid-range widths */
+.header-break{flex-basis:100%;height:0;display:none}
+/* Large / default single-row ordering: brand, search, login, cart, menu toggle */
+.site-header .header-bar{display:flex}
+/* Base ordering (≥641px single-row): brand, search, login/actions, cart, menu toggle (always last/right) */
+.site-header .brand{order:1}
+.site-header .search{order:2;flex:1 1 auto;min-width:200px}
+.site-header .header-actions{order:3}
+.site-header .cart-btn{order:4}
+.site-header .menu-toggle{order:5;margin-left:1rem}
+/* Small phones: two rows
+   Row1: brand, login (actions), cart
+   Row2: menu toggle, search (full width)
+*/
+@media (max-width:640px){
+  .header-break{display:block}
+  .site-header .header-bar{align-items:flex-start}
+  /* Row 1 */
+  .site-header .brand{order:1}
+  .site-header .header-actions{order:2;margin-left:auto}
+  .site-header .cart-btn{order:3;margin-left:.55rem}
+  /* Row 2: search and menu toggle share row; search shrinks before wrapping */
+  .site-header .search{order:4;flex:1 1 auto;min-width:150px;max-width:calc(100% - 118px);margin-top:.35rem}
+  .site-header .search input{width:100%;padding:.6rem .65rem .6rem 2.55rem;font-size:.87rem}
+  .site-header .menu-toggle{order:5;margin-left:.5rem;align-self:stretch}
+  /* Avoid full-width forcing toggle to next line on ultra narrow */
+  @media (max-width:480px){
+  .site-header .search{min-width:130px;max-width:calc(100% - 115px)}
+  }
+  @media (max-width:400px){
+  .site-header .search{min-width:115px;max-width:calc(100% - 110px)}
+  .site-header .search input{padding:.55rem .55rem .55rem 2.35rem;font-size:.8rem}
+    .site-header .menu-toggle{padding:.5rem .55rem}
+    /* Icon-only search button */
+  /* Small variant inherits embedded style; tighten sizes */
+  .site-header .search .btn{width:38px;height:38px;left:.5rem}
+  .site-header .search input{padding:.6rem .6rem .6rem 2.4rem}
+  }
+  @media (max-width:360px){
+  .site-header .search{min-width:105px;max-width:calc(100% - 104px)}
+  .site-header .search input{padding:.5rem .5rem .5rem 2.2rem;font-size:.76rem}
+  .site-header .menu-toggle{font-size:.85rem}
+  .site-header .menu-toggle span{display:none}
+  .site-header .menu-toggle{padding:.55rem;width:42px;height:42px;display:inline-flex;align-items:center;justify-content:center}
+  }
+}
+/* Mid sizes retain single-row default (allow existing nav collapse) */
+@media (min-width:641px) and (max-width:1200px){
+  .site-header .menu-toggle{margin-right:.75rem}
+  .site-header .search input{width:100%}
+}
+/* Multi-column nav when expanded still for mid sizes */
+@media (min-width:680px) and (max-width:1200px){
+  .quick-links.is-open{flex-direction:row;flex-wrap:wrap;column-gap:1.25rem;row-gap:.35rem;padding:1rem 1rem 1.25rem}
+  .quick-links.is-open a{width:auto;flex:0 0 calc(25% - 1.25rem);min-width:140px}
+  @supports (display:grid){
+    .quick-links.is-open{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));}
+    .quick-links.is-open a{width:100%;flex:none}
+  }
+}
 
 /* Mobile nav */
 .menu-toggle{display:none;background:var(--brand);color:#fff;border:1px solid var(--brand);font-weight:800;font-size:1.05rem;line-height:1;border-radius:.65rem;padding:.55rem .7rem;cursor:pointer}
@@ -686,6 +749,7 @@ img{max-width:100%;display:block}
 .calc-media .media-crop img.enlarge-150{transform:scale(1.5);object-fit:cover}
 .calc-media{overflow:visible}
 /* Calculator gallery */
+/* Gallery now acts as a slider on narrow widths */
 .calc-gallery{list-style:none;margin:.75rem 0 0;padding:0;display:flex;flex-wrap:wrap;gap:.55rem;min-height:110px;position:relative}
 .calc-gallery li{width:78px;aspect-ratio:1/1;border:2px solid var(--border);border-radius:.65rem;overflow:hidden;position:relative;cursor:pointer;background:#fff;display:grid;place-items:center}
 .calc-gallery li img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .35s ease}
@@ -698,9 +762,15 @@ img{max-width:100%;display:block}
 /* Loading skeleton state (applied before JS populates images) */
 .calc-gallery.loading:before{content:"";position:absolute;inset:0;border:2px dashed var(--border);border-radius:.75rem;background:repeating-linear-gradient(90deg,#f6f8fa 0 45px,#eef1f5 45px 90px);animation:calcShimmer 1.35s linear infinite;background-size:200% 100%;}
 @keyframes calcShimmer{0%{background-position:0 0}100%{background-position:-200% 0}}
+/* Slider variant (applied via JS below 640px) */
+.calc-gallery.slider{flex-wrap:nowrap;overflow:hidden;position:relative}
+.calc-gallery.slider .calc-gallery-track{display:flex;gap:.55rem;transition:transform .5s cubic-bezier(.6,.2,.3,1)}
+.calc-gallery.slider li{flex:0 0 70px}
+.calc-gallery.slider .gallery-nav{position:absolute;top:50%;transform:translateY(-50%);display:flex;justify-content:space-between;left:0;right:0;pointer-events:none}
+.calc-gallery.slider .gallery-btn{pointer-events:auto;background:#000000;color:#fff;border:none;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;cursor:pointer;font-size:1.1rem;box-shadow:0 4px 14px rgba(0,0,0,.25);transition:.2s}
+.calc-gallery.slider .gallery-btn:hover{filter:brightness(1.1)}
 @media (max-width:640px){
-  .calc-gallery{overflow-x:auto;flex-wrap:nowrap;padding-bottom:.35rem}
-  .calc-gallery li{flex:0 0 70px}
+  .calc-gallery{padding-bottom:.35rem}
 }
 .calc-card{background:#fff;border:1px solid var(--border);border-radius:1rem;box-shadow:0 8px 24px rgba(12,32,64,.06);padding:1rem}
 .calc-title{margin:0 0 .5rem}
@@ -711,6 +781,21 @@ img{max-width:100%;display:block}
 .calc-form .unit{opacity:.65}
 .calc-form fieldset{border:1px solid var(--border);border-radius:.75rem;padding:.65rem}
 .calc-form legend{padding:0 .25rem;font-weight:800;color:var(--ink-2)}
+/* Mesh helper spacing */
+.mesh-help{margin:-.35rem 0 .2rem;font-size:.7rem;line-height:1.3;max-width:420px}
+/* Overflow containment & responsive tightening for calculator form */
+/* Ensure internal grids never force horizontal scroll on very narrow devices */
+.calc-card{overflow:hidden;}
+/* Allow border choices to wrap instead of pushing beyond edge */
+.choices{flex-wrap:wrap}
+/* Let number inputs shrink while preserving unit label size */
+.calc-form .dims{grid-template-columns:minmax(0,1fr) auto minmax(0,1fr) auto}
+/* Prevent long labels / summary items from overflowing */
+.calc-form .form-row, .summary > div{min-width:0}
+/* Ultra narrow: stack dimension pairs (ft/in) vertically */
+@media (max-width:420px){
+  .calc-form .dims{grid-template-columns:minmax(0,1fr) auto;row-gap:.4rem}
+}
 
 /* Support/help pages */
 .support { margin-top: 1rem; }
@@ -727,6 +812,7 @@ img{max-width:100%;display:block}
 .turf-grid{display:grid;gap:1.1rem;margin:1.75rem 0 2.5rem;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
 .turf-card{background:#fff;border:1px solid var(--border);border-radius:1rem;padding:1rem;box-shadow:0 4px 18px rgba(12,32,64,.06);display:flex;flex-direction:column;gap:.55rem;position:relative}
 .turf-card h3{margin:.2rem 0 .3rem;font-size:1rem;text-transform:uppercase;letter-spacing:.5px;font-weight:900}
+.turf-media img{display:block;width:100%;height:auto;border-radius:.75rem;box-shadow:0 6px 18px rgba(12,32,64,.15);object-fit:cover}
 .badge-turf{position:absolute;top:.65rem;right:.65rem;background:var(--brand);color:#fff;font-size:.6rem;font-weight:800;padding:.3rem .5rem;border-radius:.45rem;letter-spacing:.5px}
 .inventory-callouts{display:grid;gap:1rem;margin:2.5rem 0 3rem;grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
 .inventory-box{background:#ffffff;border:2px dashed var(--border);border-radius:1rem;padding:1.1rem;display:flex;flex-direction:column;gap:.65rem;align-items:flex-start;box-shadow:0 2px 10px rgba(0,0,0,.04)}
