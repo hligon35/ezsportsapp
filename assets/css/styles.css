@@ -442,6 +442,11 @@ img{max-width:100%;display:block}
   .quick-links a{padding:.55rem .75rem;border-radius:.55rem;width:100%;}
   .quick-links.is-open{display:flex}
   body.nav-open{overflow:hidden}
+  /* Convert collapsed nav into an overlay dropdown that does NOT push header content */
+  .site-header .header-bar{position:relative}
+  .site-header .header-bar .quick-links{position:absolute;top:100%;right:0;left:auto;flex-basis:auto;order:unset;width:min(420px,calc(100% - .75rem));max-height:calc(100dvh - 110px);overflow:auto;margin-top:.55rem;z-index:70}
+  /* Re‑assert display when open (specificity bump because of absolute override) */
+  .site-header .header-bar .quick-links.is-open{display:flex}
 }
 /* Safeguard: if JS or old CSS attempts to force desktop, override below 1200px */
 @media (max-width:1200px){

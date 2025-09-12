@@ -114,6 +114,14 @@ const Store = {
           toggle.setAttribute('aria-expanded', 'false');
         }
       }));
+      // Close when clicking outside (mobile overlay)
+      document.addEventListener('click', (e) => {
+        if (!nav.classList.contains('is-open')) return;
+        if (e.target === nav || nav.contains(e.target) || e.target === toggle || toggle.contains(e.target)) return;
+        nav.classList.remove('is-open');
+        document.body.classList.remove('nav-open');
+        toggle.setAttribute('aria-expanded','false');
+      });
     }
 
     // Render initial views
