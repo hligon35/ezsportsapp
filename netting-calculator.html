@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/css/styles.css?v=5" />
-  <link rel="icon" type="image/jpeg" href="assets/img/ezsportslogo.jpg" />
+  <link rel="icon" type="image/png" href="assets/EZSportslogo.png" />
   <link rel="icon" type="image/png" href="assets/img/favicon-32.png" sizes="32x32" />
 </head>
 <body>
@@ -19,7 +19,7 @@
     <div class="container header-bar">
       <button class="menu-toggle" aria-label="Toggle menu" aria-expanded="false" aria-controls="primary-nav">☰</button>
       <a class="brand" href="index.html">
-  <img src="assets/img/ezsportslogo.jpg" alt="EZ Sports Netting logo" height="40"/>
+  <img src="assets/EZSportslogo.png" alt="EZ Sports Netting logo" height="40"/>
         <span>EZ Sports Netting</span>
       </a>
       <form class="search" role="search" aria-label="Search store" onsubmit="event.preventDefault(); window.Store.search(this.q.value)">
@@ -43,8 +43,12 @@
     <div class="calc-grid">
       <div class="calc-media">
         <div class="media-crop">
-          <img class="enlarge-150" src="./assets/img/netting3.jpg" alt="Sports netting example"/>
+          <img src="./assets/img/netting3.jpg" alt="Sports netting example"/>
         </div>
+        <!-- Dynamic thumbnail gallery inserted between hero image and description -->
+        <ul id="calc-gallery" class="calc-gallery" aria-label="Additional netting detail images">
+          <li class="gallery-empty" aria-hidden="true">Loading images…</li>
+        </ul>
         <p class="muted mt-1">Configure your panel on the right. Pricing updates live based on size and options.</p>
 
         <details class="info-block mt-1">
@@ -275,7 +279,7 @@
     <div class="container footer-grid">
       <div class="footer-brand-block">
         <a class="brand brand--light" href="index.html">
-          <img src="assets/img/ezsportslogo.jpg" alt="EZ Sports Netting logo" height="36"/>
+          <img src="assets/EZSportslogo.png" alt="EZ Sports Netting logo" height="36"/>
           <span>EZ Sports Netting</span>
         </a>
         <p class="muted">Better baseball through better gear.</p>

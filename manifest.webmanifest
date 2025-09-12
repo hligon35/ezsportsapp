@@ -7,7 +7,7 @@
   "theme_color": "#0f2f50",
   "lang": "en",
   "icons": [
-    {"src": "assets/img/ezsportslogo.jpg", "sizes": "192x192", "type": "image/jpeg"},
-    {"src": "assets/img/ezsportslogo.jpg", "sizes": "512x512", "type": "image/jpeg"}
+  {"src": "assets/EZSportslogo.png", "sizes": "192x192", "type": "image/png"},
+  {"src": "assets/EZSportslogo.png", "sizes": "512x512", "type": "image/png"}
   ]
 }

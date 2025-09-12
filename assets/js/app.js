@@ -178,7 +178,7 @@ const Store = {
       const descEl = head.querySelector('meta[name="description"]');
       const desc = (descEl && descEl.getAttribute('content')) || 'Shop premium baseball nets, bats, gloves, helmets & training gear.';
       const url = (head.querySelector('link[rel="canonical"]')?.getAttribute('href')) || location.href;
-      const defaultImage = (location.origin || '') + '/assets/img/ezsportslogo.jpg';
+  const defaultImage = (location.origin || '') + '/assets/EZSportslogo.png';
       const og = {
         'og:site_name': 'EZ Sports Netting',
         'og:type': 'website',
@@ -219,7 +219,7 @@ const Store = {
           '@type': 'Organization',
           name: 'EZ Sports Netting',
           url: (location.origin || '') + '/',
-          logo: (location.origin || '') + '/assets/img/ezsportslogo.jpg',
+          logo: (location.origin || '') + '/assets/EZSportslogo.png',
           sameAs: []
         });
         head.appendChild(s);
@@ -738,7 +738,7 @@ const Store = {
   // Replace placeholder logo.svg with brand ezsportslogo.jpg in header & footer
   ensureBrandLogos() {
     try {
-      const BRAND_SRC = 'assets/img/ezsportslogo.jpg';
+  const BRAND_SRC = 'assets/EZSportslogo.png';
       const targets = [
         ...document.querySelectorAll('.site-header .brand img, .footer-brand-block img')
       ];

@@ -31,19 +31,20 @@ body, .container, .footer-grid, .about-inner, .category-tiles .tiles, .grid, .ba
 }
 /* EZ Sports Netting — styles */
 :root{
-  /* Brand palette: #ea8631 (brand), #d3d0d7 (neutral), #000000 (ink) */
+  /* Brand palette: #241773 (brand primary deep purple), #d3d0d7 (neutral), #000000 (ink) */
   --bg:#ffffff;            /* clean white background */
   --surface:#ffffff;
   --border:#d3d0d7;        /* neutral borders/surfaces */
   --ink:#000000;           /* primary text */
   --ink-2:#000000;         /* secondary text (kept dark for contrast) */
-  --brand:#ea8631;         /* primary brand/orange */
-  --brand-2:#ea8631;       /* unify accents to brand */
+  --brand:#241773;         /* primary brand (updated) */
+  --brand-2:#241773;       /* unify accents to brand */
   --primary: var(--brand); /* alias used in admin/styles */
   --red:#d7263d;
   --blue:#0e7dd8;
   --muted:#5a5a5a;         /* muted text; stays readable on white */
-  --ring: 0 0 0 3px color-mix(in oklab, white 0%, var(--brand) 60% / 22%);
+  /* Adjusted focus ring to work with deeper purple hue (slightly higher alpha) */
+  --ring: 0 0 0 3px color-mix(in oklab, white 8%, var(--brand) 70% / 28%);
 }
 
 /* Spacing utilities */
@@ -110,9 +111,9 @@ body, .container, .footer-grid, .about-inner, .category-tiles .tiles, .grid, .ba
 
 /* Global bottom expert CTA (injected on non-contact pages) */
 .expert-cta { 
-  --cta-bg-dark:#221104; 
-  --cta-bg-accent:#ea8631; 
-  --cta-bg-accent2:#ff9d47; 
+  --cta-bg-dark:#140d2a; 
+  --cta-bg-accent:#241773; 
+  --cta-bg-accent2:#3a27b0; 
   background:
     radial-gradient(circle at 72% 18%, color-mix(in oklab,var(--brand) 75%, #fff 25%) 0%, transparent 58%),
     radial-gradient(circle at 18% 78%, color-mix(in oklab,var(--brand) 55%, #fff 45%) 0%, transparent 65%),
@@ -140,11 +141,11 @@ body, .container, .footer-grid, .about-inner, .category-tiles .tiles, .grid, .ba
   pointer-events:none; 
 }
 .expert-cta:before { 
-  background:radial-gradient(circle at 12% 38%,rgba(234,134,49,.35),transparent 62%),radial-gradient(circle at 88% 68%,rgba(234,134,49,.28),transparent 64%); 
+  background:radial-gradient(circle at 12% 38%,rgba(36,23,115,.35),transparent 62%),radial-gradient(circle at 88% 68%,rgba(36,23,115,.28),transparent 64%); 
   mix-blend-mode:color-dodge; 
 }
 .expert-cta:after { 
-  background:linear-gradient(180deg,rgba(234,134,49,.15),rgba(234,134,49,0) 40%,rgba(0,0,0,.55) 115%); 
+  background:linear-gradient(180deg,rgba(36,23,115,.20),rgba(36,23,115,0) 40%,rgba(0,0,0,.55) 115%); 
   mix-blend-mode:soft-light; 
 }
 .expert-cta h2 { 
@@ -331,9 +332,8 @@ img{max-width:100%;display:block}
 .hero-copy h1{font-size:clamp(32px,6vw,52px);margin:0 0 .3rem;font-weight:900;color:#fff;letter-spacing:.8px;text-transform:uppercase}
 .hero-copy p{color:#d3d0d7;margin:0 0 1rem;font-weight:600}
 .hero-cta{display:flex;gap:.65rem;flex-wrap:wrap}
-.hero-art img{border-radius:1rem;box-shadow:0 20px 60px rgba(6,35,71,.35);border:6px solid #ffffff}
-/* Limit hero image height to avoid excessive vertical space on large/tall screens */
-.hero-art img{max-height:clamp(260px,55vh,560px);width:1600px;object-fit:fill;background:#000;}
+/* Hero art image: responsive sizing so border hugs content */
+.hero-art img{display:block;width:100%;height:auto;max-width:100%;max-height:clamp(260px,55vh,560px);border:6px solid #ffffff;border-radius:1rem;box-shadow:0 20px 60px rgba(6,35,71,.35);object-fit:cover;background:#000;}
 
 /* Tiles */
 .section-title{font-size:clamp(22px,3.2vw,30px);font-weight:900;margin:34px 0 14px;text-transform:uppercase;letter-spacing:.6px;color:var(--ink)}
@@ -612,8 +612,24 @@ img{max-width:100%;display:block}
 .calc-media img{border-radius:1rem;border:6px solid #fff;box-shadow:0 12px 36px rgba(12,32,64,.16)}
 /* Zoom-crop: keep container size, zoom image to 150%, crop overflow */
 .calc-media .media-crop{position:relative;overflow:hidden;border-radius:1rem}
-.calc-media .media-crop img{display:block;width:100%;height:auto;transform:scale(1.5);transform-origin:center center}
+.calc-media .media-crop img{display:block;width:100%;height:auto;object-fit:contain;transform:none}
+/* Optional zoom style only when explicitly applied */
+.calc-media .media-crop img.enlarge-150{transform:scale(1.5);object-fit:cover}
 .calc-media{overflow:visible}
+/* Calculator gallery */
+.calc-gallery{list-style:none;margin:.75rem 0 0;padding:0;display:flex;flex-wrap:wrap;gap:.55rem}
+.calc-gallery li{width:78px;aspect-ratio:1/1;border:2px solid var(--border);border-radius:.65rem;overflow:hidden;position:relative;cursor:pointer;background:#fff;display:grid;place-items:center}
+.calc-gallery li img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .35s ease}
+/* Info diagram variants (filenames in assets/info) should not be hard-cropped */
+.calc-gallery li img[src*='assets/info/']{object-fit:contain;background:#fff;padding:4px}
+.calc-gallery li:focus-within img,.calc-gallery li:hover img{transform:scale(1.12)}
+.calc-gallery button{all:unset;cursor:pointer;display:block;width:100%;height:100%}
+.calc-gallery li.is-active{border-color:var(--brand);box-shadow:0 0 0 3px rgba(36,23,115,.25)}
+.calc-gallery .gallery-empty{flex:1 0 100%;text-align:center;padding:.6rem .75rem;font-size:.75rem;background:linear-gradient(135deg,#f5f7fa,#eef2f8);border:1px dashed var(--border);border-radius:.75rem;color:#555;font-weight:600}
+@media (max-width:640px){
+  .calc-gallery{overflow-x:auto;flex-wrap:nowrap;padding-bottom:.35rem}
+  .calc-gallery li{flex:0 0 70px}
+}
 .calc-card{background:#fff;border:1px solid var(--border);border-radius:1rem;box-shadow:0 8px 24px rgba(12,32,64,.06);padding:1rem}
 .calc-title{margin:0 0 .5rem}
 .calc-form{display:grid;gap:.9rem}
@@ -677,8 +693,12 @@ img{max-width:100%;display:block}
 .netting-hero h1 { margin:0 0 .4rem; font-size:clamp(1.7rem,4.2vw,2.8rem); text-transform:uppercase; letter-spacing:.6px; font-weight:900 }
 
 /* Netting layout helpers */
-.net-cols { display:grid; gap:1.25rem; margin:1.25rem 0 2.25rem; grid-template-columns:1fr 1fr }
+.net-cols { display:grid; gap:1.25rem; margin:1.25rem 0 1.75rem; grid-template-columns:1fr; }
+/* Removed second column (placeholder image) on netting pages; tighten bottom margin */
 @media (max-width: 860px){ .net-cols { grid-template-columns:1fr } }
+/* Spec layout utilities */
+.spec-narrow { max-width:760px; margin:0 auto; }
+.spec-actions { margin-top:.75rem; }
 .placeholder-img { background:#f3f5f8; border:2px dashed var(--border); border-radius:1rem; aspect-ratio:4/3; display:grid; place-items:center; font-weight:700; color:#555 }
 .spec-block { background:#fff; border:1px solid var(--border); padding:1rem; border-radius:1rem; box-shadow:0 4px 18px rgba(12,32,64,.06) }
 .spec-block h3 { margin:.1rem 0 .5rem; font-size:1rem }

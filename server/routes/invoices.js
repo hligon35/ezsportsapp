@@ -67,7 +67,7 @@ router.get('/:invoiceId/print', requireAuth, async (req, res) => {
       .totals{margin-top:12px;text-align:right}
       .meta{color:#555;margin:0 0 12px}
       .actions{margin-top:16px;text-align:right}
-      .btn{background:#ea8631;color:#fff;border:none;padding:8px 12px;border-radius:6px;cursor:pointer}
+  .btn{background:#241773;color:#fff;border:none;padding:8px 12px;border-radius:6px;cursor:pointer}
       </style></head><body>
         <h1>Invoice ${invoice.id}</h1>
         <p class="meta">Date: ${new Date(invoice.createdAt).toLocaleString()}</p>

@@ -160,3 +160,77 @@ function setup(){
 }
 
 window.addEventListener('DOMContentLoaded', setup);
+
+// --- Gallery (progressive enhancement) ---
+(function(){
+  window.addEventListener('DOMContentLoaded', ()=>{
+    const list = document.getElementById('calc-gallery');
+    const mainImg = document.querySelector('.calc-media .media-crop img');
+    if(!list || !mainImg) return;
+    // Define candidate images (will attempt to use any that actually exist). Since assets/img/info is empty now,
+    // we include fallbacks (reuse existing netting image + generic ones) – these won't 404 because they already exist.
+    // Build candidate list: look for sequentially named files user may add later in assets/img/info (net-info-1.jpg/png etc.)
+    // Actual provided images (deterministic ordering)
+    const provided = [
+      'assets/info/baseballnetting1.png',
+      'assets/info/baseballnetting2.png',
+      'assets/info/golfnetting.png',
+      'assets/info/lacrossenetting.png',
+      'assets/info/soccernetting.png',
+      'assets/info/nettingoptions.png',
+      'assets/info/netsizing.png'
+    ];
+    // Fallbacks (existing site images) if some fail to load
+    const fallbacks = [
+      'assets/img/netting3.jpg',
+      'assets/img/netting.jpg',
+      'assets/img/netting2.jpg',
+      'assets/img/netting4.jpg',
+      'assets/img/netting5.jpg'
+    ];
+    const candidates = [...provided, ...fallbacks];
+    // De‑dupe & filter to those that load successfully; create promises to probe images quickly (timeout 2s)
+    const unique = [...new Set(candidates)];
+    const loaders = unique.map(src => new Promise(resolve => {
+      const img = new Image();
+      let done = false;
+      const finish = ok => { if(done) return; done = true; resolve(ok ? src : null); };
+      img.onload = ()=>finish(true);
+      img.onerror = ()=>finish(false);
+      img.src = src;
+      setTimeout(()=>finish(false), 2000);
+    }));
+    Promise.all(loaders).then(results => {
+      const imgs = results.filter(Boolean);
+      list.innerHTML = '';
+      if(!imgs.length){
+        // Keep friendly empty state; allow future population if images added later without code changes
+        list.innerHTML = '<li class="gallery-empty">Add images to assets/img/info to populate gallery.</li>';
+        return;
+      }
+      imgs.slice(0,8).forEach((src,i)=>{
+        const li = document.createElement('li');
+        if(i===0) li.classList.add('is-active');
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.setAttribute('aria-label', 'View image '+(i+1));
+        btn.innerHTML = `<img src="${src}" alt="Netting detail ${i+1}">`;
+        btn.addEventListener('click', ()=>{
+          if(mainImg.getAttribute('src') !== src){
+            mainImg.style.opacity = '0';
+            setTimeout(()=>{
+              mainImg.setAttribute('src', src);
+              mainImg.style.transition = 'opacity .25s ease';
+              requestAnimationFrame(()=>{ mainImg.style.opacity = '1'; });
+              setTimeout(()=>{ mainImg.style.transition=''; }, 300);
+            },120);
+          }
+          list.querySelectorAll('li').forEach(li=>li.classList.remove('is-active'));
+            li.classList.add('is-active');
+        });
+        li.appendChild(btn);
+        list.appendChild(li);
+      });
+    });
+  });
+})();
