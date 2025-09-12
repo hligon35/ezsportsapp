@@ -19402,5 +19402,38 @@
     "createdAt": "2025-09-12T14:22:24.762Z",
     "updatedAt": "2025-09-12T14:22:24.762Z",
     "id": 1764
+  },
+  {
+    "type": "pageview",
+    "path": "/netting-calculator.html",
+    "referrer": "",
+    "visitorId": "v_u93vm8bhybdmfgxl8q0",
+    "userId": null,
+    "timestamp": "2025-09-12T14:27:02.413Z",
+    "createdAt": "2025-09-12T14:27:02.578Z",
+    "updatedAt": "2025-09-12T14:27:02.578Z",
+    "id": 1765
+  },
+  {
+    "type": "pageview",
+    "path": "/netting-calculator.html",
+    "referrer": "",
+    "visitorId": "v_thcp097opvmmfgyq8ts",
+    "userId": null,
+    "timestamp": "2025-09-12T14:58:55.439Z",
+    "createdAt": "2025-09-12T14:58:55.481Z",
+    "updatedAt": "2025-09-12T14:58:55.481Z",
+    "id": 1766
+  },
+  {
+    "type": "pageview",
+    "path": "/netting-calculator.html",
+    "referrer": "",
+    "visitorId": "v_hipbjr51prcmfgyzfar",
+    "userId": null,
+    "timestamp": "2025-09-12T15:06:03.713Z",
+    "createdAt": "2025-09-12T15:06:03.807Z",
+    "updatedAt": "2025-09-12T15:06:03.807Z",
+    "id": 1767
   }
 ]

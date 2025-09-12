@@ -1,6 +1,6 @@
-// Bumped versions to invalidate old cached layout assets (and SW bugfixes)
-const CORE_CACHE = 'core-v5';
-const ASSET_CACHE = 'assets-v3';
+// Bumped versions to invalidate old cached layout assets (tablet nav + calc responsiveness)
+const CORE_CACHE = 'core-v6';
+const ASSET_CACHE = 'assets-v4';
 const CORE = [
   '/index.html',
   '/assets/css/styles.css',

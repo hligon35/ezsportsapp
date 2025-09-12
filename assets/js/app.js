@@ -91,6 +91,9 @@ const Store = {
   this.ensurePerformanceOptimizations();
   this.ensureServiceWorkerRegistered();
 
+    // Runtime responsive enforcement (in case stale CSS served from cache briefly)
+    this.enforceResponsiveBehaviors();
+
     // Refresh products from admin updates
     PRODUCTS = getProducts();
 
@@ -997,6 +1000,31 @@ const Store = {
       console.error(e);
     }
   }
+};
+
+// Fallback responsive enforcement if cached old CSS briefly loads
+Store.enforceResponsiveBehaviors = function(){
+  try {
+    const apply = () => {
+      const w = window.innerWidth;
+      const nav = document.getElementById('primary-nav') || document.querySelector('nav.quick-links');
+      const toggle = document.querySelector('.menu-toggle');
+      if (w <= 1200) {
+        if (toggle) toggle.style.display = 'inline-flex';
+        if (nav && !nav.classList.contains('is-open')) {
+          // Keep it collapsed until explicitly opened
+          nav.classList.remove('forced-wide');
+        }
+      } else {
+        if (toggle) toggle.style.display = '';
+        if (nav) nav.classList.add('forced-wide');
+      }
+      // Calculator adaptive safeguard
+      // Calculator now mobile-first (single column by default); JS stack enforcement no longer required.
+    };
+    window.addEventListener('resize', apply);
+    apply();
+  } catch {}
 };
 
 window.Store = Store;

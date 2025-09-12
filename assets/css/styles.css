@@ -364,12 +364,17 @@ img{max-width:100%;display:block}
 
 /* Mobile nav */
 .menu-toggle{display:none;background:var(--brand);color:#fff;border:1px solid var(--brand);font-weight:800;font-size:1.05rem;line-height:1;border-radius:.65rem;padding:.55rem .7rem;cursor:pointer}
-@media (max-width:640px){
+/* Collapsible navigation applies up to large tablets (raised from 900px -> 1200px) */
+@media (max-width:1200px){
   .menu-toggle{display:inline-flex;align-items:center;justify-content:center}
-  .quick-links{flex-basis:100%;order:4;display:none;flex-direction:column;align-items:flex-start;background:#000000;padding:.4rem .4rem .8rem;border-radius:.75rem;margin-top:.4rem;box-shadow:0 4px 18px rgba(0,0,0,.25)}
-  .quick-links a{padding:.45rem .65rem;border-radius:.5rem;width:100%;}
+  .quick-links{flex-basis:100%;order:4;display:none;flex-direction:column;align-items:flex-start;background:#000000;padding:.6rem .6rem 1rem;border-radius:.85rem;margin-top:.55rem;box-shadow:0 4px 18px rgba(0,0,0,.25)}
+  .quick-links a{padding:.55rem .75rem;border-radius:.55rem;width:100%;}
   .quick-links.is-open{display:flex}
   body.nav-open{overflow:hidden}
+}
+/* Safeguard: if JS or old CSS attempts to force desktop, override below 1200px */
+@media (max-width:1200px){
+  .quick-links.forced-wide{display:none !important}
 }
 
 /* Buttons */
@@ -671,7 +676,8 @@ img{max-width:100%;display:block}
 }
 
 /* Netting calculator */
-.calc-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:1rem;margin:1rem 0 2rem}
+.calc-grid{display:grid;grid-template-columns:1fr;gap:1rem;margin:1rem 0 2rem}
+.calc-media,.calc-card{min-width:0}
 .calc-media img{border-radius:1rem;border:6px solid #fff;box-shadow:0 12px 36px rgba(12,32,64,.16)}
 /* Zoom-crop: keep container size, zoom image to 150%, crop overflow */
 .calc-media .media-crop{position:relative;overflow:hidden;border-radius:1rem}
@@ -680,7 +686,7 @@ img{max-width:100%;display:block}
 .calc-media .media-crop img.enlarge-150{transform:scale(1.5);object-fit:cover}
 .calc-media{overflow:visible}
 /* Calculator gallery */
-.calc-gallery{list-style:none;margin:.75rem 0 0;padding:0;display:flex;flex-wrap:wrap;gap:.55rem}
+.calc-gallery{list-style:none;margin:.75rem 0 0;padding:0;display:flex;flex-wrap:wrap;gap:.55rem;min-height:110px;position:relative}
 .calc-gallery li{width:78px;aspect-ratio:1/1;border:2px solid var(--border);border-radius:.65rem;overflow:hidden;position:relative;cursor:pointer;background:#fff;display:grid;place-items:center}
 .calc-gallery li img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .35s ease}
 /* Info diagram variants (filenames in assets/info) should not be hard-cropped */
@@ -689,6 +695,9 @@ img{max-width:100%;display:block}
 .calc-gallery button{all:unset;cursor:pointer;display:block;width:100%;height:100%}
 .calc-gallery li.is-active{border-color:var(--brand);box-shadow:0 0 0 3px rgba(36,23,115,.25)}
 .calc-gallery .gallery-empty{flex:1 0 100%;text-align:center;padding:.6rem .75rem;font-size:.75rem;background:linear-gradient(135deg,#f5f7fa,#eef2f8);border:1px dashed var(--border);border-radius:.75rem;color:#555;font-weight:600}
+/* Loading skeleton state (applied before JS populates images) */
+.calc-gallery.loading:before{content:"";position:absolute;inset:0;border:2px dashed var(--border);border-radius:.75rem;background:repeating-linear-gradient(90deg,#f6f8fa 0 45px,#eef1f5 45px 90px);animation:calcShimmer 1.35s linear infinite;background-size:200% 100%;}
+@keyframes calcShimmer{0%{background-position:0 0}100%{background-position:-200% 0}}
 @media (max-width:640px){
   .calc-gallery{overflow-x:auto;flex-wrap:nowrap;padding-bottom:.35rem}
   .calc-gallery li{flex:0 0 70px}
@@ -775,8 +784,14 @@ img{max-width:100%;display:block}
 .summary .total{font-size:1.15rem;font-weight:900}
 .actions{margin-top:.5rem}
 
-@media (max-width:860px){
-  .calc-grid{grid-template-columns:1fr}
+/* Desktop enhancement: only widen beyond 1100px */
+@media (min-width:1101px){
+  .calc-grid{grid-template-columns:1.1fr .9fr}
+}
+/* Legacy safeguard (kept harmless): if JS adds calc-stack ensure single column */
+.calc-grid.calc-stack{grid-template-columns:1fr !important}
+@media (max-width:540px){
+  .calc-gallery li{width:64px}
 }
 
 /* Breadcrumbs */

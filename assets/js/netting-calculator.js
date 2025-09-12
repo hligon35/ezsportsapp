@@ -167,6 +167,8 @@ window.addEventListener('DOMContentLoaded', setup);
     const list = document.getElementById('calc-gallery');
     const mainImg = document.querySelector('.calc-media .media-crop img');
     if(!list || !mainImg) return;
+    // Add loading class to reserve space & show skeleton until images resolved
+    list.classList.add('loading');
     // Define candidate images (will attempt to use any that actually exist). Since assets/img/info is empty now,
     // we include fallbacks (reuse existing netting image + generic ones) – these won't 404 because they already exist.
     // Build candidate list: look for sequentially named files user may add later in assets/img/info (net-info-1.jpg/png etc.)
@@ -206,6 +208,7 @@ window.addEventListener('DOMContentLoaded', setup);
       if(!imgs.length){
         // Keep friendly empty state; allow future population if images added later without code changes
         list.innerHTML = '<li class="gallery-empty">Add images to assets/img/info to populate gallery.</li>';
+        list.classList.remove('loading');
         return;
       }
       imgs.slice(0,8).forEach((src,i)=>{
@@ -231,6 +234,13 @@ window.addEventListener('DOMContentLoaded', setup);
         li.appendChild(btn);
         list.appendChild(li);
       });
+      // Trigger fade-in
+      [...list.children].forEach((li,idx)=>{
+        li.style.opacity = '0';
+        li.style.transition = 'opacity .4s ease';
+        setTimeout(()=>{ li.style.opacity='1'; }, 30 + idx*40);
+      });
+      list.classList.remove('loading');
     });
   });
 })();
