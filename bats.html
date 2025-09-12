@@ -107,7 +107,8 @@
         const totalPages = Math.ceil(bats.length/perPage);
         let pagHtml = '';
         for(let i=1;i<=totalPages;i++){
-          pagHtml += `<button onclick=\"renderBats(${i})\" class=\"btn btn-ghost\" style=\"${i===page?'background:#0b64d4;color:#fff;':''}\">${i}</button>`;
+          const active = i===page ? ' pagination-btn is-active aria-current="page"' : ' pagination-btn';
+          pagHtml += `<button onclick=\"renderBats(${i})\" class=\"btn btn-ghost${active}\">${i}</button>`;
         }
         document.getElementById('bat-pagination').innerHTML = pagHtml;
       }

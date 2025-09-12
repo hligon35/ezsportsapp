@@ -5,6 +5,36 @@
   gap: .5rem;
   margin-top: 1.25rem;
 }
+/* Pagination button refinement (replaces inline styles) */
+.pagination-btn { position:relative; min-width:42px; }
+.pagination-btn.is-active,
+.pagination-btn[aria-current="page"] { background: var(--brand); color:#fff; box-shadow:0 0 0 2px rgba(255,255,255,.15),0 0 0 4px rgba(36,23,115,.35); }
+.pagination-btn:focus-visible { outline:none; box-shadow:0 0 0 3px rgba(36,23,115,.45); }
+
+/* Global heading rhythm & fluid scale (adds consistency across simple content pages) */
+h1, .page-title { line-height:1.08; font-weight:900; letter-spacing:.6px; }
+h1:not(.hero-copy h1):not(.netting-hero h1):not(.net-hero h1) { font-size:clamp(1.85rem,4.4vw,2.75rem); margin:.25rem 0 .85rem; }
+h2 { font-size:clamp(1.25rem,2.9vw,1.9rem); line-height:1.15; font-weight:800; margin:1.6rem 0 .65rem; }
+h3 { font-size:clamp(1.05rem,2.4vw,1.35rem); line-height:1.2; font-weight:800; margin:1.2rem 0 .5rem; }
+
+/* Consistent text sizing for small helper text */
+small, .text-xs { font-size:.72rem; line-height:1.2; }
+
+/* Unified paragraph spacing (light-touch: only when not the last in a container) */
+p { line-height:1.45; }
+p + p { margin-top:.75rem; }
+
+/* Container padding refinement for very wide & very narrow screens */
+@media (min-width:1400px){ .container{padding-inline:clamp(1.5rem,2vw,2.75rem);} }
+@media (max-width:380px){ .container{padding-inline:clamp(.85rem,4.5vw,1.15rem);} }
+
+/* Improved focus states for interactive elements (accessible) */
+a:focus-visible, button:focus-visible, [role="button"]:focus-visible { outline:none; box-shadow:var(--ring); }
+
+/* Reduced motion preference – minimize large transforms */
+@media (prefers-reduced-motion: reduce){
+  *, *::before, *::after { animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important; scroll-behavior:auto !important; }
+}
 /* Centered nav utility for header */
 .nav-centered {
   justify-content: center !important;
@@ -207,6 +237,39 @@ body{
   background:var(--bg);
   overflow-x:hidden; /* prevent accidental horizontal scroll */
 }
+/* --------------------------------------------- */
+/* Mobile/tablet safe edge containment           */
+/* Ensures no component hugs the viewport edge  */
+/* or triggers horizontal scroll on narrow view */
+/* --------------------------------------------- */
+.no-overflow, .wrap, .net-hero, .netting-hero, .contact-hero, .turf-hero, .expert-cta, .carousel-section, .about-inner, .calc-grid, .inventory-callouts, .turf-grid, .footer-grid, .category-tiles .tiles {
+  max-width:100%;
+}
+/* Unified inner horizontal padding for hero-like full width blocks at narrow widths */
+@media (max-width:760px){
+  .net-hero, .netting-hero, .contact-hero, .turf-hero, .expert-cta, .carousel-section { padding-left:clamp(.9rem,5vw,1.25rem) !important; padding-right:clamp(.9rem,5vw,1.25rem) !important; }
+  .footer-grid { padding-left:clamp(.9rem,5vw,1.25rem); padding-right:clamp(.9rem,5vw,1.25rem); }
+}
+/* Protect ultra-small devices */
+@media (max-width:400px){
+  .grid, .category-tiles .tiles, .turf-grid, .inventory-callouts { gap:.65rem; }
+  .hero-inner { gap:1.25rem; }
+  .contact-grid, .calc-grid { gap:.85rem; }
+}
+/* Prevent long unbroken strings from expanding layout */
+*, *::before, *::after { word-wrap:break-word; overflow-wrap:anywhere; }
+
+/* Cards & tiles subtle padding adjustment on very narrow */
+@media (max-width:480px){
+  .card .body { padding:.8rem .75rem; }
+  .tile { padding:.55rem .6rem .65rem; }
+}
+
+/* Ensure footer subfooter text doesn’t touch edges */
+.subfooter.container { padding-left:clamp(.9rem,5vw,1.25rem); padding-right:clamp(.9rem,5vw,1.25rem); }
+
+/* Mini cart panel safe area (iOS notch etc.) */
+.mini-cart__panel { padding-bottom: env(safe-area-inset-bottom, 0); }
 /* utility */
 .muted{ color: var(--muted); }
 .mt-4{ margin-top: 1.25rem; }

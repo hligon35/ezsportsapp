@@ -19369,5 +19369,38 @@
     "createdAt": "2025-09-12T04:32:23.980Z",
     "updatedAt": "2025-09-12T04:32:23.981Z",
     "id": 1761
+  },
+  {
+    "type": "pageview",
+    "path": "/",
+    "referrer": "",
+    "visitorId": "v_xwnj60f4wwmfgx29iy",
+    "userId": null,
+    "timestamp": "2025-09-12T14:12:17.047Z",
+    "createdAt": "2025-09-12T14:12:17.122Z",
+    "updatedAt": "2025-09-12T14:12:17.122Z",
+    "id": 1762
+  },
+  {
+    "type": "pageview",
+    "path": "/netting-calculator.html",
+    "referrer": "",
+    "visitorId": "v_xwnj60f4wwmfgx29iy",
+    "userId": null,
+    "timestamp": "2025-09-12T14:22:09.288Z",
+    "createdAt": "2025-09-12T14:22:09.302Z",
+    "updatedAt": "2025-09-12T14:22:09.302Z",
+    "id": 1763
+  },
+  {
+    "type": "pageview",
+    "path": "/apparel.html",
+    "referrer": "",
+    "visitorId": "v_xwnj60f4wwmfgx29iy",
+    "userId": null,
+    "timestamp": "2025-09-12T14:22:24.739Z",
+    "createdAt": "2025-09-12T14:22:24.762Z",
+    "updatedAt": "2025-09-12T14:22:24.762Z",
+    "id": 1764
   }
 ]

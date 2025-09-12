@@ -100,7 +100,8 @@
         const totalPages = Math.ceil(gloves.length/perPage);
         let pagHtml = '';
         for(let i=1;i<=totalPages;i++){
-          pagHtml += `<button onclick=\"renderBatglo(${i})\" class=\"btn btn-ghost\" style=\"${i===page?'background:#0b64d4;color:#fff;':''}\">${i}</button>`;
+          const active = i===page ? ' pagination-btn is-active aria-current="page"' : ' pagination-btn';
+          pagHtml += `<button onclick=\"renderBatglo(${i})\" class=\"btn btn-ghost${active}\">${i}</button>`;
         }
         document.getElementById('batglo-pagination').innerHTML = pagHtml;
       }
