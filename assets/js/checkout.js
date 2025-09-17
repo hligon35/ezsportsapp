@@ -1,12 +1,15 @@
 // Stripe Payment Element integration for cards, Apple Pay, Google Pay, PayPal
 // Publishable key will be provided by a config endpoint or fallback (dev)
 let stripe;
+let stripeEnabled = false;
 async function getStripe() {
   if (stripe) return stripe;
   try {
-    const cfg = await fetch('/api/config').then(r=>r.ok?r.json():{ pk: 'pk_test_your_publishable_key' });
+    const cfg = await fetch('/api/config').then(r=>r.ok?r.json():{ pk: 'pk_test_your_publishable_key', enabled: false });
+    stripeEnabled = !!cfg.enabled;
     stripe = Stripe(cfg.pk || 'pk_test_your_publishable_key');
   } catch {
+    stripeEnabled = false;
     stripe = Stripe('pk_test_your_publishable_key');
   }
   return stripe;
@@ -77,24 +80,29 @@ async function initialize() {
     return { items, customer, shipping, shippingMethod };
   };
 
-  // Create PaymentIntent on backend with server-side calculation (optional in test mode)
+  // Initialize Stripe and create PaymentIntent on backend if Stripe is enabled
   let clientSecret = null;
   let amount = 0;
   let elements = null;
-  try {
-    const intentResp = await fetch('/api/create-payment-intent', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(getPayload())
-    }).then(r => r.json());
-    if (intentResp && !intentResp.error) {
-      clientSecret = intentResp.clientSecret;
-      amount = intentResp.amount;
-      const _stripe = await getStripe();
-      elements = _stripe.elements({ clientSecret, appearance: { theme: 'stripe' } });
-      const paymentElement = elements.create('payment', { layout: 'tabs' });
-      paymentElement.mount('#payment-element');
+  let orderId = null;
+  await getStripe();
+  if (stripeEnabled) {
+    try {
+      const intentResp = await fetch('/api/create-payment-intent', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(getPayload())
+      }).then(r => r.json());
+      if (intentResp && !intentResp.error) {
+        clientSecret = intentResp.clientSecret;
+        amount = intentResp.amount;
+        orderId = intentResp.orderId || null;
+        const _stripe = await getStripe();
+        elements = _stripe.elements({ clientSecret, appearance: { theme: 'stripe' } });
+        const paymentElement = elements.create('payment', { layout: 'tabs' });
+        paymentElement.mount('#payment-element');
+      }
+    } catch (_) {
+      // ignore; test mode fallback will handle
     }
-  } catch (_) {
-    // ignore; test mode fallback will handle
   }
 
   // Always show a computed summary (even in test mode)
@@ -125,8 +133,8 @@ async function initialize() {
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
     document.getElementById('submit').disabled = true;
-    // For test purposes: allow a simplified non-card checkout path
-    const testMode = true;
+  // Decide mode: Real Stripe when we have a clientSecret; else test mode
+  const testMode = !clientSecret;
     if (testMode) {
       try {
         const payload = getPayload();
@@ -158,10 +166,18 @@ async function initialize() {
       return;
     }
 
-    // Real Stripe flow (kept for future use)
-    const { error } = await stripe.confirmPayment({
+    // Real Stripe flow
+    // Save a lightweight snapshot for confirmation page UI
+    try {
+      const items = cart.map(i=>({ productName: i.title || i.id, id: i.id, quantity: i.qty, price: Number(i.price)||0, subtotal: (Number(i.price)||0) * (i.qty||0) }));
+      const total = amount || (calcSubtotalCents(cart) + calcShippingCents(calcSubtotalCents(cart), new FormData(form).get('shippingMethod')||'standard'));
+      const order = { id: orderId, items, total: Math.round(total)/100 };
+      sessionStorage.setItem('lastOrder', JSON.stringify(order));
+    } catch {}
+    const _stripe = await getStripe();
+    const { error } = await _stripe.confirmPayment({
       elements,
-      confirmParams: { return_url: new URL('checkout.html?success=true', window.location.href).href },
+      confirmParams: { return_url: new URL('order-confirmation.html' + (orderId ? ('?id=' + encodeURIComponent(orderId)) : ''), window.location.href).href },
     });
     if (error) {
       document.getElementById('payment-message').textContent = error.message;

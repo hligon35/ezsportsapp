@@ -14,6 +14,8 @@
   "dependencies": {
     "@vercel/postgres": "^0.9.0",
     "bcryptjs": "^2.4.3",
-    "jsonwebtoken": "^9.0.2"
+    "jsonwebtoken": "^9.0.2",
+    "micro": "^10.0.1",
+    "stripe": "^16.0.0"
   }
 }

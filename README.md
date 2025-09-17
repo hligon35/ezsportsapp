@@ -9,12 +9,14 @@ This is a lightweight, responsive ecommerce front-end template for a baseball ge
 - No build step; pure HTML/CSS/JS
 
 ## Files
+
 - `index.html` — page structure and components
 - `assets/css/styles.css` — styling and responsive rules
 - `assets/js/app.js` — mock products, rendering, and cart logic
 - `assets/img/` — placeholder assets (logo). Product images load from Unsplash.
 
 ## Run locally
+
 Open `index.html` directly in your browser, or start a simple server to avoid CORS issues with modules.
 
 On Windows PowerShell:
@@ -27,12 +29,27 @@ python -m http.server 8080
 npx serve -l 8080
 ```
 
-Then visit http://localhost:8080 in your browser and navigate to `EZSports/`.
+Then visit <http://localhost:8080> in your browser and navigate to `EZSports/`.
 
 ## Customize
-- Replace Unsplash image URLs in `assets/js/app.js` with your product images.
-- Add real categories or tags to the `PRODUCTS` list.
-- Wire up a backend by replacing `checkout()` with your checkout integration (Stripe, Shopify, etc.).
+
+
+### Stripe payments (test mode)
+
+Environment variables (configure in Vercel project settings or a local `.env` for dev):
+
+- STRIPE_PUBLISHABLE_KEY: your Stripe test publishable key (starts with `pk_test_...`).
+- STRIPE_SECRET_KEY: your Stripe test secret key (starts with `sk_test_...`).
+- STRIPE_WEBHOOK_SECRET: the signing secret from the Stripe CLI or Dashboard for your webhook endpoint.
+
+Endpoints in this repo:
+
+- `GET /api/config` returns `{ pk, enabled }` for the frontend to initialize Stripe.js.
+- `POST /api/create-payment-intent` creates a PaymentIntent and a local order row, returning `{ clientSecret, amount, orderId }`.
+- `POST /api/webhook/stripe` handles `payment_intent.succeeded` and marks the order as paid.
+
+To use your test publishable key now, either set `STRIPE_PUBLISHABLE_KEY` in env, or replace it in `api/config.js`. The backend switches to real card collection automatically when `STRIPE_SECRET_KEY` is present.
 
 ## License
+
 MIT — use freely for your projects.
