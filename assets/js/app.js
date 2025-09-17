@@ -82,6 +82,7 @@ const Store = {
     this.updateNavigation();
   this.ensureNettingSubnav();
   this.ensureNettingCarousel();
+  this.ensureUniformFooter();
   this.ensureExpertCTA();
   this.ensureQuoteButtons();
   this.ensureBrandLogos();
@@ -150,6 +151,59 @@ const Store = {
 
     // Reveal header/nav only after everything is standardized
     document.body.classList.add('nav-ready');
+  },
+
+  // Build or normalize a canonical footer structure across all pages
+  ensureUniformFooter() {
+    try {
+      let footer = document.querySelector('footer.site-footer');
+      if (!footer) {
+        footer = document.createElement('footer');
+        footer.className = 'site-footer';
+        document.body.appendChild(footer);
+      }
+      // Canonical footer markup
+      const html = `
+        <div class="container footer-grid">
+          <div class="footer-brand-block">
+            <img src="assets/EZSportslogo.png" height="36" alt="EZ Sports Netting logo"/>
+            <strong>EZ Sports Netting</strong>
+            <p>Better baseball through better gear.</p>
+            <div class="socials" aria-label="social links">
+              <a href="https://www.facebook.com/Ezsportsnetting/" aria-label="Facebook" target="_blank" rel="noopener"><img src="assets/img/facebook.png" alt="Facebook"/></a>
+              <a href="#" aria-label="Instagram" target="_blank" rel="noopener"><img src="assets/img/instagram.png" alt="Instagram"/></a>
+            </div>
+          </div>
+          <div>
+            <h4>Shop</h4>
+            <a href="bats.html">Bats</a><br/>
+            <a href="gloves.html">Gloves</a><br/>
+            <a href="ez-nets.html">EZ Nets</a><br/>
+            <a href="gear.html">Gear</a>
+          </div>
+          <div>
+            <h4>Company</h4>
+            <a href="about.html">About</a><br/>
+            <a href="careers.html">Careers</a><br/>
+            <a href="support.html">Support</a>
+          </div>
+          <div class="subscribe">
+            <h4>Get deals in your inbox</h4>
+            <div class="row">
+              <input type="email" placeholder="you@email.com" aria-label="Email address"/>
+              <button class="btn btn-primary" type="button">Subscribe</button>
+            </div>
+          </div>
+        </div>
+        <div class="subfooter container">&copy; <span id="year"></span> EZ Sports Netting. All rights reserved.</div>`;
+      // Replace footer content only if different to avoid layout thrash
+      if (footer.innerHTML.trim() !== html.trim()) {
+        footer.innerHTML = html;
+      }
+      // Ensure current year
+      const y = footer.querySelector('#year');
+      if (y) y.textContent = new Date().getFullYear();
+    } catch {}
   },
 
   // Accessibility: ensure a skip link exists for keyboard users
@@ -401,7 +455,6 @@ const Store = {
 
     // Canonical nav: rebuild to avoid legacy links and ensure correct order
     const required = [
-      { href: 'index.html', text: 'Home' },
       { href: 'deals.html', text: 'Deals' },
       { href: 'about.html', text: 'About' },
       { href: 'ez-nets.html', text: 'EZ Nets' },
@@ -413,7 +466,7 @@ const Store = {
       { href: 'apparel.html', text: 'Apparel' },
       { href: 'l-screens.html', text: 'L-Screens' },
       { href: 'facility-field.html', text: 'Facility & Field' },
-  { href: 'turf.html', text: 'Turf' },
+      { href: 'turf.html', text: 'Turf' },
       { href: 'contactus.html', text: 'Contact Us' }
     ];
 
@@ -525,34 +578,18 @@ const Store = {
   'hitting-facility.html':'Hitting Facility',
   'batting-cage.html':'Batting Cage',
   'foul-ball.html':'Foul Ball Netting',
-  'overhead.html':'Overhead Netting',
   'backstop.html':'Backstop Netting',
   'baseball-l-screen.html':'Baseball L-Screen',
   'pitchers-pocket.html':"Pitcher's Pocket",
   'training-facility.html':'Training Facility',
-  'diving-range.html':'Diving Range',
-  'golf-course.html':'Golf Course Netting',
-  'golf-cube.html':'Golf Cube',
   'residential-golf.html':'Residential Golf Netting',
   'sports-netting.html':'Sports Netting',
-  'sports-baseball.html':'Sports: Baseball',
   'basketball.html':'Basketball Netting',
-  'cricket-football.html':'Cricket Football',
-  'sports-golf.html':'Sports: Golf',
   'hockey.html':'Hockey Netting',
-  'sports-lacrosse.html':'Sports: Lacrosse',
-  'multi-sport.html':'Multi-Sport',
-  'sports-soccer.html':'Sports: Soccer',
   'softball.html':'Softball Netting',
   'tennis.html':'Tennis Netting',
   'volleyball.html':'Volleyball Netting',
   'commercial-netting.html':'Commercial Netting',
-  'auto-drone.html':'Auto-Drone',
-  'drone-enclosure.html':'Drone Enclosure',
-  'warehouse.html':'Warehouse Netting',
-  'safety-netting.html':'Safety Netting',
-  'debris-netting.html':'Debris Netting',
-  'landfill-netting.html':'Landfill Netting',
       'ez-nets.html': 'EZ Nets',
       'baseball-netting.html': 'Baseball Netting',
       'golf-netting.html': 'Golf Netting',

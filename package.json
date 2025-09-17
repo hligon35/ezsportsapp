@@ -2,7 +2,7 @@
   "name": "ezsports-app",
   "private": true,
   "version": "1.0.0",
-  "description": "EZSportsApp root package to proxy server scripts and support Vercel Functions",
+  "description": "EZSportsApp root package for Render-hosted Express server",
   "scripts": {
     "start": "npm --prefix server run start",
     "dev": "npm --prefix server run dev",
@@ -12,10 +12,8 @@
     "db:reset": "npm --prefix server run db:reset"
   },
   "dependencies": {
-    "@vercel/postgres": "^0.9.0",
     "bcryptjs": "^2.4.3",
     "jsonwebtoken": "^9.0.2",
-    "micro": "^10.0.1",
     "stripe": "^16.0.0"
   }
 }

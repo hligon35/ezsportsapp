@@ -9,7 +9,15 @@ const helmet = require('helmet');
 const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
 const cookieParser = require('cookie-parser');
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY || 'sk_test_yourkey'); // Replace with your real key
+// Initialize Stripe client only if a secret key is provided (set in Render env)
+let stripe = null;
+try {
+  if (process.env.STRIPE_SECRET_KEY) {
+    stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+  }
+} catch (e) {
+  console.warn('Stripe SDK failed to initialize:', e.message);
+}
 
 // Database and services
 const DatabaseManager = require('./database/DatabaseManager');
@@ -88,11 +96,13 @@ app.post('/webhook/stripe', express.raw({ type: 'application/json' }), async (re
   const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET || '';
   let event;
   try {
-    if (endpointSecret) {
-      event = stripe.webhooks.constructEvent(req.body, sig, endpointSecret);
-    } else {
+    if (!endpointSecret) {
       const raw = Buffer.isBuffer(req.body) ? req.body.toString('utf8') : req.body;
       event = JSON.parse(raw);
+    } else if (stripe) {
+      event = stripe.webhooks.constructEvent(req.body, sig, endpointSecret);
+    } else {
+      throw new Error('Stripe not initialized; cannot verify webhook with endpoint secret.');
     }
   } catch (err) {
     console.error('Webhook signature verification failed.', err.message);
@@ -123,12 +133,33 @@ app.use('/api/inventory', inventoryRoutes);
 app.use('/api/invoices', invoiceRoutes);
 app.use('/api/analytics', analyticsRoutes);
 
+// Legacy redirects for removed static pages (migrated from previous hosting config)
+const redirects = [
+  ['/overhead.html', '/ez-nets.html'],
+  ['/multi-sport.html', '/sports-netting.html'],
+  ['/debris-netting.html', '/commercial-netting.html'],
+  ['/diving-range.html', '/golf-netting.html'],
+  ['/golf-course.html', '/golf-netting.html'],
+  ['/golf-cube.html', '/golf-netting.html'],
+  ['/cricket-football.html', '/sports-netting.html'],
+  ['/auto-drone.html', '/commercial-netting.html'],
+  ['/drone-enclosure.html', '/commercial-netting.html'],
+  ['/warehouse.html', '/commercial-netting.html'],
+  ['/safety-netting.html', '/commercial-netting.html'],
+  ['/landfill-netting.html', '/commercial-netting.html'],
+  ['/sports-baseball.html', '/sports-netting.html'],
+  ['/sports-golf.html', '/sports-netting.html'],
+  ['/sports-lacrosse.html', '/sports-netting.html'],
+  ['/sports-soccer.html', '/sports-netting.html'],
+];
+redirects.forEach(([source, dest]) => {
+  app.get(source, (req, res) => res.redirect(301, dest));
+});
+
 // Lightweight config endpoint for frontend checkout/test mode
 app.get('/api/config', (req, res) => {
-  res.json({
-    pk: process.env.STRIPE_PUBLISHABLE_KEY || 'pk_test_your_publishable_key',
-    testMode: true
-  });
+  const enabled = !!process.env.STRIPE_SECRET_KEY;
+  res.json({ pk: process.env.STRIPE_PUBLISHABLE_KEY || 'pk_test_your_publishable_key', enabled });
 });
 
 // Fallback endpoints (defensive): ensure core routes respond in dev even if router mounting is altered
@@ -229,6 +260,9 @@ function calcShippingCents(subtotalCents, method = 'standard'){
 app.post('/api/create-payment-intent', async (req, res) => {
   const { items = [], customer = {}, shipping = {}, shippingMethod = 'standard', currency = 'usd' } = req.body;
   try {
+    if (!stripe) {
+      return res.status(503).json({ error: 'Stripe is not configured on the server.' });
+    }
     const subtotal = calcSubtotalCents(items);
     const shippingCents = calcShippingCents(subtotal, shippingMethod);
     const amount = subtotal + shippingCents; // taxes omitted in demo

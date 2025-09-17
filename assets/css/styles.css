@@ -316,10 +316,18 @@ img{max-width:100%;display:block}
 .site-header{position:sticky;top:0;z-index:30;background:#000000;color:#fff;border-bottom:1px solid rgba(255,255,255,.08);padding-top:25px}
 .header-bar{display:flex;align-items:center;gap:1rem;min-height:51px;flex-wrap:wrap}
 .brand{display:flex;align-items:center;gap:.6rem;color:#fff;text-decoration:none;font-weight:900;letter-spacing:.3px}
-.brand img{filter:drop-shadow(0 4px 12px rgba(0,0,0,.25));border-radius:0.75rem;}
+.brand img{filter:drop-shadow(0 4px 12px rgba(0,0,0,.25));border-radius:0.75rem;background:#ffffff;}
 
-.footer-brand-block img {
-  border-radius: 0.75rem;
+.footer-brand-block img { border-radius: 0.75rem; background:#ffffff; }
+
+/* Uniform white background for all logo images across the app */
+img[alt*="logo" i],
+img[src*="EZSportslogo"],
+img[src*="ezsportslogo"],
+img[src*="/logo.svg"]{
+  background:#ffffff;
+  /* Keep current radius if present; otherwise add a soft radius */
+  border-radius:0.75rem;
 }
 .search{display:flex;gap:.5rem;flex:1;justify-content:center}
 .search{position:relative;gap:0}

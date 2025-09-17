@@ -36,7 +36,7 @@ Then visit <http://localhost:8080> in your browser and navigate to `EZSports/`.
 
 ### Stripe payments (test mode)
 
-Environment variables (configure in Vercel project settings or a local `.env` for dev):
+Environment variables (configure in Render dashboard or a local `.env` for dev):
 
 - STRIPE_PUBLISHABLE_KEY: your Stripe test publishable key (starts with `pk_test_...`).
 - STRIPE_SECRET_KEY: your Stripe test secret key (starts with `sk_test_...`).
@@ -48,7 +48,7 @@ Endpoints in this repo:
 - `POST /api/create-payment-intent` creates a PaymentIntent and a local order row, returning `{ clientSecret, amount, orderId }`.
 - `POST /api/webhook/stripe` handles `payment_intent.succeeded` and marks the order as paid.
 
-To use your test publishable key now, either set `STRIPE_PUBLISHABLE_KEY` in env, or replace it in `api/config.js`. The backend switches to real card collection automatically when `STRIPE_SECRET_KEY` is present.
+To use your test publishable key now, set `STRIPE_PUBLISHABLE_KEY` in env. The backend switches to real card collection automatically when `STRIPE_SECRET_KEY` is present.
 
 ## License
 

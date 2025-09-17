@@ -8,8 +8,8 @@
     "lastName": "User",
     "role": "admin",
     "createdAt": "2025-08-13T02:57:41.654Z",
-    "lastLogin": "2025-08-26T16:31:52.657Z",
-    "updatedAt": "2025-08-26T16:31:52.658Z"
+    "lastLogin": "2025-09-17T17:57:35.322Z",
+    "updatedAt": "2025-09-17T17:57:35.323Z"
   },
   {
     "username": "customer",
@@ -33,5 +33,17 @@
     "createdAt": "2025-09-09T23:01:30.004Z",
     "updatedAt": "2025-09-09T23:01:30.004Z",
     "id": 1004
+  },
+  {
+    "email": "test@example.com",
+    "password": "$2b$10$fJSz6wGZJmVRjjE3de25cuJ30TavpGAovQoAjIzjyDZCasW0mY17.",
+    "name": "Test Customer",
+    "firstName": "Test",
+    "lastName": "Customer",
+    "isAdmin": false,
+    "lastLogin": null,
+    "createdAt": "2025-09-17T17:59:11.195Z",
+    "updatedAt": "2025-09-17T17:59:11.195Z",
+    "id": 1005
   }
 ]
