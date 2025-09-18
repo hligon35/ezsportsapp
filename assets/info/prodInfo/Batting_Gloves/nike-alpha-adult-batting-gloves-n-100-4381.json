@@ -1,0 +1,25 @@
+{
+  "name": "div",
+  "price": 25.0,
+  "description": "Experience unbeatable performance with the Nike Alpha Adult Batting Gloves, designed to excel from the batting cages to the batter's box. These durable gloves feature a textured, premium synthetic leather palm that enhances your grip, while the flexible back of the hand overlay offers crucial support. Equipped with Nike Dri-FIT technology, these gloves efficiently wick away sweat, ensuring you stay dry and comfortable during intense play. The stretchy cuff provides a secure fit, allowing you to focus on your game with confidence. function positionHandler() {\n    return {\n        top: 0,\n        updatePosition() {\n            this.$nextTick(() => {\n                let viewportCenter = window.innerHeight / 2,\n                    parent = this.$el.parentElement,\n                    parentCenter = parent.clientHeight / 2,\n                    blockHeight = this.$el.offsetHeight / 2\n                this.top = viewportCenter - blockHeight;\n            });\n        }\n    };\n} {\n        \"body\": {\n            \"acidAdvancedReportsAjax\": {\"url\":\"https:\\/\\/betterbaseball.com\\/acid_acidreports\\/countViews\\/product\\/id\\/176048\\/\"}        }\n    } BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW.",
+  "source_url": "https://betterbaseball.com/nike-alpha-adult-batting-gloves-n-100-4381",
+  "image_url": "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/n/_/n.100.4381.jpg",
+  "image_urls": [
+    "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/n/_/n.100.4381.jpg"
+  ],
+  "downloaded_images": [
+    "C:\\Users\\Harold Ligon\\Documents\\Coding\\SparQDigital\\BBScraper\\prodInfo\\Batting_Gloves\\images\\nike-alpha-adult-batting-gloves-n-100-4381_1.jpg"
+  ],
+  "category_path": [
+    "Batting Gloves",
+    "Nike Alpha Adult Batting Gloves: N.100.4381"
+  ],
+  "features": [
+    "Delivery : FAST & FREE Shipping on All Orders",
+    "Dri-FIT Technology : Moisture-wicking fabric keeps hands dry & comfortable during every swing",
+    "Premium Synthetic Leather : Textured palm enhances grip & durability for consistent performance",
+    "Flexible Overlay : Back-of-hand overlay adds stretch & support exactly where you need it",
+    "Stretch Cuff : Snug, secure fit at the wrist for confident swings & lasting comfort",
+    "Proven Design : Built for batting cage reps & game-day performance with durable, high-quality materials"
+  ]
+}

@@ -1,0 +1,33 @@
+{
+  "name": "div",
+  "price": 349.99,
+  "description": "The Wilson A2000 Austin Wells Game Model 34\" Catcher's Mitt is expertly designed for serious catchers seeking superior performance on the field. With its SA34 glove pattern and closed web design, this mitt ensures optimal control and precision. The striking black and camo colorway, crafted from Pro Stock Leather, is not only durable but also visually appealing. Enhanced with innovative SuperSnakeskin material, the mitt offers twice the strength of regular leather at half the weight, providing unmatched durability. Additional features like the Dri-Lex wrist lining for moisture-wicking comfort and an extended index finger pad for extra cushioning make this mitt a top choice for catchers. function positionHandler() {\n    return {\n        top: 0,\n        updatePosition() {\n            this.$nextTick(() => {\n                let viewportCenter = window.innerHeight / 2,\n                    parent = this.$el.parentElement,\n                    parentCenter = parent.clientHeight / 2,\n                    blockHeight = this.$el.offsetHeight / 2\n                this.top = viewportCenter - blockHeight;\n            });\n        }\n    };\n} {\n        \"body\": {\n            \"acidAdvancedReportsAjax\": {\"url\":\"https:\\/\\/betterbaseball.com\\/acid_acidreports\\/countViews\\/product\\/id\\/168856\\/\"}        }\n    } BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW.",
+  "source_url": "https://betterbaseball.com/wilson-a2000-austin-wells-game-model-34-catcher-s-mitt-wbw103494",
+  "image_url": "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/w/b/wbw103494.jpg",
+  "warranty": "Glove Pattern: SA34",
+  "image_urls": [
+    "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/w/b/wbw103494.jpg"
+  ],
+  "downloaded_images": [
+    "C:\\Users\\Harold Ligon\\Documents\\Coding\\SparQDigital\\BBScraper\\prodInfo\\Gloves_Mitts\\images\\wilson-a2000-austin-wells-game-model-34-catcher-s-mitt-wbw103494_1.jpg"
+  ],
+  "category_path": [
+    "Gloves & Mitts"
+  ],
+  "features": [
+    "D elivery: FAST & FREE Shipping on all orders",
+    "Warranty: Full 365-day manufacturer's warranty",
+    "Glove Pattern: SA34",
+    "Series: Wilson A2000",
+    "Glove Length: 34 Inch",
+    "Web Design: Closed web",
+    "Colorway: Black & camo",
+    "Leather: Pro Stock Leather",
+    "Player Recommendation: Catcher",
+    "Wrist Type: Conventional open back",
+    "Wrist Lining: Dri-Lex - Ultra-breathable and moisture-wicking",
+    "Flat Finger Binding: Provides a more comfortable feel",
+    "SuperSnakeskin: Twice as strong as regular leather & half the weight",
+    "Extended Index Finger Pad: Adds extra cushion for index finger"
+  ]
+}

@@ -1,0 +1,33 @@
+{
+  "name": "div",
+  "price": 329.99,
+  "description": "The Rawlings Heart of the Hide Roulette 11.5\" Infield Glove is a top-tier choice for infielders who demand precision, durability, and style. This exclusive design, available only at Better Baseball, features a sleek black, blonde, and red colorway that stands out on the field. Crafted from premium steerhide, this Heart of the Hide infield glove is built to last while providing the perfect combination of stiffness and feel. The Rawlings 11.5\" infield glove is designed with the 204 pattern, offering a deep pocket depth that helps secure quick transfers and smooth fielding. Its I-Web construction makes it ideal for handling hard-hit grounders and quick plays. The deer-tanned cowhide plus lining and padded thumb sleeve ensure superior comfort, while thermoformed padding offers optimal wrist support. Whether you're making plays up the middle or flashing leather at third, this HOH infield glove is built for elite performance. function positionHandler() {\n    return {\n        top: 0,\n        updatePosition() {\n            this.$nextTick(() => {\n                let viewportCenter = window.innerHeight / 2,\n                    parent = this.$el.parentElement,\n                    parentCenter = parent.clientHeight / 2,\n                    blockHeight = this.$el.offsetHeight / 2\n                this.top = viewportCenter - blockHeight;\n            });\n        }\n    };\n} {\n        \"body\": {\n            \"acidAdvancedReportsAjax\": {\"url\":\"https:\\/\\/betterbaseball.com\\/acid_acidreports\\/countViews\\/product\\/id\\/169739\\/\"}        }\n    } BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW.",
+  "source_url": "https://betterbaseball.com/rawlings-heart-of-the-hide-11-5-infield-glove-roulette",
+  "image_url": "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/p/r/pro204-2cs.jpg",
+  "warranty": "Player Recommendation: Infield",
+  "image_urls": [
+    "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/p/r/pro204-2cs.jpg"
+  ],
+  "downloaded_images": [
+    "C:\\Users\\Harold Ligon\\Documents\\Coding\\SparQDigital\\BBScraper\\prodInfo\\Gloves_Mitts\\images\\rawlings-heart-of-the-hide-11-5-infield-glove-roulette_1.jpg"
+  ],
+  "category_path": [
+    "Gloves & Mitts",
+    "Rawlings Heart of the Hide 11.5\" Infield Glove: PRO204-2CS"
+  ],
+  "features": [
+    "Exclusive Design: Only Available at Better Baseball",
+    "Delivery: FAST & FREE Shipping on All Orders",
+    "Warranty: Full 365-Day Manufacturer's Warranty Included",
+    "Player Recommendation: Infield",
+    "Series: Heart of the Hide Glove",
+    "Pattern: 204 (Deep Pocket Depth)",
+    "Glove Length: 11.5 Inch",
+    "Web Design: I-Web",
+    "Colorway: Black, Blonde & Red",
+    "Wrist Type: Conventional Open Back",
+    "Lining: Deer-Tanned Cowhide Plus",
+    "Padded Thumb Sleeve: Provides Exceptional Comfort Thermoformed",
+    "Padding: Allows for Optimal Wrist Support"
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "name": "div",
+  "price": 79.95,
+  "description": "The Cotton Candy Sliding Mitt from Naked Grips is your ultimate game-day companion, offering a blend of style and protection that's \"sooooo sweet, so clean.\" Designed with a structurally reinforced construction, this mitt stands out with its deliberately stiff build, providing superior protection compared to the competition's softer designs. Featuring premium neoprene, it ensures lightweight, breathable comfort, while the flexible vinyl strap allows for a customized fit. The dual-layered hand pad shells offer extra protection against cleats and agrilime scrapes, and its easy-on, easy-off design makes transitioning to base running a breeze. Pair it with the matching Cotton Candy bat grip and batting gloves, and carry all your essentials in the custom tote for a complete, stylish look on the field. function positionHandler() {\n    return {\n        top: 0,\n        updatePosition() {\n            this.$nextTick(() => {\n                let viewportCenter = window.innerHeight / 2,\n                    parent = this.$el.parentElement,\n                    parentCenter = parent.clientHeight / 2,\n                    blockHeight = this.$el.offsetHeight / 2\n                this.top = viewportCenter - blockHeight;\n            });\n        }\n    };\n} {\n        \"body\": {\n            \"acidAdvancedReportsAjax\": {\"url\":\"https:\\/\\/betterbaseball.com\\/acid_acidreports\\/countViews\\/product\\/id\\/166994\\/\"}        }\n    } BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW.",
+  "source_url": "https://betterbaseball.com/naked-grips-cotton-candy-sliding-mitt-nkdsm-cc",
+  "image_url": "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/n/k/nkdsm-cc.jpg",
+  "image_urls": [
+    "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/n/k/nkdsm-cc.jpg"
+  ],
+  "downloaded_images": [
+    "C:\\Users\\Harold Ligon\\Documents\\Coding\\SparQDigital\\BBScraper\\prodInfo\\Accessories\\images\\naked-grips-cotton-candy-sliding-mitt-nkdsm-cc_1.jpg"
+  ],
+  "category_path": [
+    "Accessories"
+  ],
+  "features": [
+    "Construction : Structurally reinforced with a stiff, durable build—outperforms flimsy alternatives",
+    "Material Composition : Made with polyester, wool lycra, neoprene, & nylon for comfort & performance",
+    "Comfort & Fit : Premium neoprene for lightweight breathability; flexible vinyl strap for a custom fit",
+    "Protection : Dual-layer hand pad shells guard against cleats & scrapes from agrilime",
+    "Convenience : Easy-on, easy-off design for fast base running transitions",
+    "Visual Appeal : Premium rubber-stamped design replaces basic embroidery for elite style"
+  ]
+}

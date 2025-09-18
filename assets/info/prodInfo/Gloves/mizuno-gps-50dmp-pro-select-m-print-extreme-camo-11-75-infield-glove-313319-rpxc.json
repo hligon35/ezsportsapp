@@ -1,0 +1,31 @@
+{
+  "name": "div",
+  "price": 300.0,
+  "description": "The Mizuno GPS-50DMP Pro Select M-Print Extreme Camo 11.75\" Infield Glove is a testament to elite performance and innovative design. With its standout M-Print technology, intricate designs are printed directly onto genuine full grain leather, creating a glove that combines unmatched durability with eye-catching style. Engineered for a natural fit, it molds seamlessly to your hand, enhancing comfort and elevating your game on the field. This exclusive Xtreme camo pattern, designed by Austin Riley in collaboration with Realtree, reflects a deep commitment to supporting military veterans, making it more than just equipment—it's a symbol of dedication and tradition. function positionHandler() {\n    return {\n        top: 0,\n        updatePosition() {\n            this.$nextTick(() => {\n                let viewportCenter = window.innerHeight / 2,\n                    parent = this.$el.parentElement,\n                    parentCenter = parent.clientHeight / 2,\n                    blockHeight = this.$el.offsetHeight / 2\n                this.top = viewportCenter - blockHeight;\n            });\n        }\n    };\n} {\n        \"body\": {\n            \"acidAdvancedReportsAjax\": {\"url\":\"https:\\/\\/betterbaseball.com\\/acid_acidreports\\/countViews\\/product\\/id\\/176287\\/\"}        }\n    } BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW.",
+  "source_url": "https://betterbaseball.com/mizuno-gps-50dmp-pro-select-m-print-extreme-camo-11-75-infield-glove-313319-rpxc",
+  "image_url": "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/3/1/313319_rpxc.jpg",
+  "warranty": "Glove Series: Pro Select",
+  "image_urls": [
+    "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/3/1/313319_rpxc.jpg"
+  ],
+  "downloaded_images": [
+    "C:\\Users\\Harold Ligon\\Documents\\Coding\\SparQDigital\\BBScraper\\prodInfo\\Gloves_Mitts\\images\\mizuno-gps-50dmp-pro-select-m-print-extreme-camo-11-75-infield-glove-313319-rpxc_1.jpg"
+  ],
+  "category_path": [
+    "Gloves & Mitts"
+  ],
+  "features": [
+    "D elivery: FAST & FREE Shipping on all orders",
+    "Warranty: Full 365-day manufacturer's warranty included",
+    "Glove Series: Pro Select",
+    "Glove Length: 11.75 Inch",
+    "Web Design: H-Web",
+    "Colorway: Red, Blue, & White",
+    "Wrist Type: Conventional open back",
+    "Professional Patterns: Position optimized glove patterns",
+    "Professional Level Lace: High-grade durability",
+    "X-Treme Camo: Austin Riley & Realtree collaboration",
+    "M-Print: Printed on full-grain leather",
+    "Mizuno 3-D Silicone Label: For extra detail"
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "name": "footer",
+  "price": 299.95,
+  "description": "This 7x7 Baseball Catch Net is the perfect batting practice solution with pro-grade construction for any training facility, school, or organization. Built tough and ready to last, it features a durable and rust-resistant 14 gauge galvanized steel frame that can handle the outdoor elements – rain or shine. The long-lasting #42 UV treated nylon netting provides an extra layer of security as you take swing after swing on your path toward glory. This net includes a double layer pillowcase net for easy install! Plus, ships broken down easily for simple assembly right out of the box. Start swinging away with confidence using the 7x7 Baseball Catch Net. WARNING: This screen is intended to protect the pitcher or nearby players during batting practice or practice drills. However, it is possible a batted ball may ricochet off the screen and hit the batter or a nearby player, causing serious injury or even death. Batters, pitchers, and nearby players should always wear appropriate protective equipment while using this product. WARNING: This screen is intended to protect the pitcher or nearby players during batting practice or practice drills. However, it is possible a batted ball may ricochet off the screen and hit the batter or a nearby player, causing serious injury or even death. Batters, pitchers, and nearby players should always wear appropriate protective equipment while using this product. WARNING: This screen is intended to protect the pitcher or nearby players during batting practice or practice drills. However, it is possible a batted ball may ricochet off the screen and hit the batter or a nearby player, causing serious injury or even death. Batters, pitchers, and nearby players should always wear appropriate protective equipment while using this product. WARNING: This screen is intended to protect the pitcher or nearby players during batting practice or practice drills. However, it is possible a batted ball may ricochet off the screen and hit the batter or a nearby player, causing serious injury or even death. Batters, pitchers, and nearby players should always wear appropriate protective equipment while using this product. function positionHandler() {\n    return {\n        top: 0,\n        updatePosition() {\n            this.$nextTick(() => {\n                let viewportCenter = window.innerHeight / 2,\n                    parent = this.$el.parentElement,\n                    parentCenter = parent.clientHeight / 2,\n                    blockHeight = this.$el.offsetHeight / 2\n                this.top = viewportCenter - blockHeight;\n            });\n        }\n    };\n} {\n        \"body\": {\n            \"acidAdvancedReportsAjax\": {\"url\":\"https:\\/\\/betterbaseball.com\\/acid_acidreports\\/countViews\\/product\\/id\\/68389\\/\"}        }\n    } BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy",
+  "source_url": "https://betterbaseball.com/better-baseball-catch-net-7x7-catchnet",
+  "image_url": "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/c/a/catchnet.jpg",
+  "image_urls": [
+    "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/c/a/catchnet.jpg"
+  ],
+  "downloaded_images": [
+    "C:\\Users\\Harold Ligon\\Documents\\Coding\\SparQDigital\\BBScraper\\prodInfo\\Better_Baseball_7x7_Catch_Net\\images\\better-baseball-catch-net-7x7-catchnet_1.jpg"
+  ],
+  "category_path": [
+    "Better Baseball 7x7 Catch Net",
+    "Baseball L-Screens"
+  ],
+  "features": [
+    "Shipping: FREE & FAST DELIVERY",
+    "Pro Grade: 7’H x 7’W Catch Net",
+    "Frame: Durable & Rust Resistant 14 Gauge Galvanized Steel Frame",
+    "Netting: Long-Lasting #42 UV Treated Nylon, Double Layer Pillowcase Net",
+    "All-Weather Materials: Provides Protection from Outdoor Elements",
+    "Built Tough: For Training Facilities, Schools, & Organizations",
+    "Ships Broken Down: Assembly Required"
+  ]
+}

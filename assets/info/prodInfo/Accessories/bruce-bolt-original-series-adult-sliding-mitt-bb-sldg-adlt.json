@@ -1,0 +1,26 @@
+{
+  "name": "div",
+  "price": 60.0,
+  "description": "The BRUCE BOLT Original Series Adult Sliding Mitt is expertly crafted to enhance both protection and performance for athletes. Featuring a proprietary non-slip palm akin to football receiver's gloves, this mitt ensures you maintain a firm grip and don't slide past the bag. Its design incorporates semi-flexible TPU protective plates, a neoprene mitt with Cabretta leather, and Kevlar-reinforced pads in key wear zones, providing superior defense against hand and finger injuries. The 3-inch elastic band offers additional wrist support, while double-reinforced stitching in all wear areas ensures durability. With input from professional players, this mitt combines innovative materials and premium craftsmanship, making it a top choice for serious athletes. function positionHandler() {\n    return {\n        top: 0,\n        updatePosition() {\n            this.$nextTick(() => {\n                let viewportCenter = window.innerHeight / 2,\n                    parent = this.$el.parentElement,\n                    parentCenter = parent.clientHeight / 2,\n                    blockHeight = this.$el.offsetHeight / 2\n                this.top = viewportCenter - blockHeight;\n            });\n        }\n    };\n} {\n        \"body\": {\n            \"acidAdvancedReportsAjax\": {\"url\":\"https:\\/\\/betterbaseball.com\\/acid_acidreports\\/countViews\\/product\\/id\\/166417\\/\"}        }\n    } BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW.",
+  "source_url": "https://betterbaseball.com/bruce-bolt-original-series-adult-sliding-mitt-bb-sldg-adlt",
+  "image_url": "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/b/b/bb-sldg-adlt-black.jpg",
+  "image_urls": [
+    "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/b/b/bb-sldg-adlt-black.jpg"
+  ],
+  "downloaded_images": [
+    "C:\\Users\\Harold Ligon\\Documents\\Coding\\SparQDigital\\BBScraper\\prodInfo\\Accessories\\images\\bruce-bolt-original-series-adult-sliding-mitt-bb-sldg-adlt_1.jpg"
+  ],
+  "category_path": [
+    "Accessories",
+    "Bruce Bolt Original Series Adult Sliding Mitt: BB-SLDG-ADLT"
+  ],
+  "features": [
+    "Non-Slip Palm: Proprietary palm material enhances grip to prevent sliding past the base, similar to football receiver gloves",
+    "Protective Plates: Semi-flexible TPU plates on both sides of the hand help guard against cleat & bag impact injuries",
+    "Reinforced Padding: Neoprene mitt with Cabretta leather & Kevlar-reinforced pads in high-wear zones for durability & protection",
+    "Wrist Support: 3\" elastic band provides a secure fit & added wrist stability to prevent jams during slides",
+    "Durable Construction: Double reinforced stitching in all wear areas ensures long-lasting performance",
+    "Pro-Level Design: Crafted with input from pro players to contour to the hand’s natural shape & optimize protection",
+    "Signature Style: Finished with BRUCE BOLT’s iconic 3D BOLT logo for premium branding"
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "name": "div",
+  "price": 199.99,
+  "description": "The Marucci Ascension M Type Youth Outfield Glove is expertly crafted for young outfielders seeking top-tier performance. Designed with a 12.75-inch length and a versatile H-Web design, this glove offers excellent coverage and ball-catching capabilities. The glove's blonde and tan colorway pairs beautifully with its conventional open back, providing a classic look. Featuring a deep pocket for enhanced ball securing and a moisture-wicking wrist liner made with memory foam, this glove ensures comfort and stability during play. The tight-grain steerhide leather and cowhide leather lining add durability and a premium feel, making it a standout choice in the Marucci Ascension series. function positionHandler() {\n    return {\n        top: 0,\n        updatePosition() {\n            this.$nextTick(() => {\n                let viewportCenter = window.innerHeight / 2,\n                    parent = this.$el.parentElement,\n                    parentCenter = parent.clientHeight / 2,\n                    blockHeight = this.$el.offsetHeight / 2\n                this.top = viewportCenter - blockHeight;\n            });\n        }\n    };\n} {\n        \"body\": {\n            \"acidAdvancedReportsAjax\": {\"url\":\"https:\\/\\/betterbaseball.com\\/acid_acidreports\\/countViews\\/product\\/id\\/141603\\/\"}        }\n    } BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW.",
+  "source_url": "https://betterbaseball.com/marucci-ascension-m-type-78r3-12-75-youth-outfield-glove-mfg3as78r3",
+  "image_url": "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/m/f/mfg3as78r3.jpg",
+  "warranty": "Glove Length: 12.75 Inch",
+  "image_urls": [
+    "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/m/f/mfg3as78r3.jpg"
+  ],
+  "downloaded_images": [
+    "C:\\Users\\Harold Ligon\\Documents\\Coding\\SparQDigital\\BBScraper\\prodInfo\\Gloves_Mitts\\images\\marucci-ascension-m-type-78r3-12-75-youth-outfield-glove-mfg3as78r3_1.jpg"
+  ],
+  "category_path": [
+    "Gloves & Mitts"
+  ],
+  "features": [
+    "D elivery: FAST & FREE Shipping on All Orders",
+    "Warranty: Full 365-Day Manufacturer's Warranty Included",
+    "Glove Length: 12.75 Inch",
+    "Web Design: H-Web",
+    "Player Recommendation: Outfielder",
+    "Series: Marucci Ascension",
+    "Glove Fit: M Type Fit",
+    "Colorway: Blonde & Tan",
+    "Wrist Type: Conventional Open Back",
+    "Lining: Cowhide Leather",
+    "Leather: Tight-Grain Steerhide Leather",
+    "Pocket Depth: Deep Pocket for Enhanced Ball Securing",
+    "Moisture Wicking Wrist Liner: Made with Memory Foam"
+  ]
+}

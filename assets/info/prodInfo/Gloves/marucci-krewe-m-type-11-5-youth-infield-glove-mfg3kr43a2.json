@@ -1,0 +1,32 @@
+{
+  "name": "div",
+  "price": 79.99,
+  "description": "The Marucci Krewe 11.5\" Youth Infield Glove is expertly designed for young players seeking exceptional performance on the field. Featuring an I-Web design, this glove is perfect for any position, ensuring quick ball transfers and superior control. The striking black and green colorway not only stands out but also complements the glove's full-grain cowhide leather construction, offering unmatched durability and style. With its M Type fit, young athletes will experience optimal comfort and feel, while the conventional open back ensures a secure fit. Ready for action with little-to-no break-in period, this glove is a game-changer for youth players eager to excel. function positionHandler() {\n    return {\n        top: 0,\n        updatePosition() {\n            this.$nextTick(() => {\n                let viewportCenter = window.innerHeight / 2,\n                    parent = this.$el.parentElement,\n                    parentCenter = parent.clientHeight / 2,\n                    blockHeight = this.$el.offsetHeight / 2\n                this.top = viewportCenter - blockHeight;\n            });\n        }\n    };\n} {\n        \"body\": {\n            \"acidAdvancedReportsAjax\": {\"url\":\"https:\\/\\/betterbaseball.com\\/acid_acidreports\\/countViews\\/product\\/id\\/168525\\/\"}        }\n    } BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW.",
+  "source_url": "https://betterbaseball.com/marucci-krewe-m-type-11-5-youth-infield-glove-mfg3kr43a2",
+  "image_url": "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/m/f/mfg3kr43a2.jpg",
+  "warranty": "Glove Length: 11.5 Inch",
+  "image_urls": [
+    "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/m/f/mfg3kr43a2.jpg"
+  ],
+  "downloaded_images": [
+    "C:\\Users\\Harold Ligon\\Documents\\Coding\\SparQDigital\\BBScraper\\prodInfo\\Gloves_Mitts\\images\\marucci-krewe-m-type-11-5-youth-infield-glove-mfg3kr43a2_1.jpg"
+  ],
+  "category_path": [
+    "Gloves & Mitts",
+    "Baseball Gloves",
+    "Youth Gloves & Mitts"
+  ],
+  "features": [
+    "D elivery: FAST & FREE Shipping on All Orders",
+    "Warranty: Full 365-Day Manufacturer's Warranty Included",
+    "Glove Length: 11.5 Inch",
+    "Web Design: I-Web",
+    "Series: Marucci Krewe",
+    "Player Recommendation: Youth - Any Position",
+    "Glove Fit: M Type - For Optimal Comfort & Feel",
+    "Colorway: Black & Green",
+    "Wrist Type: Conventional Open Back",
+    "Leather: Full-Grain Cowhide Leather",
+    "Game Ready: Little-to-No Break-In Period"
+  ]
+}

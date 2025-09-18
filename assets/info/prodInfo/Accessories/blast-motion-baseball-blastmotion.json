@@ -1,0 +1,27 @@
+{
+  "name": "strong",
+  "price": 149.95,
+  "description": "The Blast Baseball Swing Analyzer is the ultimate training tool for hitters at every level. Trusted by the pros, this small sensor attaches to the knob of any bat and instantly turns it into a smart bat . Every swing is automatically recorded, analyzed, and paired with auto-edited video clips in the easy-to-use Blast app (iOS & Android). With new app updates , training has never been more personalized or fun:",
+  "source_url": "https://betterbaseball.com/blast-motion-baseball-blastmotion",
+  "image_url": "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/b/l/blastmotion.jpg",
+  "image_urls": [
+    "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/b/l/blastmotion.jpg"
+  ],
+  "downloaded_images": [
+    "C:\\Users\\Harold Ligon\\Documents\\Coding\\SparQDigital\\BBScraper\\prodInfo\\Accessories\\images\\blast-motion-baseball-blastmotion_1.jpg"
+  ],
+  "category_path": [
+    "Accessories"
+  ],
+  "features": [
+    "Delivery: FAST & FREE Shipping on All Orders",
+    "Player Development: Train with the same technology trusted by professional players",
+    "Accuracy: The most trusted and accurate swing analyzer in baseball",
+    "Advanced Metrics: Real-time data on power, contact, consistency, and more",
+    "Smart Video Capture: Auto-clipped swing videos with metrics overlaid",
+    "Air Swings: Train anytime, anywhere—no ball required (Gen 3 analyzers)",
+    "Blast Games: Fun, skill-testing modes like Home Run Derby (iOS only)",
+    "Ease of Use: Just attach and swing—no setup required",
+    "Package Includes: Swing Analyzer (sensor), charger, bat attachment & 1-month app subscription"
+  ]
+}

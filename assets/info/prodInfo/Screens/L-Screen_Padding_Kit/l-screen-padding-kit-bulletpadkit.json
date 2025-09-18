@@ -1,0 +1,28 @@
+{
+  "name": "footer",
+  "price": 114.95,
+  "description": "Match your team colors and protect your screens with our L Screen Padding Kit. Our tough l screen padding kit is built for durability and to last in training facilities, schools, and outdoors. This Bullet L Screen Padding fits a 1 5/8” to 2” steel frame diameter. Protect your net border and reduce ball deflection with our high grade l screen padding! Featured on the Bullet Screen Series (The Best Baseball L Screen in the industry), our Bullet L Screen Padding is the toughest l screen padding on the market. This l screen padding comes fully equipped with heavy duty 18 oz Vinyl with a grommet border. The 1 ½” impact foam padding, included with this l screen padding, is built to withstand the constant abuse of a commercial training facility, high school, college, or organization. Match your team’s colors, reduce batted ball ricochet, and protect the life of your netting with heavy-duty foam and vinyl padding. Perfect for indoor and outdoor use this l screen padding is protected by superior all-weather materials. Trusted by training facilities, schools, and organizations, Better Baseball has the industry-leading and most durable l screen padding. At every step of the design process, we prioritized durability and longevity over everything. Better Baseball is committed to ensuring that the facility owners, coaches, and players that use our l screen padding are getting the most durable professional grade l screen padding on the market. WARNING: This screen padding is intended to protect the pitcher or nearby players during batting practice or practice drills. However, it is possible a batted ball may ricochet off the screen padding and hit the batter or a nearby player, causing serious injury or even death. Batters, pitchers, and nearby players should always wear appropriate protective equipment while using this product. WARNING: This screen padding is intended to protect the pitcher or nearby players during batting practice or practice drills. However, it is possible a batted ball may ricochet off the screen padding and hit the batter or a nearby player, causing serious injury or even death. Batters, pitchers, and nearby players should always wear appropriate protective equipment while using this product. WARNING: This screen padding is intended to protect the pitcher or nearby players during batting practice or practice drills. However, it is possible a batted ball may ricochet off the screen padding and hit the batter or a nearby player, causing serious injury or even death. Batters, pitchers, and nearby players should always wear appropriate protective equipment while using this product. WARNING: This screen padding is intended to protect the pitcher or nearby players during batting practice or practice drills. However, it is possible a batted ball may ricochet off the screen padding and hit the batter or a nearby player, causing serious injury or even death. Batters, pitchers, and nearby players should always wear appropriate protective equipment while using this product. function positionHandler() {\n    return {\n        top: 0,\n        updatePosition() {\n            this.$nextTick(() => {\n                let viewportCenter = window.innerHeight / 2,\n                    parent = this.$el.parentElement,\n                    parentCenter = parent.clientHeight / 2,\n                    blockHeight = this.$el.offsetHeight / 2\n                this.top = viewportCenter - blockHeight;\n            });\n        }\n    };\n} {\n        \"body\": {\n            \"acidAdvancedReportsAjax\": {\"url\":\"https:\\/\\/betterbaseball.com\\/acid_acidreports\\/countViews\\/product\\/id\\/90007\\/\"}        }\n    } BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy",
+  "source_url": "https://betterbaseball.com/l-screen-padding-kit-bulletpadkit",
+  "image_url": "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/b/u/bulletpadkit.jpg",
+  "image_urls": [
+    "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/b/u/bulletpadkit.jpg"
+  ],
+  "downloaded_images": [
+    "C:\\Users\\Harold Ligon\\Documents\\Coding\\SparQDigital\\BBScraper\\prodInfo\\L-Screen_Padding_Kit\\images\\l-screen-padding-kit-bulletpadkit_1.jpg"
+  ],
+  "category_path": [
+    "L-Screen Padding Kit",
+    "Baseball L-Screens"
+  ],
+  "features": [
+    "Free Shipping",
+    "Heavy Duty 18 oz Vinyl With Grommet Border",
+    "Impact 1 ½” Foam Padding",
+    "Fits 1 5/8” to 2” Steel Frame Diameter",
+    "Includes Twine to Securely Attach Padding to Frame",
+    "L Screen Padding Reduces Ball Deflection",
+    "Provides Protection to Net Border",
+    "All-Weather Materials Provides Protection from Outdoor Elements",
+    "Built Tough for Training Facilities, Schools, & Organizations"
+  ]
+}

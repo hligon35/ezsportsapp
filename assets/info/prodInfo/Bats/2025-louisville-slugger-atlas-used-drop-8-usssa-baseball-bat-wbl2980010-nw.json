@@ -1,0 +1,31 @@
+{
+  "name": "div",
+  "price": 249.95,
+  "description": "function positionHandler() {\n    return {\n        top: 0,\n        updatePosition() {\n            this.$nextTick(() => {\n                let viewportCenter = window.innerHeight / 2,\n                    parent = this.$el.parentElement,\n                    parentCenter = parent.clientHeight / 2,\n                    blockHeight = this.$el.offsetHeight / 2\n                this.top = viewportCenter - blockHeight;\n            });\n        }\n    };\n} {\n        \"body\": {\n            \"acidAdvancedReportsAjax\": {\"url\":\"https:\\/\\/betterbaseball.com\\/acid_acidreports\\/countViews\\/product\\/id\\/170370\\/\"}        }\n    } BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW. Email Address SIGN UP",
+  "source_url": "https://betterbaseball.com/2025-louisville-slugger-atlas-used-drop-8-usssa-baseball-bat-wbl2980010-nw",
+  "image_url": "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/w/b/wbl2980010_1.jpg",
+  "image_urls": [
+    "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/w/b/wbl2980010_1.jpg"
+  ],
+  "downloaded_images": [
+    "C:\\Users\\Harold Ligon\\Documents\\Coding\\SparQDigital\\BBScraper\\prodInfo\\Bats\\images\\2025-louisville-slugger-atlas-used-drop-8-usssa-baseball-bat-wbl2980010-nw_1.jpg"
+  ],
+  "category_path": [
+    "Bats",
+    "2025 Louisville Slugger Atlas Used Drop 8 USSSA Baseball Bat: WBL2980010-NW"
+  ],
+  "features": [
+    "Delivery: FAST & FREE Shipping",
+    "Returns: Free 30-Day Returns",
+    "100% Satisfaction Guarantee: 30 Days Through Better Baseball",
+    "Length to Weight Ratio: Drop 8",
+    "Certification: USSSA Certified",
+    "Swing Feel: Balanced",
+    "Bat Material: One-Piece Alloy",
+    "Barrel Diameter: 2 3/4 Inch",
+    "Colorway: White, Pink, Black, & Turquoise",
+    "Bat Series: Atlas",
+    "SPD-Gen2 End Cap: Maximize Barrel Performance",
+    "LS Pro Comfort Grip: For Better Control & Feel"
+  ]
+}

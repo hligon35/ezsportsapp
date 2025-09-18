@@ -1,0 +1,23 @@
+{
+  "name": "div",
+  "price": 45.0,
+  "description": "Stay focused and protected at the plate with the Nike Diamond Batter's Leg Guard, designed to ensure that a wild pitch doesn't disrupt your game. This durable yet lightweight guard features a tough shell and a removable toe cover, allowing you to maintain your natural range of motion while staying protected. Equipped with Nike Dri-FIT technology, it efficiently wicks sweat away, keeping you cool and dry from practice sessions to intense summer league games. The adjustable strap offers a custom, comfortable fit, while its low-profile ergonomic design enhances your natural movement for optimal performance. function positionHandler() {\n    return {\n        top: 0,\n        updatePosition() {\n            this.$nextTick(() => {\n                let viewportCenter = window.innerHeight / 2,\n                    parent = this.$el.parentElement,\n                    parentCenter = parent.clientHeight / 2,\n                    blockHeight = this.$el.offsetHeight / 2\n                this.top = viewportCenter - blockHeight;\n            });\n        }\n    };\n} {\n        \"body\": {\n            \"acidAdvancedReportsAjax\": {\"url\":\"https:\\/\\/betterbaseball.com\\/acid_acidreports\\/countViews\\/product\\/id\\/170867\\/\"}        }\n    } BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW.",
+  "source_url": "https://betterbaseball.com/nike-diamond-batters-leg-guard-n-100-3438",
+  "image_url": "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/n/_/n.100.3438-white.jpg",
+  "image_urls": [
+    "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/n/_/n.100.3438-white.jpg"
+  ],
+  "downloaded_images": [
+    "C:\\Users\\Harold Ligon\\Documents\\Coding\\SparQDigital\\BBScraper\\prodInfo\\Accessories\\images\\nike-diamond-batters-leg-guard-n-100-3438_1.jpg"
+  ],
+  "category_path": [
+    "Accessories"
+  ],
+  "features": [
+    "Protection : Durable, lightweight shell with removable toe cover helps guard against wild pitches",
+    "Moisture Control : Nike Dri-FIT technology keeps you cool and dry by wicking away sweat",
+    "Fit Customization : Adjustable strap ensures a secure & personalized fit",
+    "Mobility : Low-profile ergonomic design supports a natural range of motion",
+    "Materials : 51% polyethylene / 26% polyester / 15% ethylene vinyl acetate / 6% rubber / 2% polyurethane"
+  ]
+}

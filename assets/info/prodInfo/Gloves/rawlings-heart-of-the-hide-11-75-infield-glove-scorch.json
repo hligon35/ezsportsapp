@@ -1,0 +1,34 @@
+{
+  "name": "div",
+  "price": 329.99,
+  "description": "The Rawlings Heart of the Hide Scorch 11.75\" Infield Glove is built for infielders who want to make highlight-reel plays with confidence and style. Designed exclusively for Better Baseball, this glove features a striking black and red colorway with camouflage-printed leather, making it one of the most unique designs on the field. The 205 pattern provides a deep pocket, perfect for securing hard-hit grounders and quick transfers. Crafted from premium Heart of the Hide leather, this glove is made to last, while the deer-tanned cowhide plus lining and padded thumb sleeve deliver elite-level comfort. The I-Web design offers the perfect blend of flexibility and control, ideal for infielders looking to dominate on defense. With thermoformed padding for optimal wrist support and a conventional open back for a classic feel, this Rawlings 11.75\" infield glove is the ultimate tool for serious players. If you're looking for a HOH infield glove that stands out in both performance and style, this is the one for you. function positionHandler() {\n    return {\n        top: 0,\n        updatePosition() {\n            this.$nextTick(() => {\n                let viewportCenter = window.innerHeight / 2,\n                    parent = this.$el.parentElement,\n                    parentCenter = parent.clientHeight / 2,\n                    blockHeight = this.$el.offsetHeight / 2\n                this.top = viewportCenter - blockHeight;\n            });\n        }\n    };\n} {\n        \"body\": {\n            \"acidAdvancedReportsAjax\": {\"url\":\"https:\\/\\/betterbaseball.com\\/acid_acidreports\\/countViews\\/product\\/id\\/169417\\/\"}        }\n    } BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW.",
+  "source_url": "https://betterbaseball.com/rawlings-heart-of-the-hide-11-75-infield-glove-scorch",
+  "image_url": "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/p/r/pro205w-2xb.jpg",
+  "warranty": "Player Recommendation: Infield Player Recommendation: Infield",
+  "image_urls": [
+    "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/p/r/pro205w-2xb.jpg"
+  ],
+  "downloaded_images": [
+    "C:\\Users\\Harold Ligon\\Documents\\Coding\\SparQDigital\\BBScraper\\prodInfo\\Gloves_Mitts\\images\\rawlings-heart-of-the-hide-11-75-infield-glove-scorch_1.jpg"
+  ],
+  "category_path": [
+    "Gloves & Mitts",
+    "Baseball Gloves",
+    "Infield Gloves"
+  ],
+  "features": [
+    "Exclusive Design: Only Available at Better Baseball",
+    "Delivery: FAST & FREE Shipping on All Orders",
+    "Warranty: Full 365-Day Manufacturer's Warranty Included",
+    "Player Recommendation: Infield",
+    "Series: Heart of the Hide",
+    "Glove Pattern: 205 (Deep Pocket Depth)",
+    "Glove Length: 11.75 Inch",
+    "Web Design: I-Web",
+    "Colorway: Black & Red",
+    "Wrist Type: Conventional Open Back",
+    "Lining: Deer-Tanned Cowhide Plus",
+    "Padded Thumb Sleeve: Provides Exceptional Comfort",
+    "Thermoformed Padding: Allows for Optimal Wrist Support"
+  ]
+}

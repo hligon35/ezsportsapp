@@ -1,0 +1,28 @@
+{
+  "name": "div",
+  "price": 19.99,
+  "description": "Experience unparalleled performance with the Lizard Skins American Dream DSP Ultra Bat Grip, featuring a captivating stars and stripes pattern that lets freedom ring on the field. This next-gen bat grip boasts multi-directional ridges and a reformulated polymer, providing enhanced feel, game-changing tackiness, and unmatched durability. Designed for ease of use, it includes a new premium adhesive and installation call-outs, ensuring a seamless fit on any bat. As the Official Bat Grip of Major League Baseball, it combines innovative texture and design, making it a must-have for players seeking superior grip and style. function positionHandler() {\n    return {\n        top: 0,\n        updatePosition() {\n            this.$nextTick(() => {\n                let viewportCenter = window.innerHeight / 2,\n                    parent = this.$el.parentElement,\n                    parentCenter = parent.clientHeight / 2,\n                    blockHeight = this.$el.offsetHeight / 2\n                this.top = viewportCenter - blockHeight;\n            });\n        }\n    };\n} {\n        \"body\": {\n            \"acidAdvancedReportsAjax\": {\"url\":\"https:\\/\\/betterbaseball.com\\/acid_acidreports\\/countViews\\/product\\/id\\/125969\\/\"}        }\n    } BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW.",
+  "source_url": "https://betterbaseball.com/lizard-skins-american-dream-dsp-ultra-bat-grip-dspubb-ad",
+  "image_url": "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/d/s/dspubb-ad.jpg",
+  "image_urls": [
+    "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/d/s/dspubb-ad.jpg"
+  ],
+  "downloaded_images": [
+    "C:\\Users\\Harold Ligon\\Documents\\Coding\\SparQDigital\\BBScraper\\prodInfo\\Accessories\\images\\lizard-skins-american-dream-dsp-ultra-bat-grip-dspubb-ad_1.jpg"
+  ],
+  "category_path": [
+    "Accessories"
+  ],
+  "features": [
+    "Superior Grip: Multi-directional texture for enhanced control",
+    "Durable & Lightweight: New formulation improves feel and longevity",
+    "Weather-Resistant: Slip-resistant in both wet and dry conditions",
+    "Shock Absorbing: Reduces vibration for a smoother swing",
+    "Easy Installation: Pre-cut ends with premium adhesive backing",
+    "Universal Fit: Works on wood, aluminum, and composite bats",
+    "Pro-Level Performance: Used and endorsed by professional players",
+    "Easy Maintenance: Cleans easily with water or isopropyl alcohol",
+    "Thicknesses: 0.5, 1.1 & 1.8 mm",
+    "Length: 39 inches wl pre-cut ends"
+  ]
+}

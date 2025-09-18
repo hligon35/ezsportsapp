@@ -1,0 +1,30 @@
+{
+  "name": "div",
+  "price": 329.99,
+  "description": "Elevate your game with this Better Baseball Exclusive Rawlings Heart of the Hide Infield Glove, meticulously crafted for infielders seeking superior performance. The 11.75-inch glove features an I-Web design, perfect for quick transfers and precise catches. Its striking colorway of Sky Blue, Blonde, Navy, and Chrome ensures you stand out on the field. With a conventional open back and deer-tanned cowhide lining, this glove offers exceptional comfort and a secure fit. function positionHandler() {\n    return {\n        top: 0,\n        updatePosition() {\n            this.$nextTick(() => {\n                let viewportCenter = window.innerHeight / 2,\n                    parent = this.$el.parentElement,\n                    parentCenter = parent.clientHeight / 2,\n                    blockHeight = this.$el.offsetHeight / 2\n                this.top = viewportCenter - blockHeight;\n            });\n        }\n    };\n} {\n        \"body\": {\n            \"acidAdvancedReportsAjax\": {\"url\":\"https:\\/\\/betterbaseball.com\\/acid_acidreports\\/countViews\\/product\\/id\\/169411\\/\"}        }\n    } BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW.",
+  "source_url": "https://betterbaseball.com/rawlings-heart-of-the-hide-11-75-infield-glove-fan-vote",
+  "image_url": "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/p/r/pro205w-2ccb-new.jpg",
+  "warranty": "Player Recommendation: Infield",
+  "image_urls": [
+    "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/p/r/pro205w-2ccb-new.jpg"
+  ],
+  "downloaded_images": [
+    "C:\\Users\\Harold Ligon\\Documents\\Coding\\SparQDigital\\BBScraper\\prodInfo\\Gloves_Mitts\\images\\rawlings-heart-of-the-hide-11-75-infield-glove-fan-vote_1.jpg"
+  ],
+  "category_path": [
+    "Gloves & Mitts"
+  ],
+  "features": [
+    "Better Baseball Exclusive: Only at Better Baseball",
+    "D elivery: FAST & FREE Shipping on All Orders",
+    "Warranty: Full 365-Day Manufacturer's Warranty Included",
+    "Player Recommendation: Infield",
+    "Series: Heart of the Hide",
+    "Glove Length: 11.75 Inch",
+    "Web Design: I-Web",
+    "Colorway: Sky Blue, Blonde, Navy, & Chrome",
+    "Wrist Type: Conventional Open Back",
+    "Lining: Deer-Tanned Cowhide Plus",
+    "Padded Thumb Sleeve: Provides Exceptional Comfort"
+  ]
+}

@@ -1,0 +1,34 @@
+{
+  "name": "div",
+  "price": 299.95,
+  "description": "Get ready to stand out on the field with the Mantis 12.25\" Outfield Glove, exclusively available at Better Baseball! Crafted for outfielders who demand the perfect blend of style and performance, this glove features a jaw-dropping seafoam and lavender colorway, making it as eye-catching as it is functional. The Wilson A2000 series is renowned for its high-quality construction, and this glove is no exception. Designed with Pro Stock Leather, it's durable yet buttery smooth to the touch, giving players the premium feel they expect from Wilson's outfield glove lineup. Plus, the 12.25-inch length and H-Web design provide maximum coverage and control, helping you snag every fly ball with ease. The Better Baseball Exclusive glove nickname, “Mantis\", listed above is not the property of or associated with Wilson Sporting Goods Co. The mark Wilson is a registered trademark of Wilson Sporting Goods Co., all rights reserved. The Better Baseball Exclusive glove nickname, “Mantis\", listed above is not the property of or associated with Wilson Sporting Goods Co. The mark Wilson is a registered trademark of Wilson Sporting Goods Co., all rights reserved. function positionHandler() {\n    return {\n        top: 0,\n        updatePosition() {\n            this.$nextTick(() => {\n                let viewportCenter = window.innerHeight / 2,\n                    parent = this.$el.parentElement,\n                    parentCenter = parent.clientHeight / 2,\n                    blockHeight = this.$el.offsetHeight / 2\n                this.top = viewportCenter - blockHeight;\n            });\n        }\n    };\n} {\n        \"body\": {\n            \"acidAdvancedReportsAjax\": {\"url\":\"https:\\/\\/betterbaseball.com\\/acid_acidreports\\/countViews\\/product\\/id\\/165180\\/\"}        }\n    } BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS",
+  "source_url": "https://betterbaseball.com/wilson-a2000-pf50-mantis-12-25-outfield-glove",
+  "image_url": "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/w/b/wbw103312.jpg",
+  "warranty": "Glove Pattern: PF50",
+  "image_urls": [
+    "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/w/b/wbw103312.jpg"
+  ],
+  "downloaded_images": [
+    "C:\\Users\\Harold Ligon\\Documents\\Coding\\SparQDigital\\BBScraper\\prodInfo\\Wilson_A2000_PF50_12.25_Outfield_Glove_WBW103312\\images\\wilson-a2000-pf50-mantis-12-25-outfield-glove_1.jpg"
+  ],
+  "category_path": [
+    "Wilson A2000 PF50 12.25\" Outfield Glove: WBW103312",
+    "Gloves & Mitts"
+  ],
+  "features": [
+    "Exclusive Design: Only at Better Baseball",
+    "Fast & Free Shipping: Included",
+    "Manufacturer's Warranty: Full 365-Days",
+    "Glove Pattern: PF50",
+    "Series: Wilson A2000",
+    "Glove Length: 12.25 Inch",
+    "Web Design: H-Web",
+    "Colorway: Seafoam & Lavender",
+    "Leather: Pro Stock Leather",
+    "Player Recommendation: Outfield",
+    "Wrist Type: Conventional Open Back",
+    "Lining: Breathable & Moisture Wicking",
+    "Rolled Dual Welting: Retains Glove Shape",
+    "SuperSnakeSkin: For Superior Durability"
+  ]
+}

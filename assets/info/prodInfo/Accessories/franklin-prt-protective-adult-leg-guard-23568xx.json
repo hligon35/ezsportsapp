@@ -1,0 +1,23 @@
+{
+  "name": "div",
+  "price": 74.99,
+  "description": "Step up to the plate with confidence using the Franklin Sports PRT Adult Baseball + Softball Leg Guard, designed to provide superior protection and peace of mind. This innovative leg and toe plate shield safeguards the fragile bones in your legs and feet from painful and costly hit-by-pitches. Its impact-absorbing soft-shell design hardens upon contact, reducing injury risk while maintaining a sleek, comfortable fit that won't impede your swing. With dual leg utility, this adjustable guard fits both left and right-handed hitters, offering extended coverage down both sides of the ankle for enhanced protection. Lightweight and form-fitting, the interior shell molds to your leg over time, ensuring a unique and comfortable fit. function positionHandler() {\n    return {\n        top: 0,\n        updatePosition() {\n            this.$nextTick(() => {\n                let viewportCenter = window.innerHeight / 2,\n                    parent = this.$el.parentElement,\n                    parentCenter = parent.clientHeight / 2,\n                    blockHeight = this.$el.offsetHeight / 2\n                this.top = viewportCenter - blockHeight;\n            });\n        }\n    };\n} {\n        \"body\": {\n            \"acidAdvancedReportsAjax\": {\"url\":\"https:\\/\\/betterbaseball.com\\/acid_acidreports\\/countViews\\/product\\/id\\/168232\\/\"}        }\n    } BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW.",
+  "source_url": "https://betterbaseball.com/franklin-prt-protective-adult-leg-guard-23568xx",
+  "image_url": "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/2/3/23568xx-pink.jpg",
+  "image_urls": [
+    "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/2/3/23568xx-pink.jpg"
+  ],
+  "downloaded_images": [
+    "C:\\Users\\Harold Ligon\\Documents\\Coding\\SparQDigital\\BBScraper\\prodInfo\\Accessories\\images\\franklin-prt-protective-adult-leg-guard-23568xx_1.jpg"
+  ],
+  "category_path": [
+    "Accessories"
+  ],
+  "features": [
+    "Protective: Soft-shell leg protector hardens on impact to absorb & reduce damage from hit-by-pitches",
+    "Dual Leg Utility: Adjustable design fits both left-handed & right-handed hitters",
+    "Ankle + Foot Extension: Extended protection from shin through ankle & toes for full lower-leg coverage",
+    "Form Fitting: Pre-curved, flexible interior shell molds to the unique shape of your leg over time",
+    "Lightweight: Sleek, non-bulky design for comfort & freedom of movement at the plate"
+  ]
+}

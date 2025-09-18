@@ -1,0 +1,24 @@
+{
+  "name": "strong",
+  "price": 99.95,
+  "description": "Introducing the Marucci REMX Adult Batting Gloves, designed to elevate your game with unmatched durability and comfort. These gloves feature reinforced AAA Cabretta Leather sheepskin palms, ensuring maximum durability and a superior feel for every swing. The stretch knit knuckle breaks offer a better fit and enhanced flexibility, allowing for a natural grip and movement. With a removable elastic wrist strap and an additional second wrist strap for an interchangeable look, you can customize your support and style. The flexible neoprene cuff ensures added comfort, making these gloves a perfect choice for serious athletes seeking performance and style. table {\n  border: 1px solid #ccc;\n  border-collapse: collapse;\n  margin: 0;\n  padding: 0;\n  width: 100%;\n  table-layout: fixed;\n}\n\ntable caption {\n  font-size: 1.5em;\n  margin: .5em 0 .75em;\n}\n\ntable tr {\n  background-color: #FFFFFF;\n  border: 1px solid #ddd;\n  padding: .35em;\n}\n\ntable th,\ntable td {\n  padding: .625em .35em;\n  text-align: left;\n}\n\ntable th {\n  font-size: .5em;\n  letter-spacing: .07em;\n  text-transform: uppercase;\n}\n\n@media screen and (max-width: 600px) {\n  table {\n    border: 0;\n  }\n\n  table caption {\n    font-size: 1.3em;\n  }\n  \n  table thead {\n    border: none;\n    clip: rect(0 0 0 0);\n    height: 1px;\n    margin: -1px;\n    overflow: hidden;\n    padding: 0;\n    position: absolute;\n    width: 1px;\n  }\n  \n  table tr {\n    border-bottom: 2px solid #ddd;\n    display: ;\n    margin-bottom: .625em;\n  }\n  \n  table td {\n    border-bottom: 1px solid #ddd;\n    display: ;\n    font-size: .8em;\n    text-align: left;\n  }\n  \n\n  \n  table td:last-child {\n    border-bottom: 0;\n  }\n} Glove Size Men's Women's Youth S 6.75-7\" 6.5-6.75\" 6-6.25\" M 7-7.25\" 6.75-7\" 6.25-6.5\" L 7.5-7.75\" 7-7.5\" 6.5-6.75\" XL 7.75-8\" 7.5-7.75\" XXL 8-8.25\" 8-8.25\" Glove Size Men's Women's Youth S 6.75-7\" 6.5-6.75\" 6-6.25\" M 7-7.25\" 6.75-7\" 6.25-6.5\" L 7.5-7.75\" 7-7.5\" 6.5-6.75\" XL 7.75-8\" 7.5-7.75\" XXL 8-8.25\" 8-8.25\" Glove Size Men's Women's Youth Glove Size",
+  "source_url": "https://betterbaseball.com/marucci-remx-adult-batting-gloves-mbrmx",
+  "image_url": "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/m/b/mbrmx_blue_mint.jpg",
+  "image_urls": [
+    "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/m/b/mbrmx_blue_mint.jpg"
+  ],
+  "downloaded_images": [
+    "C:\\Users\\Harold Ligon\\Documents\\Coding\\SparQDigital\\BBScraper\\prodInfo\\Batting_Gloves\\images\\marucci-remx-adult-batting-gloves-mbrmx_1.jpg"
+  ],
+  "category_path": [
+    "Batting Gloves",
+    "Marucci REMX Adult Batting Gloves: MBRMX"
+  ],
+  "features": [
+    "Reinforced AAA Cabretta Leather: Sheepskin palm for max durability & feel",
+    "Stretch Knit Knuckle Breaks: for better fit & flexibility",
+    "Removable Elastic Wriststrap: for added support",
+    "Second Wriststrap: included for interchangeable look",
+    "Flexible Neiprene Cuff: for comfort"
+  ]
+}

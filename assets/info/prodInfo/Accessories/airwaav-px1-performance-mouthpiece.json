@@ -1,0 +1,28 @@
+{
+  "name": "div",
+  "price": 49.95,
+  "description": "The AIRWAAV PX1 Performance Mouthpiece is expertly designed for athletes aiming to achieve peak performance. This innovative tool enhances athletic potential by optimizing jaw and tongue placement, improving airflow and muscle efficiency. Scientifically backed by research, it increases strength by accelerating neuromuscular response, boosts endurance by reducing respiratory rate and lactic acid production, and speeds up recovery by lowering cortisol levels post-workout. Featuring a relaxed fit with a wide bite channel, this mouthpiece ensures comfort and a custom fit. Proudly made in the USA, the AIRWAAV PX1 exemplifies quality and durability, supporting athletes for up to nine months. function positionHandler() {\n    return {\n        top: 0,\n        updatePosition() {\n            this.$nextTick(() => {\n                let viewportCenter = window.innerHeight / 2,\n                    parent = this.$el.parentElement,\n                    parentCenter = parent.clientHeight / 2,\n                    blockHeight = this.$el.offsetHeight / 2\n                this.top = viewportCenter - blockHeight;\n            });\n        }\n    };\n} {\n        \"body\": {\n            \"acidAdvancedReportsAjax\": {\"url\":\"https:\\/\\/betterbaseball.com\\/acid_acidreports\\/countViews\\/product\\/id\\/167420\\/\"}        }\n    } BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW.",
+  "source_url": "https://betterbaseball.com/airwaav-px1-performance-mouthpiece",
+  "image_url": "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/a/i/air-px1_miamivice.jpg",
+  "image_urls": [
+    "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/a/i/air-px1_miamivice.jpg"
+  ],
+  "downloaded_images": [
+    "C:\\Users\\Harold Ligon\\Documents\\Coding\\SparQDigital\\BBScraper\\prodInfo\\Accessories\\images\\airwaav-px1-performance-mouthpiece_1.jpg"
+  ],
+  "category_path": [
+    "Accessories"
+  ],
+  "features": [
+    "Increase Strength: Accelerate neuromuscular response",
+    "Increase Endurance: Reduce respiratory rate by 20%, minimizing lactic acid production",
+    "Speed Up Recovery: Reduce post-workout cortisol levels by 50%",
+    "Crafted from Patented Material: BPA free & hydrophobic",
+    "Lifespan: 9 months on average",
+    "Includes: 1x PX1 Performance Mouthpiece 1x Ventilated Case 1x Carabiner Attachment Fitting Instructions",
+    "1x PX1 Performance Mouthpiece",
+    "1x Ventilated Case",
+    "1x Carabiner Attachment",
+    "Fitting Instructions"
+  ]
+}

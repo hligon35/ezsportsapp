@@ -1,0 +1,37 @@
+{
+  "name": "div",
+  "price": 299.95,
+  "description": "function positionHandler() {\n    return {\n        top: 0,\n        updatePosition() {\n            this.$nextTick(() => {\n                let viewportCenter = window.innerHeight / 2,\n                    parent = this.$el.parentElement,\n                    parentCenter = parent.clientHeight / 2,\n                    blockHeight = this.$el.offsetHeight / 2\n                this.top = viewportCenter - blockHeight;\n            });\n        }\n    };\n} {\n        \"body\": {\n            \"acidAdvancedReportsAjax\": {\"url\":\"https:\\/\\/betterbaseball.com\\/acid_acidreports\\/countViews\\/product\\/id\\/170350\\/\"}        }\n    } BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW. Email Address SIGN UP",
+  "source_url": "https://betterbaseball.com/2025-demarini-the-goods-2-piece-used-drop-10-usssa-baseball-bat-wbd2535010-nw",
+  "image_url": "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/w/b/wbd2535010.jpg",
+  "image_urls": [
+    "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/w/b/wbd2535010.jpg"
+  ],
+  "downloaded_images": [
+    "C:\\Users\\Harold Ligon\\Documents\\Coding\\SparQDigital\\BBScraper\\prodInfo\\Bats\\images\\2025-demarini-the-goods-2-piece-used-drop-10-usssa-baseball-bat-wbd2535010-nw_1.jpg"
+  ],
+  "category_path": [
+    "Bats",
+    "Baseball Bats",
+    "Youth Baseball Bats",
+    "USSSA Bats",
+    "Sale",
+    "Closeout Bats"
+  ],
+  "features": [
+    "Delivery: FAST & FREE Shipping",
+    "Returns: Free 30-Day Returns",
+    "100% Satisfaction Guarantee: 30 Days Through Better Baseball",
+    "Condition: Used",
+    "Length to Weight Ratio: Drop 10",
+    "Certification: USSSA",
+    "Swing Feel: Slightly End-Loaded",
+    "Bat Material: Hybrid (Alloy Barrel & Composite Handle)",
+    "Barrel Diameter: 2 3/4 Inch Barrel Diameter",
+    "Colorway: White & Orange",
+    "X14 Alloy Barrel: Optimal Swing Speed & Durability",
+    "Paraflex Plus Composite Handle: Equips Superior Feel",
+    "Type V Connection Point: Prevents Hand Vibration",
+    "Tracer End Cap: Enhances Bat Speed"
+  ]
+}

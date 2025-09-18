@@ -1,0 +1,29 @@
+{
+  "name": "div",
+  "price": 185.0,
+  "description": "The Mine Baseball Oval Training Bat is expertly crafted to enhance your precision at the plate with its unique oval bat design, merging the benefits of flat and skinny bats. This innovative training tool combines three essential functions into one versatile bat, eliminating the need for extra equipment. Experience the authentic feel of real ball compatibility, allowing you to practice like you play with a weight and feel that mimics your game bat. Featuring red zone targets, the bat helps you consistently find your sweet spot, while its design aids in correcting common issues like rolling over and undercutting, ensuring you hit more line drives. function positionHandler() {\n    return {\n        top: 0,\n        updatePosition() {\n            this.$nextTick(() => {\n                let viewportCenter = window.innerHeight / 2,\n                    parent = this.$el.parentElement,\n                    parentCenter = parent.clientHeight / 2,\n                    blockHeight = this.$el.offsetHeight / 2\n                this.top = viewportCenter - blockHeight;\n            });\n        }\n    };\n} {\n        \"body\": {\n            \"acidAdvancedReportsAjax\": {\"url\":\"https:\\/\\/betterbaseball.com\\/acid_acidreports\\/countViews\\/product\\/id\\/168661\\/\"}        }\n    } BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW.",
+  "source_url": "https://betterbaseball.com/mine-baseball-oval-training-bat",
+  "image_url": "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/m/b/mb-oval.jpg",
+  "warranty": "Oval Bat Design: Blends Flat & Skinny Bats for Precision.",
+  "image_urls": [
+    "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/m/b/mb-oval.jpg"
+  ],
+  "downloaded_images": [
+    "C:\\Users\\Harold Ligon\\Documents\\Coding\\SparQDigital\\BBScraper\\prodInfo\\Bats\\images\\mine-baseball-oval-training-bat_1.jpg"
+  ],
+  "category_path": [
+    "Bats",
+    "Mine Baseball Oval Training Bat"
+  ],
+  "features": [
+    "D elivery: FAST & FREE Shipping on ALL Orders",
+    "6-Month Warranty: Through the Manufacturer",
+    "Oval Bat Design: Blends Flat & Skinny Bats for Precision.",
+    "3 Tools, One Bat: No Extra Equipment Needed.",
+    "Real Ball Compatibility: Authentic in-game training feel",
+    "Practice Like You Play: Weight & Feel mimic Your Game Bat",
+    "Red Zone Targets: Help You Find Your Sweet spot Targets are Designed to Show Wear to Identify Points of Contact",
+    "Targets are Designed to Show Wear to Identify Points of Contact",
+    "Hit More Line Drives: Helps Correct Rolling Over & Undercutting"
+  ]
+}

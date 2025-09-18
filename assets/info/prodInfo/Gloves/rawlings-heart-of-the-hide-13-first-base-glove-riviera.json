@@ -1,0 +1,32 @@
+{
+  "name": "div",
+  "price": 329.99,
+  "description": "Make a statement at first base with the Rawlings Heart of the Hide Riviera 13\" First Base Glove, an exclusive design only available at Better Baseball. This eye-catching glove features a bold sherry, sky blue, and pink colorway that’s sure to turn heads while delivering pro-level performance. Crafted from the same legendary leather used across the Rawlings Heart of the Hide lineup, this glove is built for durability and game-ready feel. The Rawlings 13\" First Base Glove features a classic DCT pattern with a single-post web, giving first basemen a standard pocket depth that’s perfect for scooping, stretching, and securing every throw. Inside, the Deer-Tanned Cowhide Plus lining and padded thumb sleeve add unmatched comfort, while thermoformed wrist padding offers excellent support during every play. Whether you're chasing gold gloves or just bringing the style, this Rawlings First Base Glove brings elite function and flash to every game. If you're looking for the ultimate Heart of the Hide First Base Glove, this Riviera edition delivers in every way. function positionHandler() {\n    return {\n        top: 0,\n        updatePosition() {\n            this.$nextTick(() => {\n                let viewportCenter = window.innerHeight / 2,\n                    parent = this.$el.parentElement,\n                    parentCenter = parent.clientHeight / 2,\n                    blockHeight = this.$el.offsetHeight / 2\n                this.top = viewportCenter - blockHeight;\n            });\n        }\n    };\n} {\n        \"body\": {\n            \"acidAdvancedReportsAjax\": {\"url\":\"https:\\/\\/betterbaseball.com\\/acid_acidreports\\/countViews\\/product\\/id\\/169495\\/\"}        }\n    } BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW.",
+  "source_url": "https://betterbaseball.com/rawlings-heart-of-the-hide-13-first-base-glove-riviera",
+  "image_url": "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/p/r/prodct-10shcb.jpg",
+  "warranty": "Player Recommendation: First Base Player Recommendation: First Base",
+  "image_urls": [
+    "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/p/r/prodct-10shcb.jpg"
+  ],
+  "downloaded_images": [
+    "C:\\Users\\Harold Ligon\\Documents\\Coding\\SparQDigital\\BBScraper\\prodInfo\\Gloves_Mitts\\images\\rawlings-heart-of-the-hide-13-first-base-glove-riviera_1.jpg"
+  ],
+  "category_path": [
+    "Gloves & Mitts"
+  ],
+  "features": [
+    "Exclusive Design: Only Available at Better Baseball",
+    "Delivery: FAST & FREE Shipping on All Orders",
+    "Warranty: Full 365-Day Manufacturer's Warranty Included",
+    "Player Recommendation: First Base",
+    "Series: Heart of the Hide",
+    "Glove Pattern: DCT (Standard Pocket Depth)",
+    "Glove Length: 13 Inch",
+    "Web Design: Single-Post Web",
+    "Colorway: Sherry, Sky Blue & Pink",
+    "Wrist Type: Conventional Open Back",
+    "Lining: Deer-Tanned Cowhide Plus",
+    "Padded Thumb Sleeve: Provides Exceptional Comfort",
+    "Thermoformed Padding: Allows for Optimal Wrist Support"
+  ]
+}

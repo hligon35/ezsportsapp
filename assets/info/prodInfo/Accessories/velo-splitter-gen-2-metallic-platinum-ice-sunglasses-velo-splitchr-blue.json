@@ -1,0 +1,36 @@
+{
+  "name": "div",
+  "price": 109.99,
+  "description": "Experience the ultimate game-changer with the VELO Splitter Gen 2 Metallic Platinum Ice Sunglasses. These aren't just sunglasses—they're your secret weapon for elevating on-field performance with unmatched style. Featuring 3 interchangeable frames, you can effortlessly switch up your look to match your energy and enhance your confidence. Trusted by top high school, college, and pro athletes, these shades are designed for those who aspire to greatness. With their durable and affordable design, along with interchangeable side earpieces, these sunglasses offer the perfect blend of functionality and fashion, ensuring you stay at the top of your game. function positionHandler() {\n    return {\n        top: 0,\n        updatePosition() {\n            this.$nextTick(() => {\n                let viewportCenter = window.innerHeight / 2,\n                    parent = this.$el.parentElement,\n                    parentCenter = parent.clientHeight / 2,\n                    blockHeight = this.$el.offsetHeight / 2\n                this.top = viewportCenter - blockHeight;\n            });\n        }\n    };\n} {\n        \"body\": {\n            \"acidAdvancedReportsAjax\": {\"url\":\"https:\\/\\/betterbaseball.com\\/acid_acidreports\\/countViews\\/product\\/id\\/173224\\/\"}        }\n    } BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW.",
+  "source_url": "https://betterbaseball.com/velo-splitter-gen-2-metallic-platinum-ice-sunglasses-velo-splitchr-blue",
+  "image_url": "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/v/e/velo-splitchr-blue.jpg",
+  "image_urls": [
+    "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/v/e/velo-splitchr-blue.jpg"
+  ],
+  "downloaded_images": [
+    "C:\\Users\\Harold Ligon\\Documents\\Coding\\SparQDigital\\BBScraper\\prodInfo\\Accessories\\images\\velo-splitter-gen-2-metallic-platinum-ice-sunglasses-velo-splitchr-blue_1.jpg"
+  ],
+  "category_path": [
+    "Accessories"
+  ],
+  "features": [
+    "D elivery: FAST & FREE Shipping on All Orders",
+    "Frame Color: Pink",
+    "Lenses Color: Pink",
+    "Front Color Finish: Polished",
+    "Nose Pad: Rubber",
+    "UV Protection: 100%, UV400",
+    "Frame Material : T90 Lightweight Polycarbonate",
+    "Lenses Material: Polycarbonate - Shatterproof/Impact-Resistant",
+    "Dimensions: Small - 55.5 x 132mm; Large - 57 x 143mm",
+    "What's Included: VELO Shades Sunglasses VELO Hard Protective Case Full-frame Nose Piece Extended Nose Piece Standard Nose Piece Microfiber Bag Microfiber Cleaning Cloth The Bullpen Training Sticker",
+    "VELO Shades Sunglasses",
+    "VELO Hard Protective Case",
+    "Full-frame Nose Piece",
+    "Extended Nose Piece",
+    "Standard Nose Piece",
+    "Microfiber Bag",
+    "Microfiber Cleaning Cloth",
+    "The Bullpen Training Sticker"
+  ]
+}

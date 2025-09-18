@@ -1,0 +1,40 @@
+{
+  "name": "div",
+  "price": 286.0,
+  "description": "The Oakley Feedback Polished Chrome Prizm Sapphire Polarized Sunglasses combine elegance and functionality, making them the ideal choice for active women. These sunglasses feature a unique blend of a C5-wire front and warm acetate stems, offering both style and durability. With an ultra-lightweight frame, Three-Point Fit, and no-snag nosepads, they ensure maximum comfort during any activity. The Unobtainium earpads provide a secure fit, while the 6 base lens geometry with HDO delivers superior optical clarity. Choose from polarized, Iridium, and gradient lens options, and enjoy the convenience of Oakley Authentic Prescription Lenses and a protective carrying case. function positionHandler() {\n    return {\n        top: 0,\n        updatePosition() {\n            this.$nextTick(() => {\n                let viewportCenter = window.innerHeight / 2,\n                    parent = this.$el.parentElement,\n                    parentCenter = parent.clientHeight / 2,\n                    blockHeight = this.$el.offsetHeight / 2\n                this.top = viewportCenter - blockHeight;\n            });\n        }\n    };\n} {\n        \"body\": {\n            \"acidAdvancedReportsAjax\": {\"url\":\"https:\\/\\/betterbaseball.com\\/acid_acidreports\\/countViews\\/product\\/id\\/176686\\/\"}        }\n    } BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW.",
+  "source_url": "https://betterbaseball.com/oakley-feedback-polished-chrome-prizm-sapphire-polarized-sunglasses",
+  "image_url": "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/o/o/oo4079.jpg",
+  "warranty": "Frame Color: Polished Chrome",
+  "image_urls": [
+    "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/o/o/oo4079.jpg"
+  ],
+  "downloaded_images": [
+    "C:\\Users\\Harold Ligon\\Documents\\Coding\\SparQDigital\\BBScraper\\prodInfo\\Accessories\\images\\oakley-feedback-polished-chrome-prizm-sapphire-polarized-sunglasses_1.jpg"
+  ],
+  "category_path": [
+    "Accessories"
+  ],
+  "features": [
+    "Delivery: FAST & FREE Shipping on all orders",
+    "Warranty: 2-Year limited warranty through the manufacturer",
+    "Frame Color: Polished Chrome",
+    "Lenses Color: Prizm Sapphire Light Transmission: 12% Light Conditions: Bright Light Base Lens Color: Grey Light Filter: 3",
+    "Prizm Sapphire Light Transmission: 12% Light Conditions: Bright Light Base Lens Color: Grey Light Filter: 3",
+    "Light Transmission: 12%",
+    "Light Conditions: Bright Light",
+    "Base Lens Color: Grey",
+    "Light Filter: 3",
+    "Polarized: Yes",
+    "Frame Material: Ultra-light C-5 alloy frame",
+    "HDO Lens Technology : High Definition Optics provides razor-sharp clarity & optimal peripheral vision",
+    "Prizm Lens : Enhances color, contrast, & detail for a more vivid, optimized visual experience",
+    "Unobtainium Grip : Earsocks & nosepads increase grip with sweat",
+    "Protective Soft Vault : Comes with a durable case to keep your eyewear secure when not in use",
+    "Size & Fit: Arm Length: 135mm Frame Width: 132mm Lens Width: 59mm Lens Height: 46.9mm Bridge Width: 13mm",
+    "Arm Length: 135mm",
+    "Frame Width: 132mm",
+    "Lens Width: 59mm",
+    "Lens Height: 46.9mm",
+    "Bridge Width: 13mm"
+  ]
+}

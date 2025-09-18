@@ -1,0 +1,26 @@
+{
+  "name": "div",
+  "price": 40.0,
+  "description": "Step into the batter’s box with confidence, from the daily grind in the cage to the pressure of playoff moments. These Nike Batting Gloves are engineered for hitters who demand comfort, control, and clutch performance. Crafted with premium textured goatskin leather on the palm, these gloves deliver exceptional grip, improved feel, and long-lasting durability swing after swing. function positionHandler() {\n    return {\n        top: 0,\n        updatePosition() {\n            this.$nextTick(() => {\n                let viewportCenter = window.innerHeight / 2,\n                    parent = this.$el.parentElement,\n                    parentCenter = parent.clientHeight / 2,\n                    blockHeight = this.$el.offsetHeight / 2\n                this.top = viewportCenter - blockHeight;\n            });\n        }\n    };\n} {\n        \"body\": {\n            \"acidAdvancedReportsAjax\": {\"url\":\"https:\\/\\/betterbaseball.com\\/acid_acidreports\\/countViews\\/product\\/id\\/170884\\/\"}        }\n    } BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW.",
+  "source_url": "https://betterbaseball.com/nike-alpha-varsity-batting-gloves-n-100-4379",
+  "image_url": "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/n/_/n.100.4379-whiteblue.jpg",
+  "image_urls": [
+    "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/n/_/n.100.4379-whiteblue.jpg"
+  ],
+  "downloaded_images": [
+    "C:\\Users\\Harold Ligon\\Documents\\Coding\\SparQDigital\\BBScraper\\prodInfo\\Batting_Gloves\\images\\nike-alpha-varsity-batting-gloves-n-100-4379_1.jpg"
+  ],
+  "category_path": [
+    "Batting Gloves",
+    "Nike Alpha Varsity Adult Batting Gloves: N.100.4379"
+  ],
+  "features": [
+    "Goatskin Leather : Offers a superior hand feel, enhanced grip, & long-lasting durability",
+    "Nike Dri-FIT : Sweat-wicking technology keeps hands dry & comfortable",
+    "Noeprene Cuff : Ensures a secure fit for stability during gameplay",
+    "Material Composition : Palm: 100% goatskin leather Back: 87% nylon/13% spandex Other: 98% nylon/1% polyurethane/1% polyester",
+    "Palm: 100% goatskin leather",
+    "Back: 87% nylon/13% spandex",
+    "Other: 98% nylon/1% polyurethane/1% polyester"
+  ]
+}

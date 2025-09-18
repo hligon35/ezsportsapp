@@ -1,0 +1,31 @@
+{
+  "name": "div",
+  "price": 149.95,
+  "description": "The All-Star Top Star 31.5\" Youth Catcher's Mitt is a standout choice for young athletes aiming for excellence behind the plate. This premium glove features a sleek black and blonde colorway, complemented by a two-piece closed web design that ensures optimal ball control. With an adjustable Velcro strap and a partially open back wrist type, it offers a customizable fit for maximum comfort during intense games. Crafted for durability, the mitt boasts 360 dual stitching and Japanese tanned U.S. steerhide leather, while its Pro Guard Padding provides extra protection for handling higher velocities, making it the perfect companion for aspiring catchers. function positionHandler() {\n    return {\n        top: 0,\n        updatePosition() {\n            this.$nextTick(() => {\n                let viewportCenter = window.innerHeight / 2,\n                    parent = this.$el.parentElement,\n                    parentCenter = parent.clientHeight / 2,\n                    blockHeight = this.$el.offsetHeight / 2\n                this.top = viewportCenter - blockHeight;\n            });\n        }\n    };\n} {\n        \"body\": {\n            \"acidAdvancedReportsAjax\": {\"url\":\"https:\\/\\/betterbaseball.com\\/acid_acidreports\\/countViews\\/product\\/id\\/169904\\/s\\/all-star-top-star-31-5-youth-baseball-catcher-s-mitt-cm-ts-y\\/category\\/24\\/\"}        }\n    } BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW.",
+  "source_url": "https://betterbaseball.com/catalog/product/view/id/169904/s/all-star-top-star-31-5-youth-baseball-catcher-s-mitt-cm-ts-y/category/24/",
+  "image_url": "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/c/m/cmtsy.jpg",
+  "warranty": "Series: All Star Top Star",
+  "image_urls": [
+    "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/c/m/cmtsy.jpg"
+  ],
+  "downloaded_images": [
+    "C:\\Users\\Harold Ligon\\Documents\\Coding\\SparQDigital\\BBScraper\\prodInfo\\Gloves_Mitts\\images\\24_1.jpg"
+  ],
+  "category_path": [
+    "Gloves & Mitts"
+  ],
+  "features": [
+    "Delivery: FAST & FREE Shipping on All Orders",
+    "Warranty: Full 365-Day Manufacturer's Warranty Included",
+    "Series: All Star Top Star",
+    "Glove Circumference: 33.5 Inch",
+    "Web Design: Two-Piece Closed Web",
+    "Colorway: Black & Blonde",
+    "Wrist Type: Partially Open Back",
+    "Wrist Strap: Adjustable Velcro Strap",
+    "Leather: Japanese Tanned U.S. Steerhide",
+    "Pro Guard Padding: Extra Protection & Handling of Higher Velos",
+    "360 Dual Stitching: Added Durability for Extra Innings",
+    "Player Recommendation: Catcher"
+  ]
+}

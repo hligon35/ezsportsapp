@@ -1,0 +1,30 @@
+{
+  "name": "div",
+  "price": 269.99,
+  "description": "Get ready to light up the mound with the Emery Emerald Series Electric Mamba 11.75\" Pitcher's Glove — a bold, exclusive design only available at Better Baseball. Built for pitchers who want performance and personality, this glove features the ELS19 pattern with a medium pocket depth, perfect for hiding your grip and making slick plays. The two-piece web offers solid structure and ball concealment, while the 11.75-inch length gives you total control. Finished in a sleek black and grey colorway with eye-popping neon green accents and elephant print for added drip, this glove doesn’t just play hard — it looks the part. With a conventional open back and smooth feel, the Electric Mamba is ready to dominate the game in style. function positionHandler() {\n    return {\n        top: 0,\n        updatePosition() {\n            this.$nextTick(() => {\n                let viewportCenter = window.innerHeight / 2,\n                    parent = this.$el.parentElement,\n                    parentCenter = parent.clientHeight / 2,\n                    blockHeight = this.$el.offsetHeight / 2\n                this.top = viewportCenter - blockHeight;\n            });\n        }\n    };\n} {\n        \"body\": {\n            \"acidAdvancedReportsAjax\": {\"url\":\"https:\\/\\/betterbaseball.com\\/acid_acidreports\\/countViews\\/product\\/id\\/168134\\/\"}        }\n    } BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW.",
+  "source_url": "https://betterbaseball.com/emery-electric-mamba-11-75-pitcher-s-glove",
+  "image_url": "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/j/4/j426-3_2_3.jpg",
+  "warranty": "Player Recommendation: Pitcher",
+  "image_urls": [
+    "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/j/4/j426-3_2_3.jpg"
+  ],
+  "downloaded_images": [
+    "C:\\Users\\Harold Ligon\\Documents\\Coding\\SparQDigital\\BBScraper\\prodInfo\\Gloves_Mitts\\images\\emery-electric-mamba-11-75-pitcher-s-glove_1.jpg"
+  ],
+  "category_path": [
+    "Gloves & Mitts"
+  ],
+  "features": [
+    "Exclusive Design: Only Available at Better Baseball",
+    "Delivery: FAST & FREE Shipping on All Orders",
+    "Warranty: Full 365-Day Manufacturer's Warranty Included",
+    "Player Recommendation: Pitcher",
+    "Series: Emerald",
+    "Glove Pattern: ELS19 (Medium Pocket Depth)",
+    "Glove Length: 11.75 Inch",
+    "Web Design: Two-Piece Web",
+    "Colorway: Black, Grey & Neon Green",
+    "Wrist Type: Conventional Open Back",
+    "Elephant Print: For Added Drip"
+  ]
+}

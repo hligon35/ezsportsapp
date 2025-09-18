@@ -1,0 +1,25 @@
+{
+  "name": "div",
+  "price": 99.95,
+  "description": "Discover the Nokona Leather ShowBelt, a versatile and fully customizable accessory perfect for the field, the course, and the street. Handmade using the same premium ballglove leather as Nokona's renowned gloves, along with exotic options like caiman and Japanese calfskin, these belts offer unparalleled quality and craftsmanship. Originally inspired by professional athletes who coined the term \"showbelts,\" these belts are celebrated for their unique personalization options, vibrant colors, and exceptional materials. The ShowBelt collection has seamlessly transitioned into lifestyle accessories, featuring painted edges, contrasting stitching, and customizable hardware, making them a timeless addition to any wardrobe. function positionHandler() {\n    return {\n        top: 0,\n        updatePosition() {\n            this.$nextTick(() => {\n                let viewportCenter = window.innerHeight / 2,\n                    parent = this.$el.parentElement,\n                    parentCenter = parent.clientHeight / 2,\n                    blockHeight = this.$el.offsetHeight / 2\n                this.top = viewportCenter - blockHeight;\n            });\n        }\n    };\n} {\n        \"body\": {\n            \"acidAdvancedReportsAjax\": {\"url\":\"https:\\/\\/betterbaseball.com\\/acid_acidreports\\/countViews\\/product\\/id\\/127303\\/\"}        }\n    } BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW.",
+  "source_url": "https://betterbaseball.com/nokona-leather-showbelt-showbelt-bb",
+  "image_url": "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/s/h/showbelt-bb-red.jpg",
+  "image_urls": [
+    "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/s/h/showbelt-bb-red.jpg"
+  ],
+  "downloaded_images": [
+    "C:\\Users\\Harold Ligon\\Documents\\Coding\\SparQDigital\\BBScraper\\prodInfo\\Apparel\\images\\nokona-leather-showbelt-showbelt-bb_1.jpg"
+  ],
+  "category_path": [
+    "Apparel"
+  ],
+  "features": [
+    "Versatile Use : Designed for performance and style on the field, golf course, or street",
+    "Customizable : Fully personalized belts with your unique design visible in full view",
+    "Premium Materials : Handmade from high-quality ballglove leather, exotic caiman, & Japanese calfskin",
+    "Pro-Inspired : Developed with input from professional athletes who coined the term “ShowBelts™”",
+    "Craftsmanship : Meticulously handcrafted with painted edges, contrasting stitching, & hardware options",
+    "Lifestyle Appeal : Evolved into timeless lifestyle belts, combining style with performance features",
+    "Distinctive Design : Known for exceptional quality, bold color choices, & personalized flair"
+  ]
+}

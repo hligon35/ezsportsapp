@@ -1,0 +1,32 @@
+{
+  "name": "div",
+  "price": 299.95,
+  "description": "The Shadow Shiesty Spearmint Pitcher's Glove is designed for pitchers looking to make a statement on the mound. Its striking mint colorway and embossed logos give it a bold look that demands attention. Crafted with a unique one-of-a-kind closed web, this glove ensures excellent ball grip and control thanks to its deep pocket depth. The lightweight feel of the glove, combined with the stability provided by Triple X Lacing on the thumb and pinky, offers quick reactions and enhanced control. Suitable for players aged 13 and up, its conventional open back and middle finger pad add an extra layer of intimidation to your game. function positionHandler() {\n    return {\n        top: 0,\n        updatePosition() {\n            this.$nextTick(() => {\n                let viewportCenter = window.innerHeight / 2,\n                    parent = this.$el.parentElement,\n                    parentCenter = parent.clientHeight / 2,\n                    blockHeight = this.$el.offsetHeight / 2\n                this.top = viewportCenter - blockHeight;\n            });\n        }\n    };\n} {\n        \"body\": {\n            \"acidAdvancedReportsAjax\": {\"url\":\"https:\\/\\/betterbaseball.com\\/acid_acidreports\\/countViews\\/product\\/id\\/178921\\/\"}        }\n    } BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW.",
+  "source_url": "https://betterbaseball.com/shadow-shiesty-12-pitcher-s-glove-shadow-spearmint",
+  "image_url": "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/s/h/shadowspearmint.jpg",
+  "image_urls": [
+    "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/s/h/shadowspearmint.jpg"
+  ],
+  "downloaded_images": [
+    "C:\\Users\\Harold Ligon\\Documents\\Coding\\SparQDigital\\BBScraper\\prodInfo\\Gloves_Mitts\\images\\shadow-shiesty-12-pitcher-s-glove-shadow-spearmint_1.jpg"
+  ],
+  "category_path": [
+    "Gloves & Mitts",
+    "Shadow Shiesty 12\" Pitcher's Glove: Shadow Spearmint"
+  ],
+  "features": [
+    "Delivery: FAST & FREE Shipping on All Orders",
+    "Glove Length: 12 Inch",
+    "Player Recommendation: Pitcher",
+    "Colorway: Mint",
+    "Wrist Type: Conventional open back",
+    "Leather: High-end Japanese Kip Leather",
+    "Web Design: One-of-a-kind closed web w/ embossed designs",
+    "Glove Feel: Lightweight for quick reactions & reflexes",
+    "Triple X Lacing: On thumb & pinky for added stability & control",
+    "Pocket Depth: Deep - For improved ball grip & control",
+    "Embossed Logos: Delivers an intimidating, bold look that commands attention",
+    "Middle Finger Pad: For superior intimidation",
+    "Age Range: 13 - Adult"
+  ]
+}

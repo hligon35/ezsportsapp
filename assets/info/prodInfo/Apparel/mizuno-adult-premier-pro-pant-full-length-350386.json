@@ -1,0 +1,28 @@
+{
+  "name": "strong",
+  "price": 35.95,
+  "description": "Experience top-tier performance with the Mizuno Premier Pro Full Length G2 Adult Baseball Pant, designed to offer players a professional look and feel on the field. Known for its durability, this pant features a hemmed finished leg opening style, making it one of the most sought-after options for serious athletes. The tunnel-belt loop waist and fly front with extended two-snap closure ensure a secure fit, while the set-in back pockets with button closure add functionality. With double-layer knee construction for added protection and lightweight, double-knit fabric, these pants provide the perfect blend of comfort and resilience. Complete with an embroidered logo, the Mizuno Premier Pro G2 is the ultimate choice for baseball enthusiasts aiming for excellence. table {\n  border: 1px solid #ccc;\n  border-collapse: collapse;\n  margin: 0;\n  padding: 0;\n  width: 100%;\n  table-layout: fixed;\n}\n\ntable caption {\n  font-size: 1.5em;\n  margin: .5em 0 .75em;\n}\n\ntable tr {\n  background-color: #FFFFFF;\n  border: 1px solid #ddd;\n  padding: .35em;\n}\n\ntable th,\ntable td {\n  padding: .625em .35em;\n  text-align: left;\n}\n\ntable th {\n  font-size: .5em;\n  letter-spacing: .07em;\n  text-transform: uppercase;\n}\n\n@media screen and (max-width: 600px) {\n  table {\n    border: 0;\n  }\n\n  table caption {\n    font-size: 1.3em;\n  }\n  \n  table thead {\n    border: none;\n    clip: rect(0 0 0 0);\n    height: 1px;\n    margin: -1px;\n    overflow: hidden;\n    padding: 0;\n    position: absolute;\n    width: 1px;\n  }\n  \n  table tr {\n    border-bottom: 2px solid #ddd;\n    display: ;\n    margin-bottom: .625em;\n  }\n  \n  table td {\n    border-bottom: 1px solid #ddd;\n    display: ;\n    font-size: .8em;\n    text-align: left;\n  }\n  \n\n  \n  table td:last-child {\n    border-bottom: 0;\n  }\n} US Size Waist Inseam XS 28-30\" 32\" S 30-32” 33\" M 32-34” 34\" L 34-36” 35\" XL 36-38” 36\" XXL 40-42” 36\" US Size Waist Inseam XS 28-30\" 32\" S 30-32” 33\" M 32-34” 34\" L 34-36” 35\" XL 36-38” 36\" XXL 40-42” 36\" US Size Waist Inseam US Size",
+  "source_url": "https://betterbaseball.com/mizuno-adult-premier-pro-pant-full-length-350386",
+  "image_url": "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/3/5/350386.jpg",
+  "image_urls": [
+    "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/3/5/350386.jpg"
+  ],
+  "downloaded_images": [
+    "C:\\Users\\Harold Ligon\\Documents\\Coding\\SparQDigital\\BBScraper\\prodInfo\\Apparel\\images\\mizuno-adult-premier-pro-pant-full-length-350386_1.jpg"
+  ],
+  "category_path": [
+    "Apparel",
+    "Mizuno Premier Pro Full Length G2 Adult Baseball Pant: 350386"
+  ],
+  "features": [
+    "Delivery: FAST & FREE Shipping on All Orders",
+    "Premier Pro Fit : Offers a professional look and feel trusted by top-level players",
+    "Double Knit Fabric : Lightweight yet highly durable construction built for elite performance",
+    "Double Knee Construction : Reinforced dual-layer knees provide added protection & long-lasting wear",
+    "Tunnel-Belt Loop Waist : Traditional waistband design allows for a secure, adjustable fit with any standard belt",
+    "Two-Snap Fly Closure : Extended front with two snaps ensures a secure & comfortable closure",
+    "Set-In Back Pockets : Functional pockets with button closures offer convenient storage",
+    "Hemmed Bottom : Clean finish for a polished, game-ready appearance",
+    "Embroidered Logo : Signature Mizuno branding delivers a premium touch"
+  ]
+}

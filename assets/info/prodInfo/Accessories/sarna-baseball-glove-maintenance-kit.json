@@ -1,0 +1,24 @@
+{
+  "name": "strong",
+  "price": 44.99,
+  "description": "The Sarna Baseball Glove Maintenance Kit is the complete solution for keeping your glove in peak playing condition. Designed for both new and well-loved gloves, this all-in-one kit includes everything you need to clean, condition, and protect your leather—ensuring it stays soft, flexible, and ready for game day.",
+  "source_url": "https://betterbaseball.com/sarna-baseball-glove-maintenance-kit",
+  "image_url": "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/5/5/55321.jpg",
+  "image_urls": [
+    "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/5/5/55321.jpg"
+  ],
+  "downloaded_images": [
+    "C:\\Users\\Harold Ligon\\Documents\\Coding\\SparQDigital\\BBScraper\\prodInfo\\Accessories\\images\\sarna-baseball-glove-maintenance-kit_1.jpg"
+  ],
+  "category_path": [
+    "Accessories"
+  ],
+  "features": [
+    "Delivery: FAST & FREE Shipping on All Orders",
+    "All-in-One Kit: Cleaner, conditioner, hog hair brush, horsehair brush, and microfiber cloth",
+    "Does Not Darken: Specially formulated to maintain your glove’s original color",
+    "Water-Based Formula: Lightweight, non-greasy, and preserves glove structure",
+    "Step-by-Step Care: Clean → Condition → Restore for peak glove performance",
+    "Long-Lasting Protection: Keeps leather soft, supple, and game-ready season after season"
+  ]
+}

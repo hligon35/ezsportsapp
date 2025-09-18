@@ -1,0 +1,32 @@
+{
+  "name": "div",
+  "price": 359.99,
+  "description": "The Marucci Capitol 45A3 12\" Outfield Glove is crafted for the dedicated outfielder, featuring an H-Web design that enhances catching versatility. Its striking mint and red colorway is not only eye-catching but also practical, with a medium pocket depth that facilitates quick ball exchanges. Made from premium Japanese-tanned USA Kip Leather, this glove offers durability and a comfortable fit, enhanced by thumb and pinky sleeves. The sheepskin finger lining and moisture-wicking wrist liner ensure that your hand stays comfortable and dry during intense plays. function positionHandler() {\n    return {\n        top: 0,\n        updatePosition() {\n            this.$nextTick(() => {\n                let viewportCenter = window.innerHeight / 2,\n                    parent = this.$el.parentElement,\n                    parentCenter = parent.clientHeight / 2,\n                    blockHeight = this.$el.offsetHeight / 2\n                this.top = viewportCenter - blockHeight;\n            });\n        }\n    };\n} {\n        \"body\": {\n            \"acidAdvancedReportsAjax\": {\"url\":\"https:\\/\\/betterbaseball.com\\/acid_acidreports\\/countViews\\/product\\/id\\/127820\\/\"}        }\n    } BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW.",
+  "source_url": "https://betterbaseball.com/marucci-capitol-45a3-12-outfield-glove-mfg2cp45a3",
+  "image_url": "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/m/f/mfg2cp45a3.jpg",
+  "warranty": "Glove Length: 12 Inch",
+  "image_urls": [
+    "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/m/f/mfg2cp45a3.jpg"
+  ],
+  "downloaded_images": [
+    "C:\\Users\\Harold Ligon\\Documents\\Coding\\SparQDigital\\BBScraper\\prodInfo\\Gloves_Mitts\\images\\marucci-capitol-45a3-12-outfield-glove-mfg2cp45a3_1.jpg"
+  ],
+  "category_path": [
+    "Gloves & Mitts"
+  ],
+  "features": [
+    "D elivery: FAST & FREE Shipping on all orders",
+    "Warranty: Full 1-year manufacturer's warranty",
+    "Glove Length: 12 Inch",
+    "Web Design: H-Web",
+    "Player Recommendation: Outfield",
+    "Series: Marucci Capitol",
+    "Colorway: Mint & Red",
+    "Pocket Depth: Medium to Encourage Fast Exchanges",
+    "Leather: Premium Japanese-Tanned USA Kip Leather",
+    "Wrist Type: Conventional open back & moisture wicking",
+    "M Type Fit: Thumb & pinky sleeves to maximize feel & comfort",
+    "Finger Lining: Sheepskin lining for comfort in the hand slot",
+    "Moisture-Wicking Wrist Liner: Keeps the back of your wrist dry"
+  ]
+}

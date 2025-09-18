@@ -1,0 +1,34 @@
+{
+  "name": "div",
+  "price": 379.99,
+  "description": "Crafted with precision, the Jax DM-5S infield glove blends Japanese and American craftsmanship to deliver unmatched performance on the field. Its distinctive orange tan leather, complemented by tan lace and gold stitching, creates a striking aesthetic that stands out. The I-Web design and split gray welting enhance the glove's durability and agility, making it perfect for infielders seeking quick, confident plays. Handcrafted in Japan by master glovemakers, the glove's close-fitting design ensures a secure grip and a personalized fit, allowing players to perform at their best. function positionHandler() {\n    return {\n        top: 0,\n        updatePosition() {\n            this.$nextTick(() => {\n                let viewportCenter = window.innerHeight / 2,\n                    parent = this.$el.parentElement,\n                    parentCenter = parent.clientHeight / 2,\n                    blockHeight = this.$el.offsetHeight / 2\n                this.top = viewportCenter - blockHeight;\n            });\n        }\n    };\n} {\n        \"body\": {\n            \"acidAdvancedReportsAjax\": {\"url\":\"https:\\/\\/betterbaseball.com\\/acid_acidreports\\/countViews\\/product\\/id\\/179234\\/\"}        }\n    } BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW.",
+  "source_url": "https://betterbaseball.com/jax-dm-5s-11-25-infield-glove-jffgb-dm5rh-iweb",
+  "image_url": "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/j/f/jffgb-dm5rh-iweb-024.jpg",
+  "warranty": "Player Recommendation: Infield",
+  "image_urls": [
+    "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/j/f/jffgb-dm5rh-iweb-024.jpg"
+  ],
+  "downloaded_images": [
+    "C:\\Users\\Harold Ligon\\Documents\\Coding\\SparQDigital\\BBScraper\\prodInfo\\Gloves_Mitts\\images\\jax-dm-5s-11-25-infield-glove-jffgb-dm5rh-iweb_1.jpg"
+  ],
+  "category_path": [
+    "Gloves & Mitts"
+  ],
+  "features": [
+    "Delivery: FAST & FREE Shipping on all orders",
+    "Warranty: Full 1-year manufacturer's warranty",
+    "Player Recommendation: Infield",
+    "Glove Length: 11.25 inches",
+    "Web Design: I-Web",
+    "Glove Pattern: DM-5S",
+    "Colorway: Blonde & brown",
+    "Wrist Type: Conventional open back",
+    "Leather: Premium Steerhide Leather",
+    "Close-Fitting Design : Thumb closes to the ring finger for a secure grip & enhanced control",
+    "Shallow, Higher Sitting Pocket : Increases feel & allows for quick transfers",
+    "Made in Japan : Handcrafted by master glovemakers for exceptional quality & durability",
+    "Lightweight Construction : Premium Japanese steerhide leather delivers agility without sacrificing strength",
+    "Close Thumb to Ring Finger Design : Reinforces control & precision on every play",
+    "Individualized Fit : Molds uniquely to each athlete’s hand for a personalized, game-ready fit"
+  ]
+}

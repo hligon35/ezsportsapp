@@ -9,7 +9,9 @@
     "init-db": "node init-db.js",
     "db:stats": "node db-utils.js stats",
     "db:backup": "node db-utils.js backup",
-    "db:reset": "node db-utils.js reset"
+    "db:reset": "node db-utils.js reset",
+    "products:sync": "node scripts/sync-products.js",
+    "products:sync:dry": "node scripts/sync-products.js --dry --no-stripe"
   },
   "dependencies": {
     "bcrypt": "^6.0.0",

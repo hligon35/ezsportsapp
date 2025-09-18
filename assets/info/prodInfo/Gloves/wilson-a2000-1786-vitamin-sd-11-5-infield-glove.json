@@ -1,0 +1,32 @@
+{
+  "name": "div",
+  "price": 299.95,
+  "description": "Step onto the diamond with flair and performance like never before with the Wilson A2000 1786 11.5\" Infield Glove—an exclusive gem available only at Better Baseball! This Wilson A2000 infield glove combines the precision of the legendary 1786 pattern with a bold white, seafoam, pink, and yellow colorway that screams personality. The Vitamin SD's 11.5-inch design and classic I-Web make it a must-have for infield maestros, offering a perfect blend of reach, speed, and control for snagging grounders and making lightning-quick transitions. Crafted from Wilson’s renowned Pro Stock Leather, this glove is as durable as it is stylish, ready to shine play after play. The Better Baseball Exclusive glove nickname, “Vitamin SD\", listed above is not the property of or associated with Wilson Sporting Goods Co. The mark Wilson is a registered trademark of Wilson Sporting Goods Co., all rights reserved. The Better Baseball Exclusive glove nickname, “Vitamin SD\", listed above is not the property of or associated with Wilson Sporting Goods Co. The mark Wilson is a registered trademark of Wilson Sporting Goods Co., all rights reserved. function positionHandler() {\n    return {\n        top: 0,\n        updatePosition() {\n            this.$nextTick(() => {\n                let viewportCenter = window.innerHeight / 2,\n                    parent = this.$el.parentElement,\n                    parentCenter = parent.clientHeight / 2,\n                    blockHeight = this.$el.offsetHeight / 2\n                this.top = viewportCenter - blockHeight;\n            });\n        }\n    };\n} {\n        \"body\": {\n            \"acidAdvancedReportsAjax\": {\"url\":\"https:\\/\\/betterbaseball.com\\/acid_acidreports\\/countViews\\/product\\/id\\/165126\\/\"}        }\n    } BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS",
+  "source_url": "https://betterbaseball.com/wilson-a2000-1786-vitamin-sd-11-5-infield-glove",
+  "image_url": "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/w/b/wbw102832.jpg",
+  "warranty": "Glove Pattern: 1786",
+  "image_urls": [
+    "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/w/b/wbw102832.jpg"
+  ],
+  "downloaded_images": [
+    "C:\\Users\\Harold Ligon\\Documents\\Coding\\SparQDigital\\BBScraper\\prodInfo\\Gloves_Mitts\\images\\wilson-a2000-1786-vitamin-sd-11-5-infield-glove_1.jpg"
+  ],
+  "category_path": [
+    "Gloves & Mitts"
+  ],
+  "features": [
+    "Exclusive Design: Only at Better Baseball",
+    "Fast & Free Shipping: Included",
+    "Manufacturer's Warranty: Full 365-Days",
+    "Glove Pattern: 1786",
+    "Series: Wilson A2000",
+    "Glove Length: 11.5 Inch",
+    "Web Design: I-Web",
+    "Colorway: Light Blue & Pink",
+    "Leather: Pro Stock Leather",
+    "Player Recommendation: Infield",
+    "Wrist Type: Conventional Open Back",
+    "Lining: Breathable & Moisture Wicking",
+    "Rolled Dual Welting: Retains Glove Shape"
+  ]
+}

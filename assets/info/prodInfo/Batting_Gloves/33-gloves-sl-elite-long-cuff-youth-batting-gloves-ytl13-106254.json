@@ -1,0 +1,29 @@
+{
+  "name": "strong",
+  "price": 50.0,
+  "description": "The 33 Gloves SL Elite Long Cuff Youth Batting Gloves are expertly designed, refined, and built to fit and perform better, offering young athletes a custom-tailored fit from cuff to fingertips. Featuring a pre-curved palm, reverse stitched and tapered fingers, comfort fit cuff, and 4-way stretch top hand, these gloves provide unmatched comfort and superior bat feel. Say goodbye to puffy palms, misshaped fingers, and irritating bulky seams with our meticulously crafted design. Each pair is handcrafted with precision, eliminating traditional weaknesses through reinforced stitching, extended coverage in high-friction zones, and attention to small details that make a big difference. Invest in quality and experience the difference with gloves that are built to stand the test of time. table {\n  border: 1px solid #ccc;\n  border-collapse: collapse;\n  margin: 0;\n  padding: 0;\n  width: 100%;\n  table-layout: fixed;\n}\n\ntable caption {\n  font-size: 1.5em;\n  margin: .5em 0 .75em;\n}\n\ntable tr {\n  background-color: #FFFFFF;\n  border: 1px solid #ddd;\n  padding: .35em;\n}\n\ntable th,\ntable td {\n  padding: .625em .35em;\n  text-align: left;\n}\n\ntable th {\n  font-size: .5em;\n  letter-spacing: .07em;\n  text-transform: uppercase;\n}\n\n@media screen and (max-width: 600px) {\n  table {\n    border: 0;\n  }\n\n  table caption {\n    font-size: 1.3em;\n  }\n  \n  table thead {\n    border: none;\n    clip: rect(0 0 0 0);\n    height: 1px;\n    margin: -1px;\n    overflow: hidden;\n    padding: 0;\n    position: absolute;\n    width: 1px;\n  }\n  \n  table tr {\n    border-bottom: 2px solid #ddd;\n    display: ;\n    margin-bottom: .625em;\n  }\n  \n  table td {\n    border-bottom: 1px solid #ddd;\n    display: ;\n    font-size: .8em;\n    text-align: left;\n  }\n  \n\n  \n  table td:last-child {\n    border-bottom: 0;\n  }\n} Glove Size Adult Youth S 7-7.25” 6.25-6.5” M 7.25-7.5” 6.5-6.75” L 7.5-7.75” 6.75-7” XL 7.75-8” 7-7.25” XXL 8-8.25” Glove Size Adult Youth S 7-7.25” 6.25-6.5” M 7.25-7.5” 6.5-6.75” L 7.5-7.75” 6.75-7” XL 7.75-8” 7-7.25” XXL 8-8.25” Glove Size Adult Youth Glove Size",
+  "source_url": "https://betterbaseball.com/33-gloves-sl-elite-long-cuff-youth-batting-gloves-ytl13-106254",
+  "image_url": "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/y/t/ytl13-106254_light_blue.jpg",
+  "image_urls": [
+    "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/y/t/ytl13-106254_light_blue.jpg"
+  ],
+  "downloaded_images": [
+    "C:\\Users\\Harold Ligon\\Documents\\Coding\\SparQDigital\\BBScraper\\prodInfo\\Batting_Gloves\\images\\33-gloves-sl-elite-long-cuff-youth-batting-gloves-ytl13-106254_1.jpg"
+  ],
+  "category_path": [
+    "Batting Gloves",
+    "33 Gloves SL Elite Long Cuff Youth Batting Gloves: YTL13-106254"
+  ],
+  "features": [
+    "FIT: SL Elite Long Cuff Gloves offer a secure, tailored fit for hitters, for comfort & freedom of movement",
+    "LEATHER: Soft 0.9mm genuine Cabretta leather with a non-slip finish for superior comfort & protection",
+    "PALM: Pre-curved, single-layer palm & reverse-stitched fingers enhance bat feel & reduce bulk",
+    "TOP HAND: Durable, lightweight, breathable 4-way stretch ensures a secure fit & maximum motion range",
+    "FRICTION ZONES: Reinforced glove-to-glove friction zones increase comfort & glove longevity",
+    "CUFF: Wide neoprene & leather cuff offers wrist support & a secure fit for better swing performance",
+    "CLOSURE: Adjustable cuff with heavy-duty stretch wrap & anti-snag Velcro for customizable fit & support",
+    "FOURCHETTES: Breathable, stretchy fourchettes for superior fit & comfort",
+    "FINGER SHAPE: Tapered fingers mimic natural hand contours for comfort & reduced seam irritation",
+    "THREAD: High-tensile strength nylon thread enhances durability against wear & tear"
+  ]
+}

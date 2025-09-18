@@ -1,0 +1,37 @@
+{
+  "name": "div",
+  "price": 399.99,
+  "description": "The 108 BP Vest is revolutionizing the way hitters and pitchers train by addressing common issues like flying open, failing to get to the front side, and not rotating properly. This innovative training tool requires no verbal cues—simply put it on, pull the band, and watch as athletes achieve personal records effortlessly. The secret lies in understanding how force is applied to the ground, similar to how a punch impacts a punching bag; it's all about the force you generate. By focusing on upper body control, the vest helps athletes harness their energy more effectively, leading to improved balance and performance. Perfect for both bullpens and batting practice, the 108 BP Vest is a multi-use tool that not only trains but also exposes and corrects players' bad habits with dynamic resistance. function positionHandler() {\n    return {\n        top: 0,\n        updatePosition() {\n            this.$nextTick(() => {\n                let viewportCenter = window.innerHeight / 2,\n                    parent = this.$el.parentElement,\n                    parentCenter = parent.clientHeight / 2,\n                    blockHeight = this.$el.offsetHeight / 2\n                this.top = viewportCenter - blockHeight;\n            });\n        }\n    };\n} {\n        \"body\": {\n            \"acidAdvancedReportsAjax\": {\"url\":\"https:\\/\\/betterbaseball.com\\/acid_acidreports\\/countViews\\/product\\/id\\/166278\\/\"}        }\n    } BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW.",
+  "source_url": "https://betterbaseball.com/108-bp-vest",
+  "image_url": "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/1/0/108-5.png",
+  "image_urls": [
+    "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/1/0/108-5.png"
+  ],
+  "downloaded_images": [
+    "C:\\Users\\Harold Ligon\\Documents\\Coding\\SparQDigital\\BBScraper\\prodInfo\\Accessories\\images\\108-bp-vest_1.png"
+  ],
+  "category_path": [
+    "Accessories"
+  ],
+  "features": [
+    "1-year access to 108 BP Vest Playbook: Content on how & why to use the BP Vest Drills specific to swing faults",
+    "Content on how & why to use the BP Vest",
+    "Drills specific to swing faults",
+    "Training Concept: Feed the Mistake – uses dynamic resistance to expose & correct poor mechanics",
+    "Performance Benefits: Helps players stop flying open Promotes proper front-side connection Encourages staying back & rotating through the middle of the field Improves posture & body control without verbal cues",
+    "Helps players stop flying open",
+    "Promotes proper front-side connection",
+    "Encourages staying back & rotating through the middle of the field",
+    "Improves posture & body control without verbal cues",
+    "How It Works: Resistance bands apply dynamic feedback Encourages upper-body driven movement & proper sequencing Reinforces putting force into the ground for efficient energy transfer",
+    "Resistance bands apply dynamic feedback",
+    "Encourages upper-body driven movement & proper sequencing",
+    "Reinforces putting force into the ground for efficient energy transfer",
+    "Scientific Principle: Force is created by the athlete & measured by the ground",
+    "Training Focus: Teaches proper movement initiation from the upper body Enhances leg balance through top-down control",
+    "Teaches proper movement initiation from the upper body",
+    "Enhances leg balance through top-down control",
+    "Bullet Proof: For Bullpens and Batting Practice",
+    "Ideal For: Pitchers and hitters looking to break bad habits & increase performance consistency"
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "name": "div",
+  "price": 139.0,
+  "description": "Discover the ultimate in performance eyewear with the 100% S3 Tokyo Night Purple Multilayer Mirror Sunglasses. Expertly designed in California, the S3® combines the subtle brow of the S2 with the iconic intake vents of the Speedcraft, offering a bold statement of power and precision. These sunglasses feature a 5.5-base cylindrical shield lens for enhanced peripheral vision and protection, with 360º visibility ensuring an unobstructed field of view. Enjoy superior comfort and fit with the ultra-grip rubber nose and temple tips, while the durable TR90 frame and high-impact resistant polycarbonate lenses provide unmatched durability. With additional features like interchangeable lenses and advanced lens treatments, the S3® is perfect for riders seeking both style and functionality. function positionHandler() {\n    return {\n        top: 0,\n        updatePosition() {\n            this.$nextTick(() => {\n                let viewportCenter = window.innerHeight / 2,\n                    parent = this.$el.parentElement,\n                    parentCenter = parent.clientHeight / 2,\n                    blockHeight = this.$el.offsetHeight / 2\n                this.top = viewportCenter - blockHeight;\n            });\n        }\n    };\n} {\n        \"body\": {\n            \"acidAdvancedReportsAjax\": {\"url\":\"https:\\/\\/betterbaseball.com\\/acid_acidreports\\/countViews\\/product\\/id\\/168749\\/\"}        }\n    } BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW.",
+  "source_url": "https://betterbaseball.com/100-s3-tokyo-night-purple-multilayer-mirror-sunglasses-60005-00017",
+  "image_url": "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/6/0/60005-00017.jpg",
+  "warranty": "Frame Color: Tokyo Night",
+  "image_urls": [
+    "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/6/0/60005-00017.jpg"
+  ],
+  "downloaded_images": [
+    "C:\\Users\\Harold Ligon\\Documents\\Coding\\SparQDigital\\BBScraper\\prodInfo\\Accessories\\images\\100-s3-tokyo-night-purple-multilayer-mirror-sunglasses-60005-00017_1.jpg"
+  ],
+  "category_path": [
+    "Accessories"
+  ],
+  "features": [
+    "Delivery: FAST & FREE Shipping on All Orders",
+    "Warranty: 1 Year Through the Manufacturer",
+    "Frame Color: Tokyo Night",
+    "Lenses Color: Purple Multilayer Mirror Light Transmission: 33% Light Conditions: Medium Light Light Filter: 2",
+    "Light Transmission: 33%",
+    "Light Conditions: Medium Light",
+    "Light Filter: 2",
+    "Front Color Finish: Polished",
+    "Polarized: No",
+    "Lenses Material: Polycarbonate, Shatter-Proof & Impact-Resistant",
+    "HiPER Lens: High Contrast & Enhances Detail",
+    "Lower Air Scoops: Increase Ventilation While Reducing Moisture",
+    "360º Visibility: Unobstructed Optimal Field of Vision",
+    "Size & Fit: Width: 157mm Height: 62mm Temple: 129mm",
+    "Width: 157mm",
+    "Height: 62mm",
+    "Temple: 129mm"
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "name": "div",
+  "price": 47.95,
+  "description": "Upgrade your baseball gear with the Rawlings Premium Straight Fit Adult Baseball Pants, designed for athletes seeking both style and functionality. These pants feature a premium unhemmed straight fit, offering a professional look with Pro Style elements like a gripper elastic waistband, flat-lock stitching, and pocket tie-downs. The zipper fly front and two set-in back pockets enhance the sleek, professional appearance. Equipped with advanced technology, these pants provide 2-way stretch for optimal movement, moisture management for comfort, and stain release for easy maintenance, ensuring you stay at the top of your game. Perfect for men who demand performance and style on the baseball field. function positionHandler() {\n    return {\n        top: 0,\n        updatePosition() {\n            this.$nextTick(() => {\n                let viewportCenter = window.innerHeight / 2,\n                    parent = this.$el.parentElement,\n                    parentCenter = parent.clientHeight / 2,\n                    blockHeight = this.$el.offsetHeight / 2\n                this.top = viewportCenter - blockHeight;\n            });\n        }\n    };\n} {\n        \"body\": {\n            \"acidAdvancedReportsAjax\": {\"url\":\"https:\\/\\/betterbaseball.com\\/acid_acidreports\\/countViews\\/product\\/id\\/79570\\/\"}        }\n    } BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW.",
+  "source_url": "https://betterbaseball.com/rawlings-premium-straight-fit-adult-baseball-pants-bpu150",
+  "image_url": "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/b/p/bpu150-white_1.jpg",
+  "image_urls": [
+    "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/b/p/bpu150-white_1.jpg"
+  ],
+  "downloaded_images": [
+    "C:\\Users\\Harold Ligon\\Documents\\Coding\\SparQDigital\\BBScraper\\prodInfo\\Apparel\\images\\rawlings-premium-straight-fit-adult-baseball-pants-bpu150_1.jpg"
+  ],
+  "category_path": [
+    "Apparel"
+  ],
+  "features": [
+    "Delivery : FAST & FREE Shipping on All Orders",
+    "Plated 150 Cloth : Durable 100% polyester circular knit with a professional-grade finish",
+    "2-Way Stretch : Enhanced mobility & comfort with fabric that moves with every play",
+    "Moisture Management : Wicks sweat to keep you dry & focused on the game",
+    "Stain Release : Easy-care fabric helps resist and release dirt & grass stains",
+    "Gripper Elastic Waistband : Keeps your jersey tucked & secure during gameplay",
+    "Flat-Lock Stitching : Reduces chafing while adding durability & a clean look",
+    "Pocket Tie-Downs : Keeps pocket contents secure during intense action",
+    "Zipper Fly & Set-In Back Pockets : Adds pro-style detail & functional storage",
+    "Fit : Premium straight with unhemmed legs for custom tailoring"
+  ]
+}

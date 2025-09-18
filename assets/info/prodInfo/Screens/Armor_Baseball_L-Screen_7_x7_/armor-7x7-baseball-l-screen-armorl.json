@@ -1,0 +1,30 @@
+{
+  "name": "footer",
+  "price": 249.95,
+  "description": "The Armor Series 7’ x 7’ baseball L screen comes with a foam and vinyl wrapped black powder-coated steel frame. The foam and vinyl allow schools and teams to outfit their baseball net with their organization’s color. Most importantly, the foam and vinyl wrap drastically decrease deflection when the baseball makes contact with the pitching net frame. In today’s game, most players are taking batting practice from distances around thirty feet which increases the chances of a violent deflection. Furthermore, the foam and vinyl will increase the lifespan of the pitching net because it prevents the baseball from pinching the net between the ball and frame. WARNING: This screen is intended to protect the pitcher or nearby players during batting practice or practice drills. However, it is possible a batted ball may ricochet off the screen and hit the batter or a nearby player, causing serious injury or even death. Batters, pitchers, and nearby players should always wear appropriate protective equipment while using this product. WARNING: This screen is intended to protect the pitcher or nearby players during batting practice or practice drills. However, it is possible a batted ball may ricochet off the screen and hit the batter or a nearby player, causing serious injury or even death. Batters, pitchers, and nearby players should always wear appropriate protective equipment while using this product. WARNING: This screen is intended to protect the pitcher or nearby players during batting practice or practice drills. However, it is possible a batted ball may ricochet off the screen and hit the batter or a nearby player, causing serious injury or even death. Batters, pitchers, and nearby players should always wear appropriate protective equipment while using this product. WARNING: This screen is intended to protect the pitcher or nearby players during batting practice or practice drills. However, it is possible a batted ball may ricochet off the screen and hit the batter or a nearby player, causing serious injury or even death. Batters, pitchers, and nearby players should always wear appropriate protective equipment while using this product. function positionHandler() {\n    return {\n        top: 0,\n        updatePosition() {\n            this.$nextTick(() => {\n                let viewportCenter = window.innerHeight / 2,\n                    parent = this.$el.parentElement,\n                    parentCenter = parent.clientHeight / 2,\n                    blockHeight = this.$el.offsetHeight / 2\n                this.top = viewportCenter - blockHeight;\n            });\n        }\n    };\n} {\n        \"body\": {\n            \"acidAdvancedReportsAjax\": {\"url\":\"https:\\/\\/betterbaseball.com\\/acid_acidreports\\/countViews\\/product\\/id\\/86597\\/\"}        }\n    } BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy",
+  "source_url": "https://betterbaseball.com/armor-7x7-baseball-l-screen-armorl",
+  "image_url": "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/a/r/armorl_red.jpg",
+  "image_urls": [
+    "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/a/r/armorl_red.jpg"
+  ],
+  "downloaded_images": [
+    "C:\\Users\\Harold Ligon\\Documents\\Coding\\SparQDigital\\BBScraper\\prodInfo\\Armor_Baseball_L-Screen_7_x7_\\images\\armor-7x7-baseball-l-screen-armorl_1.jpg"
+  ],
+  "category_path": [
+    "Armor Baseball L-Screen (7'x7')",
+    "Baseball L-Screens"
+  ],
+  "features": [
+    "Shipping: FREE & FAST DELIVERY",
+    "Durable: 7’H x 7’W L Frame with Hip Guard Protector",
+    "Frame: 15 Gauge Black Powder Coated Steel Frame",
+    "Netting: #60 UV Treated Poly, Double Layer Pillowcase Netting",
+    "Heavy Duty: 18 oz Vinyl & 1 ½” Impact Foam Padding",
+    "Reversible \"L\" Shape: for Right & Left-Handed Pitchers",
+    "All-Weather Materials: Provides Protection from Outdoor Elements",
+    "Match Team Colors: Choose from 11 Color Options",
+    "Shipping Dimensions: Screen Box: 46” x 11” x 11” (45 lbs) Pad Kit Box: 14”H x 14”W x 19”L (10 lbs)",
+    "Screen Box: 46” x 11” x 11” (45 lbs)",
+    "Pad Kit Box: 14”H x 14”W x 19”L (10 lbs)"
+  ]
+}

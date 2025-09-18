@@ -1,0 +1,31 @@
+{
+  "name": "div",
+  "price": 349.99,
+  "description": "The Wilson A2000 1750 SuperSkin 12.5\" Outfield Glove is designed for outfield players seeking exceptional performance and style. Featuring an H-Web design and the 1750 glove pattern, this glove ensures superior control and flexibility. The vibrant colorway of teal, purple, and red adds a striking visual appeal, while the conventional open back wrist type offers a classic feel. Enhanced with Dri-Lex wrist lining for breathability and moisture wicking, this glove keeps your hand dry and comfortable. Crafted with Pro Stock Leather and backed with SuperSkin, the glove is both durable and lightweight, with rolled dual welting to maintain its shape and provide a comfortable fit. function positionHandler() {\n    return {\n        top: 0,\n        updatePosition() {\n            this.$nextTick(() => {\n                let viewportCenter = window.innerHeight / 2,\n                    parent = this.$el.parentElement,\n                    parentCenter = parent.clientHeight / 2,\n                    blockHeight = this.$el.offsetHeight / 2\n                this.top = viewportCenter - blockHeight;\n            });\n        }\n    };\n} {\n        \"body\": {\n            \"acidAdvancedReportsAjax\": {\"url\":\"https:\\/\\/betterbaseball.com\\/acid_acidreports\\/countViews\\/product\\/id\\/168817\\/\"}        }\n    } BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW.",
+  "source_url": "https://betterbaseball.com/wilson-a2000-1750-superskin-12-5-outfield-glove-wbw103455",
+  "image_url": "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/w/b/wbw103455.jpg",
+  "warranty": "Player Recommendation: Outfield",
+  "image_urls": [
+    "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/w/b/wbw103455.jpg"
+  ],
+  "downloaded_images": [
+    "C:\\Users\\Harold Ligon\\Documents\\Coding\\SparQDigital\\BBScraper\\prodInfo\\Gloves_Mitts\\images\\wilson-a2000-1750-superskin-12-5-outfield-glove-wbw103455_1.jpg"
+  ],
+  "category_path": [
+    "Gloves & Mitts"
+  ],
+  "features": [
+    "D elivery: FAST & FREE Shipping on all orders",
+    "Warranty: Full 365-day manufacturer's warranty",
+    "Player Recommendation: Outfield",
+    "Glove Length: 12.5 Inch",
+    "Web Design: H-Web",
+    "Glove Pattern: 1750",
+    "Colorway: Teal, purple, & red",
+    "Wrist Type: Conventional Open Back",
+    "Wrist Lining: Dri-Lex - Ultra-breathable and moisture-wicking",
+    "Leather: Pro Stock Leather",
+    "Rolled Dual Welting: Retains glove shape over time",
+    "SuperSkin Backing: Twice as strong as regular leather"
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "name": "strong",
+  "price": 40.0,
+  "description": "Experience enhanced performance with the Bruce Bolt Baby Blue Xtra Long Compression Leg Sleeves, designed to elevate your game with four key improvements. These sleeves increase blood flow and reduce muscle vibration, helping you play, practice, and train harder and longer. Protect against sliding rash on your knees and shins while enjoying the freedom to wear your preferred sock and shoe combination. Benefit from faster muscle recovery post-game with the aid of graduated compression, which removes lactic acid and boosts oxygen delivery. Keep your legs feeling cool and fresh, reduce potential injuries, and feel the difference in your performance with these essential athletic accessories. table {\n  border: 1px solid #ccc;\n  border-collapse: collapse;\n  margin: 0;\n  padding: 0;\n  width: 100%;\n  table-layout: fixed;\n}\n\ntable caption {\n  font-size: 1.5em;\n  margin: .5em 0 .75em;\n}\n\ntable tr {\n  background-color: #FFFFFF;\n  border: 1px solid #ddd;\n  padding: .35em;\n}\n\ntable th,\ntable td {\n  padding: .625em .35em;\n  text-align: left;\n}\n\ntable th {\n  font-size: .5em;\n  letter-spacing: .07em;\n  text-transform: uppercase;\n}\n\n@media screen and (max-width: 600px) {\n  table {\n    border: 0;\n  }\n\n  table caption {\n    font-size: 1.3em;\n  }\n  \n  table thead {\n    border: none;\n    clip: rect(0 0 0 0);\n    height: 1px;\n    margin: -1px;\n    overflow: hidden;\n    padding: 0;\n    position: absolute;\n    width: 1px;\n  }\n  \n  table tr {\n    border-bottom: 2px solid #ddd;\n    display: ;\n    margin-bottom: .625em;\n  }\n  \n  table td {\n    border-bottom: 1px solid #ddd;\n    display: ;\n    font-size: .8em;\n    text-align: left;\n  }\n  \n\n  \n  table td:last-child {\n    border-bottom: 0;\n  }\n} Height Weight Size 4'8-5'2 60-115 Youth 5'3-5'9 115-170 Small/Medium 5'10-6'2 170-215 Large/XL 6'3-6'9 215-270 XXL Height Weight Size 4'8-5'2 60-115 Youth 5'3-5'9 115-170 Small/Medium 5'10-6'2 170-215 Large/XL 6'3-6'9 215-270 XXL Height Weight Size Height",
+  "source_url": "https://betterbaseball.com/bruce-bolt-purple-leg-sleeve-bb-lslv-pur",
+  "image_url": "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/b/b/bb-lslv-pur.jpg",
+  "image_urls": [
+    "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/b/b/bb-lslv-pur.jpg"
+  ],
+  "downloaded_images": [
+    "C:\\Users\\Harold Ligon\\Documents\\Coding\\SparQDigital\\BBScraper\\prodInfo\\Accessories\\images\\bruce-bolt-purple-leg-sleeve-bb-lslv-pur_1.jpg"
+  ],
+  "category_path": [
+    "Accessories"
+  ],
+  "features": [
+    "Performance Enhancements: Increase blood flow and reduce muscle vibration during play, practice, and workouts Eliminate or reduce sliding rash on knees and shins Improve muscle recovery after games, practices, and training Allow players to wear their preferred sock and shoe combination",
+    "Increase blood flow and reduce muscle vibration during play, practice, and workouts",
+    "Eliminate or reduce sliding rash on knees and shins",
+    "Improve muscle recovery after games, practices, and training",
+    "Allow players to wear their preferred sock and shoe combination",
+    "Play Harder, Longer: Graduated compression increases blood flow by dilating arteries by 40%, providing more oxygen and helping legs feel rested and \"live\" during the game",
+    "Keep Your Legs Cool: Increased blood flow helps maintain a cool and fresh feeling while playing",
+    "Reduce Injuries: Compression reduces muscle and tendon vibration, keeping everything in place and reducing injury potential",
+    "Faster Recovery: Helps with post-game recovery by removing lactic acid, boosting blood flow, and enhancing oxygen delivery; wear for an hour after playing for noticeable results"
+  ]
+}

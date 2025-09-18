@@ -1,0 +1,26 @@
+{
+  "name": "div",
+  "price": 79.99,
+  "description": "Experience unmatched performance and style with the Rawlings ICON Batting Gloves, designed for hitters who demand excellence. These gloves combine luxury with durability, featuring reinforced palm zones that provide extra protection and ensure long-lasting use through countless swings. The double-stitched, rolled edges not only enhance the sleek, tailored look but also contribute to the gloves' structural integrity for sustained performance. An ergonomic embossed neoprene wrist cuff offers flexible support and a secure fit, making these gloves a perfect blend of comfort and functionality. Plus, each pair comes with a stylish Rawlings glove bag for premium storage, reflecting the sophistication and quality synonymous with the ICON name. function positionHandler() {\n    return {\n        top: 0,\n        updatePosition() {\n            this.$nextTick(() => {\n                let viewportCenter = window.innerHeight / 2,\n                    parent = this.$el.parentElement,\n                    parentCenter = parent.clientHeight / 2,\n                    blockHeight = this.$el.offsetHeight / 2\n                this.top = viewportCenter - blockHeight;\n            });\n        }\n    };\n} {\n        \"body\": {\n            \"acidAdvancedReportsAjax\": {\"url\":\"https:\\/\\/betterbaseball.com\\/acid_acidreports\\/countViews\\/product\\/id\\/175588\\/\"}        }\n    } BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW.",
+  "source_url": "https://betterbaseball.com/rawlings-icon-adult-batting-gloves",
+  "image_url": "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/i/c/icon26bg-whwh.jpg",
+  "image_urls": [
+    "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/i/c/icon26bg-whwh.jpg"
+  ],
+  "downloaded_images": [
+    "C:\\Users\\Harold Ligon\\Documents\\Coding\\SparQDigital\\BBScraper\\prodInfo\\Batting_Gloves\\images\\rawlings-icon-adult-batting-gloves_1.jpg"
+  ],
+  "category_path": [
+    "Batting Gloves",
+    "Rawlings Icon Adult Batting Gloves"
+  ],
+  "features": [
+    "Delivery : FAST & FREE Shipping on All Orders",
+    "Cabretta Sheepskin Leather : 0.9mm pro-grade leather for an ultra-soft feel & molds to your hands",
+    "Reinforced Palm Zones : Enhances durability for season-long performance",
+    "Double-Stitched Rolled Edges : Adds structural integrity for a clean, high-performance finish",
+    "Ergonomic Neoprene Wrist Cuff : Embossed neoprene cuff provides flexible support & a secure feel",
+    "Glove Bag Included : Sleek Rawlings glove bag adds protection & presentation for elite hitters",
+    "ICON Design Standard : Built for serious players who demand control, comfort, & standout style"
+  ]
+}

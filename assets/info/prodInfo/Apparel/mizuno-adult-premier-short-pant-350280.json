@@ -1,0 +1,26 @@
+{
+  "name": "strong",
+  "price": 39.95,
+  "description": "Experience top-tier performance with the Mizuno Premier Short Adult Baseball Pant, designed for athletes who demand excellence on the field. Featuring a shorter inseam, these pants are tailored to be worn just below the knee for optimal comfort and style. Renowned for their durability, they boast a tunnel-belt loop waist and a fly front with an extended two-snap closure, ensuring a secure fit. The set-in back pockets with button closures add convenience, while the elastic bottom and embroidered logo enhance their classic baseball look. Crafted with double-knit construction, these lightweight and durable baseball pants are a must-have for any serious player. table {\n  border: 1px solid #ccc;\n  border-collapse: collapse;\n  margin: 0;\n  padding: 0;\n  width: 100%;\n  table-layout: fixed;\n}\n\ntable caption {\n  font-size: 1.5em;\n  margin: .5em 0 .75em;\n}\n\ntable tr {\n  background-color: #FFFFFF;\n  border: 1px solid #ddd;\n  padding: .35em;\n}\n\ntable th,\ntable td {\n  padding: .625em .35em;\n  text-align: left;\n}\n\ntable th {\n  font-size: .5em;\n  letter-spacing: .07em;\n  text-transform: uppercase;\n}\n\n@media screen and (max-width: 600px) {\n  table {\n    border: 0;\n  }\n\n  table caption {\n    font-size: 1.3em;\n  }\n  \n  table thead {\n    border: none;\n    clip: rect(0 0 0 0);\n    height: 1px;\n    margin: -1px;\n    overflow: hidden;\n    padding: 0;\n    position: absolute;\n    width: 1px;\n  }\n  \n  table tr {\n    border-bottom: 2px solid #ddd;\n    display: ;\n    margin-bottom: .625em;\n  }\n  \n  table td {\n    border-bottom: 1px solid #ddd;\n    display: ;\n    font-size: .8em;\n    text-align: left;\n  }\n  \n\n  \n  table td:last-child {\n    border-bottom: 0;\n  }\n} US Size Waist Inseam XS 28-30\" 15\" S 30-32” 16\" M 32-34” 17\" L 34-36” 18\" XL 36-38” 19\" XXL 40-42” 20\" US Size Waist Inseam XS 28-30\" 15\" S 30-32” 16\" M 32-34” 17\" L 34-36” 18\" XL 36-38” 19\" XXL 40-42” 20\" US Size Waist Inseam US Size",
+  "source_url": "https://betterbaseball.com/mizuno-adult-premier-short-pant-350280",
+  "image_url": "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/3/5/350280.jpg",
+  "image_urls": [
+    "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/3/5/350280.jpg"
+  ],
+  "downloaded_images": [
+    "C:\\Users\\Harold Ligon\\Documents\\Coding\\SparQDigital\\BBScraper\\prodInfo\\Apparel\\images\\mizuno-adult-premier-short-pant-350280_1.jpg"
+  ],
+  "category_path": [
+    "Apparel"
+  ],
+  "features": [
+    "Delivery: FAST & FREE Shipping on All Orders",
+    "Premier Short Inseam : Designed to be worn just below the knee for a classic, high-performance baseball look",
+    "Double Knit Fabric : Lightweight yet durable construction built to withstand the demands of elite play",
+    "Tunnel-Belt Loop Waist : Traditional belt loop design for a secure and adjustable fit",
+    "Two-Snap Fly Closure : Extended fly front with two snaps offers a snug and reliable closure",
+    "Set-In Back Pockets : Functional pockets with button closures provide convenient storage",
+    "Elastic Bottom : Keeps the pant securely in place just below the knee",
+    "Embroidered Logo : Premium stitched Mizuno branding for a professional finish"
+  ]
+}

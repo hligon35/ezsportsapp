@@ -1,0 +1,38 @@
+{
+  "name": "div",
+  "price": 139.99,
+  "description": "function positionHandler() {\n    return {\n        top: 0,\n        updatePosition() {\n            this.$nextTick(() => {\n                let viewportCenter = window.innerHeight / 2,\n                    parent = this.$el.parentElement,\n                    parentCenter = parent.clientHeight / 2,\n                    blockHeight = this.$el.offsetHeight / 2\n                this.top = viewportCenter - blockHeight;\n            });\n        }\n    };\n} {\n        \"body\": {\n            \"acidAdvancedReportsAjax\": {\"url\":\"https:\\/\\/betterbaseball.com\\/acid_acidreports\\/countViews\\/product\\/id\\/103266\\/\"}        }\n    } BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW. Email Address SIGN UP",
+  "source_url": "https://betterbaseball.com/rawlings-r9-12-fastpitch-softball-glove-r9sb120fs-18g-r9sb120fs-18g-rht",
+  "image_url": "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/r/9/r9sb120fs-18g.jpg",
+  "warranty": "Glove Length: 12 Inch Glove Length: 12 Inch",
+  "image_urls": [
+    "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/r/9/r9sb120fs-18g.jpg"
+  ],
+  "downloaded_images": [
+    "C:\\Users\\Harold Ligon\\Documents\\Coding\\SparQDigital\\BBScraper\\prodInfo\\Gloves_Mitts\\images\\rawlings-r9-12-fastpitch-softball-glove-r9sb120fs-18g-r9sb120fs-18g-rht_1.jpg"
+  ],
+  "category_path": [
+    "Gloves & Mitts",
+    "Rawlings R9 12\" Fastpitch Softball Glove: R9SB120FS-18G",
+    "Sale",
+    "Closeout Gloves",
+    "Closeout Softball Gloves"
+  ],
+  "features": [
+    "D elivery: FAST & FREE Shipping on All Orders",
+    "Warranty: Full 365-Day Manufacturer's Warranty Included",
+    "Glove Length: 12 Inch",
+    "Web Design: Double-Laced Basket Web",
+    "Player Recommendation: Pitchers & Infielders",
+    "Series: Rawlings R9 Fastpitch Softball",
+    "Glove Fit: 120SB Pattern",
+    "Colorway: Grey with White Lacing",
+    "Easy Break-In: Nearly Game Ready",
+    "Snug Fit Design: Perfect for a Female's Hand",
+    "Index Finger Pad On Shell Backing: For Protection And Comfort",
+    "Adjustable Pull-Strap: Optimal Fit & Comfort",
+    "Quality Full Grain Leather: For Enhanced Durability",
+    "Finger Shift Design: Pinky & Ring Finger To Be Worn In Pinky Slot",
+    "Leather Cushioned Palm Padding: For Impact Protection"
+  ]
+}

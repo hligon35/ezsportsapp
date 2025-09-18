@@ -1,0 +1,33 @@
+{
+  "name": "div",
+  "price": 329.99,
+  "description": "Crafted for the discerning infielder, the Rawlings Heart of the Hide ContoUR 11.5\" Infield Glove combines precision and style with its striking yellow and red colorway. The I-Web design and 314 pattern offer a standard pocket width, perfect for quick ball transfers. Nearly game-ready with its R2G break-in, this glove ensures optimal wrist support with thermoformed padding and unparalleled comfort with a deer-tanned cowhide lining and padded thumb sleeve. The ContoUR Fit provides a secure feel, featuring a smaller hand opening and lowered finger stalls, making it an ideal choice for players seeking both performance and comfort. function positionHandler() {\n    return {\n        top: 0,\n        updatePosition() {\n            this.$nextTick(() => {\n                let viewportCenter = window.innerHeight / 2,\n                    parent = this.$el.parentElement,\n                    parentCenter = parent.clientHeight / 2,\n                    blockHeight = this.$el.offsetHeight / 2\n                this.top = viewportCenter - blockHeight;\n            });\n        }\n    };\n} {\n        \"body\": {\n            \"acidAdvancedReportsAjax\": {\"url\":\"https:\\/\\/betterbaseball.com\\/acid_acidreports\\/countViews\\/product\\/id\\/178990\\/\"}        }\n    } BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW.",
+  "source_url": "https://betterbaseball.com/rawlings-heart-of-the-hide-contour-11-5-infield-glove-pror314u-2y",
+  "image_url": "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/p/r/pror314u-2y.jpg",
+  "warranty": "Glove Length: 11.5 Inch",
+  "image_urls": [
+    "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/p/r/pror314u-2y.jpg"
+  ],
+  "downloaded_images": [
+    "C:\\Users\\Harold Ligon\\Documents\\Coding\\SparQDigital\\BBScraper\\prodInfo\\Gloves_Mitts\\images\\rawlings-heart-of-the-hide-contour-11-5-infield-glove-pror314u-2y_1.jpg"
+  ],
+  "category_path": [
+    "Gloves & Mitts"
+  ],
+  "features": [
+    "Delivery: FAST & FREE Shipping on all orders",
+    "Warranty: Full 1-year manufacturer's warranty",
+    "Glove Length: 11.5 Inch",
+    "Web Design: I-Web",
+    "Player Recommendation: Infielder",
+    "Series: Heart of the Hide R2G",
+    "Glove Fit: 314 Pattern (Standard pocket width)",
+    "Colorway: Yellow & red",
+    "Wrist Type: Conventional open back",
+    "R2G Break-In: Nearly game-ready",
+    "Lining: Deer-Tanned Cowhide Plus",
+    "Padded Thumb Sleeve: Provides exceptional comfort",
+    "Thermoformed Padding: Allows for optimal wrist support",
+    "ContoUR Fit : Offers a secure fit w/ a smaller hand opening & lowered finger stalls"
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "name": "div",
+  "price": 79.95,
+  "description": "Introducing the Naked Grips Flamingo Sliding Mitt, a must-have for any baseball enthusiast looking to elevate their game with style and functionality. Mingle with Mingo and enjoy the oozing vibes of this unique mitt, designed with a structurally reinforced construction and a stiff build that outshines the competition. Pair it seamlessly with the matching Flamingo bat grip and batting gloves, and don't forget the custom carrying tote for all your ballgame essentials. Crafted with premium neoprene for lightweight, breathable use, and featuring a flexible vinyl strap for custom comfort, this mitt offers dual-layered hand pad shells to protect against cleats and agrilime scrapes. The easy-on, easy-off design ensures a quick transition to running the bases, while the next-level DRIP with premium rubber stamp designs adds the perfect finishing touch to your collection. function positionHandler() {\n    return {\n        top: 0,\n        updatePosition() {\n            this.$nextTick(() => {\n                let viewportCenter = window.innerHeight / 2,\n                    parent = this.$el.parentElement,\n                    parentCenter = parent.clientHeight / 2,\n                    blockHeight = this.$el.offsetHeight / 2\n                this.top = viewportCenter - blockHeight;\n            });\n        }\n    };\n} {\n        \"body\": {\n            \"acidAdvancedReportsAjax\": {\"url\":\"https:\\/\\/betterbaseball.com\\/acid_acidreports\\/countViews\\/product\\/id\\/166997\\/\"}        }\n    } BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW.",
+  "source_url": "https://betterbaseball.com/naked-grips-flamingo-sliding-mitt-nkdsm-fo",
+  "image_url": "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/n/k/nkdsm-fo.jpg",
+  "image_urls": [
+    "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/n/k/nkdsm-fo.jpg"
+  ],
+  "downloaded_images": [
+    "C:\\Users\\Harold Ligon\\Documents\\Coding\\SparQDigital\\BBScraper\\prodInfo\\Accessories\\images\\naked-grips-flamingo-sliding-mitt-nkdsm-fo_1.jpg"
+  ],
+  "category_path": [
+    "Accessories"
+  ],
+  "features": [
+    "Construction : Structurally reinforced with a stiff, durable build—outperforms flimsy alternatives",
+    "Material Composition : Made with polyester, wool lycra, neoprene, & nylon for comfort & performance",
+    "Comfort & Fit : Premium neoprene for lightweight breathability; flexible vinyl strap for a custom fit",
+    "Protection : Dual-layer hand pad shells guard against cleats & scrapes from agrilime",
+    "Convenience : Easy-on, easy-off design for fast base running transitions",
+    "Visual Appeal : Premium rubber-stamped design replaces basic embroidery for elite style"
+  ]
+}

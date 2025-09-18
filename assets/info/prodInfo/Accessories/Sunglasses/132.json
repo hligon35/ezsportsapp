@@ -1,0 +1,37 @@
+{
+  "name": "div",
+  "price": 185.0,
+  "description": "The 100 Percent Speedcraft Tokyo Night Purple Multilayer Mirror Sunglasses are engineered for peak sports performance, boasting advanced technology and a stylish design. Featuring the signature 100% cylindrical shield lens, these sunglasses provide 360-degree visibility in the riding position, ensuring an unobstructed field of vision. Enhanced comfort is delivered through ultra-grip rubber nose and temple tips, while lower air scoops increase ventilation and minimize moisture on the lens. Designed in California, these sunglasses come with a hard case, microfiber cleaning bag, and additional accessories, and are available with contrast-defining HiPER and photochromic lens options for optimal visual clarity. With UV400 protection and hydrophobic lens treatment, these sunglasses are perfect for athletes seeking both style and performance. function positionHandler() {\n    return {\n        top: 0,\n        updatePosition() {\n            this.$nextTick(() => {\n                let viewportCenter = window.innerHeight / 2,\n                    parent = this.$el.parentElement,\n                    parentCenter = parent.clientHeight / 2,\n                    blockHeight = this.$el.offsetHeight / 2\n                this.top = viewportCenter - blockHeight;\n            });\n        }\n    };\n} {\n        \"body\": {\n            \"acidAdvancedReportsAjax\": {\"url\":\"https:\\/\\/betterbaseball.com\\/acid_acidreports\\/countViews\\/product\\/id\\/118030\\/s\\/100-percent-speedcraft-tokyo-night-purple-multilayer-mirror-sunglasses-60007-00017\\/category\\/132\\/\"}        }\n    } BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW.",
+  "source_url": "https://betterbaseball.com/catalog/product/view/id/118030/s/100-percent-speedcraft-tokyo-night-purple-multilayer-mirror-sunglasses-60007-00017/category/132/",
+  "image_url": "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/6/0/60007-00017.jpg",
+  "warranty": "Frame Color: Tokyo Night",
+  "image_urls": [
+    "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/6/0/60007-00017.jpg"
+  ],
+  "downloaded_images": [
+    "C:\\Users\\Harold Ligon\\Documents\\Coding\\SparQDigital\\BBScraper\\prodInfo\\Accessories\\Sunglasses\\images\\132_1.jpg"
+  ],
+  "category_path": [
+    "Accessories",
+    "Sunglasses"
+  ],
+  "features": [
+    "Delivery: FAST & FREE Shipping on All Orders",
+    "Warranty: 1 Year Through the Manufacturer",
+    "Frame Color: Tokyo Night",
+    "Lenses Color: Purple Multilayer Mirror Light Transmission: 33% Light Conditions: Medium Light Light Filter: 2",
+    "Light Transmission: 33%",
+    "Light Conditions: Medium Light",
+    "Light Filter: 2",
+    "Front Color Finish: Polished",
+    "Polarized: No",
+    "Lenses Material: Polycarbonate, Shatter-Proof & Impact-Resistant",
+    "HiPER Lens: High Contrast & Enhances Detail",
+    "Lower Air Scoops: Increase Ventilation While Reducing Moisture",
+    "360º Visibility: Unobstructed Optimal Field of Vision",
+    "Size & Fit: Width: 156mm Height: 66mm Temple: 110mm",
+    "Width: 156mm",
+    "Height: 66mm",
+    "Temple: 110mm"
+  ]
+}

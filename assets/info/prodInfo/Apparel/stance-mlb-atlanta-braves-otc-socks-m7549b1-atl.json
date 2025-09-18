@@ -1,0 +1,28 @@
+{
+  "name": "div",
+  "price": 23.99,
+  "description": "Elevate your athletic performance with the officially MLB-approved Stance MLB Atlanta Braves OTC Socks, designed to enhance your game with cutting-edge technology. These over-the-calf socks feature FRESHTEK™ moisture and odor control, ensuring you stay fresh and dry during intense matches. Engineered for high-performance athletes, they offer antimicrobial, sweat-wicking properties, gradual compression, and performance cushioning for maximum support and comfort. With channeled air cushioning, engineered ankle protection, and a seamless toe closure, these socks are crafted to provide superior performance and protection on the field. function positionHandler() {\n    return {\n        top: 0,\n        updatePosition() {\n            this.$nextTick(() => {\n                let viewportCenter = window.innerHeight / 2,\n                    parent = this.$el.parentElement,\n                    parentCenter = parent.clientHeight / 2,\n                    blockHeight = this.$el.offsetHeight / 2\n                this.top = viewportCenter - blockHeight;\n            });\n        }\n    };\n} {\n        \"body\": {\n            \"acidAdvancedReportsAjax\": {\"url\":\"https:\\/\\/betterbaseball.com\\/acid_acidreports\\/countViews\\/product\\/id\\/127787\\/\"}        }\n    } BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW.",
+  "source_url": "https://betterbaseball.com/stance-mlb-atlanta-braves-otc-socks-m7549b1-atl",
+  "image_url": "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/m/7/m7549b1-atl.jpg",
+  "image_urls": [
+    "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/m/7/m7549b1-atl.jpg"
+  ],
+  "downloaded_images": [
+    "C:\\Users\\Harold Ligon\\Documents\\Coding\\SparQDigital\\BBScraper\\prodInfo\\Apparel\\images\\stance-mlb-atlanta-braves-otc-socks-m7549b1-atl_1.jpg"
+  ],
+  "category_path": [
+    "Apparel"
+  ],
+  "features": [
+    "Height : Over the calf design for full-length coverage",
+    "Material : Durable nylon blend for a balanced feel and performance",
+    "Cushioning : Medium cushioning with performance padding for impact protection",
+    "Moisture & Odor Control : FRESHTEK™ technology wicks away sweat & neutralizes odor",
+    "Airflow : Channeled air cushioning & performance mesh enhance breathability",
+    "Ankle Protection : Engineered design supports and shields the ankle during movement",
+    "Arch Support : Performance arch support for improved fit & reduced fatigue",
+    "Toe Comfort : Seamless toe closure helps prevent irritation",
+    "Heel Fit : Deep heel pocket ensures a secure, stay-put fit",
+    "Fabric Composition : 74% nylon, 18% polyester, 3% combed cotton, 1% elastane"
+  ]
+}

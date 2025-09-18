@@ -1,0 +1,28 @@
+{
+  "name": "div",
+  "price": 19.99,
+  "description": "Elevate your workout experience with the JUNK BB Black/White Flex Tie Headband, crafted from professional-grade jersey material for unparalleled comfort and durability. Engineered with efficient moisture-wicking technology, this headband keeps you dry and focused during even the most intense activities. Its non-slip design ensures a secure fit, while the four-way stretch allows for unrestricted movement, making it ideal for any sport. Breathable and easy to care for, this washable headband maintains its performance wash after wash, catering to all athletes with its unisex design. function positionHandler() {\n    return {\n        top: 0,\n        updatePosition() {\n            this.$nextTick(() => {\n                let viewportCenter = window.innerHeight / 2,\n                    parent = this.$el.parentElement,\n                    parentCenter = parent.clientHeight / 2,\n                    blockHeight = this.$el.offsetHeight / 2\n                this.top = viewportCenter - blockHeight;\n            });\n        }\n    };\n} {\n        \"body\": {\n            \"acidAdvancedReportsAjax\": {\"url\":\"https:\\/\\/betterbaseball.com\\/acid_acidreports\\/countViews\\/product\\/id\\/177554\\/\"}        }\n    } BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW.",
+  "source_url": "https://betterbaseball.com/junk-bb-black-white-flex-tie-headband",
+  "image_url": "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/j/b/jb-bb-blackflextie.jpg",
+  "image_urls": [
+    "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/j/b/jb-bb-blackflextie.jpg"
+  ],
+  "downloaded_images": [
+    "C:\\Users\\Harold Ligon\\Documents\\Coding\\SparQDigital\\BBScraper\\prodInfo\\Apparel\\images\\junk-bb-black-white-flex-tie-headband_1.jpg"
+  ],
+  "category_path": [
+    "Apparel"
+  ],
+  "features": [
+    "Delivery : FAST & FREE Shipping on All Orders",
+    "Pro Sport Jersey Fabric : Professional-grade jersey material designed for comfort & durability",
+    "Wicking : Efficient moisture-wicking technology to keep you dry",
+    "Non-Slip : Secure fit that stays in place during activity",
+    "4 Way Stretch : Enhanced flexibility for unrestricted movement",
+    "Breathable : Allows airflow to keep you cool during intense workouts",
+    "Washable : Easy-care fabric that maintains performance after washing",
+    "Unisex : Designed to fit & perform for all athletes",
+    "Fabric Blend : 92% polyester / 8% spandex for optimal stretch & comfort",
+    "Flex Tie Headband Dimensions : 2.5\" wide by 29\" tall"
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "name": "div",
+  "price": 179.99,
+  "description": "Designed for young travel ball players, the Rawlings NXT 12.25\" Outfield Glove offers unmatched versatility and performance on the field. Its innovative 207U pattern provides exceptional control and comfort, making it ideal for both outfield catches and infield plays. The ContoUR Fit system ensures a snug fit for smaller hands, boosting confidence and enabling quick, agile movements. Finished in a striking Gray and Columbia Blue colorway, this glove features a padded thumb sleeve and Pro H™ web, combining professional-grade aesthetics with top-tier functionality. function positionHandler() {\n    return {\n        top: 0,\n        updatePosition() {\n            this.$nextTick(() => {\n                let viewportCenter = window.innerHeight / 2,\n                    parent = this.$el.parentElement,\n                    parentCenter = parent.clientHeight / 2,\n                    blockHeight = this.$el.offsetHeight / 2\n                this.top = viewportCenter - blockHeight;\n            });\n        }\n    };\n} {\n        \"body\": {\n            \"acidAdvancedReportsAjax\": {\"url\":\"https:\\/\\/betterbaseball.com\\/acid_acidreports\\/countViews\\/product\\/id\\/178945\\/\"}        }\n    } BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW.",
+  "source_url": "https://betterbaseball.com/rawlings-nxt-12-25-outfield-glove-nxt207u-6g",
+  "image_url": "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/n/x/nxt207u-6g.jpg",
+  "warranty": "Glove Length: 12.25 Inch",
+  "image_urls": [
+    "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/n/x/nxt207u-6g.jpg"
+  ],
+  "downloaded_images": [
+    "C:\\Users\\Harold Ligon\\Documents\\Coding\\SparQDigital\\BBScraper\\prodInfo\\Gloves_Mitts\\images\\rawlings-nxt-12-25-outfield-glove-nxt207u-6g_1.jpg"
+  ],
+  "category_path": [
+    "Gloves & Mitts",
+    "Rawlings NXT 12.25\" Outfield Glove: NXT207U-6G"
+  ],
+  "features": [
+    "D elivery: FAST & FREE Shipping on all orders",
+    "Warranty: Full 1-year manufacturer's warranty",
+    "Glove Length: 12.25 Inch",
+    "Web Design: H-Web",
+    "Glove Fit: Youth ContoUR",
+    "Colorway: Grey & columbia blue",
+    "Pro-Soft Leather Shell: Designed for an easy break-in",
+    "Conventional Back: Wide opening above the wrist",
+    "Reinforced Palm Pad: Impact protection",
+    "Padded Fingerback Lining: Soft, comfortable feel"
+  ]
+}

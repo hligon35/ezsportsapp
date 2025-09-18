@@ -1,0 +1,29 @@
+{
+  "name": "div",
+  "price": 175.0,
+  "description": "The Mizuno Prime Elite GPE1150M 11.5\" Infield Glove is part of the distinguished MVP Prime Elite series, designed for serious players seeking top-tier performance. With an 11.5-inch length and a classic I-Web design, this glove is perfect for infielders looking to enhance their game. Featuring a striking tan and orange colorway, it combines style with functionality. The glove boasts smooth leather that delivers the perfect balance of oil and softness, ensuring a comfortable feel. Additionally, the perforated thumb and pinky reduce sting and weight, while the ultrasoft pro palm liner offers unparalleled comfort in the palm, making it an ideal choice for dedicated athletes. function positionHandler() {\n    return {\n        top: 0,\n        updatePosition() {\n            this.$nextTick(() => {\n                let viewportCenter = window.innerHeight / 2,\n                    parent = this.$el.parentElement,\n                    parentCenter = parent.clientHeight / 2,\n                    blockHeight = this.$el.offsetHeight / 2\n                this.top = viewportCenter - blockHeight;\n            });\n        }\n    };\n} {\n        \"body\": {\n            \"acidAdvancedReportsAjax\": {\"url\":\"https:\\/\\/betterbaseball.com\\/acid_acidreports\\/countViews\\/product\\/id\\/108359\\/\"}        }\n    } BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW.",
+  "source_url": "https://betterbaseball.com/mizuno-prime-elite-gpe1150m-11-5-infield-glove-312875",
+  "image_url": "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/3/1/312875.jpg",
+  "warranty": "Glove Series: MVP Prime Elite",
+  "image_urls": [
+    "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/3/1/312875.jpg"
+  ],
+  "downloaded_images": [
+    "C:\\Users\\Harold Ligon\\Documents\\Coding\\SparQDigital\\BBScraper\\prodInfo\\Gloves_Mitts\\images\\mizuno-prime-elite-gpe1150m-11-5-infield-glove-312875_1.jpg"
+  ],
+  "category_path": [
+    "Gloves & Mitts"
+  ],
+  "features": [
+    "D elivery: FAST & FREE Shipping on All Orders",
+    "Warranty: Full 365-Day Manufacturer's Warranty Included",
+    "Glove Series: MVP Prime Elite",
+    "Glove Length: 11.5 Inch",
+    "Web Design: I-Web",
+    "Colorway: Tan & Orange",
+    "Wrist Type: Conventional Open Back",
+    "Bio Soft Leather: Smooth Leather with the Perfect Balance of Oil and Softness",
+    "Perforated Thumb & Pinky: Lessens sting & weight",
+    "Ultrasoft Pro Palm Liner: Ultra comfortable in the palm"
+  ]
+}

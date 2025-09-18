@@ -1,0 +1,27 @@
+{
+  "name": "footer",
+  "price": 199.95,
+  "description": "The Armor 7x7 Protective Screen, except for the price, is anything but an economy screen. The Armor screens are equipped with a 1 ⅝”  industrial grade powder coated steel frame and #60 gauge poly double layered pillowcase netting. It is built to withstand the constant abuse and outlast the competition. This screen was designed to maximize quality and durability without breaking the bank! Perfect for use as an on field protective screen or as a barrier in a facility. Match your team’s colors, reduce batted ball ricochet, and protect the life of your netting by adding the heavy duty foam and vinyl pad kit. The Armor 7x7 Protective Baseball Screen is an all-weather baseball screen designed for personal and recreational usage. This durable, heavy duty square frame is constructed from 15 gauge black powder coated steel and features 18 oz vinyl and 1 ½” impact foam padding to provide extra protection from any enemy line drives. The netting is constructed of #60 UV treated poly, making it two layers of pillowcase material that will keep your gear safe while you practice or train outdoors. Plus choose between 11 different color options to match your team colors. Play with confidence knowing that the Armor 7x7 Protective Baseball Screen has got you covered! WARNING: This screen is intended to protect the pitcher or nearby players during batting practice or practice drills. However, it is possible a batted ball may ricochet off the screen and hit the batter or a nearby player, causing serious injury or even death. Batters, pitchers, and nearby players should always wear appropriate protective equipment while using this product. WARNING: This screen is intended to protect the pitcher or nearby players during batting practice or practice drills. However, it is possible a batted ball may ricochet off the screen and hit the batter or a nearby player, causing serious injury or even death. Batters, pitchers, and nearby players should always wear appropriate protective equipment while using this product. WARNING: This screen is intended to protect the pitcher or nearby players during batting practice or practice drills. However, it is possible a batted ball may ricochet off the screen and hit the batter or a nearby player, causing serious injury or even death. Batters, pitchers, and nearby players should always wear appropriate protective equipment while using this product. WARNING: This screen is intended to protect the pitcher or nearby players during batting practice or practice drills. However, it is possible a batted ball may ricochet off the screen and hit the batter or a nearby player, causing serious injury or even death. Batters, pitchers, and nearby players should always wear appropriate protective equipment while using this product. function positionHandler() {\n    return {\n        top: 0,\n        updatePosition() {\n            this.$nextTick(() => {\n                let viewportCenter = window.innerHeight / 2,\n                    parent = this.$el.parentElement,\n                    parentCenter = parent.clientHeight / 2,\n                    blockHeight = this.$el.offsetHeight / 2\n                this.top = viewportCenter - blockHeight;\n            });\n        }\n    };\n} {\n        \"body\": {\n            \"acidAdvancedReportsAjax\": {\"url\":\"https:\\/\\/betterbaseball.com\\/acid_acidreports\\/countViews\\/product\\/id\\/86404\\/\"}        }\n    } BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy",
+  "source_url": "https://betterbaseball.com/better-baseball-armor-7x7-protective-screen-armor7x7",
+  "image_url": "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/a/r/armor7x7-royal-main.jpg",
+  "image_urls": [
+    "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/a/r/armor7x7-royal-main.jpg"
+  ],
+  "downloaded_images": [
+    "C:\\Users\\Harold Ligon\\Documents\\Coding\\SparQDigital\\BBScraper\\prodInfo\\Armor_Protective_Screen_7_x7_\\images\\better-baseball-armor-7x7-protective-screen-armor7x7_1.jpg"
+  ],
+  "category_path": [
+    "Armor Protective Screen (7'x7')",
+    "Baseball L-Screens"
+  ],
+  "features": [
+    "Shipping: FREE & FAST DELIVERY",
+    "Durable: 7’H x 7’W Square Frame",
+    "Frame: 15 Gauge Black Powder Coated Steel Frame",
+    "Netting: #60 UV Treated Poly, Double Layer Pillowcase Netting",
+    "Heavy Duty: 18 oz Vinyl & 1 ½” Impact Foam Padding",
+    "All-Weather Materials: Provides Protection from Outdoor Elements",
+    "Match Team Colors: Choose from 11 Color Options",
+    "Designed For: Personal & Recreational Usage"
+  ]
+}

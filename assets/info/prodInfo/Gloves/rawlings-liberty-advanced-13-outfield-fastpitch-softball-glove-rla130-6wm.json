@@ -1,0 +1,31 @@
+{
+  "name": "div",
+  "price": 199.99,
+  "description": "Experience exceptional performance on the field with the Rawlings Liberty Advanced 13\" Outfield Fastpitch Softball Glove, designed for outfield players seeking superior quality and style. Featuring a robust H-Web design and a striking white and teal colorway, this glove not only stands out visually but also offers functionality with its deep pocket, ideal for quick transitions and a secure catch. Crafted with a full-grain oil treated leather shell and lined with deer-tanned cowhide, it ensures a game-ready feel and exceptional durability. The Poron XRD palm pad provides excellent protection by minimizing sting, while the adjustable, non-slip pull strap back allows for a custom fit, enhancing comfort and control during play. function positionHandler() {\n    return {\n        top: 0,\n        updatePosition() {\n            this.$nextTick(() => {\n                let viewportCenter = window.innerHeight / 2,\n                    parent = this.$el.parentElement,\n                    parentCenter = parent.clientHeight / 2,\n                    blockHeight = this.$el.offsetHeight / 2\n                this.top = viewportCenter - blockHeight;\n            });\n        }\n    };\n} {\n        \"body\": {\n            \"acidAdvancedReportsAjax\": {\"url\":\"https:\\/\\/betterbaseball.com\\/acid_acidreports\\/countViews\\/product\\/id\\/142012\\/\"}        }\n    } BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW.",
+  "source_url": "https://betterbaseball.com/rawlings-liberty-advanced-13-outfield-fastpitch-softball-glove-rla130-6wm",
+  "image_url": "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/r/l/rla130-6wm.jpg",
+  "warranty": "Glove Length: 13 Inch",
+  "image_urls": [
+    "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/r/l/rla130-6wm.jpg"
+  ],
+  "downloaded_images": [
+    "C:\\Users\\Harold Ligon\\Documents\\Coding\\SparQDigital\\BBScraper\\prodInfo\\Gloves_Mitts\\images\\rawlings-liberty-advanced-13-outfield-fastpitch-softball-glove-rla130-6wm_1.jpg"
+  ],
+  "category_path": [
+    "Gloves & Mitts"
+  ],
+  "features": [
+    "D elivery: FAST & FREE Shipping on all orders",
+    "Warranty: Full 1-year manufacturer's warranty",
+    "Glove Length: 13 Inch",
+    "Web Design: H-Web",
+    "Player Recommendation: Outfield",
+    "Series: Liberty Advanced",
+    "Colorway: White & teal",
+    "Lining: Deer-tanned cowhide",
+    "Deep Pocket: Perfect for quick transitions & a tight squeeze",
+    "Full-Grain Oil Treated Leather Shell: Provides game-ready feel",
+    "Poron XRD Palm Pad: Decrease sting by providing great protection",
+    "Adjustable, Non-Slip Pull Strap Back: Equips a custom fit"
+  ]
+}

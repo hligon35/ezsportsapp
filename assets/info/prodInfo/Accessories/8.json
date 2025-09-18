@@ -1,0 +1,59 @@
+{
+  "name": "div",
+  "price": 79.99,
+  "description": "function positionHandler() {\n    return {\n        top: 0,\n        updatePosition() {\n            this.$nextTick(() => {\n                let viewportCenter = window.innerHeight / 2,\n                    parent = this.$el.parentElement,\n                    parentCenter = parent.clientHeight / 2,\n                    blockHeight = this.$el.offsetHeight / 2\n                this.top = viewportCenter - blockHeight;\n            });\n        }\n    };\n} {\n        \"body\": {\n            \"acidAdvancedReportsAjax\": {\"url\":\"https:\\/\\/betterbaseball.com\\/acid_acidreports\\/countViews\\/product\\/id\\/175741\\/s\\/velo-shades-slider-gen-2-phantom-blue-ice-sunglasses\\/category\\/8\\/\"}        }\n    } BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW. Email Address SIGN UP",
+  "source_url": "https://betterbaseball.com/catalog/product/view/id/175741/s/velo-shades-slider-gen-2-phantom-blue-ice-sunglasses/category/8/",
+  "image_url": "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/v/e/velo-slider_adult_blue.jpg",
+  "image_urls": [
+    "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/v/e/velo-slider_adult_blue.jpg",
+    "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/6/0/60007-00017.jpg",
+    "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/n/k/nkdgrpsxx-pink_2.jpg",
+    "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/v/e/velo-cut_adult_pink.jpg"
+  ],
+  "downloaded_images": [
+    "C:\\Users\\Harold Ligon\\Documents\\Coding\\SparQDigital\\BBScraper\\prodInfo\\Accessories\\images\\8_1.jpg"
+  ],
+  "category_path": [
+    "Accessories"
+  ],
+  "features": [
+    "Delivery: FAST & FREE Shipping on All Orders",
+    "Frame Color: Phantom Blue Ice",
+    "Lenses Color: Blue",
+    "Front Color Finish: Polished",
+    "Nose Pad: Rubber",
+    "UV Protection: 100%, UV400",
+    "Frame Material : T90 Lightweight Polycarbonate",
+    "Lenses Material: Polycarbonate - Shatterproof/Impact Resistant",
+    "Dimensions: 53.5 x 132mm",
+    "What's Included: VELO Shades Sunglasses VELO Hard Protective Case Microfiber Bag Microfiber Cleaning Cloth",
+    "VELO Shades Sunglasses",
+    "VELO Hard Protective Case",
+    "Microfiber Bag",
+    "Microfiber Cleaning Cloth",
+    "Warranty: 1 Year Through the Manufacturer",
+    "Frame Color: Tokyo Night",
+    "Lenses Color: Purple Multilayer Mirror Light Transmission: 33% Light Conditions: Medium Light Light Filter: 2",
+    "Light Transmission: 33%",
+    "Light Conditions: Medium Light",
+    "Light Filter: 2",
+    "Polarized: No",
+    "Lenses Material: Polycarbonate, Shatter-Proof & Impact-Resistant",
+    "HiPER Lens: High Contrast & Enhances Detail",
+    "Lower Air Scoops: Increase Ventilation While Reducing Moisture",
+    "360º Visibility: Unobstructed Optimal Field of Vision",
+    "Size & Fit: Width: 156mm Height: 66mm Temple: 110mm",
+    "Width: 156mm",
+    "Height: 66mm",
+    "Temple: 110mm",
+    "Grip Options : Available in 1.0mm & 0.5mm thicknesses — 1.0mm ideal for metal bats (shock absorption), 0.5mm perfect for wood bats (minimal thickness)",
+    "Feel : Silky soft textures with superior tackiness & pillow-like comfort",
+    "Durability : Built with state-of-the-art polymers and custom stamping for multi-directional flex & long-lasting performance",
+    "Finishing Tape : Signature Nkd finishing tape with 3M adhesive — ultra-sticky & peel-resistant",
+    "Frame Color: Phantom Pink",
+    "Lenses Color: Pink",
+    "Lenses Material: Polycarbonate - Shatterproof/Impact-Resistant",
+    "Dimensions: Small - 55.5 x 132mm; Large - 57 x 143mm"
+  ],
+  "warranty": "Frame Color: Tokyo Night"
+}

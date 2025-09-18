@@ -9,7 +9,9 @@
     "init-db": "npm --prefix server run init-db",
     "db:stats": "npm --prefix server run db:stats",
     "db:backup": "npm --prefix server run db:backup",
-    "db:reset": "npm --prefix server run db:reset"
+    "db:reset": "npm --prefix server run db:reset",
+    "products:sync": "node server/scripts/sync-products.js",
+    "products:sync:dry": "node server/scripts/sync-products.js --dry --no-stripe"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",

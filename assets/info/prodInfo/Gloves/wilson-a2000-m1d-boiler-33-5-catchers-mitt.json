@@ -1,0 +1,33 @@
+{
+  "name": "div",
+  "price": 299.95,
+  "description": "Step up your game with this exclusive Wilson A2000 M1D 33.5\" Catcher's Mitt, only available at Better Baseball! This top-of-the-line Wilson Catcher's Mitt is crafted for serious catchers who demand performance and durability. Built on the M1D glove pattern, it combines a sleek black and blonde colorway with Wilson’s Pro Stock Leather, known for its exceptional feel and longevity. With a closed web design, this Wilson A2000 Catcher's Mitt delivers that secure pocket catchers rely on, giving you the confidence to block and hold the ball like a pro. Plus, the flat finger binding adds a touch of comfort, letting you focus on calling the game, not breaking in your glove. The Better Baseball Exclusive glove nickname, “Boiler\", listed above is not the property of or associated with Wilson Sporting Goods Co. The mark Wilson is a registered trademark of Wilson Sporting Goods Co., all rights reserved. The Better Baseball Exclusive glove nickname, “Boiler\", listed above is not the property of or associated with Wilson Sporting Goods Co. The mark Wilson is a registered trademark of Wilson Sporting Goods Co., all rights reserved. function positionHandler() {\n    return {\n        top: 0,\n        updatePosition() {\n            this.$nextTick(() => {\n                let viewportCenter = window.innerHeight / 2,\n                    parent = this.$el.parentElement,\n                    parentCenter = parent.clientHeight / 2,\n                    blockHeight = this.$el.offsetHeight / 2\n                this.top = viewportCenter - blockHeight;\n            });\n        }\n    };\n} {\n        \"body\": {\n            \"acidAdvancedReportsAjax\": {\"url\":\"https:\\/\\/betterbaseball.com\\/acid_acidreports\\/countViews\\/product\\/id\\/165112\\/\"}        }\n    } BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS",
+  "source_url": "https://betterbaseball.com/wilson-a2000-m1d-boiler-33-5-catchers-mitt",
+  "image_url": "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/w/b/wbw102827.jpg",
+  "warranty": "Glove Pattern: M1D",
+  "image_urls": [
+    "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/w/b/wbw102827.jpg"
+  ],
+  "downloaded_images": [
+    "C:\\Users\\Harold Ligon\\Documents\\Coding\\SparQDigital\\BBScraper\\prodInfo\\Gloves_Mitts\\images\\wilson-a2000-m1d-boiler-33-5-catchers-mitt_1.jpg"
+  ],
+  "category_path": [
+    "Gloves & Mitts",
+    "Wilson A2000 M1D 33.5\" Catchers Mitt: WBW102827"
+  ],
+  "features": [
+    "Exclusive Design: Only at Better Baseball",
+    "Fast & Free Shipping: Included",
+    "Manufacturer's Warranty: Full 365-Days",
+    "Glove Pattern: M1D",
+    "Series: Wilson A2000",
+    "Glove Length: 33.5 Inch",
+    "Web Design: Closed Web",
+    "Colorway: Black & Blonde",
+    "Leather: Pro Stock Leather",
+    "Player Recommendation: Catcher",
+    "Wrist Type: Conventional Open Back",
+    "Lining: Breathable & Moisture Wicking",
+    "SuperSnakeskin: Optimal Durability"
+  ]
+}

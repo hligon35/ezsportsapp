@@ -1,0 +1,21 @@
+{
+  "name": "strong",
+  "price": 14.95,
+  "description": "Discover the TCK Dugout Stirrup Pattern E Socks, designed to elevate your game with unmatched comfort and style. Featuring a double-welt top, these socks ensure a secure, stay-in-place fit, so you can focus on your performance without distractions. Built with durable construction, they promise long-lasting wear that can withstand the rigors of intense play. Experience the perfect blend of comfort and flexibility, making these socks an essential addition to any athlete's gear. table {\n  border: 1px solid #ccc;\n  border-collapse: collapse;\n  margin: 0;\n  padding: 0;\n  width: 100%;\n  table-layout: fixed;\n}\n\ntable caption {\n  font-size: 1.5em;\n  margin: .5em 0 .75em;\n}\n\ntable tr {\n  background-color: #FFFFFF;\n  border: 1px solid #ddd;\n  padding: .35em;\n}\n\ntable th,\ntable td {\n  padding: .625em .35em;\n  text-align: left;\n}\n\ntable th {\n  font-size: .5em;\n  letter-spacing: .07em;\n  text-transform: uppercase;\n}\n\n@media screen and (max-width: 600px) {\n  table {\n    border: 0;\n  }\n\n  table caption {\n    font-size: 1.3em;\n  }\n  \n  table thead {\n    border: none;\n    clip: rect(0 0 0 0);\n    height: 1px;\n    margin: -1px;\n    overflow: hidden;\n    padding: 0;\n    position: absolute;\n    width: 1px;\n  }\n  \n  table tr {\n    border-bottom: 2px solid #ddd;\n    display: ;\n    margin-bottom: .625em;\n  }\n  \n  table td {\n    border-bottom: 1px solid #ddd;\n    display: ;\n    font-size: .8em;\n    text-align: left;\n  }\n  \n\n  \n  table td:last-child {\n    border-bottom: 0;\n  }\n} Sock Size Youth Shoe Size Women's Shoe Size Men's Shoe Size XS 8-12 S 12-5 M 5-10 5-9 L 10-13 9-12 XL 12-15 Sock Size Youth Shoe Size Women's Shoe Size Men's Shoe Size XS 8-12 S 12-5 M 5-10 5-9 L 10-13 9-12 XL 12-15 Sock Size Youth Shoe Size Women's Shoe Size Men's Shoe Size Sock Size",
+  "source_url": "https://betterbaseball.com/tck-dugout-stirrup-pattern-e-socks-dnoe5",
+  "image_url": "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/d/n/dnoe5-navy-white-scarlet.jpg",
+  "image_urls": [
+    "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/d/n/dnoe5-navy-white-scarlet.jpg"
+  ],
+  "downloaded_images": [
+    "C:\\Users\\Harold Ligon\\Documents\\Coding\\SparQDigital\\BBScraper\\prodInfo\\Apparel\\images\\tck-dugout-stirrup-pattern-e-socks-dnoe5_1.jpg"
+  ],
+  "category_path": [
+    "Apparel"
+  ],
+  "features": [
+    "Top Design : Double-welt top provides a secure, stay-in-place fit",
+    "Durability : Built with durable construction for long-lasting performance",
+    "Material : 87% nylon, 10% elastic, 3% spandex for comfort & stretch"
+  ]
+}

@@ -1,0 +1,34 @@
+{
+  "name": "div",
+  "price": 329.99,
+  "description": "The Rawlings Heart of the Hide Funburst 11.5\" Infield Glove is expertly designed for infield players seeking top-tier performance and style. Part of the renowned Heart of the Hide series, this glove features the 204 pattern and an I-Web design, making it perfect for quick transfers and precise fielding. Its striking navy, light blue, and pink gradient colorway is sure to turn heads on the field. The glove's conventional open back offers a classic fit, while the deer-tanned cowhide lining and padded thumb sleeve ensure exceptional comfort. Additionally, the thermoformed padding provides optimal wrist support, and the Speed Shell's synthetic microfiber construction reduces weight for enhanced maneuverability and flair. function positionHandler() {\n    return {\n        top: 0,\n        updatePosition() {\n            this.$nextTick(() => {\n                let viewportCenter = window.innerHeight / 2,\n                    parent = this.$el.parentElement,\n                    parentCenter = parent.clientHeight / 2,\n                    blockHeight = this.$el.offsetHeight / 2\n                this.top = viewportCenter - blockHeight;\n            });\n        }\n    };\n} {\n        \"body\": {\n            \"acidAdvancedReportsAjax\": {\"url\":\"https:\\/\\/betterbaseball.com\\/acid_acidreports\\/countViews\\/product\\/id\\/165412\\/\"}        }\n    } BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW.",
+  "source_url": "https://betterbaseball.com/rawlings-heart-of-the-hide-funburst-11-5-infield-glove-pror204-2rss",
+  "image_url": "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/p/r/pror204-2rss.jpg",
+  "warranty": "Player Recommendation: Infield",
+  "image_urls": [
+    "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/p/r/pror204-2rss.jpg"
+  ],
+  "downloaded_images": [
+    "C:\\Users\\Harold Ligon\\Documents\\Coding\\SparQDigital\\BBScraper\\prodInfo\\Gloves_Mitts\\images\\rawlings-heart-of-the-hide-funburst-11-5-infield-glove-pror204-2rss_1.jpg"
+  ],
+  "category_path": [
+    "Gloves & Mitts",
+    "Baseball Gloves",
+    "Infield Gloves"
+  ],
+  "features": [
+    "Delivery: FAST & FREE shipping on all orders",
+    "Warranty: Full 365-Day manufacturer's warranty included",
+    "Player Recommendation: Infield",
+    "Series: Heart of the Hide",
+    "Glove Pattern: 204",
+    "Glove Length: 11.5 Inch",
+    "Web Design: I-Web",
+    "Colorway: Navy, light blue & pink gradient",
+    "Wrist Type: Conventional open back",
+    "Lining: Deer-tanned cowhide plus",
+    "Padded Thumb Sleeve: Provides exceptional comfort",
+    "Thermoformed Padding: Allows for optimal wrist support",
+    "Speed Shell: Synthetic microfiber reduces weight & adds flair"
+  ]
+}

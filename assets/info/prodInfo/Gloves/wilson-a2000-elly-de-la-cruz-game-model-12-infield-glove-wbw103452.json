@@ -1,0 +1,32 @@
+{
+  "name": "div",
+  "price": 349.99,
+  "description": "Bring the energy to the infield like Cincinnati's lightning rod, Elly De La Cruz, with the Wilson A2000 EDLC 12\" Game Model Infield Glove. This Game Model baseball glove, designed specifically for shortstop play, features a striking Flamingo Pink palm with Elly's signature, ensuring you stand out on the field. Its H-Web and Buffed Sky Blue leather back provide both style and function, enhancing your ability to make crucial plays. The modified wrist strap offers a snug fit, accommodating multiple fingers in the pinky stall for optimal comfort and control. function positionHandler() {\n    return {\n        top: 0,\n        updatePosition() {\n            this.$nextTick(() => {\n                let viewportCenter = window.innerHeight / 2,\n                    parent = this.$el.parentElement,\n                    parentCenter = parent.clientHeight / 2,\n                    blockHeight = this.$el.offsetHeight / 2\n                this.top = viewportCenter - blockHeight;\n            });\n        }\n    };\n} {\n        \"body\": {\n            \"acidAdvancedReportsAjax\": {\"url\":\"https:\\/\\/betterbaseball.com\\/acid_acidreports\\/countViews\\/product\\/id\\/168815\\/\"}        }\n    } BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW.",
+  "source_url": "https://betterbaseball.com/wilson-a2000-elly-de-la-cruz-game-model-12-infield-glove-wbw103452",
+  "image_url": "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/w/b/wbw103452.jpg",
+  "warranty": "Glove Length: 12 Inch",
+  "image_urls": [
+    "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/w/b/wbw103452.jpg"
+  ],
+  "downloaded_images": [
+    "C:\\Users\\Harold Ligon\\Documents\\Coding\\SparQDigital\\BBScraper\\prodInfo\\Gloves_Mitts\\images\\wilson-a2000-elly-de-la-cruz-game-model-12-infield-glove-wbw103452_1.jpg"
+  ],
+  "category_path": [
+    "Gloves & Mitts",
+    "Wilson A2000 Elly De La Cruz Game Model 12\" Infield Glove: WBW103452"
+  ],
+  "features": [
+    "Delivery: FAST & FREE Shipping on all orders",
+    "Warranty: Full 365-day manufacturer's warranty",
+    "Glove Length: 12 Inch",
+    "Web Design: H-Web",
+    "Player Recommendation: Infielder",
+    "Glove Fit: DW5 Pattern",
+    "Colorway: Columbia blue & pink",
+    "Wrist Type: Conventional open backing",
+    "Wrist Lining: Dri-Lex - Ultra-breathable and moisture-wicking",
+    "Leather: Buffed Pro Stock leather",
+    "Rolled Dual Welting: Retains glove shape over time",
+    "Modified Wrist Strap: Shaped to bend toward the player's hand"
+  ]
+}

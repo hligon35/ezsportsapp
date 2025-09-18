@@ -1,0 +1,29 @@
+{
+  "name": "div",
+  "price": 24.95,
+  "description": "The Ballplayers Know Youth T-Shirt is the ultimate choice for young athletes, offering a blend of performance and comfort. Made from 5-Star Fabric, this 4.0 oz micro poly interlock is designed for durability and all-season wear, featuring moisture-wicking technology to keep kids cool and dry. With a rash guard design, it ensures smooth, irritation-free protection, while its stain release and odor-resistant properties promise long-lasting freshness. The shirt is built to withstand the rigors of active play with fade and snag resistance, reinforced seams, and double needle stitching. Plus, the 44+ UPF provides essential UV protection, and its ultra-tight knit construction enhances coverage and printability for a polished look. function positionHandler() {\n    return {\n        top: 0,\n        updatePosition() {\n            this.$nextTick(() => {\n                let viewportCenter = window.innerHeight / 2,\n                    parent = this.$el.parentElement,\n                    parentCenter = parent.clientHeight / 2,\n                    blockHeight = this.$el.offsetHeight / 2\n                this.top = viewportCenter - blockHeight;\n            });\n        }\n    };\n} {\n        \"body\": {\n            \"acidAdvancedReportsAjax\": {\"url\":\"https:\\/\\/betterbaseball.com\\/acid_acidreports\\/countViews\\/product\\/id\\/176315\\/\"}        }\n    } BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW.",
+  "source_url": "https://betterbaseball.com/ballplayers-know-youth-t-shirt",
+  "image_url": "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/y/b/yballplayersknowtee-blackcolumbiablue.jpg",
+  "image_urls": [
+    "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/y/b/yballplayersknowtee-blackcolumbiablue.jpg"
+  ],
+  "downloaded_images": [
+    "C:\\Users\\Harold Ligon\\Documents\\Coding\\SparQDigital\\BBScraper\\prodInfo\\Apparel\\images\\ballplayers-know-youth-t-shirt_1.jpg"
+  ],
+  "category_path": [
+    "Apparel"
+  ],
+  "features": [
+    "Delivery : FAST & FREE Shipping on all orders",
+    "5-Star Fabric : 4.0 oz micro poly interlock built for durability, comfort, & all-season performance",
+    "Moisture Wicking : Pulls sweat away from the skin for cool, dry comfort during workouts",
+    "Rash Guard : Smooth, irritation-free fabric protects skin during intense activity",
+    "Stain Release : Engineered to resist stains & odors for long-lasting freshness",
+    "Fade & Snag Resistance : Maintains a clean, professional look wear after wear",
+    "UV Protection : 44+ UPF blocks harmful rays for outdoor performance & safety",
+    "Opacity & Printability : Ultra-tight knit construction enhances coverage & allows detailed decoration",
+    "Reinforced Seams : Shoulder seams built to handle heavy use & movement",
+    "Double Needle Stitching : Clean, durable hem finish that stands up to repeated wear",
+    "Tag-Free Comfort : No tag neckline prevents irritation for a distraction-free fit"
+  ]
+}

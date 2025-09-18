@@ -1,0 +1,24 @@
+{
+  "name": "div",
+  "price": 89.95,
+  "description": "Step up to the plate with confidence and flair wearing the EvoShield X-SRZ™ Savannah Bananas Youth Batter’s Leg Guard. This cutting-edge leg guard features EvoShield’s innovative Gel-to-Shell® Technology, providing a custom fit that shields you from inside pitches and foul balls. The vibrant Navy Blue design with Banana Yellow accents celebrates the iconic colors of the Savannah Bananas, while the guard straps proudly display the Bananas script and logo. Perfect for the excitement of Banana Ball, this leg guard transforms from a flexible material to a custom-molded shield in just 30 minutes, ensuring you can swing big and dazzle the fans with every plate appearance. function positionHandler() {\n    return {\n        top: 0,\n        updatePosition() {\n            this.$nextTick(() => {\n                let viewportCenter = window.innerHeight / 2,\n                    parent = this.$el.parentElement,\n                    parentCenter = parent.clientHeight / 2,\n                    blockHeight = this.$el.offsetHeight / 2\n                this.top = viewportCenter - blockHeight;\n            });\n        }\n    };\n} {\n        \"body\": {\n            \"acidAdvancedReportsAjax\": {\"url\":\"https:\\/\\/betterbaseball.com\\/acid_acidreports\\/countViews\\/product\\/id\\/142391\\/\"}        }\n    } BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW.",
+  "source_url": "https://betterbaseball.com/evoshield-x-srz-savannah-bananas-youth-batter-s-leg-guard-wb5767001",
+  "image_url": "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/w/b/wb5767001.jpg",
+  "image_urls": [
+    "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/w/b/wb5767001.jpg"
+  ],
+  "downloaded_images": [
+    "C:\\Users\\Harold Ligon\\Documents\\Coding\\SparQDigital\\BBScraper\\prodInfo\\Accessories\\images\\evoshield-x-srz-savannah-bananas-youth-batter-s-leg-guard-wb5767001_1.jpg"
+  ],
+  "category_path": [
+    "Accessories"
+  ],
+  "features": [
+    "Ergonomic Design: Engineered for a personalized fit & maximum protection",
+    "Gel-to-Shell® Technology: Air-activated material transforms from a gel into a form-fitting shield in 30 minutes",
+    "Dispersion Technology: Custom-molded guards efficiently deflect & disperse impact for optimal protection",
+    "Custom Molding Gear: All Gel-to-Shell® products provide a one-to-one, personalized fit for each player",
+    "Comfort Lining: Moisture-wicking interior enhances comfort during wear",
+    "3D Cloud Mesh: Raised textured base material offers a premium look & feel"
+  ]
+}

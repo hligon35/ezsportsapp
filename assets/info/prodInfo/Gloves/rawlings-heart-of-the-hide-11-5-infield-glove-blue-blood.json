@@ -1,0 +1,32 @@
+{
+  "name": "div",
+  "price": 329.99,
+  "description": "The Rawlings Heart of the Hide Blue Blood 11.5\" Infield Glove is a premium choice for infielders looking for top-tier performance and a standout design. Crafted from high-quality steerhide, this Heart of the Hide Infield Glove is built for durability and exceptional feel on the field. Featuring the 314 pattern with a medium pocket depth, this Rawlings 11.5\" Infield Glove provides the perfect balance of control and quick transfers. The I-Web design enhances visibility and flexibility, making it ideal for snagging grounders and turning double plays. Designed with a sleek navy, white, and sky blue gradient colorway, this exclusive model is only available at Better Baseball. The Deer-Tanned Cowhide Plus lining, padded thumb sleeve, and thermoformed wrist padding offer superior comfort and wrist support, while the speedshell back ensures a lightweight feel for faster reaction times. This HOH Infield Glove is built to help elite players dominate the infield with confidence and style. function positionHandler() {\n    return {\n        top: 0,\n        updatePosition() {\n            this.$nextTick(() => {\n                let viewportCenter = window.innerHeight / 2,\n                    parent = this.$el.parentElement,\n                    parentCenter = parent.clientHeight / 2,\n                    blockHeight = this.$el.offsetHeight / 2\n                this.top = viewportCenter - blockHeight;\n            });\n        }\n    };\n} {\n        \"body\": {\n            \"acidAdvancedReportsAjax\": {\"url\":\"https:\\/\\/betterbaseball.com\\/acid_acidreports\\/countViews\\/product\\/id\\/169768\\/\"}        }\n    } BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW.",
+  "source_url": "https://betterbaseball.com/rawlings-heart-of-the-hide-11-5-infield-glove-blue-blood",
+  "image_url": "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/p/r/pro314-2ncbw.jpg",
+  "warranty": "Player Recommendation: Infield",
+  "image_urls": [
+    "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/p/r/pro314-2ncbw.jpg"
+  ],
+  "downloaded_images": [
+    "C:\\Users\\Harold Ligon\\Documents\\Coding\\SparQDigital\\BBScraper\\prodInfo\\Gloves_Mitts\\images\\rawlings-heart-of-the-hide-11-5-infield-glove-blue-blood_1.jpg"
+  ],
+  "category_path": [
+    "Gloves & Mitts",
+    "Rawlings Heart of the Hide 11.5\" Infield Glove: PRO314-2NCBW"
+  ],
+  "features": [
+    "Exclusive Design: Only Available at Better Baseball",
+    "Delivery: FAST & FREE Shipping on All Orders",
+    "Warranty: Full 365-Day Manufacturer's Warranty Included",
+    "Player Recommendation: Infield",
+    "Series: Heart of the Hide",
+    "Glove Pattern: 314 (Medium Pocket Depth)",
+    "Glove Length: 11.5 Inch",
+    "Web Design: I-Web",
+    "Colorway: Navy, White & Sky Blue Gradient Wrist Type: Conventional Open Back",
+    "Lining: Deer-Tanned Cowhide Plus",
+    "Padded Thumb Sleeve: Provides Exceptional Comfort",
+    "Thermoformed Padding: Allows for Optimal Wrist Support"
+  ]
+}

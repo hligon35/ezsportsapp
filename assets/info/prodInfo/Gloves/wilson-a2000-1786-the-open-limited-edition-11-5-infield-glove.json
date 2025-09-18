@@ -1,0 +1,32 @@
+{
+  "name": "div",
+  "price": 349.95,
+  "description": "Experience unparalleled control and speed on the field with the 2025 Tennis A2000® 1786SS Infield Glove. This 11.5” glove features genuine Wilson tennis ball felt on the exterior, offering a unique blend of style and function. The shallow pocket and classic I-Web design ensure quick reflexes and smooth transfers, perfect for any infield player. Crafted with Seafoam Pro Stock Leather and Black SuperSkin, this glove provides a lightweight yet durable feel, while the Dri-Lex wrist lining keeps your hand cool and dry. The lime green, black, and teal colorway adds a splash of flair, making it a standout choice for athletes who demand performance and style. function positionHandler() {\n    return {\n        top: 0,\n        updatePosition() {\n            this.$nextTick(() => {\n                let viewportCenter = window.innerHeight / 2,\n                    parent = this.$el.parentElement,\n                    parentCenter = parent.clientHeight / 2,\n                    blockHeight = this.$el.offsetHeight / 2\n                this.top = viewportCenter - blockHeight;\n            });\n        }\n    };\n} {\n        \"body\": {\n            \"acidAdvancedReportsAjax\": {\"url\":\"https:\\/\\/betterbaseball.com\\/acid_acidreports\\/countViews\\/product\\/id\\/177926\\/\"}        }\n    } BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW.",
+  "source_url": "https://betterbaseball.com/wilson-a2000-1786-the-open-limited-edition-11-5-infield-glove",
+  "image_url": "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/w/b/wbw104177.jpg",
+  "warranty": "Glove Length: 11.5 Inch",
+  "image_urls": [
+    "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/w/b/wbw104177.jpg"
+  ],
+  "downloaded_images": [
+    "C:\\Users\\Harold Ligon\\Documents\\Coding\\SparQDigital\\BBScraper\\prodInfo\\Gloves_Mitts\\images\\wilson-a2000-1786-the-open-limited-edition-11-5-infield-glove_1.jpg"
+  ],
+  "category_path": [
+    "Gloves & Mitts"
+  ],
+  "features": [
+    "Delivery: FAST & FREE Shipping on all orders",
+    "Warranty: Full 365-day manufacturer's warranty",
+    "Glove Length: 11.5 Inch",
+    "Web Design: I-Web",
+    "Player Recommendation: Infield",
+    "Glove Fit: 1786 Pattern",
+    "Colorway: Lime green, black, & teal",
+    "Wrist Type: Conventional open backing",
+    "Wrist Lining: Dri-Lex - Ultra-breathable and moisture-wicking",
+    "Leather: Pro Stock leather",
+    "Rolled Dual Welting: Retains glove shape over time",
+    "SuperSkin: Twice as strong as regular leather & half the weight",
+    "Comfort Pro Fit: Redesigned liner for a softer feel against your hand"
+  ]
+}

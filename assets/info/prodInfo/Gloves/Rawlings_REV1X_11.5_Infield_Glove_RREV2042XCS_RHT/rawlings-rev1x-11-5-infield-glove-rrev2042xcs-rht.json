@@ -1,0 +1,35 @@
+{
+  "name": "div",
+  "price": 439.99,
+  "description": "Experience superior performance on the field with the Rawlings REV1X 11.5\" Infield Glove, meticulously designed for infielders seeking precision and comfort. Featuring an I-Web design and a 204 Pattern, this glove provides the deepest pocket and standard palm width, ensuring excellent ball control. The striking colorway of red, black, and blonde complements its durable U.S. steerhide leather construction, while the adaptive fit system and padded thumb sleeve offer unparalleled comfort and support. With its thermoformed padding and optimized lattice structure, this glove reduces excess weight and maintains durability, making it a reliable choice for any serious player. function positionHandler() {\n    return {\n        top: 0,\n        updatePosition() {\n            this.$nextTick(() => {\n                let viewportCenter = window.innerHeight / 2,\n                    parent = this.$el.parentElement,\n                    parentCenter = parent.clientHeight / 2,\n                    blockHeight = this.$el.offsetHeight / 2\n                this.top = viewportCenter - blockHeight;\n            });\n        }\n    };\n} {\n        \"body\": {\n            \"acidAdvancedReportsAjax\": {\"url\":\"https:\\/\\/betterbaseball.com\\/acid_acidreports\\/countViews\\/product\\/id\\/127940\\/\"}        }\n    } BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW.",
+  "source_url": "https://betterbaseball.com/rawlings-rev1x-11-5-infield-glove-rrev2042xcs-rht",
+  "image_url": "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/r/r/rrev204-2xcs.jpg",
+  "warranty": "Glove Length: 11.5 Inch",
+  "image_urls": [
+    "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/r/r/rrev204-2xcs.jpg"
+  ],
+  "downloaded_images": [
+    "C:\\Users\\Harold Ligon\\Documents\\Coding\\SparQDigital\\BBScraper\\prodInfo\\Rawlings_REV1X_11.5_Infield_Glove_RREV2042XCS_RHT\\images\\rawlings-rev1x-11-5-infield-glove-rrev2042xcs-rht_1.jpg"
+  ],
+  "category_path": [
+    "Rawlings REV1X 11.5\" Infield Glove: RREV2042XCS|RHT",
+    "Gloves & Mitts"
+  ],
+  "features": [
+    "D elivery: Fast & Free Shipping on all orders",
+    "Warranty: Full 365-Day manufacturer's warranty included",
+    "Glove Length: 11.5 Inch",
+    "Web Design: I-Web",
+    "Player Recommendation: Infielders",
+    "Glove Fit: 204 Pattern - Deepest pocket & standard palm width",
+    "Colorway: Red, Black, & Blonde",
+    "Wrist Type: Conventional open back",
+    "Leather: U.S. steerhide leather",
+    "Lining: Top grade U.S. steerhide",
+    "Shell Backing: Optimal glove shaping & holds up over time",
+    "Adaptive Fit System: Keeps wrist backing snug to hand",
+    "Padded Thumb Sleeve: Provides exceptional comfort",
+    "Thermoformed Padding: Allows for optimal wrist support",
+    "Optimized Lattice Structure: Reduces excess weight & maintains durability"
+  ]
+}

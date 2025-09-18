@@ -1,0 +1,33 @@
+{
+  "name": "div",
+  "price": 299.95,
+  "description": "The Wilson A2000 1975 Lil' Dippa 11.75\" Infield Glove is a top choice for infielders seeking a blend of style and performance. Featuring a 1975 glove pattern and an I-Web design, this glove offers superior control and stability. Its striking navy, pink, sky blue, and lime colorway is crafted from premium Pro Stock Leather, ensuring durability and a standout look on the field. The glove's conventional open back wrist type, combined with Dri-Lex ultra-breathable and moisture-wicking wrist lining, provides unmatched comfort during intense gameplay. With rolled dual welting, this glove retains its shape over time, making it a reliable companion for dedicated players. function positionHandler() {\n    return {\n        top: 0,\n        updatePosition() {\n            this.$nextTick(() => {\n                let viewportCenter = window.innerHeight / 2,\n                    parent = this.$el.parentElement,\n                    parentCenter = parent.clientHeight / 2,\n                    blockHeight = this.$el.offsetHeight / 2\n                this.top = viewportCenter - blockHeight;\n            });\n        }\n    };\n} {\n        \"body\": {\n            \"acidAdvancedReportsAjax\": {\"url\":\"https:\\/\\/betterbaseball.com\\/acid_acidreports\\/countViews\\/product\\/id\\/169843\\/\"}        }\n    } BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW.",
+  "source_url": "https://betterbaseball.com/wilson-a2000-1975-11-75-infield-glove-wbw103371",
+  "image_url": "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/w/b/wbw103371-1.jpg",
+  "warranty": "Exclusive Design: Only at Better Baseball",
+  "image_urls": [
+    "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/w/b/wbw103371-1.jpg"
+  ],
+  "downloaded_images": [
+    "C:\\Users\\Harold Ligon\\Documents\\Coding\\SparQDigital\\BBScraper\\prodInfo\\Gloves_Mitts\\images\\wilson-a2000-1975-11-75-infield-glove-wbw103371_1.jpg"
+  ],
+  "category_path": [
+    "Gloves & Mitts",
+    "Wilson A2000 1975 11.75\" Infield Glove: WBW103371"
+  ],
+  "features": [
+    "D elivery: FAST & FREE Shipping on All Orders",
+    "Warranty: Full 365-Day Manufacturer's Warranty Included",
+    "Exclusive Design: Only at Better Baseball",
+    "Glove Pattern: 1975",
+    "Glove Length: 11.75 Inch",
+    "Web Design: I-Web",
+    "Colorway: Navy, Pink, Sky Blue & Lime",
+    "Leather: Pro Stock Leather",
+    "Player Recommendation: Infield",
+    "Wrist Type: Conventional Open Back",
+    "Wrist Lining: Dri-Lex - Ultra-Breathable and Moisture Wicking",
+    "Rolled Dual Welting: Retains Glove Shape Over Time",
+    "SuperSnakeSkin: For Superior Durability"
+  ]
+}

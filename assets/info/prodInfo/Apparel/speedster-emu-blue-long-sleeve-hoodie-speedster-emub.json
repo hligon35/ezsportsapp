@@ -1,0 +1,27 @@
+{
+  "name": "div",
+  "price": 34.95,
+  "description": "The Speedster Emu Blue Adult Long Sleeve Better Baseball Hoodie stands as the pinnacle of style and functionality, catering to athletes who demand nothing but the best. Crafted from 4-ounce, 100% polyester interlock fabric infused with advanced PosiCharge technology, this hoodie guarantees unparalleled durability and color retention with each wash. Offering a UPF rating of 50, it ensures top-tier UV protection, while its moisture-wicking capabilities ensure you remain cool and dry, even during the most demanding games. Engineered with set-in sleeves to achieve a sleek silhouette and featuring a tear-away label for enhanced comfort, this hoodie is the preferred choice for those aiming to stay ahead of the competition. Elevate both your game and your style this season with the Speedster Emu Blue Adult Long Sleeve Better Baseball Hoodie. function positionHandler() {\n    return {\n        top: 0,\n        updatePosition() {\n            this.$nextTick(() => {\n                let viewportCenter = window.innerHeight / 2,\n                    parent = this.$el.parentElement,\n                    parentCenter = parent.clientHeight / 2,\n                    blockHeight = this.$el.offsetHeight / 2\n                this.top = viewportCenter - blockHeight;\n            });\n        }\n    };\n} {\n        \"body\": {\n            \"acidAdvancedReportsAjax\": {\"url\":\"https:\\/\\/betterbaseball.com\\/acid_acidreports\\/countViews\\/product\\/id\\/128149\\/\"}        }\n    } BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW.",
+  "source_url": "https://betterbaseball.com/speedster-emu-blue-long-sleeve-hoodie-speedster-emub",
+  "image_url": "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/s/p/speedster-emub-1.jpg",
+  "image_urls": [
+    "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/s/p/speedster-emub-1.jpg"
+  ],
+  "downloaded_images": [
+    "C:\\Users\\Harold Ligon\\Documents\\Coding\\SparQDigital\\BBScraper\\prodInfo\\Apparel\\images\\speedster-emu-blue-long-sleeve-hoodie-speedster-emub_1.jpg"
+  ],
+  "category_path": [
+    "Apparel"
+  ],
+  "features": [
+    "Delivery: Fast & Free Shipping",
+    "Colorway: Navy with Mint Logo",
+    "High-Performance: Long Sleeve Hoodie",
+    "Designed for Athletes: Top-Tier Quality & Functionality.",
+    "Material: 4-Ounce, 100% Polyester Interlock Fabric",
+    "PosiCharge® Technology: For Enhanced Durability",
+    "UPF Rating of 50: Provides Exceptional UV Protection",
+    "Moisture-Wicking: Stay Dry & Comfortable at All Times",
+    "Set-In Sleeves: Equips a Modern Fit"
+  ]
+}

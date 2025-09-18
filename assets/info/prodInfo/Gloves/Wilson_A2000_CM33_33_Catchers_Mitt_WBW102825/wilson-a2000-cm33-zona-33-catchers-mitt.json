@@ -1,0 +1,34 @@
+{
+  "name": "div",
+  "price": 299.95,
+  "description": "Step up your game behind the plate with the Wilson A2000 CM33 33\" Catcher's Mitt! Exclusively available at Better Baseball, this Wilson Catcher's Mitt brings unmatched craftsmanship, innovation, and style to the field. Designed with the iconic Wilson A2000 series quality, this mitt features a 33-inch CM33 pattern, perfectly suited for catchers who demand high performance. The striking blonde, teal, and maroon colorway not only turns heads but also highlights the premium Pro Stock Leather, known for its durability and comfort. Equipped with Spin-Control Technology, this glove enhances friction and control, helping you secure every pitch with ease. The Better Baseball Exclusive glove nickname, “Zona\", listed above is not the property of or associated with Wilson Sporting Goods Co. The mark Wilson is a registered trademark of Wilson Sporting Goods Co., all rights reserved. The Better Baseball Exclusive glove nickname, “Zona\", listed above is not the property of or associated with Wilson Sporting Goods Co. The mark Wilson is a registered trademark of Wilson Sporting Goods Co., all rights reserved. function positionHandler() {\n    return {\n        top: 0,\n        updatePosition() {\n            this.$nextTick(() => {\n                let viewportCenter = window.innerHeight / 2,\n                    parent = this.$el.parentElement,\n                    parentCenter = parent.clientHeight / 2,\n                    blockHeight = this.$el.offsetHeight / 2\n                this.top = viewportCenter - blockHeight;\n            });\n        }\n    };\n} {\n        \"body\": {\n            \"acidAdvancedReportsAjax\": {\"url\":\"https:\\/\\/betterbaseball.com\\/acid_acidreports\\/countViews\\/product\\/id\\/165108\\/\"}        }\n    } BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS",
+  "source_url": "https://betterbaseball.com/wilson-a2000-cm33-zona-33-catchers-mitt",
+  "image_url": "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/w/b/wbw102825.jpg",
+  "warranty": "Glove Pattern: CM33",
+  "image_urls": [
+    "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/w/b/wbw102825.jpg"
+  ],
+  "downloaded_images": [
+    "C:\\Users\\Harold Ligon\\Documents\\Coding\\SparQDigital\\BBScraper\\prodInfo\\Wilson_A2000_CM33_33_Catchers_Mitt_WBW102825\\images\\wilson-a2000-cm33-zona-33-catchers-mitt_1.jpg"
+  ],
+  "category_path": [
+    "Wilson A2000 CM33 33\" Catchers Mitt: WBW102825",
+    "Gloves & Mitts"
+  ],
+  "features": [
+    "Exclusive Design: Only at Better Baseball",
+    "Fast & Free Shipping: Included",
+    "Manufacturer's Warranty: Full 365-Days",
+    "Glove Pattern: CM33",
+    "Series: Wilson A2000",
+    "Glove Length: 33 Inch",
+    "Web Design: Closed Web",
+    "Colorway: Blonde, Teal, & Maroon",
+    "Leather: Pro Stock Leather",
+    "Player Recommendation: Catcher",
+    "Wrist Type: Conventional Open Back",
+    "Lining: Breathable & Moisture Wicking",
+    "SuperSnakeskin: Optimal Durability",
+    "Spin Control: Increases Ball Control"
+  ]
+}

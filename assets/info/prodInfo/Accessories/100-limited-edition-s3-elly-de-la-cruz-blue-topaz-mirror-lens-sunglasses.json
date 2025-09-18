@@ -1,0 +1,37 @@
+{
+  "name": "div",
+  "price": 185.0,
+  "description": "Elevate your game with the exclusive S3 Elly De La Cruz Blue Topaz Mirror Lens Sunglasses, a tribute to Cincinnati Reds superstar Elly De La Cruz's second limited edition release. Designed for sport-performance, these sunglasses feature 100 Percent's cutting-edge HiPER lens technology, enhancing contrast and depth-of-field so you never miss a moment. The topaz mirror lens provides a burst of brilliance, while the unique green splatter graphic over a polished white frame ensures you stand out both on and off the field. Combining elements from the S2 and Speedcraft, the S3 offers a refined angularity with unmatched performance and style, embodying the spirit of giving it 100%. function positionHandler() {\n    return {\n        top: 0,\n        updatePosition() {\n            this.$nextTick(() => {\n                let viewportCenter = window.innerHeight / 2,\n                    parent = this.$el.parentElement,\n                    parentCenter = parent.clientHeight / 2,\n                    blockHeight = this.$el.offsetHeight / 2\n                this.top = viewportCenter - blockHeight;\n            });\n        }\n    };\n} {\n        \"body\": {\n            \"acidAdvancedReportsAjax\": {\"url\":\"https:\\/\\/betterbaseball.com\\/acid_acidreports\\/countViews\\/product\\/id\\/168299\\/\"}        }\n    } BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW.",
+  "source_url": "https://betterbaseball.com/100-limited-edition-s3-elly-de-la-cruz-blue-topaz-mirror-lens-sunglasses",
+  "image_url": "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/6/1/61005-00001.jpg",
+  "warranty": "Frame Color: Light Green",
+  "image_urls": [
+    "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/6/1/61005-00001.jpg"
+  ],
+  "downloaded_images": [
+    "C:\\Users\\Harold Ligon\\Documents\\Coding\\SparQDigital\\BBScraper\\prodInfo\\Accessories\\images\\100-limited-edition-s3-elly-de-la-cruz-blue-topaz-mirror-lens-sunglasses_1.jpg"
+  ],
+  "category_path": [
+    "Accessories"
+  ],
+  "features": [
+    "Delivery: FAST & FREE Shipping on All Orders",
+    "Warranty: 1 Year Through the Manufacturer",
+    "Frame Color: Light Green",
+    "Lenses Color: Blue Topaz Mirror Light Transmission: 12% Light Conditions: Bright Light Light Filter: 3",
+    "Light Transmission: 12%",
+    "Light Conditions: Bright Light",
+    "Light Filter: 3",
+    "Front Color Finish: Polished",
+    "Polarized: No",
+    "100% UV Protection: UV400",
+    "Lenses Material: Polycarbonate, Shatter-Proof & Impact-Resistant",
+    "HiPER Lens: High Contrast & Enhances Detail",
+    "Lower Air Scoops: Increase Ventilation While Reducing Moisture",
+    "360º Visibility: Unobstructed Optimal Field of Vision",
+    "Size & Fit: Width: 157mm Height: 62mm Temple: 129mm",
+    "Width: 157mm",
+    "Height: 62mm",
+    "Temple: 129mm"
+  ]
+}

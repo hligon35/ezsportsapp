@@ -1,0 +1,27 @@
+{
+  "name": "div",
+  "price": 24.99,
+  "description": "The BRUCE BOLT Premium Pine Tar Stick is a game-changer for baseball players seeking the tackiest, longest-lasting grip enhancement available. This premium blend of real pine tar and rosin ensures optimal grip in all conditions, eliminating the need for messy sprays, rosin rubs, or towels. Simply apply it between your bat handle and barrel, with or without gloves, and enjoy a grip that lasts an entire tournament, maintaining its stickiness even when dirty. The innovative \"no mess\" plastic push-up applicator with a screw-on top keeps the pine tar fresh and sticky, preventing the common issues of drying out or becoming gooey in the heat. Plus, it boasts that classic pine tar aroma, enhancing your game with every swing. function positionHandler() {\n    return {\n        top: 0,\n        updatePosition() {\n            this.$nextTick(() => {\n                let viewportCenter = window.innerHeight / 2,\n                    parent = this.$el.parentElement,\n                    parentCenter = parent.clientHeight / 2,\n                    blockHeight = this.$el.offsetHeight / 2\n                this.top = viewportCenter - blockHeight;\n            });\n        }\n    };\n} {\n        \"body\": {\n            \"acidAdvancedReportsAjax\": {\"url\":\"https:\\/\\/betterbaseball.com\\/acid_acidreports\\/countViews\\/product\\/id\\/140076\\/\"}        }\n    } BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW.",
+  "source_url": "https://betterbaseball.com/bruce-bolt-premium-pine-tar-stick-bb-pt90",
+  "image_url": "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/b/b/bb-pt90.jpg",
+  "image_urls": [
+    "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/b/b/bb-pt90.jpg"
+  ],
+  "downloaded_images": [
+    "C:\\Users\\Harold Ligon\\Documents\\Coding\\SparQDigital\\BBScraper\\prodInfo\\Accessories\\images\\bruce-bolt-premium-pine-tar-stick-bb-pt90_1.jpg"
+  ],
+  "category_path": [
+    "Accessories"
+  ],
+  "features": [
+    "Delivery : FAST & FREE Shipping on All Orders",
+    "Size: 90 oz",
+    "Proprietary Blend Formula : Crafted with real pine tar & rosin for the tackiest, longest-lasting grip in baseball",
+    "All-Condition Performance : Delivers optimal grip in any weather & stays sticky even with dirt contact",
+    "No Activation Needed : Ready to use—no sprays, rubs, or towels required",
+    "Long-Lasting Application : One coat lasts an entire tournament, making reapplication unnecessary",
+    "Mess-Free Applicator : Features a plastic push-up tube with a screw-on cap to keep pine tar fresh & hands clean",
+    "Glove or Bare-Hand Use : Works effectively whether you're swinging with batting gloves or bare hands",
+    "Bat Handle Application : Apply between the handle & barrel for ideal grip and control"
+  ]
+}

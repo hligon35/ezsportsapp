@@ -1,0 +1,30 @@
+{
+  "name": "strong",
+  "price": 299.95,
+  "description": "LIMITED EDITION DESIGN (ONLY 25 MADE)",
+  "source_url": "https://betterbaseball.com/the-shadow-6-shindig-11-75-baseball-infield-glove-shadow6-rht",
+  "image_url": "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/s/h/shadow6.jpg",
+  "image_urls": [
+    "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/s/h/shadow6.jpg"
+  ],
+  "downloaded_images": [
+    "C:\\Users\\Harold Ligon\\Documents\\Coding\\SparQDigital\\BBScraper\\prodInfo\\Gloves_Mitts\\images\\the-shadow-6-shindig-11-75-baseball-infield-glove-shadow6-rht_1.jpg"
+  ],
+  "category_path": [
+    "Gloves & Mitts"
+  ],
+  "features": [
+    "Limited Edition Design: Only 25 Made",
+    "Glove Length: 11.75 Inch",
+    "Player Recommendation: Infield",
+    "Web Design: One-of-a-Kind Modified V-Web with Metallic Magenta Inlays",
+    "Glove Feel: Light Weight for Quick Reactions & Reflexes",
+    "Colorway: Jet Black Japanese Kip Leather with Magenta Accents",
+    "Inner Lining: Japanese Kip for Optimal Comfort",
+    "Gill Lacing: On Thumb & Pinky for Added Stability & Control",
+    "Wrist Type: Conventional Open Back",
+    "Leather: High-End Japanese Kip Leather",
+    "Shadow Style Pocket: For Quick Transfers",
+    "Middle Finger Pad : Dominate Your Competition"
+  ]
+}

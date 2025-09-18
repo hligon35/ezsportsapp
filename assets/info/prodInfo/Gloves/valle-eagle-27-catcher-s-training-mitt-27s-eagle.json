@@ -1,0 +1,31 @@
+{
+  "name": "div",
+  "price": 164.99,
+  "description": "Ideal for honing your catching skills, this expertly designed Valle Eagle 27S Catcher Training Glove combines functionality with style. Featuring a small pocket depth and a closed web design, this glove ensures excellent control and quick ball retrieval. Perfect for warm-up sessions & practice, the small size pocket promotes good catching habits. With a glove length of 27 inches, it offers a perfect fit for players focused on improving their catching techniques. The glove's white colorway adds a sleek touch, while the conventional open back and Velcro adjustable wrist back provide customization for comfort and ease of use. Enhanced protection is guaranteed with double index finger pads and reinforced palm and thumb pads, ensuring impact reduction during intense practice sessions. function positionHandler() {\n    return {\n        top: 0,\n        updatePosition() {\n            this.$nextTick(() => {\n                let viewportCenter = window.innerHeight / 2,\n                    parent = this.$el.parentElement,\n                    parentCenter = parent.clientHeight / 2,\n                    blockHeight = this.$el.offsetHeight / 2\n                this.top = viewportCenter - blockHeight;\n            });\n        }\n    };\n} {\n        \"body\": {\n            \"acidAdvancedReportsAjax\": {\"url\":\"https:\\/\\/betterbaseball.com\\/acid_acidreports\\/countViews\\/product\\/id\\/108300\\/\"}        }\n    } BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW.",
+  "source_url": "https://betterbaseball.com/valle-eagle-27-catcher-s-training-mitt-27s-eagle",
+  "image_url": "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/2/7/27s-eagle.jpg",
+  "warranty": "Player Recommendation: Catcher",
+  "image_urls": [
+    "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/2/7/27s-eagle.jpg"
+  ],
+  "downloaded_images": [
+    "C:\\Users\\Harold Ligon\\Documents\\Coding\\SparQDigital\\BBScraper\\prodInfo\\Gloves_Mitts\\images\\valle-eagle-27-catcher-s-training-mitt-27s-eagle_1.jpg"
+  ],
+  "category_path": [
+    "Gloves & Mitts"
+  ],
+  "features": [
+    "Delivery: FAST & FREE Shipping on All Orders",
+    "Warranty: Full 365-Day Manufacturer's Warranty Included",
+    "Player Recommendation: Catcher",
+    "Glove Fit: Small Pocket Depth",
+    "Glove Length: 27 Inch",
+    "Web Design: Closed Web",
+    "Colorway: White",
+    "Wrist Type: Conventional Open Back",
+    "Recommended For: Catching Skills Practice",
+    "Double Index Finger Pads: For Protection & Comfort",
+    "Reinforced Palm & Thumb Pads: For Impact Reduction",
+    "Velcro Adjustable Wrist Back: For Easy Adjustment"
+  ]
+}

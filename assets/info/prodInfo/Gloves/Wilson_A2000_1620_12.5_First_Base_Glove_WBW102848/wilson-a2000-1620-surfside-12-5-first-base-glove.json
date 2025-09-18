@@ -1,0 +1,31 @@
+{
+  "name": "div",
+  "price": 299.95,
+  "description": "Make a splash with the Wilson A2000 1620 12.5\" First Base Glove – where first base meets pure style and top-tier performance! This exclusive gem, only available at Better Baseball, is not just a glove; it’s a game-changer. Designed with the 1620 glove pattern in Wilson's A2000 series, this mitt packs serious pro potential. The vibrant seafoam, white, yellow, and pink colorway adds a touch of beach vibes to the field, while the Pro Stock leather construction ensures it’s built to last through every game-winning snag. Equipped with a 12.5-inch single-post web, this Wilson A2000 first base glove offers unmatched support and control for picking balls out of the dirt like a pro. The Better Baseball Exclusive glove nickname, “Surfside\", listed above is not the property of or associated with Wilson Sporting Goods Co. The mark Wilson is a registered trademark of Wilson Sporting Goods Co., all rights reserved. The Better Baseball Exclusive glove nickname, “Surfside\", listed above is not the property of or associated with Wilson Sporting Goods Co. The mark Wilson is a registered trademark of Wilson Sporting Goods Co., all rights reserved. function positionHandler() {\n    return {\n        top: 0,\n        updatePosition() {\n            this.$nextTick(() => {\n                let viewportCenter = window.innerHeight / 2,\n                    parent = this.$el.parentElement,\n                    parentCenter = parent.clientHeight / 2,\n                    blockHeight = this.$el.offsetHeight / 2\n                this.top = viewportCenter - blockHeight;\n            });\n        }\n    };\n} {\n        \"body\": {\n            \"acidAdvancedReportsAjax\": {\"url\":\"https:\\/\\/betterbaseball.com\\/acid_acidreports\\/countViews\\/product\\/id\\/165174\\/\"}        }\n    } BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS",
+  "source_url": "https://betterbaseball.com/wilson-a2000-1620-surfside-12-5-first-base-glove",
+  "image_url": "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/w/b/wbw102848.jpg",
+  "warranty": "Glove Pattern: 1620",
+  "image_urls": [
+    "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/w/b/wbw102848.jpg"
+  ],
+  "downloaded_images": [
+    "C:\\Users\\Harold Ligon\\Documents\\Coding\\SparQDigital\\BBScraper\\prodInfo\\Wilson_A2000_1620_12.5_First_Base_Glove_WBW102848\\images\\wilson-a2000-1620-surfside-12-5-first-base-glove_1.jpg"
+  ],
+  "category_path": [
+    "Wilson A2000 1620 12.5\" First Base Glove: WBW102848"
+  ],
+  "features": [
+    "Exclusive Design: Only at Better Baseball",
+    "Fast & Free Shipping: Included",
+    "Manufacturer's Warranty: Full 365-Days",
+    "Glove Pattern: 1620",
+    "Series: Wilson A2000",
+    "Glove Length: 12.5 Inch",
+    "Web Design: Single Post",
+    "Colorway: Seafoam, White, Yellow, & Pink",
+    "Leather: Pro Stock Leather",
+    "Player Recommendation: First Base",
+    "Wrist Type: Conventional Open Back",
+    "Lining: Breathable & Moisture Wicking"
+  ]
+}

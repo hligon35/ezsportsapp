@@ -1,0 +1,36 @@
+{
+  "name": "div",
+  "price": 439.99,
+  "description": "Introducing the Limited Edition Glow in the Dark Rawlings REV1X UFO 11.75\" Infield Glove, a rare gem for serious infielders, with only 100 available worldwide. This glove features an I-Web design and a 205 Pattern, offering the deepest pocket and standard palm width for optimal control and performance. The striking blue, black, and UFO-inspired colorway is as eye-catching as it is functional, with U.S. Steerhide Leather ensuring long-lasting durability. Tailored for players aged 13 and up, this glove's conventional open backing and Adaptive Fit System provide a snug, comfortable fit, while its optimized lattice structure reduces excess weight without compromising strength. Enhance your game with this exclusive piece that combines innovative design with superior craftsmanship. function positionHandler() {\n    return {\n        top: 0,\n        updatePosition() {\n            this.$nextTick(() => {\n                let viewportCenter = window.innerHeight / 2,\n                    parent = this.$el.parentElement,\n                    parentCenter = parent.clientHeight / 2,\n                    blockHeight = this.$el.offsetHeight / 2\n                this.top = viewportCenter - blockHeight;\n            });\n        }\n    };\n} {\n        \"body\": {\n            \"acidAdvancedReportsAjax\": {\"url\":\"https:\\/\\/betterbaseball.com\\/acid_acidreports\\/countViews\\/product\\/id\\/169510\\/\"}        }\n    } BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW.",
+  "source_url": "https://betterbaseball.com/rawlings-ufo-glove",
+  "image_url": "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/r/e/rev205-2xte.jpg",
+  "warranty": "Limited Edition: 1/100",
+  "image_urls": [
+    "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/r/e/rev205-2xte.jpg"
+  ],
+  "downloaded_images": [
+    "C:\\Users\\Harold Ligon\\Documents\\Coding\\SparQDigital\\BBScraper\\prodInfo\\Gloves_Mitts\\images\\rawlings-ufo-glove_1.jpg"
+  ],
+  "category_path": [
+    "Gloves & Mitts",
+    "Rawlings REV1X 11.75\" Infield Glove: REV205-2XTE",
+    "Baseball Gloves"
+  ],
+  "features": [
+    "D elivery: FAST & FREE Shipping on All Orders",
+    "Warranty: Full 365-Day Manufacturer's Warranty Included",
+    "Limited Edition: 1/100",
+    "Glows in the Dark: Yes",
+    "Glove Length: 11.75 Inch",
+    "Web Design: I-Web",
+    "Player Recommendation: Infielders",
+    "Glove Fit: 205 Pattern (Deepest Pocket & Standard Palm Width)",
+    "Colorway: Blue, Black & UFO Design",
+    "Wrist Type: Conventional Open Backing",
+    "Leather: U.S. Steerhide Leather",
+    "Age Range: 13 - Adult",
+    "Shell Backing: Optimal Glove Shaping & Holds Up Over Time",
+    "Adaptive Fit System: Keeps Wrist Backing Snug to Hand",
+    "Optimized Lattice Structure: Reduces Excess Weight & Maintains Durability"
+  ]
+}

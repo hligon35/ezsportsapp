@@ -1,0 +1,32 @@
+{
+  "name": "div",
+  "price": 219.99,
+  "description": "The Eagle Pro 11\" First Base Training Mitt is expertly crafted to enhance your infield skills with its Single Post Web and Conventional Open Back design. This mitt is perfect for improving hand-eye coordination, mastering quick transfers, and maintaining a low stance to field grounders effectively. Featuring double index finger pads and reinforced palm and thumb pads, it ensures superior protection and comfort while reducing impact during intense practice sessions. The glove's adjustable Velcro wrist back offers a customizable fit, making it practice-ready for fielding grounders, receiving at first, and picking the ball out of the dirt with ease. Its sleek white design adds a professional touch to your training gear. function positionHandler() {\n    return {\n        top: 0,\n        updatePosition() {\n            this.$nextTick(() => {\n                let viewportCenter = window.innerHeight / 2,\n                    parent = this.$el.parentElement,\n                    parentCenter = parent.clientHeight / 2,\n                    blockHeight = this.$el.offsetHeight / 2\n                this.top = viewportCenter - blockHeight;\n            });\n        }\n    };\n} {\n        \"body\": {\n            \"acidAdvancedReportsAjax\": {\"url\":\"https:\\/\\/betterbaseball.com\\/acid_acidreports\\/countViews\\/product\\/id\\/125677\\/\"}        }\n    } BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW.",
+  "source_url": "https://betterbaseball.com/eagle-pro-11-first-base-training-mitt-11-pro",
+  "image_url": "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/1/1/11-pro.jpg",
+  "warranty": "Glove Width: 11 Inch",
+  "image_urls": [
+    "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/1/1/11-pro.jpg"
+  ],
+  "downloaded_images": [
+    "C:\\Users\\Harold Ligon\\Documents\\Coding\\SparQDigital\\BBScraper\\prodInfo\\Gloves_Mitts\\images\\eagle-pro-11-first-base-training-mitt-11-pro_1.jpg"
+  ],
+  "category_path": [
+    "Gloves & Mitts"
+  ],
+  "features": [
+    "Delivery: FAST & FREE Shipping on All Orders",
+    "Warranty: Full 365-Day Manufacturer's Warranty Included",
+    "Glove Width: 11 Inch",
+    "Web Design: Single Post Web",
+    "Wrist Type: Conventional Open Back",
+    "Leather: USA Steerhide Leather",
+    "Helps Teach: Hand-Eye Coordination, Transfers & Staying Down On The Ball",
+    "Color: White",
+    "Recommended For: Infield Skills Practice",
+    "Double Index Finger Pads: For Protection & Comfort",
+    "Reinforced Palm & Thumb Pads: For Impact Reduction",
+    "Velcro Adjustable Wrist Back: For Easy Adjustment",
+    "Practice Ready: Fielding Grounders, Receiving at First, & Picking the Ball Out of the Dirt"
+  ]
+}

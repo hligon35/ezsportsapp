@@ -1,0 +1,30 @@
+{
+  "name": "div",
+  "price": 24.0,
+  "description": "Elevate your game with the Stance Diamond Pro Stripes OTC Socks, meticulously designed to enhance your performance on the field. These baseball socks feature breathable performance mesh and channeled air cushioning, ensuring optimal airflow and comfort during intense play. With engineered ankle protection and reinforced toe and heel, they provide unparalleled durability and support. The seamless toe closure and medium cushioning offer a snug fit, while FRESHTEK™ moisture and odor control technology keeps your feet fresh and dry. Experience the perfect blend of innovation and comfort with these over-the-calf socks, crafted to help you perform at your peak. function positionHandler() {\n    return {\n        top: 0,\n        updatePosition() {\n            this.$nextTick(() => {\n                let viewportCenter = window.innerHeight / 2,\n                    parent = this.$el.parentElement,\n                    parentCenter = parent.clientHeight / 2,\n                    blockHeight = this.$el.offsetHeight / 2\n                this.top = viewportCenter - blockHeight;\n            });\n        }\n    };\n} {\n        \"body\": {\n            \"acidAdvancedReportsAjax\": {\"url\":\"https:\\/\\/betterbaseball.com\\/acid_acidreports\\/countViews\\/product\\/id\\/92187\\/\"}        }\n    } BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW.",
+  "source_url": "https://betterbaseball.com/stance-diamond-pro-stripe-otc-socks-m759a19dmn",
+  "image_url": "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/m/7/m759a19dmn-blackwhite-1.jpg",
+  "image_urls": [
+    "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/m/7/m759a19dmn-blackwhite-1.jpg"
+  ],
+  "downloaded_images": [
+    "C:\\Users\\Harold Ligon\\Documents\\Coding\\SparQDigital\\BBScraper\\prodInfo\\Apparel\\images\\stance-diamond-pro-stripe-otc-socks-m759a19dmn_1.jpg"
+  ],
+  "category_path": [
+    "Apparel"
+  ],
+  "features": [
+    "Delivery : FAST & FREE Shipping on All Orders",
+    "FreshTek Moisture & Odor Control : Wicks away sweat & eliminates odor-causing bacteria to keep feet fresh",
+    "Performance Mesh : Enhances breathability with ventilated zones for cool, dry comfort",
+    "Engineered Ankle Cushioning : Targeted padding adds comfort & protection where it’s needed most",
+    "Reinforced Toe and Heel : Built-in durability for long-lasting wear through every inning",
+    "Over the Calf Height : Full-leg coverage for a secure, stay-put fit",
+    "Nylon Blend : Strong, stretchable fabric offers a supportive, quick-drying fit",
+    "Performance Cushioning : Adds softness & support during high-intensity play",
+    "Channeled Air Cushioning : Promotes airflow to reduce heat & moisture buildup",
+    "Engineered Ankle Protection : Prevents rubbing & irritation from cleats",
+    "Seamless Toe Closure : Reduces friction for a smooth, irritation-free feel",
+    "Materials: 72% nylon, 20% polyester, 5% combed cotton, 3% elastane"
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "name": "div",
+  "price": 79.99,
+  "description": "Experience unparalleled protection with the G-Form Alpha Baseball Elbow Guard, designed for Big League impact resistance with its innovative two-panel design and patented SmartFlex technology. This elbow guard remains soft and flexible during play, but hardens on impact, absorbing up to twice the force of traditional hard-shell guards, leading to fewer injuries and enhanced player confidence. Its true body mapping feature ensures a perfect fit right out of the box, eliminating the need for molding or shaping. Lightweight and breathable, it boasts 4-way stretch for maximum comfort and freedom of movement, making it a favorite among MLB players and athletic trainers. As part of G-Form's MLB Authentic Collection, this guard is trusted by the pros and is an Official Protective Equipment Supplier of Major League Baseball. function positionHandler() {\n    return {\n        top: 0,\n        updatePosition() {\n            this.$nextTick(() => {\n                let viewportCenter = window.innerHeight / 2,\n                    parent = this.$el.parentElement,\n                    parentCenter = parent.clientHeight / 2,\n                    blockHeight = this.$el.offsetHeight / 2\n                this.top = viewportCenter - blockHeight;\n            });\n        }\n    };\n} {\n        \"body\": {\n            \"acidAdvancedReportsAjax\": {\"url\":\"https:\\/\\/betterbaseball.com\\/acid_acidreports\\/countViews\\/product\\/id\\/175357\\/\"}        }\n    } BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW.",
+  "source_url": "https://betterbaseball.com/g-form-alpha-baseball-elbow-guard-gf-aep13214",
+  "image_url": "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/g/f/gf-aep13214-lightblue_1.jpg",
+  "image_urls": [
+    "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/g/f/gf-aep13214-lightblue_1.jpg"
+  ],
+  "downloaded_images": [
+    "C:\\Users\\Harold Ligon\\Documents\\Coding\\SparQDigital\\BBScraper\\prodInfo\\Accessories\\images\\g-form-alpha-baseball-elbow-guard-gf-aep13214_1.jpg"
+  ],
+  "category_path": [
+    "Accessories"
+  ],
+  "features": [
+    "SmartFlex: Flexible during play, hardens on impact",
+    "Pre-curved ergonomic shape: For a form-fitting, lightweight feel",
+    "Internal Shell : Engineered to retain shape over time & enhance impact protection",
+    "Wrap-Around Design: For superior elbow & upper arm protection",
+    "Shield Design : Cantilever top pad increases upper arm protection without restricting swing",
+    "Materials : Cushioned mesh lining moisture-wicking, UPF 50+ compression fabric keeps",
+    "Official Status : Official Protective Equipment Supplier of Major League Baseball",
+    "Care : Machine washable"
+  ]
+}

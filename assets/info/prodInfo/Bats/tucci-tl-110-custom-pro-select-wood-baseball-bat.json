@@ -1,0 +1,29 @@
+{
+  "name": "div",
+  "price": 149.99,
+  "description": "The Tucci TL-110 Custom Pro Select Wood Baseball Bat is expertly crafted for players seeking enhanced performance and control. Featuring a medium barrel, this bat offers increased swing speed and a balanced feel, while its medium handle ensures greater barrel control for precision hitting. Part of the Pro Select Series, it utilizes hand-split pro-grade billets and is steel burnished, maximizing exit velocity for powerful hits. With a traditional knob and ink dot certification, this bat guarantees pro-grade durability, making it an excellent choice for serious athletes. Its light brown colorway adds a classic touch to its modern design. function positionHandler() {\n    return {\n        top: 0,\n        updatePosition() {\n            this.$nextTick(() => {\n                let viewportCenter = window.innerHeight / 2,\n                    parent = this.$el.parentElement,\n                    parentCenter = parent.clientHeight / 2,\n                    blockHeight = this.$el.offsetHeight / 2\n                this.top = viewportCenter - blockHeight;\n            });\n        }\n    };\n} {\n        \"body\": {\n            \"acidAdvancedReportsAjax\": {\"url\":\"https:\\/\\/betterbaseball.com\\/acid_acidreports\\/countViews\\/product\\/id\\/168582\\/\"}        }\n    } BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW.",
+  "source_url": "https://betterbaseball.com/tucci-tl-110-custom-pro-select-wood-baseball-bat",
+  "image_url": "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/t/l/tl-110.jpg",
+  "warranty": "Length to Weight Ratio: Drop 3",
+  "image_urls": [
+    "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/t/l/tl-110.jpg"
+  ],
+  "downloaded_images": [
+    "C:\\Users\\Harold Ligon\\Documents\\Coding\\SparQDigital\\BBScraper\\prodInfo\\Bats\\images\\tucci-tl-110-custom-pro-select-wood-baseball-bat_1.jpg"
+  ],
+  "category_path": [
+    "Bats"
+  ],
+  "features": [
+    "Fast & Free Shipping: Included",
+    "Warranty: Full 60-Days through the Manufacturer",
+    "Length to Weight Ratio: Drop 3",
+    "Colorway: Light Brown",
+    "Swing Feel: Balanced",
+    "Bat Material: Maple Wood",
+    "Knob: Traditional",
+    "Handle: Medium for greater barrel control",
+    "Medium Barrel: For increased swing speed & balanced feel",
+    "Ink Dot Certified: For pro grade durability"
+  ]
+}

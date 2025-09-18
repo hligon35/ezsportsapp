@@ -1,0 +1,24 @@
+{
+  "name": "div",
+  "price": 45.0,
+  "description": "Step up to the plate with the Nike Alpha Varsity Ronald Acuna Jr. Batting Gloves, designed to make you feel like one of baseball's elite. The radiant yellow hue captures Ronald Acuna Jr.'s vibrant energy on the field, while red and blue accents pay homage to the team that launched him to stardom. These gloves feature a flexible overlay on the back for optimal stretch and support, ensuring you have the freedom to perform at your best. The textured premium-leather palm enhances comfort and durability, while the flexible cuff provides a secure fit, making these gloves a must-have for any serious baseball player. function positionHandler() {\n    return {\n        top: 0,\n        updatePosition() {\n            this.$nextTick(() => {\n                let viewportCenter = window.innerHeight / 2,\n                    parent = this.$el.parentElement,\n                    parentCenter = parent.clientHeight / 2,\n                    blockHeight = this.$el.offsetHeight / 2\n                this.top = viewportCenter - blockHeight;\n            });\n        }\n    };\n} {\n        \"body\": {\n            \"acidAdvancedReportsAjax\": {\"url\":\"https:\\/\\/betterbaseball.com\\/acid_acidreports\\/countViews\\/product\\/id\\/174158\\/\"}        }\n    } BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW.",
+  "source_url": "https://betterbaseball.com/nike-alpha-varsity-ronald-acuna-jr-batting-gloves-n-101-1806-412",
+  "image_url": "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/n/_/n.101.1806_412.jpg",
+  "image_urls": [
+    "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/n/_/n.101.1806_412.jpg"
+  ],
+  "downloaded_images": [
+    "C:\\Users\\Harold Ligon\\Documents\\Coding\\SparQDigital\\BBScraper\\prodInfo\\Batting_Gloves\\images\\nike-alpha-varsity-ronald-acuna-jr-batting-gloves-n-101-1806-412_1.jpg"
+  ],
+  "category_path": [
+    "Batting Gloves",
+    "Nike Alpha Varsity Ronald Acuna Jr. Batting Gloves: N.101.1806.412"
+  ],
+  "features": [
+    "RA13 Inspired : Designed to reflect Ronald Acuña Jr.’s energy and rise to stardom",
+    "Colorway : Radiant yellow with red and blue accents",
+    "Flexible Cuff : Ensures a secure and comfortable fit",
+    "Palm : 100% goatskin leather for comfort & durability",
+    "Back Materials : 65% polyester / 26% goatskin leather / 9% spandex"
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "name": "div",
+  "price": 299.95,
+  "description": "The Shadow 25 Slaughter Pitcher's Glove blends style, performance, and intimidation on the field. Crafted for intimidation and domination, this 12 inch high-end is designed for pitchers seeking unmatched performance. The Shadow 12 closed web boasts a battle tested design with chrome inlays, exuding elegance and fierceness. All black Japanese Kip Leather combined with stunning red accents ensures all eyes are on you as you deliver perfection. Crafted from Japanese Kip Leather, it offers durability, flexibility, and enhanced control. Triple X lacing on the thumb and pinky enhances stability, while the middle finger pad adds an intimidation factor that strikes fear into opponents. More than a glove, it's a weapon for skilled pitchers. function positionHandler() {\n    return {\n        top: 0,\n        updatePosition() {\n            this.$nextTick(() => {\n                let viewportCenter = window.innerHeight / 2,\n                    parent = this.$el.parentElement,\n                    parentCenter = parent.clientHeight / 2,\n                    blockHeight = this.$el.offsetHeight / 2\n                this.top = viewportCenter - blockHeight;\n            });\n        }\n    };\n} {\n        \"body\": {\n            \"acidAdvancedReportsAjax\": {\"url\":\"https:\\/\\/betterbaseball.com\\/acid_acidreports\\/countViews\\/product\\/id\\/178580\\/\"}        }\n    } BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW.",
+  "source_url": "https://betterbaseball.com/shadow-25-slaughter-12-pitcher-s-glove",
+  "image_url": "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/s/h/shadow25.jpg",
+  "image_urls": [
+    "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/s/h/shadow25.jpg"
+  ],
+  "downloaded_images": [
+    "C:\\Users\\Harold Ligon\\Documents\\Coding\\SparQDigital\\BBScraper\\prodInfo\\Gloves_Mitts\\images\\shadow-25-slaughter-12-pitcher-s-glove_1.jpg"
+  ],
+  "category_path": [
+    "Gloves & Mitts",
+    "Shadow 12\" Baseball Pitcher's Glove: Shadow 25"
+  ],
+  "features": [
+    "Delivery: FAST & FREE Shipping on all orders",
+    "Glove Length: 12 Inch",
+    "Player Recommendation: Pitcher",
+    "Colorway: Black Japanese Kip Leather w/ red accents",
+    "Wrist Type: Conventional open back",
+    "Leather: High-End Japanese Kip Leather",
+    "Web Design: One of a Kind Closed Web with Chrome Inlays",
+    "Glove Feel: Lightweight for quick reactions & reflexes",
+    "Triple X Lacing: On thumb & pinky for added stability & control",
+    "Pocket Depth: Deep - For improved ball grip & control",
+    "Middle Finger Pad: For superior intimidation",
+    "Age Range: 13 - Adult"
+  ]
+}

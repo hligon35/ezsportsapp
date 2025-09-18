@@ -1,0 +1,26 @@
+{
+  "name": "div",
+  "price": 39.95,
+  "description": "The Franklin Pro Classic Adult Batting Gloves are the original gloves that set the standard in the game, embodying the rich heritage of Franklin’s batting glove line. Developed with input from MLB Hall of Famer Mike Schmidt, these gloves are crafted to elevate your performance on the field. Featuring a premium leather construction, flexible hand back, and seamless leather palm, they ensure a comfortable and responsive fit. With advanced technologies like Quad-Flex Technology and Pro Spandex Technology, these gloves offer superior grip and flexibility in any weather conditions. Trusted by MLB pros, the Franklin Pro Classic gloves are available in various colors, making them an essential accessory for baseball and softball players aiming to excel at the highest level. function positionHandler() {\n    return {\n        top: 0,\n        updatePosition() {\n            this.$nextTick(() => {\n                let viewportCenter = window.innerHeight / 2,\n                    parent = this.$el.parentElement,\n                    parentCenter = parent.clientHeight / 2,\n                    blockHeight = this.$el.offsetHeight / 2\n                this.top = viewportCenter - blockHeight;\n            });\n        }\n    };\n} {\n        \"body\": {\n            \"acidAdvancedReportsAjax\": {\"url\":\"https:\\/\\/betterbaseball.com\\/acid_acidreports\\/countViews\\/product\\/id\\/174714\\/\"}        }\n    } BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW.",
+  "source_url": "https://betterbaseball.com/franklin-pro-classic-adult-batting-gloves-2096xx",
+  "image_url": "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/2/0/2096xx-white_1.jpg",
+  "image_urls": [
+    "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/2/0/2096xx-white_1.jpg"
+  ],
+  "downloaded_images": [
+    "C:\\Users\\Harold Ligon\\Documents\\Coding\\SparQDigital\\BBScraper\\prodInfo\\Batting_Gloves\\images\\franklin-pro-classic-adult-batting-gloves-2096xx_1.jpg"
+  ],
+  "category_path": [
+    "Batting Gloves",
+    "Franklin Pro Classic Adult Batting Gloves: 2096XX"
+  ],
+  "features": [
+    "MLB Inspired : Time-honored classic worn by both baseball and softball players, including MLB pros",
+    "Palm Material : Seamless, premium quality leather palm for a comfortable, responsive fit",
+    "Digital Cabretta Leather : Strategically-etched grooves increase surface area, reduce palm bunching, and enhance grip",
+    "Quad-Flex Technology : Anticipates palm flexing for a perfect grip around the bat handle",
+    "Tri-Curve Technology : Engineered to follow the pre-curved anatomy of the hand to reduce bunching and improve overall fit and feel",
+    "Pro Spandex Technology : Provides ultra-comfortable feel and superior hand flexibility",
+    "Weather Performance : Designed to maintain grip in all weather conditions"
+  ]
+}

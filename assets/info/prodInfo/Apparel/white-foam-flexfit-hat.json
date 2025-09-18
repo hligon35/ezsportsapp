@@ -1,0 +1,17 @@
+{
+  "name": "strong",
+  "price": 29.95,
+  "description": "The White Foam Flexfit Hat is designed for those who value both style and functionality. Featuring a sleek Pro Shape Flat Bill, this hat offers a modern aesthetic that complements any outfit. Its 5 Size Stretch-Fit ensures a comfortable and secure fit for a variety of head sizes, making it a versatile addition to your wardrobe. Ideal for active lifestyles, this hat combines innovative design with performance-driven features to keep you looking sharp in any setting. table {\n  border: 1px solid #ccc;\n  border-collapse: collapse;\n  margin: 0;\n  padding: 0;\n  width: 100%;\n  table-layout: fixed;\n}\n\ntable caption {\n  font-size: 1.5em;\n  margin: .5em 0 .75em;\n}\n\ntable tr {\n  background-color: #FFFFFF;\n  border: 1px solid #ddd;\n  padding: .35em;\n}\n\ntable th,\ntable td {\n  padding: .625em .35em;\n  text-align: left;\n}\n\ntable th {\n  font-size: .5em;\n  letter-spacing: .07em;\n  text-transform: uppercase;\n}\n\n@media screen and (max-width: 600px) {\n  table {\n    border: 0;\n  }\n\n  table caption {\n    font-size: 1.3em;\n  }\n  \n  table thead {\n    border: none;\n    clip: rect(0 0 0 0);\n    height: 1px;\n    margin: -1px;\n    overflow: hidden;\n    padding: 0;\n    position: absolute;\n    width: 1px;\n  }\n  \n  table tr {\n    border-bottom: 2px solid #ddd;\n    display: ;\n    margin-bottom: .625em;\n  }\n  \n  table td {\n    border-bottom: 1px solid #ddd;\n    display: ;\n    font-size: .8em;\n    text-align: left;\n  }\n  \n\n  \n  table td:last-child {\n    border-bottom: 0;\n  }\n} Hat Size Head Circumference XS (6 1/2 - 6 3/4) 20.5-21.5\" S (6 7/8 - 7 1/8) 21.75-22.375” M (7 1/8 - 7 3/8) 22.375-23.25” L (7 3/8 - 7 5/8) 23.25-24” XL (7 5/8 - 8) 34-25.25” Hat Size Head Circumference XS (6 1/2 - 6 3/4) 20.5-21.5\" S (6 7/8 - 7 1/8) 21.75-22.375” M (7 1/8 - 7 3/8) 22.375-23.25” L (7 3/8 - 7 5/8) 23.25-24” XL (7 5/8 - 8) 34-25.25” Hat Size Head Circumference Hat Size",
+  "source_url": "https://betterbaseball.com/white-foam-flexfit-hat",
+  "image_url": "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/b/b/bbhfoamout-1.jpg",
+  "image_urls": [
+    "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/b/b/bbhfoamout-1.jpg"
+  ],
+  "downloaded_images": [
+    "C:\\Users\\Harold Ligon\\Documents\\Coding\\SparQDigital\\BBScraper\\prodInfo\\Apparel\\images\\white-foam-flexfit-hat_1.jpg"
+  ],
+  "category_path": [
+    "Apparel"
+  ],
+  "features": []
+}

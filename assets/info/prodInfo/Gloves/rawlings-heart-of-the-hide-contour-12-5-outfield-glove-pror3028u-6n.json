@@ -1,0 +1,32 @@
+{
+  "name": "div",
+  "price": 329.99,
+  "description": "The Rawlings Heart of the Hide ContoUR 12.5\" Outfield Glove is expertly crafted for outfield players seeking superior performance and style. This glove, part of the renowned Heart of the Hide R2G series, features a striking black, columbia blue, and pink colorway. Its H-Web design and nearly game-ready R2G break-in provide the perfect combination of flexibility and control. The glove's ContoUR Fit ensures a secure feel with a smaller hand opening and lowered finger stalls, while the deer-tanned cowhide lining and padded thumb sleeve offer unmatched comfort. Enhanced with thermoformed padding, this glove delivers optimal wrist support for confident play. function positionHandler() {\n    return {\n        top: 0,\n        updatePosition() {\n            this.$nextTick(() => {\n                let viewportCenter = window.innerHeight / 2,\n                    parent = this.$el.parentElement,\n                    parentCenter = parent.clientHeight / 2,\n                    blockHeight = this.$el.offsetHeight / 2\n                this.top = viewportCenter - blockHeight;\n            });\n        }\n    };\n} {\n        \"body\": {\n            \"acidAdvancedReportsAjax\": {\"url\":\"https:\\/\\/betterbaseball.com\\/acid_acidreports\\/countViews\\/product\\/id\\/178977\\/\"}        }\n    } BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW.",
+  "source_url": "https://betterbaseball.com/rawlings-heart-of-the-hide-contour-12-5-outfield-glove-pror3028u-6n",
+  "image_url": "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/p/r/pror3028u-6n.jpg",
+  "warranty": "Player Recommendation: Outfield",
+  "image_urls": [
+    "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/p/r/pror3028u-6n.jpg"
+  ],
+  "downloaded_images": [
+    "C:\\Users\\Harold Ligon\\Documents\\Coding\\SparQDigital\\BBScraper\\prodInfo\\Gloves_Mitts\\images\\rawlings-heart-of-the-hide-contour-12-5-outfield-glove-pror3028u-6n_1.jpg"
+  ],
+  "category_path": [
+    "Gloves & Mitts"
+  ],
+  "features": [
+    "Delivery: FAST & FREE Shipping on all orders",
+    "Warranty: Full 1-year manufacturer's warranty",
+    "Player Recommendation: Outfield",
+    "Series: Heart of the Hide R2G",
+    "Glove Length: 12.75 Inch",
+    "Web Design: H-Web",
+    "Colorway: Black, columbia blue, & pink",
+    "Wrist Type: Conventional open back",
+    "Lining: Deer-Tanned Cowhide Plus",
+    "Padded Thumb Sleeve: Provides exceptional comfort",
+    "Thermoformed Padding: Allows for optimal wrist support",
+    "R2G Break-In: Nearly game-ready",
+    "ContoUR Fit : Offers a secure fit w/ a smaller hand opening & lowered finger stalls"
+  ]
+}

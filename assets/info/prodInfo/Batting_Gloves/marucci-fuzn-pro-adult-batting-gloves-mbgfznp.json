@@ -1,0 +1,25 @@
+{
+  "name": "strong",
+  "price": 49.99,
+  "description": "The Marucci FUZN Pro Adult Batting Gloves are designed for elite players seeking the perfect blend of feel and durability. Featuring a digitally embossed cabretta sheepskin palm, these gloves offer exceptional gripping power even in wet conditions. The ergonomic palm shape enhances mobility and comfort, while the cabretta sheepskin leather reinforcement panels bolster high-friction areas for long-lasting performance. Additionally, a rubberized synthetic layer on top of the thumb provides added durability, and a wide neoprene cuff offers flexibility and support, ensuring a secure and comfortable fit. table {\n  border: 1px solid #ccc;\n  border-collapse: collapse;\n  margin: 0;\n  padding: 0;\n  width: 100%;\n  table-layout: fixed;\n}\n\ntable caption {\n  font-size: 1.5em;\n  margin: .5em 0 .75em;\n}\n\ntable tr {\n  background-color: #FFFFFF;\n  border: 1px solid #ddd;\n  padding: .35em;\n}\n\ntable th,\ntable td {\n  padding: .625em .35em;\n  text-align: left;\n}\n\ntable th {\n  font-size: .5em;\n  letter-spacing: .07em;\n  text-transform: uppercase;\n}\n\n@media screen and (max-width: 600px) {\n  table {\n    border: 0;\n  }\n\n  table caption {\n    font-size: 1.3em;\n  }\n  \n  table thead {\n    border: none;\n    clip: rect(0 0 0 0);\n    height: 1px;\n    margin: -1px;\n    overflow: hidden;\n    padding: 0;\n    position: absolute;\n    width: 1px;\n  }\n  \n  table tr {\n    border-bottom: 2px solid #ddd;\n    display: ;\n    margin-bottom: .625em;\n  }\n  \n  table td {\n    border-bottom: 1px solid #ddd;\n    display: ;\n    font-size: .8em;\n    text-align: left;\n  }\n  \n\n  \n  table td:last-child {\n    border-bottom: 0;\n  }\n} Glove Size Men's Women's Youth S 6.75-7\" 6.5-6.75\" 6-6.25\" M 7-7.25\" 6.75-7\" 6.25-6.5\" L 7.5-7.75\" 7-7.5\" 6.5-6.75\" XL 7.75-8\" 7.5-7.75\" XXL 8-8.25\" 8-8.25\" Glove Size Men's Women's Youth S 6.75-7\" 6.5-6.75\" 6-6.25\" M 7-7.25\" 6.75-7\" 6.25-6.5\" L 7.5-7.75\" 7-7.5\" 6.5-6.75\" XL 7.75-8\" 7.5-7.75\" XXL 8-8.25\" 8-8.25\" Glove Size Men's Women's Youth Glove Size",
+  "source_url": "https://betterbaseball.com/marucci-fuzn-pro-adult-batting-gloves-mbgfznp",
+  "image_url": "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/m/b/mbgfznp-w-tl-nb_1.jpg",
+  "image_urls": [
+    "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/m/b/mbgfznp-w-tl-nb_1.jpg"
+  ],
+  "downloaded_images": [
+    "C:\\Users\\Harold Ligon\\Documents\\Coding\\SparQDigital\\BBScraper\\prodInfo\\Batting_Gloves\\images\\marucci-fuzn-pro-adult-batting-gloves-mbgfznp_1.jpg"
+  ],
+  "category_path": [
+    "Batting Gloves",
+    "Marucci FUZN Pro Adult Batting Gloves: MBGFZNP"
+  ],
+  "features": [
+    "Ideal For : Elite players seeking maximum feel & durability",
+    "Palm Material : Digitally embossed cabretta sheepskin enhances grip, even in wet conditions",
+    "Ergonomic Design : Palm shape offers improved mobility & all-day comfort",
+    "Reinforcement : Cabretta sheepskin panels strengthen high-friction zones for extended use",
+    "Thumb Protection : Rubberized synthetic overlay adds extra durability to the thumb area",
+    "Cuff Design : Wide neoprene cuff provides superior flexibility & wrist support"
+  ]
+}

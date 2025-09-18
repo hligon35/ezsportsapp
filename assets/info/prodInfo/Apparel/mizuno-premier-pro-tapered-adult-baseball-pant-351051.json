@@ -1,0 +1,27 @@
+{
+  "name": "strong",
+  "price": 44.95,
+  "description": "Introducing Mizuno's latest addition to their premium pant lineup, the Premier Pro Tapered Adult Baseball Pant. Designed for the modern athlete, this fitted baseball pant combines flexibility, durability, and style, making it an essential part of any player's wardrobe. Featuring a traditional tunnel-belt loop waist with a fly front and extended two-snap closure, these pants ensure a secure and comfortable fit. The double knee construction provides added protection, while the hemmed bottom and embroidered logo add a touch of sophistication. With set-in back pockets featuring button closures, these pants offer both functionality and a sleek, professional look on the field. table {\n  border: 1px solid #ccc;\n  border-collapse: collapse;\n  margin: 0;\n  padding: 0;\n  width: 100%;\n  table-layout: fixed;\n}\n\ntable caption {\n  font-size: 1.5em;\n  margin: .5em 0 .75em;\n}\n\ntable tr {\n  background-color: #FFFFFF;\n  border: 1px solid #ddd;\n  padding: .35em;\n}\n\ntable th,\ntable td {\n  padding: .625em .35em;\n  text-align: left;\n}\n\ntable th {\n  font-size: .5em;\n  letter-spacing: .07em;\n  text-transform: uppercase;\n}\n\n@media screen and (max-width: 600px) {\n  table {\n    border: 0;\n  }\n\n  table caption {\n    font-size: 1.3em;\n  }\n  \n  table thead {\n    border: none;\n    clip: rect(0 0 0 0);\n    height: 1px;\n    margin: -1px;\n    overflow: hidden;\n    padding: 0;\n    position: absolute;\n    width: 1px;\n  }\n  \n  table tr {\n    border-bottom: 2px solid #ddd;\n    display: ;\n    margin-bottom: .625em;\n  }\n  \n  table td {\n    border-bottom: 1px solid #ddd;\n    display: ;\n    font-size: .8em;\n    text-align: left;\n  }\n  \n\n  \n  table td:last-child {\n    border-bottom: 0;\n  }\n} US Size Waist Inseam XS 28-30\" 32\" S 30-32” 33\" M 32-34” 34\" L 34-36” 35\" XL 36-38” 36\" XXL 40-42” 36\" US Size Waist Inseam XS 28-30\" 32\" S 30-32” 33\" M 32-34” 34\" L 34-36” 35\" XL 36-38” 36\" XXL 40-42” 36\" US Size Waist Inseam US Size",
+  "source_url": "https://betterbaseball.com/mizuno-premier-pro-tapered-adult-baseball-pant-351051",
+  "image_url": "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/3/5/351051_grey.jpg",
+  "image_urls": [
+    "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/3/5/351051_grey.jpg"
+  ],
+  "downloaded_images": [
+    "C:\\Users\\Harold Ligon\\Documents\\Coding\\SparQDigital\\BBScraper\\prodInfo\\Apparel\\images\\mizuno-premier-pro-tapered-adult-baseball-pant-351051_1.jpg"
+  ],
+  "category_path": [
+    "Apparel"
+  ],
+  "features": [
+    "Delivery: FAST & FREE Shipping on All Orders",
+    "Premier Pro Tapered Fit : Combines modern style with a fitted cut for a professional on-field look",
+    "Double Knit Fabric : Lightweight yet durable; made with 92% polyester/8% spandex",
+    "Double Knee Construction : Reinforced knee panels offer added protection & durability",
+    "Tunnel-Belt Loop Waist : Allows for a secure fit with any standard baseball belt",
+    "Two-Snap Fly Closure : Extended two-snap system ensures a secure & comfortable fit",
+    "Set-In Back Pockets : Functional pockets with button closures provide secure storage",
+    "Hemmed Bottom : Clean, ready-to-wear finish",
+    "Embroidered Logo : Premium Mizuno branding for a polished, professional appearance"
+  ]
+}

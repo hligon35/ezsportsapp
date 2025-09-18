@@ -1,0 +1,32 @@
+{
+  "name": "div",
+  "price": 299.95,
+  "description": "The Wilson A2000 PF50 12.25\" Outfield Glove is a top choice for outfield players seeking exceptional performance and style. Part of the renowned Wilson A2000 series, this glove features a 12.25-inch length and a unique H-Web design, perfect for snagging fly balls with ease. Its eye-catching mint and white multi-color design, crafted with Pro Stock Leather, not only provides durability but also stands out on the field. The glove's breathable and moisture-wicking lining ensures comfort during intense play, while the rolled dual welting helps retain its shape over time. With a conventional open back wrist type, this glove is designed for outfielders looking to enhance their game with reliability and flair. function positionHandler() {\n    return {\n        top: 0,\n        updatePosition() {\n            this.$nextTick(() => {\n                let viewportCenter = window.innerHeight / 2,\n                    parent = this.$el.parentElement,\n                    parentCenter = parent.clientHeight / 2,\n                    blockHeight = this.$el.offsetHeight / 2\n                this.top = viewportCenter - blockHeight;\n            });\n        }\n    };\n} {\n        \"body\": {\n            \"acidAdvancedReportsAjax\": {\"url\":\"https:\\/\\/betterbaseball.com\\/acid_acidreports\\/countViews\\/product\\/id\\/169858\\/\"}        }\n    } BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW.",
+  "source_url": "https://betterbaseball.com/wilson-a2000-pf50-12-25-outfield-glove-wbw103378",
+  "image_url": "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/w/b/wbw103378-1.jpg",
+  "warranty": "Exclusive Design: Only at Better Baseball",
+  "image_urls": [
+    "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/w/b/wbw103378-1.jpg"
+  ],
+  "downloaded_images": [
+    "C:\\Users\\Harold Ligon\\Documents\\Coding\\SparQDigital\\BBScraper\\prodInfo\\Gloves_Mitts\\images\\wilson-a2000-pf50-12-25-outfield-glove-wbw103378_1.jpg"
+  ],
+  "category_path": [
+    "Gloves & Mitts"
+  ],
+  "features": [
+    "Fast & Free Shipping: Included",
+    "Manufacturer's Warranty: Full 365-Days",
+    "Exclusive Design: Only at Better Baseball",
+    "Glove Pattern: PF50",
+    "Series: Wilson A2000",
+    "Glove Length: 12.25 Inch",
+    "Web Design: H-Web",
+    "Colorway: Mint & White Multi-Color Design",
+    "Leather: Pro Stock Leather",
+    "Player Recommendation: Outfield",
+    "Wrist Type: Conventional Open Back",
+    "Lining: Breathable & Moisture Wicking",
+    "Rolled Dual Welting: Retains Glove Shape"
+  ]
+}

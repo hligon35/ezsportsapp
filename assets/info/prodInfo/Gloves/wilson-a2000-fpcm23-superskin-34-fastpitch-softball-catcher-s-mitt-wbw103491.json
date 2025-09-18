@@ -1,0 +1,33 @@
+{
+  "name": "div",
+  "price": 349.99,
+  "description": "The Wilson A2000 FPCM23 SuperSkin 34\" Fastpitch Softball Catcher's Mitt is a top choice for serious catchers, offering a combination of durability and comfort. Featuring the distinctive FPCM23SS glove pattern, this mitt showcases a stylish sky blue and grey colorway, complemented by a closed web design for optimal performance behind the plate. Crafted with Pro Stock Leather and enhanced with SuperSkin, this mitt is twice as strong as regular leather, ensuring longevity and resilience. The conventional open back and adjustable drawstring closure provide a custom fit, while the Dri-Lex wrist lining keeps your hand dry and comfortable. Additionally, the flat finger binding offers a more comfortable feel, making this mitt an essential tool for any dedicated catcher. function positionHandler() {\n    return {\n        top: 0,\n        updatePosition() {\n            this.$nextTick(() => {\n                let viewportCenter = window.innerHeight / 2,\n                    parent = this.$el.parentElement,\n                    parentCenter = parent.clientHeight / 2,\n                    blockHeight = this.$el.offsetHeight / 2\n                this.top = viewportCenter - blockHeight;\n            });\n        }\n    };\n} {\n        \"body\": {\n            \"acidAdvancedReportsAjax\": {\"url\":\"https:\\/\\/betterbaseball.com\\/acid_acidreports\\/countViews\\/product\\/id\\/168852\\/\"}        }\n    } BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW.",
+  "source_url": "https://betterbaseball.com/wilson-a2000-fpcm23-superskin-34-fastpitch-softball-catcher-s-mitt-wbw103491",
+  "image_url": "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/w/b/wbw103491.jpg",
+  "warranty": "Glove Pattern: FPCM23SS",
+  "image_urls": [
+    "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/w/b/wbw103491.jpg"
+  ],
+  "downloaded_images": [
+    "C:\\Users\\Harold Ligon\\Documents\\Coding\\SparQDigital\\BBScraper\\prodInfo\\Gloves_Mitts\\images\\wilson-a2000-fpcm23-superskin-34-fastpitch-softball-catcher-s-mitt-wbw103491_1.jpg"
+  ],
+  "category_path": [
+    "Gloves & Mitts"
+  ],
+  "features": [
+    "D elivery: FAST & FREE Shipping on all orders",
+    "Warranty: Full 365-day manufacturer's warranty",
+    "Glove Pattern: FPCM23SS",
+    "Series: Wilson A2000",
+    "Glove Length: 34 Inch",
+    "Web Design: Closed Web",
+    "Colorway: Sky blue & grey",
+    "Leather: Pro Stock Leather",
+    "Player Recommendation: Catcher",
+    "Wrist Type: Conventional open back",
+    "Wrist Lining: Dri-Lex - Ultra-breathable and moisture-wicking",
+    "Flat Finger Binding: Provides a more comfortable feel",
+    "Superskin: Twice as strong as regular leather",
+    "Drawstring Closure: Adjustable laces for easy adjustments"
+  ]
+}

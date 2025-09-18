@@ -1,0 +1,32 @@
+{
+  "name": "div",
+  "price": 379.99,
+  "description": "Elevate your infield game with the Rawlings Pro Preferred 11.5\" Infield Glove, designed for players who demand excellence on the field. This glove is crafted with the finest materials, offering a flawless feel and Big League quality that attracts hundreds of pros each season. The 31 pattern enhances quick transfers from any angle, while the Pro-I web ensures impact absorption and smooth transitions for seamless plays. Its striking royal blue leather, complemented by a camel web and silver metallic accents, adds a touch of swagger to your game. Experience the gold standard in premium baseball gloves and see why top players choose the Pro Preferred lineup for their gameday needs. function positionHandler() {\n    return {\n        top: 0,\n        updatePosition() {\n            this.$nextTick(() => {\n                let viewportCenter = window.innerHeight / 2,\n                    parent = this.$el.parentElement,\n                    parentCenter = parent.clientHeight / 2,\n                    blockHeight = this.$el.offsetHeight / 2\n                this.top = viewportCenter - blockHeight;\n            });\n        }\n    };\n} {\n        \"body\": {\n            \"acidAdvancedReportsAjax\": {\"url\":\"https:\\/\\/betterbaseball.com\\/acid_acidreports\\/countViews\\/product\\/id\\/141848\\/\"}        }\n    } BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW.",
+  "source_url": "https://betterbaseball.com/rawlings-pro-preferred-11-5-infield-glove-rpros934-2bw",
+  "image_url": "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/p/r/pros934-2bw.jpg",
+  "warranty": "Glove Length: 11.5 Inch",
+  "image_urls": [
+    "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/p/r/pros934-2bw.jpg"
+  ],
+  "downloaded_images": [
+    "C:\\Users\\Harold Ligon\\Documents\\Coding\\SparQDigital\\BBScraper\\prodInfo\\Gloves_Mitts\\images\\rawlings-pro-preferred-11-5-infield-glove-rpros934-2bw_1.jpg"
+  ],
+  "category_path": [
+    "Gloves & Mitts"
+  ],
+  "features": [
+    "D elivery: FAST & FREE Shipping on All Orders",
+    "Warranty: Full 365-Day Manufacturer's Warranty Included",
+    "Glove Length: 11.5 Inch",
+    "Web Design: I-Web",
+    "Player Recommendation: Infielders",
+    "Glove Fit: NP4 Pattern - Flattest Infield Pocket Depth",
+    "Colorway: Black, Carolina Blue, & White w/ Silver Accents",
+    "Wrist Type: Conventional Open Back",
+    "Pittards Sheepskin Palm Lining: Improves Comfort & Fit",
+    "Full-Grain Kip Leather: Provides Long-Lasting Structure",
+    "Deertouch Finger Back Lining: Enhances Comfort & Fit",
+    "Padded Thumb Sleeve: Provides Exceptional Comfort",
+    "100% Wool Padding: Aids In Pocket Formation & Shape Retention"
+  ]
+}

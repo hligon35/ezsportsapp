@@ -1,0 +1,42 @@
+{
+  "name": "strong",
+  "price": 105.0,
+  "description": "Discover the unmatched quality and durability of the Bruce Bolt CHROME Series Long Cuff Batting Gloves, the pinnacle of performance in baseball gear. Handcrafted with precision, these gloves utilize the finest 0.9mm Cabretta leather, renowned for its exceptional softness and resilience, ensuring they remain pliable and comfortable game after game. Featuring a patent-pending double inverse cuff, these gloves provide unparalleled wrist support and power, enhancing your swing while protecting against injuries. Designed with a meticulous understanding of the human hand, Bruce Bolt gloves offer a superior fit, minimizing wear and maximizing comfort, making them an essential choice for serious players seeking the best in batting gloves. table {\n  border: 1px solid #ccc;\n  border-collapse: collapse;\n  margin: 0;\n  padding: 0;\n  width: 100%;\n  table-layout: fixed;\n}\n\ntable caption {\n  font-size: 1.5em;\n  margin: .5em 0 .75em;\n}\n\ntable tr {\n  background-color: #FFFFFF;\n  border: 1px solid #ddd;\n  padding: .35em;\n}\n\ntable th,\ntable td {\n  padding: .625em .35em;\n  text-align: left;\n}\n\ntable th {\n  font-size: .5em;\n  letter-spacing: .07em;\n  text-transform: uppercase;\n}\n\n@media screen and (max-width: 600px) {\n  table {\n    border: 0;\n  }\n\n  table caption {\n    font-size: 1.3em;\n  }\n  \n  table thead {\n    border: none;\n    clip: rect(0 0 0 0);\n    height: 1px;\n    margin: -1px;\n    overflow: hidden;\n    padding: 0;\n    position: absolute;\n    width: 1px;\n  }\n  \n  table tr {\n    border-bottom: 2px solid #ddd;\n    display: ;\n    margin-bottom: .625em;\n  }\n  \n  table td {\n    border-bottom: 1px solid #ddd;\n    display: ;\n    font-size: .8em;\n    text-align: left;\n  }\n  \n\n  \n  table td:last-child {\n    border-bottom: 0;\n  }\n} Glove Size Men's Women's Youth XXS 5.5-5.75” XS 5.75-6” S 7-7.25” 6.75-7” 6-6.25\" M 7.25-7.5\" 7-7.125” 6.25-6.5\" L 7.5-7.75\" 7.125-7.5” 6.5-6.75\" XL 7.75-8\" 6.75-7” XXL 8-8.25\" XXXL 8.25-8.5” Glove Size Men's Women's Youth XXS 5.5-5.75” XS 5.75-6” S 7-7.25” 6.75-7” 6-6.25\" M 7.25-7.5\" 7-7.125” 6.25-6.5\" L 7.5-7.75\" 7.125-7.5” 6.5-6.75\" XL 7.75-8\" 6.75-7” XXL 8-8.25\" XXXL 8.25-8.5” Glove Size Men's Women's Youth Glove Size",
+  "source_url": "https://betterbaseball.com/catalog/product/view/id/102017/s/bruce-bolt-long-cuff-chrome-series-adult-batting-gloves-bblongcuffchr/category/32/",
+  "image_url": "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/b/b/bblongcuffchr_white.jpg",
+  "image_urls": [
+    "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/b/b/bblongcuffchr_white.jpg",
+    "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/b/b/bblongcuffchr_white_2.jpg",
+    "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/n/_/n.100.4383-black.jpg",
+    "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/b/b/bbshortcuffchryth_white_2.jpg"
+  ],
+  "downloaded_images": [
+    "C:\\Users\\Harold Ligon\\Documents\\Coding\\SparQDigital\\BBScraper\\prodInfo\\Batting_Gloves\\images\\32_1.jpg"
+  ],
+  "category_path": [
+    "Batting Gloves"
+  ],
+  "features": [
+    "Double Reinforced Palm: Offers superior feel & durability while remaining soft",
+    "0.9mm Cabretta Leather: Softest leather for great feel",
+    "Double Inverse Cuff: Increased wrist support, injury protection & power",
+    "Superior Craftsmanship: Handmade for buttery soft & durable gloves",
+    "Designed to Fit: No unnecessary stitching for max durability",
+    "Built for T-Ball : Designed specifically to keep young players comfortable & focused during games",
+    "Moisture Management : Nike Dri-FIT technology wicks away sweat for quicker evaporation & lasting comfort",
+    "Comfort Fit : Smooth material creates a soft, comfortable feel on hands",
+    "Durable Construction : Built to withstand repeated use during practices & games",
+    "Material Composition :",
+    "Palm: 55% polyester / 45% polyurethane",
+    "Back: 61% polyester / 26% nylon / 13% spandex",
+    "Other: 97% nylon / 2% polyester / 1% polyurethane",
+    "Chrome/Grey palm: stylish and sleek design for a premium look",
+    "Double Inverse Cuff Technology: provides a locked-in, secure fit",
+    "Upgraded double-reinforced palm: enhances durability and longevity",
+    "Upgraded Lycra between fingers and knuckles: improves flexibility and comfort",
+    "Upgraded thread: increases overall glove durability and strength",
+    "Inverse stitching on fingers: reduces friction for a smoother, more natural feel",
+    "Raised and stitched Bolt logo: adds a signature, high-quality touch",
+    "Made from 0.9mm - 1.1mm Cabretta leather: ensures exceptional softness and grip"
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "name": "div",
+  "price": 55.0,
+  "description": "Experience the perfect blend of style and functionality with the Nike Ronald Acuna Jr Diamond 2.0 Sliding Mitt. Featuring the signature flair of Ronald Acuna Jr., this mitt is crafted for optimal protection during slides, boasting an abrasion-resistant palm zone for superior coverage and support. Customize your comfort with a removable wrist insert and adjustable wrist stays, ensuring a personalized fit and level of protection. With Nike's Dri-FIT technology, the mitt efficiently manages moisture, keeping your hand dry and comfortable. Designed for versatility, its dual-hand design allows it to be worn on either hand, making it a must-have for any serious athlete. function positionHandler() {\n    return {\n        top: 0,\n        updatePosition() {\n            this.$nextTick(() => {\n                let viewportCenter = window.innerHeight / 2,\n                    parent = this.$el.parentElement,\n                    parentCenter = parent.clientHeight / 2,\n                    blockHeight = this.$el.offsetHeight / 2\n                this.top = viewportCenter - blockHeight;\n            });\n        }\n    };\n} {\n        \"body\": {\n            \"acidAdvancedReportsAjax\": {\"url\":\"https:\\/\\/betterbaseball.com\\/acid_acidreports\\/countViews\\/product\\/id\\/178601\\/\"}        }\n    } BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW.",
+  "source_url": "https://betterbaseball.com/nike-ronald-acuna-jr-diamond-2-0-sliding-mitt",
+  "image_url": "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/n/_/n.101.1804.489.jpg",
+  "image_urls": [
+    "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/n/_/n.101.1804.489.jpg"
+  ],
+  "downloaded_images": [
+    "C:\\Users\\Harold Ligon\\Documents\\Coding\\SparQDigital\\BBScraper\\prodInfo\\Accessories\\images\\nike-ronald-acuna-jr-diamond-2-0-sliding-mitt_1.jpg"
+  ],
+  "category_path": [
+    "Accessories",
+    "Drip",
+    "Protective"
+  ],
+  "features": [
+    "Delivery: FAST & FREE Shipping on all orders",
+    "Purpose-Built Protection : Designed for safe, comfortable slides w/ abrasion-resistant palm zone for targeted coverage & support",
+    "Removable Wrist Insert: Customize your wrist angle for optimal comfort",
+    "Adjustable Wrist Stays: Allows you to choose your level or protection",
+    "Moisture Management : Nike Dri-FIT technology keeps your hand dry by wicking sweat away",
+    "Custom Fit : Removable wrist stay and adjustable wrist insert allow for personalized protection & fit",
+    "Dual Hand Design : Can be worn on either hand for versatility",
+    "Durable Construction : Made from a blend of neoprene, aluminum alloy, polypropylene, nylon, & polyester"
+  ]
+}

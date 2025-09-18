@@ -228,25 +228,24 @@ app.use((err, req, res, next) => {
   res.status(err.status || 500).json({ message: err.message || 'Internal Server Error' });
 });
 
-// Basic price book (server authoritative)
-const PRODUCTS = {
-  'bat-ghost': 399_95,
-  'bat-hype': 349_95,
-  'glove-a2000': 299_95,
-  'glove-heart': 279_95,
-  'net-pro': 219_00,
-  'net-cage': 649_00,
-  'helmet-pro': 89_99,
-  'helmet-lite': 59_99,
-};
-
-function toCents(n) { return Math.round(Number(n) * 100); }
-
-function calcSubtotalCents(items = []){
+// Dynamic pricing sourced from products DB (cached briefly in-memory)
+let priceCache = { ts: 0, map: new Map() };
+async function loadPriceMap() {
+  const now = Date.now();
+  if (now - priceCache.ts < 60_000 && priceCache.map.size) return priceCache.map;
+  const all = await productService.getAllProducts(false);
+  const map = new Map();
+  all.forEach(p => { if (p.isActive !== false && typeof p.price === 'number') map.set(p.id, Math.round(p.price * 100)); });
+  priceCache = { ts: now, map };
+  return map;
+}
+async function calcSubtotalCents(items = []) {
+  const priceMap = await loadPriceMap();
   return items.reduce((sum, it) => {
-    const price = PRODUCTS[it.id];
-    if (!price) return sum;
-    return sum + Math.round((price) * it.qty);
+    const cents = priceMap.get(it.id);
+    if (!cents) return sum;
+    const qty = Math.max(1, Number(it.qty) || 1);
+    return sum + cents * qty;
   }, 0);
 }
 
@@ -263,7 +262,7 @@ app.post('/api/create-payment-intent', async (req, res) => {
     if (!stripe) {
       return res.status(503).json({ error: 'Stripe is not configured on the server.' });
     }
-    const subtotal = calcSubtotalCents(items);
+    const subtotal = await calcSubtotalCents(items);
     const shippingCents = calcShippingCents(subtotal, shippingMethod);
     const amount = subtotal + shippingCents; // taxes omitted in demo
 
@@ -334,7 +333,25 @@ app.post('/api/order', async (req, res) => {
 });
 
 const PORT = process.env.PORT || 4242;
-const server = app.listen(PORT, '0.0.0.0', () => console.log(`Server running on port ${PORT}`));
+// Optional auto product sync on startup (e.g., AUTOSYNC_PRODUCTS=1)
+async function autoSyncOnStart() {
+  if (process.env.AUTOSYNC_PRODUCTS === '1') {
+    try {
+      const { spawn } = require('child_process');
+      const args = ['scripts/sync-products.js'];
+      if (process.env.AUTOSYNC_STRIPE !== '1') args.push('--no-stripe');
+      const child = spawn('node', args, { cwd: path.join(__dirname), stdio: 'inherit' });
+      child.on('exit', code => console.log('Auto product sync finished with code', code));
+    } catch (e) {
+      console.warn('Auto product sync failed:', e.message);
+    }
+  }
+}
+
+const server = app.listen(PORT, '0.0.0.0', () => {
+  console.log(`Server running on port ${PORT}`);
+  autoSyncOnStart();
+});
 
 // Graceful shutdown
 process.on('SIGINT', () => { server.close(() => process.exit(0)); });

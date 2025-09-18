@@ -1,0 +1,34 @@
+{
+  "name": "div",
+  "price": 349.99,
+  "description": "The Wilson A2000 PF88 SuperSkin 11.25\" Infield Glove is a top choice for infield players seeking superior performance and style. Featuring an eye-catching black, sky blue, and neon yellow colorway, this glove combines the durability of Pro Stock Leather with the strength of SuperSkin backing, which is twice as strong as regular leather. Its I-Web design and 11.25-inch length make it ideal for quick plays and precise fielding. The glove's Pedroia Fit ensures a snug fit with a smaller wrist opening and finger stalls, while the Dri-Lex wrist lining offers ultra-breathable, moisture-wicking comfort. Enhanced with flat finger binding and rolled dual welting, this glove retains its shape and provides a comfortable feel, making it a must-have for serious infielders. function positionHandler() {\n    return {\n        top: 0,\n        updatePosition() {\n            this.$nextTick(() => {\n                let viewportCenter = window.innerHeight / 2,\n                    parent = this.$el.parentElement,\n                    parentCenter = parent.clientHeight / 2,\n                    blockHeight = this.$el.offsetHeight / 2\n                this.top = viewportCenter - blockHeight;\n            });\n        }\n    };\n} {\n        \"body\": {\n            \"acidAdvancedReportsAjax\": {\"url\":\"https:\\/\\/betterbaseball.com\\/acid_acidreports\\/countViews\\/product\\/id\\/168828\\/\"}        }\n    } BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS BALLPLAYERS KNOW.",
+  "source_url": "https://betterbaseball.com/wilson-a2000-pf88-superskin-11-25-infield-glove-wbw103462",
+  "image_url": "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/w/b/wbw103462.jpg",
+  "warranty": "Glove Pattern: PF88",
+  "image_urls": [
+    "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/w/b/wbw103462.jpg"
+  ],
+  "downloaded_images": [
+    "C:\\Users\\Harold Ligon\\Documents\\Coding\\SparQDigital\\BBScraper\\prodInfo\\Gloves_Mitts\\images\\wilson-a2000-pf88-superskin-11-25-infield-glove-wbw103462_1.jpg"
+  ],
+  "category_path": [
+    "Gloves & Mitts"
+  ],
+  "features": [
+    "Delivery: FAST & FREE Shipping on all orders",
+    "Warranty: Full 365-day manufacturer's warranty",
+    "Glove Pattern: PF88",
+    "Series: Wilson A2000",
+    "Glove Length: 11.25 Inch",
+    "Web Design: I-Web",
+    "Colorway: Black, sky blue, & neon yellow",
+    "Leather: Pro Stock Leather",
+    "Player Recommendation: Infield",
+    "Wrist Type: Conventional Open Back",
+    "Wrist Lining: Dri-Lex - Ultra-Breathable and Moisture Wicking",
+    "Flat Finger Binding: Provides a more comfortable feel",
+    "Rolled Dual Welting: Retains glove shape over time",
+    "SuperSkin Backing: Twice as strong as regular leather",
+    "Pedroia Fit: Smaller Wrist Opening & Smaller Finger Stalls"
+  ]
+}

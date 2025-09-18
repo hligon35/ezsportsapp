@@ -18,28 +18,83 @@ try {
 
 const currency = new Intl.NumberFormat(undefined, { style: 'currency', currency: 'USD' });
 
-const DEFAULT_PRODUCTS = [
-  { id: 'bat-ghost', title: 'Ghost Unlimited Bat -11', price: 399.95, category: 'bats', img: 'assets/img/bat3.avif' },
-  { id: 'bat-hype', title: 'HYPE Fire -10', price: 349.95, category: 'bats', img: 'assets/img/bat4.avif' },
-  { id: 'glove-a2000', title: 'Wilson A2000 11.5"', price: 299.95, category: 'gloves', img: 'assets/img/glove3.avif' },
-  { id: 'glove-heart', title: 'Heart of the Hide 12.25"', price: 279.95, category: 'gloves', img: 'assets/img/glove4.avif' },
-  { id: 'net-pro', title: 'Pro Backstop Net 10x30', price: 219.00, category: 'netting', img: 'assets/img/netting.jpg' },
-  { id: 'net-cage', title: 'Batting Cage Net 12x55', price: 649.00, category: 'netting', img: 'assets/img/netting3.jpg' },
-  { id: 'helmet-pro', title: 'Pro Helmet With Face Guard', price: 89.99, category: 'helmets', img: 'assets/img/helmet3.avif' },
-  { id: 'helmet-lite', title: 'Lightweight Helmet Youth', price: 59.99, category: 'helmets', img: 'assets/img/helmet3.avif' },
-];
-
-function getProducts() {
+// Dynamic products loaded from API (fallback to empty). Each product object expected shape:
+// { id, name, description, category, price, image, stripe? }
+let PRODUCTS = [];
+async function fetchProducts() {
   try {
-    const adminProducts = JSON.parse(localStorage.getItem('shopProducts') || 'null');
-    if (Array.isArray(adminProducts) && adminProducts.length > 0) return adminProducts;
-    return DEFAULT_PRODUCTS;
-  } catch {
-    return DEFAULT_PRODUCTS;
+  // Request a larger window so first page isn't dominated by malformed or retired items
+  const res = await fetch('/api/products?limit=100');
+    if (!res.ok) throw new Error('Failed to load products');
+    const data = await res.json();
+    // Normalize to UI shape
+    const mapCategory = (raw) => {
+      const c = String(raw || '').toLowerCase();
+      // Direct matches first
+      if (['bats','gloves','netting','helmets'].includes(c)) return c;
+      // Heuristic mapping
+      if (/bat/.test(c)) return 'bats';
+      if (/glove|mitt/.test(c)) return 'gloves';
+      if (/screen|net|cage|field|facility/.test(c)) return 'netting';
+      if (/helm|protect/.test(c)) return 'helmets';
+      return 'bats'; // fallback bucket for now
+    };
+    PRODUCTS = data.map(p => {
+      const normCat = mapCategory(p.category || p.department || p.type || '');
+      // Salvage bad name cases like literal 'div' by deriving from id slug
+      let rawName = p.name || p.title || p.id || '';
+      if (/^div$/i.test(rawName) && p.id) {
+        rawName = p.id
+          .replace(/[-_]+/g, ' ')
+          .replace(/\b([a-z])/g, m => m.toUpperCase())
+          .slice(0, 120);
+      }
+      return {
+        id: p.id,
+        title: rawName,
+        price: typeof p.price === 'number' ? p.price : Number(p.price) || 0,
+        category: normCat,
+        img: p.image || 'assets/EZSportslogo.png',
+        stripe: p.stripe || null,
+        stock: p.stock,
+        createdAt: p.createdAt || null,
+        description: (p.description || '').trim(),
+        features: Array.isArray(p.features) ? p.features.slice(0, 25) : []
+      };
+    });
+    // Only filter zero-priced items now; salvaged names retained
+    const before = PRODUCTS.length;
+    PRODUCTS = PRODUCTS.filter(p => p.price > 0);
+    const removed = before - PRODUCTS.length;
+    // Expose quick debug counts in development
+    if (removed > 0 && !window.__catalogDebugShown) {
+      window.__catalogDebugShown = true;
+      const badge = document.createElement('div');
+      badge.style.cssText = 'position:fixed;bottom:8px;right:8px;background:#112;padding:6px 10px;font:12px/1.2 monospace;color:#8f8;border-radius:4px;z-index:9999;opacity:0.9';
+      badge.textContent = `Products loaded: ${PRODUCTS.length} (filtered out ${removed} zero-price)`;
+      document.body.appendChild(badge);
+      setTimeout(()=>badge.remove(), 8000);
+    }
+    // Optional: sort newest first if timestamps present; fallback to title
+    PRODUCTS.sort((a, b) => {
+      if (a.createdAt && b.createdAt) return (new Date(b.createdAt)) - (new Date(a.createdAt));
+      return a.title.localeCompare(b.title);
+    });
+  } catch (e) {
+    console.warn('Product fetch failed, leaving PRODUCTS empty:', e.message);
+    PRODUCTS = [];
   }
 }
 
-let PRODUCTS = getProducts();
+// Lightweight analytics dispatcher (fallback logs) – can later POST to /api/analytics/event
+window.trackEvent = function(eventName, payload) {
+  try {
+    const body = { event: eventName, payload, ts: Date.now() };
+    // Future: send to backend; for now just log to console to verify
+    // fetch('/api/analytics/event', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) }).catch(()=>{});
+    console.debug('[analytics]', eventName, payload);
+  } catch {}
+};
 
 const Store = {
   state: {
@@ -50,7 +105,10 @@ const Store = {
 
   // Expose a way to retrieve the current products list (admin-managed or defaults)
   getProducts() {
-    return getProducts();
+    // Previously this called a removed helper `getProducts()` which caused a ReferenceError
+    // and stopped script execution before products could render. Now we simply return the
+    // in‑memory PRODUCTS array populated by fetchProducts().
+    return PRODUCTS;
   },
 
   keyFor(item) {
@@ -95,8 +153,10 @@ const Store = {
     // Runtime responsive enforcement (in case stale CSS served from cache briefly)
     this.enforceResponsiveBehaviors();
 
-    // Refresh products from admin updates
-    PRODUCTS = getProducts();
+    // Load products from API then render
+    fetchProducts().then(() => {
+      if (this.ui.grid) this.renderProducts();
+    });
 
     // Mobile nav toggle
     const toggle = document.querySelector('.menu-toggle');
@@ -126,9 +186,8 @@ const Store = {
     }
 
     // Render initial views
-    if (this.ui.grid) {
-      this.renderProducts();
-    }
+    // initial render will happen after fetch; if fetch stalls, show spinner
+    if (this.ui.grid) this.ui.grid.innerHTML = '<p class="text-muted">Loading products…</p>';
     this.renderCart();
 
     // Chips
@@ -911,14 +970,19 @@ const Store = {
       p.title.toLowerCase().includes(query.toLowerCase())
     );
 
-    const html = list.map(p => `
-      <article class="card ${p.category === 'netting' ? '' : ''}">
-        <div class="media">
-          <img src="${p.img}" alt="${p.title}" loading="lazy" onerror="this.onerror=null;this.src='https://placehold.co/600x400?text=Image+Unavailable';"/>
+    const html = list.map(p => {
+      const desc = p.description ? p.description.slice(0, 140) + (p.description.length > 140 ? '…' : '') : '';
+      const featPreview = (p.features && p.features.length) ? p.features.slice(0,3).map(f=>`<li>${f}</li>`).join('') : '';
+      return `
+      <article class="card ${p.category === 'netting' ? '' : ''}" data-product-id="${p.id}" ${p.stripe?.defaultPriceId ? `data-stripe-price="${p.stripe.defaultPriceId}"` : ''}>
+        <div class="media no-link">
+          <img src="${p.img}" alt="${p.title}" loading="lazy" draggable="false" style="pointer-events:none;" onerror="this.onerror=null;this.src='https://placehold.co/600x400?text=Image+Unavailable';"/>
         </div>
         <div class="body">
           <h3 class="h3-tight">${p.title}</h3>
-          ${p.stock !== undefined ? `<p class=\"text-sm text-muted my-025\">Stock: ${p.stock}</p>` : ''}
+          ${desc ? `<p class=\"desc text-sm\">${desc}</p>` : ''}
+          ${featPreview ? `<ul class=\"text-xs features-preview\">${featPreview}</ul>` : ''}
+          ${p.stock !== undefined ? `<p class=\"text-xs text-muted my-025\">Stock: ${p.stock}</p>` : ''}
           <div class="variant-row">
             <label class="text-sm text-muted">Size
               <select class="sel-size ml-025">
@@ -933,15 +997,23 @@ const Store = {
           </div>
           <div class="price-row">
             <span class="price">${currency.format(p.price)}</span>
-            <button class="btn btn-ghost" data-add="${p.id}" ${p.stock === 0 ? 'disabled' : ''}>
-              ${p.stock === 0 ? 'Out of Stock' : 'Add'}
-            </button>
+            <div class="actions">
+              <button class="btn btn-ghost" data-add="${p.id}" ${p.stock === 0 ? 'disabled' : ''}>${p.stock === 0 ? 'Out of Stock' : 'Add'}</button>
+              <button class="btn btn-ghost" data-detail="${p.id}" aria-label="View details for ${p.title}">Details</button>
+            </div>
           </div>
         </div>
-      </article>
-    `).join('');
+      </article>`;
+    }).join('');
 
     this.ui.grid.innerHTML = html || `<p>No products found.</p>`;
+
+    // Analytics: product impression (batched)
+    try {
+      if (window.trackEvent && list.length) {
+        window.trackEvent('view_item_list', list.map(p => ({ id: p.id, price: p.price, stripePrice: p.stripe?.defaultPriceId })));
+      }
+    } catch {}
 
     // Inject/update JSON-LD ItemList for SEO based on currently rendered products
     try {
@@ -983,7 +1055,54 @@ const Store = {
       const colorSel = card.querySelector('.sel-color');
       const opts = { size: sizeSel ? sizeSel.value : undefined, color: colorSel ? colorSel.value : undefined };
       this.add(product, opts);
+      try { window.trackEvent && window.trackEvent('add_to_cart', { id: product.id, price: product.price, stripePrice: product.stripe?.defaultPriceId }); } catch {}
     }));
+
+    // Bind detail buttons
+    this.ui.grid.querySelectorAll('[data-detail]').forEach(btn => btn.addEventListener('click', () => {
+      const id = btn.dataset.detail;
+      const product = PRODUCTS.find(p => p.id === id);
+      if (!product) return;
+      this.openProductDetail(product);
+    }));
+  },
+
+  openProductDetail(product) {
+    let dlg = document.getElementById('product-detail');
+    if (!dlg) {
+      dlg = document.createElement('dialog');
+      dlg.id = 'product-detail';
+      dlg.className = 'product-detail-dialog';
+      document.body.appendChild(dlg);
+    }
+    const feats = (product.features && product.features.length)
+      ? `<ul class="feature-list">${product.features.map(f => `<li>${f}</li>`).join('')}</ul>`
+      : '';
+    dlg.innerHTML = `
+      <form method="dialog" class="dlg-backdrop" onclick="this.closest('dialog').close()"></form>
+      <section class="panel" role="document">
+        <header class="panel-head">
+          <h3>${product.title}</h3>
+          <button class="icon-btn" value="close" aria-label="Close">✕</button>
+        </header>
+        <div class="panel-body">
+          <div class="media"><img src="${product.img}" alt="${product.title}" onerror="this.onerror=null;this.src='https://placehold.co/800x600?text=Image+Unavailable';"/></div>
+          <p class="price-lg">${currency.format(product.price)}</p>
+          ${product.description ? `<p class="full-desc">${product.description}</p>` : ''}
+          ${feats}
+        </div>
+        <footer class="panel-foot">
+          <button class="btn btn-primary" data-add-detail="${product.id}">Add to Cart</button>
+          <button class="btn btn-ghost" value="close">Close</button>
+        </footer>
+      </section>`;
+    dlg.showModal();
+    // Add-to-cart inside dialog
+    dlg.querySelector('[data-add-detail]')?.addEventListener('click', (e) => {
+      e.preventDefault();
+      this.add(product, {});
+      try { window.trackEvent && window.trackEvent('add_to_cart', { id: product.id, price: product.price }); } catch {}
+    }, { once: true });
   },
 
   add(product, opts = {}) {
@@ -1066,6 +1185,9 @@ const Store = {
     if (this.ui.items) this.ui.items.innerHTML = rows || '<p>Your cart is empty.</p>';
     if (this.ui.count) this.ui.count.textContent = String(this.state.cart.reduce((s, i) => s + i.qty, 0));
     if (this.ui.subtotal) this.ui.subtotal.textContent = currency.format(this.subtotal);
+    if (this.state.cart.length) {
+      try { window.trackEvent && window.trackEvent('view_cart', { items: this.state.cart.map(i => ({ id: i.id, price: i.price, qty: i.qty })) }); } catch {}
+    }
 
     // Bind buttons
     if (this.ui.items) {
@@ -1091,11 +1213,23 @@ const Store = {
       localStorage.setItem('checkoutTotalCents', String(cents));
       // persist cart for the checkout page
       this.persist();
+      try { window.trackEvent && window.trackEvent('begin_checkout', { items: this.state.cart.map(i => ({ id: i.id, price: i.price, qty: i.qty })) }); } catch {}
       window.location.href = 'checkout.html';
     } catch (e) {
       alert('Unable to proceed to checkout.');
       console.error(e);
     }
+  },
+
+  // Call this after successful order placement (Stripe + server order saved)
+  completePurchase(order) {
+    try {
+      window.trackEvent && window.trackEvent('purchase', {
+        orderId: order?.id,
+        items: (order?.items || []).map(i => ({ id: i.id, price: i.price, qty: i.qty })),
+        value: (order?.items || []).reduce((s,i)=> s + (i.price * i.qty), 0)
+      });
+    } catch {}
   }
 };
 
