@@ -18,15 +18,97 @@ try {
 
 const currency = new Intl.NumberFormat(undefined, { style: 'currency', currency: 'USD' });
 
+// Featured products cache (homepage only): random until enough analytics, then popularity-based
+let FEATURED = [];
+
 // Dynamic products loaded from API (fallback to empty). Each product object expected shape:
 // { id, name, description, category, price, image, stripe? }
 let PRODUCTS = [];
+
+// Basic description sanitizer to remove scripting, styles, boilerplate clutter and collapse whitespace.
+function sanitizeDescription(raw) {
+  if (!raw || typeof raw !== 'string') return '';
+  let txt = raw;
+  // Remove script/style tags and their content
+  txt = txt.replace(/<script[\s\S]*?<\/script>/gi, ' ') // scripts
+           .replace(/<style[\s\S]*?<\/style>/gi, ' ');
+  // Strip HTML tags
+  txt = txt.replace(/<[^>]+>/g, ' ');
+  // Decode very common entities manually (avoid DOMParser dependency for robustness if blocked by CSP)
+  const entities = { '&nbsp;':' ', '&amp;':'&', '&lt;':'<', '&gt;':'>', '&quot;':'"', '&#39;':'\'' };
+  txt = txt.replace(/&(nbsp|amp|lt|gt|quot|#39);/g, (m)=> entities[m] || ' ');
+  // Split into lines, prune obvious boilerplate / navigation / marketing footer junk
+  const boilerplatePatterns = [
+    /©/i,
+    /all rights reserved/i,
+    /privacy policy/i,
+    /terms of (service|use)/i,
+    /subscribe/i,
+    /follow us/i,
+    /track your order/i,
+    /customer service/i,
+    /returns &? exchanges/i,
+    /shipping/i,
+    /warranty/i,
+    /newsletter/i,
+    /javascript required/i,
+    /var\s+\w+\s*=|function\s*\(/i,
+    /add to cart/i
+  ];
+  let lines = txt.split(/\r?\n|\u2028|\u2029/).map(l=>l.trim()).filter(l=>l);
+  lines = lines.filter(l => {
+    if (l.length < 2) return false;
+    if (l.length > 600) return false; // extremely long (likely concatenated junk)
+    return !boilerplatePatterns.some(re => re.test(l));
+  });
+  // Remove duplicate consecutive lines
+  const deduped = [];
+  for (const l of lines) {
+    if (deduped[deduped.length-1] === l) continue;
+    deduped.push(l);
+  }
+  lines = deduped;
+  // Attempt to extract feature-like bullet lines (retain for features array if not already present elsewhere)
+  const featureLike = [];
+  lines = lines.filter(l => {
+    if (/^[-*•]\s+/.test(l) || /^\d+\./.test(l)) { featureLike.push(l.replace(/^[-*•]\s+/, '').replace(/^\d+\.\s*/, '')); return false; }
+    return true;
+  });
+  // Merge back cleaned description
+  txt = lines.join(' ');
+  // Collapse multiple spaces
+  txt = txt.replace(/\s{2,}/g, ' ').trim();
+  // Truncate to reasonable length for dialog readability
+  const MAX_LEN = 800;
+  if (txt.length > MAX_LEN) txt = txt.slice(0, MAX_LEN) + '…';
+  return txt;
+}
 async function fetchProducts() {
   try {
-  // Request a larger window so first page isn't dominated by malformed or retired items
-  const res = await fetch('/api/products?limit=100');
-    if (!res.ok) throw new Error('Failed to load products');
-    const data = await res.json();
+    // Attempt multiple API bases so that when developing with Live Server (port 5500)
+    // and the backend on 4242 we still succeed. First try relative (same origin),
+    // then localhost variants. Stop at first success with >0 products.
+    const bases = [ '', 'http://127.0.0.1:4242', 'http://localhost:4242' ];
+    let data = [];
+    let lastErr = null;
+    for (const base of bases) {
+      try {
+        const url = base + '/api/products?limit=100';
+        const res = await fetch(url, { credentials: 'include' });
+        if (!res.ok) throw new Error(res.status + ' ' + res.statusText);
+        const json = await res.json();
+        if (Array.isArray(json) && json.length) {
+          data = json;
+          window.__API_BASE = base; // expose for other calls (logout, etc.)
+          break;
+        } else {
+          // keep iterating; remember empty as soft failure
+          lastErr = new Error('Empty dataset from ' + (base || 'current origin'));
+        }
+      } catch (e) { lastErr = e; }
+    }
+    if (!Array.isArray(data)) data = [];
+    if (!data.length && lastErr) throw lastErr;
     // Normalize to UI shape
     const mapCategory = (raw) => {
       const c = String(raw || '').toLowerCase();
@@ -49,16 +131,18 @@ async function fetchProducts() {
           .replace(/\b([a-z])/g, m => m.toUpperCase())
           .slice(0, 120);
       }
+      const cleanedDesc = sanitizeDescription(p.description || '');
       return {
         id: p.id,
         title: rawName,
         price: typeof p.price === 'number' ? p.price : Number(p.price) || 0,
         category: normCat,
         img: p.image || 'assets/EZSportslogo.png',
+        images: Array.isArray(p.images) ? p.images.filter(x=>typeof x==='string' && x.trim()).slice(0,8) : (p.image ? [p.image] : []),
         stripe: p.stripe || null,
         stock: p.stock,
         createdAt: p.createdAt || null,
-        description: (p.description || '').trim(),
+        description: cleanedDesc,
         features: Array.isArray(p.features) ? p.features.slice(0, 25) : []
       };
     });
@@ -80,21 +164,107 @@ async function fetchProducts() {
       if (a.createdAt && b.createdAt) return (new Date(b.createdAt)) - (new Date(a.createdAt));
       return a.title.localeCompare(b.title);
     });
+    // Notify listeners that products are loaded
+    try { window.dispatchEvent(new CustomEvent('products:loaded', { detail: { count: PRODUCTS.length } })); } catch {}
   } catch (e) {
     console.warn('Product fetch failed, leaving PRODUCTS empty:', e.message);
     PRODUCTS = [];
   }
 }
+// Augment PRODUCTS with locally built L-Screens catalog (screens-catalog.json) if present.
+(async function mergeLocalScreens(){
+  try {
+    // Wait a tick for initial fetch to complete
+    await new Promise(r=>setTimeout(r,300));
+    const res = await fetch('assets/info/prodInfo/screens-catalog.json', { cache: 'no-cache' });
+    if (!res.ok) return;
+    const local = await res.json();
+    if (!Array.isArray(local) || !local.length) return;
+    const existingIds = new Set(PRODUCTS.map(p=>p.id));
+    let added = 0;
+    local.forEach(p => {
+      if (!existingIds.has(p.id)) { PRODUCTS.push({
+        id: p.id,
+        title: p.title || p.name,
+        price: p.price || 0,
+        category: 'l-screens',
+        img: p.image || p.img || 'assets/EZSportslogo.png',
+        images: Array.isArray(p.images) ? p.images : (p.image ? [p.image] : []),
+        description: sanitizeDescription(p.description || ''),
+        features: Array.isArray(p.features) ? p.features.slice(0,25) : []
+      }); added++; }
+    });
+    if (added) {
+      PRODUCTS.sort((a,b)=> a.title.localeCompare(b.title));
+      try { window.dispatchEvent(new CustomEvent('products:loaded', { detail: { count: PRODUCTS.length, addedScreens: added } })); } catch {}
+    }
+  } catch(e) { /* silent */ }
+})();
+
+// Augment PRODUCTS with locally built Gloves catalog (gloves-catalog.json) if present.
+(async function mergeLocalGloves(){
+  try {
+    await new Promise(r=>setTimeout(r,400)); // slight delay after screens merge
+    const res = await fetch('assets/info/prodInfo/gloves-catalog.json', { cache: 'no-cache' });
+    if (!res.ok) return;
+    const local = await res.json();
+    if (!Array.isArray(local) || !local.length) return;
+    const existingIds = new Set(PRODUCTS.map(p=>p.id));
+    let added = 0;
+    local.forEach(p => {
+      if (!existingIds.has(p.id)) {
+        PRODUCTS.push({
+          id: p.id,
+          title: p.title || p.name,
+          price: p.price || 0,
+          category: 'gloves',
+          img: p.image || p.img || 'assets/EZSportslogo.png',
+          images: Array.isArray(p.images) ? p.images : (p.image ? [p.image] : []),
+          description: sanitizeDescription(p.description || ''),
+          features: Array.isArray(p.features) ? p.features.slice(0,25) : []
+        });
+        added++;
+      }
+    });
+    if (added) {
+      PRODUCTS.sort((a,b)=> a.title.localeCompare(b.title));
+      try { window.dispatchEvent(new CustomEvent('products:loaded', { detail: { count: PRODUCTS.length, addedGloves: added } })); } catch {}
+    }
+  } catch(e) { /* silent */ }
+})();
 
 // Lightweight analytics dispatcher (fallback logs) – can later POST to /api/analytics/event
 window.trackEvent = function(eventName, payload) {
   try {
     const body = { event: eventName, payload, ts: Date.now() };
-    // Future: send to backend; for now just log to console to verify
-    // fetch('/api/analytics/event', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) }).catch(()=>{});
     console.debug('[analytics]', eventName, payload);
+    // Local popularity counters (will inform FEATURED selection later)
+    const raw = localStorage.getItem('analyticsCounters');
+    const counters = raw ? JSON.parse(raw) : { view_item: {}, add_to_cart: {} };
+    if (eventName === 'view_item' && payload?.id) {
+      counters.view_item[payload.id] = (counters.view_item[payload.id] || 0) + 1;
+    } else if (eventName === 'add_to_cart' && (payload?.id || typeof payload === 'string')) {
+      const id = payload.id || payload; counters.add_to_cart[id] = (counters.add_to_cart[id] || 0) + 1;
+    }
+    localStorage.setItem('analyticsCounters', JSON.stringify(counters));
   } catch {}
 };
+
+function computeFeatured(products) {
+  if (!Array.isArray(products) || products.length === 0) return [];
+  // Pull counters
+  let counters = { view_item: {}, add_to_cart: {} };
+  try { counters = JSON.parse(localStorage.getItem('analyticsCounters')) || counters; } catch {}
+  const totalEvents = Object.values(counters.view_item).reduce((a,b)=>a+b,0) + Object.values(counters.add_to_cart).reduce((a,b)=>a+b,0);
+  const TARGET = 12;
+  if (totalEvents < 30) { // Not enough signal yet → random unique selection
+    const shuffled = products.slice().sort(()=>Math.random()-0.5);
+    return shuffled.slice(0, Math.min(TARGET, shuffled.length));
+  }
+  // Popularity score: add_to_cart * 3 + view_item
+  const score = (id) => (counters.add_to_cart[id]||0)*3 + (counters.view_item[id]||0);
+  return products.slice().sort((a,b)=> score(b.id) - score(a.id)).slice(0, Math.min(TARGET, products.length));
+}
 
 const Store = {
   state: {
@@ -155,7 +325,38 @@ const Store = {
 
     // Load products from API then render
     fetchProducts().then(() => {
+      // Homepage: build FEATURED set and hide category chips if present
+      const page = (location.pathname.split('/').pop()||'').toLowerCase();
+      if (page === 'index.html' || page === '' ) {
+        FEATURED = computeFeatured(PRODUCTS);
+        const chipBar = document.querySelector('.catalog .filters');
+        if (chipBar) chipBar.style.display = 'none';
+      }
       if (this.ui.grid) this.renderProducts();
+      if (this.ui.grid && PRODUCTS.length === 0) {
+        const msg = document.createElement('div');
+        msg.className = 'alert alert-warn';
+        msg.style.cssText = 'background:#331;padding:12px 16px;border:1px solid #663;color:#ffc;border-radius:6px;margin:12px 0;font:14px/1.4 system-ui, sans-serif;';
+        msg.innerHTML = `
+          <strong>No live products loaded.</strong><br/>
+          The backend API did not return any products. This usually means the Node server is not running or the dataset has not been synced.<br/>
+          <em>Next steps:</em>
+          <ol style="margin:6px 0 0 18px;padding:0;">
+            <li>Start the server (e.g. <code>npm run start</code> or <code>node server/index.js</code>).</li>
+            <li>Run the product sync script if needed (e.g. <code>node server/scripts/sync-products.js</code>).</li>
+            <li>Click Retry below once the server is up.</li>
+          </ol>
+          <button type="button" style="margin-top:8px" class="btn btn-primary" id="retry-products">Retry Load</button>
+        `;
+        this.ui.grid.parentNode.insertBefore(msg, this.ui.grid);
+        const retry = msg.querySelector('#retry-products');
+        retry?.addEventListener('click', async () => {
+          retry.disabled = true; retry.textContent = 'Retrying…';
+          await fetchProducts();
+          this.renderProducts();
+          if (PRODUCTS.length) msg.remove(); else { retry.disabled = false; retry.textContent = 'Retry Load'; }
+        });
+      }
     });
 
     // Mobile nav toggle
@@ -965,7 +1166,13 @@ const Store = {
 
   renderProducts(query = '') {
     if (!this.ui.grid) return;
-    const list = PRODUCTS.filter(p =>
+    // Determine source list: homepage uses FEATURED (if non-empty), other pages full PRODUCTS
+    const baseList = (function(){
+      const page = (location.pathname.split('/').pop()||'').toLowerCase();
+      if ((page === 'index.html' || page==='') && FEATURED.length) return FEATURED;
+      return PRODUCTS;
+    })();
+    const list = baseList.filter(p =>
       (this.state.filter === 'all' || p.category === this.state.filter) &&
       p.title.toLowerCase().includes(query.toLowerCase())
     );
@@ -1065,6 +1272,20 @@ const Store = {
       if (!product) return;
       this.openProductDetail(product);
     }));
+
+    // Record lightweight view_item events (on initial render for visible items only)
+    try {
+      const observer = new IntersectionObserver((entries, obs) => {
+        entries.forEach(en => {
+          if (en.isIntersecting) {
+            const id = en.target.getAttribute('data-product-id');
+            if (id) window.trackEvent && window.trackEvent('view_item', { id });
+            obs.unobserve(en.target);
+          }
+        });
+      }, { rootMargin: '0px 0px 200px 0px', threshold: 0.25 });
+      this.ui.grid.querySelectorAll('article[data-product-id]').forEach(card => observer.observe(card));
+    } catch {}
   },
 
   openProductDetail(product) {
@@ -1075,9 +1296,23 @@ const Store = {
       dlg.className = 'product-detail-dialog';
       document.body.appendChild(dlg);
     }
-    const feats = (product.features && product.features.length)
-      ? `<ul class="feature-list">${product.features.map(f => `<li>${f}</li>`).join('')}</ul>`
-      : '';
+    const images = Array.isArray(product.images) && product.images.length ? product.images : [product.img];
+    const thumbs = images.map((src,i)=>`<button class="thumb" data-thumb-index="${i}" aria-label="View image ${i+1}"><img src="${src}" alt="${product.title} thumbnail ${i+1}"/></button>`).join('');
+    // Feature key:value formatting
+    let featureList = '';
+    if (product.features && product.features.length) {
+      const items = product.features.map(f => {
+        const parts = f.split(':');
+        if (parts.length > 1 && parts[0].length < 60) {
+          const key = parts.shift().trim();
+          const val = parts.join(':').trim();
+          return `<li><strong>${key}:</strong> ${val}</li>`;
+        }
+        return `<li>${f}</li>`;
+      }).join('');
+      featureList = `<h4>Features</h4><ul class="feature-list">${items}</ul>`;
+    }
+    const descHtml = `<h4>Description</h4>` + (product.description ? `<p class="full-desc">${product.description}</p>` : `<p class="full-desc muted">Description coming soon.</p>`);
     dlg.innerHTML = `
       <form method="dialog" class="dlg-backdrop" onclick="this.closest('dialog').close()"></form>
       <section class="panel" role="document">
@@ -1085,11 +1320,16 @@ const Store = {
           <h3>${product.title}</h3>
           <button class="icon-btn" value="close" aria-label="Close">✕</button>
         </header>
-        <div class="panel-body">
-          <div class="media"><img src="${product.img}" alt="${product.title}" onerror="this.onerror=null;this.src='https://placehold.co/800x600?text=Image+Unavailable';"/></div>
-          <p class="price-lg">${currency.format(product.price)}</p>
-          ${product.description ? `<p class="full-desc">${product.description}</p>` : ''}
-          ${feats}
+        <div class="panel-body product-detail-layout">
+          <div class="gallery">
+            <div class="main-image"><img id="pd-main-img" src="${images[0]}" alt="${product.title}" onerror="this.onerror=null;this.src='https://placehold.co/800x600?text=Image+Unavailable';"/></div>
+            ${images.length > 1 ? `<div class="thumbs" role="list">${thumbs}</div>` : ''}
+          </div>
+          <div class="info">
+            <p class="price-lg">${currency.format(product.price)}</p>
+            ${featureList}
+            ${descHtml}
+          </div>
         </div>
         <footer class="panel-foot">
           <button class="btn btn-primary" data-add-detail="${product.id}">Add to Cart</button>
@@ -1097,12 +1337,30 @@ const Store = {
         </footer>
       </section>`;
     dlg.showModal();
+    // Thumbnail click swapping
+    dlg.querySelectorAll('.thumb').forEach(btn => btn.addEventListener('click', (e)=>{
+      e.preventDefault();
+      const idx = Number(btn.getAttribute('data-thumb-index')) || 0;
+      const main = dlg.querySelector('#pd-main-img');
+      if (main && images[idx]) main.src = images[idx];
+      dlg.querySelectorAll('.thumb').forEach(t=>t.classList.remove('active'));
+      btn.classList.add('active');
+    }));
     // Add-to-cart inside dialog
     dlg.querySelector('[data-add-detail]')?.addEventListener('click', (e) => {
       e.preventDefault();
       this.add(product, {});
       try { window.trackEvent && window.trackEvent('add_to_cart', { id: product.id, price: product.price }); } catch {}
     }, { once: true });
+    // Explicit close wiring (buttons with value="close" do not auto-close because they are outside the form element containing method="dialog")
+    dlg.querySelectorAll('button[value="close"], [data-close-detail]').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        try { dlg.close(); } catch {}
+      });
+    });
+    // Keyboard fallback (some browsers polyfill dialog)
+    dlg.addEventListener('keydown', (e) => { if (e.key === 'Escape') { try { dlg.close(); } catch {} } });
   },
 
   add(product, opts = {}) {

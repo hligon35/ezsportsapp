@@ -74,6 +74,29 @@ function normalizeCategory(folderName) {
     || folderName.toLowerCase();
 }
 
+// Server-side description cleaner (mirrors frontend sanitizeDescription, conservative to avoid data loss)
+function cleanDescription(raw) {
+  if (!raw || typeof raw !== 'string') return '';
+  let txt = raw;
+  // Remove script/style tags
+  txt = txt.replace(/<script[\s\S]*?<\/script>/gi, ' ').replace(/<style[\s\S]*?<\/style>/gi, ' ');
+  // Strip tags
+  txt = txt.replace(/<[^>]+>/g, ' ');
+  // Decode a few entities
+  const entities = { '&nbsp;':' ', '&amp;':'&', '&lt;':'<', '&gt;':'>', '&quot;':'"', '&#39;':'\'' };
+  txt = txt.replace(/&(nbsp|amp|lt|gt|quot|#39);/g, m => entities[m] || ' ');
+  const boiler = [ /privacy policy/i, /terms of (service|use)/i, /newsletter/i, /follow us/i, /all rights reserved/i ];
+  let lines = txt.split(/\r?\n|\u2028|\u2029/).map(l=>l.trim()).filter(Boolean);
+  lines = lines.filter(l => l.length > 1 && l.length < 600 && !boiler.some(re => re.test(l)));
+  // Deduplicate consecutive
+  const out = [];
+  for (const l of lines) { if (out[out.length-1] !== l) out.push(l); }
+  txt = out.join(' ');
+  txt = txt.replace(/\s{2,}/g, ' ').trim();
+  if (txt.length > 1000) txt = txt.slice(0, 1000) + '…';
+  return txt;
+}
+
 async function walkJsonFiles(dir) {
   const out = [];
   async function walk(current, segments = []) {
@@ -175,7 +198,9 @@ async function main() {
           .replace(/\b([a-z])/g, m => m.toUpperCase())
           .slice(0, 140);
       }
-      const description = (json.description || '').trim();
+  const rawDescription = (json.description || '').trim();
+  const cleaned = cleanDescription(rawDescription);
+  const description = cleaned;
       const price = Number(json.price); // assume already USD
       if (!price || isNaN(price)) warnings.push(`Price missing/invalid for ${id}`);
       const primaryImageRaw = (json.downloaded_images && json.downloaded_images[0])
@@ -230,7 +255,8 @@ async function main() {
         features: features.length ? features : undefined,
         meta: {
           sourceUrl: json.source_url || undefined,
-          warranty: json.warranty || undefined
+          warranty: json.warranty || undefined,
+          originalDescription: cleaned !== rawDescription ? rawDescription.slice(0, 1200) : undefined
         },
         isActive: true,
         featured: prev?.featured || false,

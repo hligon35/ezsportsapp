@@ -81,6 +81,17 @@ const Shop = {
         if (Array.isArray(window.CATALOG_PRODUCTS) && window.CATALOG_PRODUCTS.length) {
           this.state.products = window.CATALOG_PRODUCTS;
           try { localStorage.setItem('shopProducts', JSON.stringify(this.state.products)); } catch {}
+          // Developer hint so it's obvious we're not seeing live data
+          setTimeout(()=>{
+            if (!document.getElementById('fallback-warning')) {
+              const warn = document.createElement('div');
+              warn.id = 'fallback-warning';
+              warn.style.cssText = 'background:#432;padding:10px 14px;margin:12px 0;border:1px solid #765;color:#fdb;font:14px system-ui;border-radius:6px;';
+              warn.innerHTML = '<strong>Showing static fallback catalog.</strong> Live API returned no products. Start the backend server on port 4242 and clear localStorage key <code>shopProducts</code> then reload to view real data.';
+              const main = document.querySelector('main');
+              if (main) main.insertBefore(warn, main.firstChild);
+            }
+          }, 50);
         }
       } catch {}
     }

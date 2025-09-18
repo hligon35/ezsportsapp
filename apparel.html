@@ -33,58 +33,11 @@
       </nav>
     </div>
   </header>
-  <main id="main" class="container">
+  <main id="main" class="container" data-category="apparel">
     <h1>Apparel</h1>
-    <p class="muted">Fresh uniforms for home, away, and practice. Tap Add to drop items into your cart.</p>
-
-    <section class="stack-1">
-      <h2>Uniforms</h2>
-      <div class="grid grid-3 product-grid">
-        <article class="card">
-          <div class="media"><img src="assets/img/uni1.avif" alt="Home Uniform" loading="lazy" /></div>
-          <div class="body">
-            <h3 class="h3-tight">Home Uniform</h3>
-            <div class="price-row">
-              <span class="price">$59.99</span>
-              <button class="btn btn-ghost js-add" data-id="uni-home" data-title="Home Uniform" data-price="59.99" data-category="apparel" data-img="assets/img/uni1.avif">Add</button>
-            </div>
-          </div>
-        </article>
-
-        <article class="card">
-          <div class="media"><img src="assets/img/uni2.avif" alt="Away Uniform" loading="lazy" /></div>
-          <div class="body">
-            <h3 class="h3-tight">Away Uniform</h3>
-            <div class="price-row">
-              <span class="price">$64.99</span>
-              <button class="btn btn-ghost js-add" data-id="uni-away" data-title="Away Uniform" data-price="64.99" data-category="apparel" data-img="assets/img/uni2.avif">Add</button>
-            </div>
-          </div>
-        </article>
-
-        <article class="card">
-          <div class="media"><img src="assets/img/uni3.avif" alt="Alternate Uniform" loading="lazy" /></div>
-          <div class="body">
-            <h3 class="h3-tight">Alternate Uniform</h3>
-            <div class="price-row">
-              <span class="price">$69.99</span>
-              <button class="btn btn-ghost js-add" data-id="uni-alt" data-title="Alternate Uniform" data-price="69.99" data-category="apparel" data-img="assets/img/uni3.avif">Add</button>
-            </div>
-          </div>
-        </article>
-
-        <article class="card">
-          <div class="media"><img src="assets/img/uni4.avif" alt="Practice Uniform" loading="lazy" /></div>
-          <div class="body">
-            <h3 class="h3-tight">Practice Uniform</h3>
-            <div class="price-row">
-              <span class="price">$49.99</span>
-              <button class="btn btn-ghost js-add" data-id="uni-practice" data-title="Practice Uniform" data-price="49.99" data-category="apparel" data-img="assets/img/uni4.avif">Add</button>
-            </div>
-          </div>
-        </article>
-      </div>
-    </section>
+    <p class="muted">Fresh uniforms and clothing. Live catalog below updates automatically.</p>
+    <div id="category-grid" data-grid class="grid"></div>
+    <div id="category-pagination" data-pagination class="pagination-controls mt-4"></div>
   </main>
   <footer class="site-footer">
     <div class="container footer-grid">
@@ -156,18 +109,6 @@
 
   <script type="module" src="assets/js/analytics.js"></script>
   <script type="module" src="assets/js/app.js"></script>
-  <script>
-    // Bind Add buttons to Store.add with inline product snapshots
-    window.addEventListener('DOMContentLoaded', () => {
-      document.querySelectorAll('.js-add').forEach(btn => {
-        if (btn._bound) return; btn._bound = true;
-        btn.addEventListener('click', () => {
-          const d = btn.dataset;
-          const product = { id: d.id, title: d.title, price: Number(d.price)||0, category: d.category||'apparel', img: d.img };
-          try { window.Store && window.Store.add(product); } catch (e) { console.error(e); }
-        });
-      });
-    });
-  </script>
+  <script src="assets/js/category-page.js"></script>
 </body>
 </html>

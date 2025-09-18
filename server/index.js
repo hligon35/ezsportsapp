@@ -332,7 +332,7 @@ app.post('/api/order', async (req, res) => {
   }
 });
 
-const PORT = process.env.PORT || 4242;
+let basePort = Number(process.env.PORT) || 4242;
 // Optional auto product sync on startup (e.g., AUTOSYNC_PRODUCTS=1)
 async function autoSyncOnStart() {
   if (process.env.AUTOSYNC_PRODUCTS === '1') {
@@ -348,10 +348,26 @@ async function autoSyncOnStart() {
   }
 }
 
-const server = app.listen(PORT, '0.0.0.0', () => {
-  console.log(`Server running on port ${PORT}`);
-  autoSyncOnStart();
-});
+function startServer(attempt = 0) {
+  const tryPort = basePort + attempt;
+  const srv = app.listen(tryPort, '0.0.0.0', () => {
+    console.log(`Server running on port ${tryPort}`);
+    if (attempt > 0) console.log(`(Original port ${basePort} was busy; using fallback ${tryPort})`);
+    autoSyncOnStart();
+  });
+  srv.on('error', (err) => {
+    if (err.code === 'EADDRINUSE' && attempt < 5) {
+      console.warn(`Port ${tryPort} in use, retrying on ${tryPort + 1}...`);
+      setTimeout(() => startServer(attempt + 1), 300);
+    } else {
+      console.error('Failed to start server:', err.message);
+      process.exit(1);
+    }
+  });
+  return srv;
+}
+
+const server = startServer();
 
 // Graceful shutdown
 process.on('SIGINT', () => { server.close(() => process.exit(0)); });

@@ -11,7 +11,9 @@
     "db:backup": "npm --prefix server run db:backup",
     "db:reset": "npm --prefix server run db:reset",
     "products:sync": "node server/scripts/sync-products.js",
-    "products:sync:dry": "node server/scripts/sync-products.js --dry --no-stripe"
+    "products:sync:dry": "node server/scripts/sync-products.js --dry --no-stripe",
+    "screens:build": "node server/scripts/build-screens-catalog.js",
+    "gloves:build": "node server/scripts/build-gloves-catalog.js"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
