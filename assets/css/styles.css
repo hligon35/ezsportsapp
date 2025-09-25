@@ -537,6 +537,17 @@ img[src*="/logo.svg"]{
     width:min(75vw, 320px);
   }
 }
+
+/* Extra-small fallback: stack submenu inline instead of flyout to avoid off-screen clipping */
+@media (max-width:420px){
+  .site-header .header-bar .quick-links .has-submenu.submenu-left > .nav-submenu{
+    position:static;
+    right:auto; left:auto; top:auto;
+    width:100%; max-height:none; overflow:visible;
+    padding:.25rem; margin-top:.25rem;
+    background:#0a0a0a; border:none; border-radius:.5rem; box-shadow:none;
+  }
+}
 /* Safeguard: if JS or old CSS attempts to force desktop, override below 1200px */
 @media (max-width:1200px){
   .quick-links.forced-wide{display:none !important}
