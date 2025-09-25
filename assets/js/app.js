@@ -1183,13 +1183,14 @@ const Store = {
       const price = Number(prod.price || 0);
       const img = String(prod.img || 'assets/img/netting.jpg');
       const displayPrice = isFinite(price) && price > 0 ? currency.format(price) : '';
+      const href = `product.html?pid=${encodeURIComponent(id)}`;
 
       const article = document.createElement('article');
       article.className = 'card';
       article.innerHTML = `
-        <div class="media"><img src="${img}" alt="${title}" loading="lazy" /></div>
+        <a class="media" href="${href}"><img src="${img}" alt="${title}" loading="lazy" /></a>
         <div class="body">
-          <h3 class="h3-tight">${title}</h3>
+          <h3 class="h3-tight"><a href="${href}">${title}</a></h3>
           <div class="price-row">
             ${displayPrice ? `<span class="price">${displayPrice}</span>` : ''}
             <button class="btn btn-ghost js-add" data-id="${id}" data-title="${title.replace(/"/g,'&quot;')}" data-price="${price}" data-category="${prod.category || ''}" data-img="${img}">Add</button>
