@@ -387,10 +387,10 @@ img[src*="/logo.svg"]{
 /* Primary nav submenu (L-Screens) */
 .quick-links .has-submenu{position:relative}
 .quick-links .has-submenu > a::after{content:"▾";margin-left:.35rem;font-size:.85em}
-.quick-links .nav-submenu{position:absolute;top:calc(100% + .4rem);left:0;background:#0b0b0b;border:1px solid var(--border);border-radius:.6rem;box-shadow:0 8px 24px rgba(0,0,0,.32);display:none;min-width:220px;padding:.4rem;z-index:80}
+.quick-links .nav-submenu{position:absolute;top:calc(100% + .4rem);left:0;background:#0b0b0b;border:1px solid var(--border);border-radius:.6rem;box-shadow:0 8px 24px rgba(0,0,0,.32);display:none;min-width:220px;padding:.4rem;z-index:80;opacity:0;transform:translateY(-4px);transition:opacity .15s ease, transform .15s ease}
 /* For L-Screens: open the dropdown to the left by aligning submenu to the right edge */
 .quick-links .has-submenu.submenu-left > .nav-submenu{left:auto;right:0}
-.quick-links .has-submenu.open > .nav-submenu{display:block}
+.quick-links .has-submenu.open > .nav-submenu{display:block;opacity:1;transform:none}
 /* Keep submenu open when any child has focus (keyboard users) */
 .quick-links .has-submenu:focus-within > .nav-submenu{display:block}
 .quick-links .nav-submenu a{display:block;padding:.5rem .6rem;border-radius:.4rem;background:transparent;color:#d3d0d7}
@@ -526,7 +526,7 @@ img[src*="/logo.svg"]{
   .site-header .header-bar .quick-links.is-open{display:flex}
   /* Hide the flyout unless the parent submenu is open */
   .site-header .header-bar .quick-links .has-submenu.submenu-left > .nav-submenu{display:none}
-  .site-header .header-bar .quick-links .has-submenu.submenu-left.open > .nav-submenu{display:block}
+  .site-header .header-bar .quick-links .has-submenu.submenu-left.open > .nav-submenu{display:block;opacity:1;transform:none}
 }
 
 /* Small safeguards to avoid clipping on ultra-narrow widths */
@@ -535,6 +535,13 @@ img[src*="/logo.svg"]{
   .site-header .header-bar .quick-links .has-submenu.submenu-left > .nav-submenu{
     right:calc(100% + .35rem);
     width:min(75vw, 320px);
+  }
+}
+
+/* When viewport is relatively narrow, anchor the flyout to the left edge so it stays fully visible */
+@media (max-width:768px){
+  .site-header .header-bar .quick-links .has-submenu.submenu-left.open > .nav-submenu{
+    left:8px; right:auto; width:min(90vw, 360px);
   }
 }
 
