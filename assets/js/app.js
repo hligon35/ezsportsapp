@@ -1085,7 +1085,38 @@ const Store = {
       }
 
       const pageKey = (location.pathname.split('/').pop() || '').toLowerCase().replace(/\.html$/, '');
-      const items = Array.isArray(data[pageKey]) ? data[pageKey] : [];
+      let items = [];
+      // Support two schemas:
+      // 1) Legacy: { "accessories": [...], "baseball-l-screens": [...] }
+      if (Array.isArray(data[pageKey])) {
+        items = data[pageKey];
+      }
+      // 2) New: { schemaVersion, categories: { "Accessories": [...], "Better Baseball Screens": [...] } }
+      if (!items.length && data && data.categories && typeof data.categories === 'object') {
+        // Map page -> category arrays
+        const pageToCategories = {
+          'accessories': ['Accessories'],
+          'baseball-l-screens': ['Better Baseball Screens'],
+          'protective-screens': ['Better Baseball Screens'],
+          'pitchers-pocket': ["Better Baseball Pitcher's Pocket"],
+          'replacement-screens': ['Replacement Nets']
+        };
+        const cats = pageToCategories[pageKey] || [];
+        for (const c of cats) {
+          if (Array.isArray(data.categories[c])) items = items.concat(data.categories[c]);
+        }
+        // For protective-screens page, filter out only square/protective entries when using Better Baseball Screens bucket
+        if (pageKey === 'protective-screens' && items.length) {
+          items = items.filter(x => {
+            const n = (x.name || x.title || '').toLowerCase();
+            return /protective|square/.test(n) || /sock\s*net/.test(n) || /fast\s*pitch/.test(n) || /10x10|8x8|7x7/.test(n);
+          });
+        }
+        // For baseball-l-screens page, filter items that look like L-screens
+        if (pageKey === 'baseball-l-screens' && items.length) {
+          items = items.filter(x => /\bl[ -]?screen\b/i.test(x.name || x.title || ''));
+        }
+      }
       if (!items.length) {
         this.renderEmptyState(grid);
         return;
@@ -1093,7 +1124,7 @@ const Store = {
 
       grid.innerHTML = '';
       items.forEach(p => {
-        const card = this.buildProductCard(p);
+        const card = this.buildProductCard(this.normalizeProdListItem(p));
         if (card) grid.appendChild(card);
       });
 
@@ -1114,16 +1145,34 @@ const Store = {
   async fetchProdList() {
     // Cache result during session to avoid repeated fetches
     if (this._prodList) return this._prodList;
-    try {
-      const res = await fetch('prodList.json', { credentials: 'same-origin' });
-      if (!res.ok) throw new Error('prodList.json not found');
-      const json = await res.json();
-      this._prodList = json;
-      return json;
-    } catch (e) {
-      // Not present yet or invalid; caller will handle empty state
-      return null;
+    const urls = ['assets/prodList.json', 'prodList.json'];
+    for (const u of urls) {
+      try {
+        const res = await fetch(u, { credentials: 'same-origin', cache: 'no-cache' });
+        if (!res.ok) throw new Error('not found');
+        const json = await res.json();
+        if (json && (typeof json === 'object' || Array.isArray(json))) {
+          this._prodList = json;
+          return json;
+        }
+      } catch (e) { /* try next */ }
     }
+    // Not present yet or invalid; caller will handle empty state
+    return null;
+  },
+
+  // Normalize raw entries from prodList.json categories into the minimal shape our UI expects
+  normalizeProdListItem(p) {
+    if (!p || typeof p !== 'object') return p;
+    const id = String(p.sku || p.id || p.name || p.title || Math.random().toString(36).slice(2));
+    const title = String(p.name || p.title || id);
+    // Prefer explicit price fields; fall back to map, then wholesale, else 0
+    const price = Number(p.price ?? p.map ?? p.wholesale ?? 0) || 0;
+    // Try to pick a decent image
+    let img = p.img || (p.images && (p.images.primary || (Array.isArray(p.images.all) && p.images.all[0]))) || p.image;
+    if (!img && Array.isArray(p.downloaded_images) && p.downloaded_images.length) img = p.downloaded_images[0];
+    if (!img) img = 'assets/EZSportslogo.png';
+    return { id, title, price, img, category: (p.category || '').toString().toLowerCase() };
   },
 
   buildProductCard(prod) {
