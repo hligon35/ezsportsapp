@@ -170,6 +170,57 @@ body, .container, .footer-grid, .about-inner, .category-tiles .tiles, .grid, .ba
   padding-right:clamp(.85rem,2.5vw,1.75rem) !important;
 }
 
+/* Contact page layout and form aesthetics */
+.contact-grid { 
+  display:grid; 
+  gap:1.25rem; 
+  grid-template-columns: 1.2fr .8fr; 
+  align-items:start; 
+}
+@media (max-width: 860px){
+  .contact-grid { grid-template-columns: 1fr; }
+}
+
+.contact-form.card { 
+  padding:1.25rem; 
+  border-radius:.9rem; 
+  background:#fff; 
+  box-shadow:0 4px 24px rgba(12,32,64,.08);
+  display:grid; 
+  gap:.9rem; 
+}
+.contact-form label { display:grid; gap:.4rem; }
+.contact-form label > span { font-size:.85rem; color:var(--muted); }
+.contact-form input,
+.contact-form textarea {
+  width:100%;
+  padding:.85rem 1rem; 
+  border:1px solid var(--border); 
+  border-radius:.7rem; 
+  background:#fff; 
+  color:var(--ink); 
+}
+.contact-form textarea { min-height:140px; resize:vertical; }
+.contact-form input:focus,
+.contact-form textarea:focus { outline:none; box-shadow:var(--ring); border-color:var(--brand); }
+.contact-form input:invalid,
+.contact-form textarea:invalid { border-color: color-mix(in oklab, var(--red) 65%, #fff 35%); }
+.contact-form .row { display:flex; gap:.65rem; align-items:center; flex-wrap:wrap; }
+.contact-form .form-msg { font-size:.9rem; color:var(--muted); }
+.contact-form .form-msg.is-success { color:#15803d; }
+.contact-form .form-msg.is-error { color:#b91c1c; }
+
+.contact-side.card { 
+  padding:1.25rem; 
+  border-radius:.9rem; 
+  background:#fff; 
+  box-shadow:0 4px 24px rgba(12,32,64,.08);
+}
+.contact-side h3 { margin-top:.25rem; }
+.contact-side .checks { list-style:none; padding:0; margin:.5rem 0 0; display:grid; gap:.35rem; }
+.contact-side .checks li { position:relative; padding-left:1.4rem; }
+.contact-side .checks li::before { content:"✔"; position:absolute; left:0; top:0; color:#15803d; font-weight:700; }
+
 /* Global bottom expert CTA (injected on non-contact pages) */
 .expert-cta { 
   --cta-bg-dark:#140d2a; 
@@ -311,6 +362,8 @@ body{
 .stack-03{ display:grid; gap:.3rem; }
 .row-between{ display:flex; justify-content:space-between; }
 .hidden{ display:none !important; }
+/* Generic row utility for inline controls */
+.row{ display:flex; gap:.6rem; align-items:center; flex-wrap:wrap; }
 /* Auth form layout */
 .auth-container{ max-width: 480px; margin: 2rem auto; background:#fff; border-radius:1.2rem; box-shadow:0 4px 24px rgba(12,32,64,.10); padding: 1.5rem; }
 .auth-form{ display:grid; grid-auto-rows:min-content; gap:.9rem; }

@@ -40,19 +40,19 @@
       <p>Questions about custom netting, lead times, or installation? Send a note and our team will respond quickly.</p>
     </section>
 
-    <div class="contact-grid" style="display:grid; gap:1.5rem; grid-template-columns: 1.2fr .8fr; align-items:start;">
-      <form class="contact-form card" id="contact-form" style="display:grid; gap:.8rem; padding:1.25rem; border-radius:.8rem; background:#fff; box-shadow:0 4px 24px rgba(12,32,64,.08);">
+    <div class="contact-grid">
+      <form class="contact-form card" id="contact-form">
         <label>
           <span class="muted">Name</span>
-          <input id="contact-name" name="name" placeholder="Your name" required />
+          <input id="contact-name" name="name" placeholder="Your name" autocomplete="name" required />
         </label>
         <label>
           <span class="muted">Email</span>
-          <input name="email" type="email" placeholder="you@email.com" required />
+          <input name="email" type="email" placeholder="you@email.com" autocomplete="email" required />
         </label>
         <label>
           <span class="muted">Phone (optional)</span>
-          <input name="phone" placeholder="(123) 456-7890" />
+          <input name="phone" type="tel" placeholder="(123) 456-7890" autocomplete="tel" />
         </label>
         <label>
           <span class="muted">Message</span>
@@ -64,7 +64,7 @@
         </div>
       </form>
 
-      <aside class="contact-side card" style="padding:1.25rem; border-radius:.8rem; background:#fff; box-shadow:0 4px 24px rgba(12,32,64,.08);">
+      <aside class="contact-side card">
         <h3>Other ways to reach us</h3>
         <ul class="checks">
           <li>Email: support@ezsportsnetting.com</li>
