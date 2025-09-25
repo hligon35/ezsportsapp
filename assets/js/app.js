@@ -1187,9 +1187,40 @@ const Store = {
     const title = String(p.name || p.title || id);
     // Prefer explicit price fields; fall back to map, then wholesale, else 0
     const price = Number(p.price ?? p.map ?? p.wholesale ?? 0) || 0;
-    // Try to pick a decent image
-    let img = p.img || (p.images && (p.images.primary || (Array.isArray(p.images.all) && p.images.all[0]))) || p.image;
-    if (!img && Array.isArray(p.downloaded_images) && p.downloaded_images.length) img = p.downloaded_images[0];
+    // Robust image selection: prefer web URLs and known fields; avoid local file paths (e.g. C:\...)
+    const isUsableSrc = (s) => typeof s === 'string' && /^(https?:|\/|assets\/)/i.test(s);
+    let img = null;
+    // 1) Explicit fields
+    if (isUsableSrc(p.img)) img = p.img;
+    // 2) images object or array
+    if (!img && p.images) {
+      if (isUsableSrc(p.images.primary)) img = p.images.primary;
+      else if (Array.isArray(p.images.all)) {
+        const cand = p.images.all.find(isUsableSrc);
+        if (cand) img = cand;
+      } else if (Array.isArray(p.images)) {
+        const cand = p.images.find(isUsableSrc);
+        if (cand) img = cand;
+      }
+    }
+    // 3) details.images
+    if (!img && p.details && p.details.images) {
+      const di = p.details.images;
+      if (isUsableSrc(di.primary)) img = di.primary;
+      else if (Array.isArray(di.all)) {
+        const cand = di.all.find(isUsableSrc);
+        if (cand) img = cand;
+      }
+    }
+    // 4) other single fields
+    if (!img && isUsableSrc(p.image)) img = p.image;
+    if (!img && p.details && isUsableSrc(p.details.image_url)) img = p.details.image_url;
+    // 5) downloaded_images (prefer web/relative entries only)
+    const dl = (p.downloaded_images && Array.isArray(p.downloaded_images) ? p.downloaded_images : (p.details && Array.isArray(p.details.downloaded_images) ? p.details.downloaded_images : []));
+    if (!img && dl && dl.length) {
+      const cand = dl.find(isUsableSrc);
+      if (cand) img = cand;
+    }
     if (!img) img = 'assets/EZSportslogo.png';
     return { id, title, price, img, category: (p.category || '').toString().toLowerCase() };
   },

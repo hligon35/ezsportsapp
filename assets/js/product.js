@@ -43,11 +43,45 @@
     const id = String(p.sku || p.id || p.name || p.title || Math.random().toString(36).slice(2));
     const title = String(p.name || p.title || id);
     const price = Number(p.price ?? p.map ?? p.wholesale ?? 0) || 0;
-    let primary = p.img || (p.images && (p.images.primary || (Array.isArray(p.images.all) && p.images.all[0]))) || p.image;
-    if (!primary && Array.isArray(p.downloaded_images) && p.downloaded_images.length) primary = p.downloaded_images[0];
+    const isUsableSrc = (s) => typeof s === 'string' && /^(https?:|\/|assets\/)/i.test(s);
+    let primary = null;
+    // 1) explicit p.img
+    if (isUsableSrc(p.img)) primary = p.img;
+    // 2) images
+    if (!primary && p.images) {
+      if (isUsableSrc(p.images.primary)) primary = p.images.primary;
+      else if (Array.isArray(p.images.all)) {
+        const cand = p.images.all.find(isUsableSrc);
+        if (cand) primary = cand;
+      } else if (Array.isArray(p.images)) {
+        const cand = p.images.find(isUsableSrc);
+        if (cand) primary = cand;
+      }
+    }
+    // 3) details.images / details.image_url
+    if (!primary && p.details) {
+      const di = p.details.images;
+      if (di) {
+        if (isUsableSrc(di.primary)) primary = di.primary;
+        else if (Array.isArray(di.all)) {
+          const cand = di.all.find(isUsableSrc);
+          if (cand) primary = cand;
+        }
+      }
+      if (!primary && isUsableSrc(p.details.image_url)) primary = p.details.image_url;
+    }
+    // 4) image
+    if (!primary && isUsableSrc(p.image)) primary = p.image;
+    // 5) downloaded_images
+    const dl = (p.downloaded_images && Array.isArray(p.downloaded_images) ? p.downloaded_images : (p.details && Array.isArray(p.details.downloaded_images) ? p.details.downloaded_images : []));
+    if (!primary && dl && dl.length) {
+      const cand = dl.find(isUsableSrc);
+      if (cand) primary = cand;
+    }
     const gallery = [];
-    if (p.images && Array.isArray(p.images.all)) gallery.push(...p.images.all);
-    if (Array.isArray(p.downloaded_images)) gallery.push(...p.downloaded_images);
+    if (p.images && Array.isArray(p.images.all)) gallery.push(...p.images.all.filter(isUsableSrc));
+    if (p.details && p.details.images && Array.isArray(p.details.images.all)) gallery.push(...p.details.images.all.filter(isUsableSrc));
+    if (Array.isArray(dl)) gallery.push(...dl.filter(isUsableSrc));
     if (primary && !gallery.length) gallery.push(primary);
     const features = Array.isArray(p.features) ? p.features : (p.details && Array.isArray(p.details.features) ? p.details.features : []);
     const description = p.description || (p.details && p.details.description) || '';
