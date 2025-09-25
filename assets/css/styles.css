@@ -388,6 +388,8 @@ img[src*="/logo.svg"]{
 .quick-links .has-submenu{position:relative}
 .quick-links .has-submenu > a::after{content:"▾";margin-left:.35rem;font-size:.85em}
 .quick-links .nav-submenu{position:absolute;top:calc(100% + .4rem);left:0;background:#0b0b0b;border:1px solid var(--border);border-radius:.6rem;box-shadow:0 8px 24px rgba(0,0,0,.32);display:none;min-width:220px;padding:.4rem;z-index:80}
+/* For L-Screens: open the dropdown to the left by aligning submenu to the right edge */
+.quick-links .has-submenu.submenu-left > .nav-submenu{left:auto;right:0}
 .quick-links .has-submenu.open > .nav-submenu{display:block}
 /* Keep submenu open when any child has focus (keyboard users) */
 .quick-links .has-submenu:focus-within > .nav-submenu{display:block}

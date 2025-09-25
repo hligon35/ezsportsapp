@@ -747,6 +747,10 @@ const Store = {
         item.submenu.forEach(sub => {
           const subA = document.createElement('a'); subA.href = sub.href; subA.textContent = sub.text; ul.appendChild(subA);
         });
+        // For the L-Screens dropdown, align the submenu to the right so it opens to the left
+        if ((item.text || '').toLowerCase() === 'l-screens') {
+          wrapper.classList.add('submenu-left');
+        }
         wrapper.appendChild(a);
         wrapper.appendChild(ul);
         nav.appendChild(wrapper);
