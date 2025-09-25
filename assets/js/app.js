@@ -445,7 +445,7 @@ const Store = {
           <div>
             <h4>Company</h4>
             <a href="about.html">About</a><br/>
-            <a href="support.html">Support</a>
+            <a href="contactus.html">Contact Us</a>
           </div>
           <div class="subscribe">
             <h4>Get deals in your inbox</h4>
@@ -881,7 +881,7 @@ const Store = {
       'index.html': 'Home',
       'deals.html': 'Deals',
       'about.html': 'About',
-      'support.html': 'Support',
+  'careers.html': 'Careers',
       'careers.html': 'Careers',
       'login.html': 'Login',
       'checkout.html': 'Checkout',
