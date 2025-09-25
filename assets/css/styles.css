@@ -516,17 +516,26 @@ img[src*="/logo.svg"]{
     border:1px solid var(--border);
     border-radius:.6rem;
     box-shadow:0 8px 24px rgba(0,0,0,.32);
-    z-index:81;
+    z-index:100;
   }
   body.nav-open{overflow:hidden}
   /* Convert collapsed nav into an overlay dropdown that does NOT push header content */
   .site-header .header-bar{position:relative}
-  .site-header .header-bar .quick-links{position:absolute;top:100%;right:0;left:auto;flex-basis:auto;order:unset;width:min(420px,calc(100% - .75rem));max-height:calc(100dvh - 110px);overflow:auto;margin-top:.55rem;z-index:70}
+  .site-header .header-bar .quick-links{position:absolute;top:100%;right:0;left:auto;flex-basis:auto;order:unset;width:min(420px,calc(100% - .75rem));max-height:calc(100dvh - 110px);overflow-y:auto;overflow-x:visible;margin-top:.55rem;z-index:70}
   /* Re‑assert display when open (specificity bump because of absolute override) */
   .site-header .header-bar .quick-links.is-open{display:flex}
   /* Hide the flyout unless the parent submenu is open */
   .site-header .header-bar .quick-links .has-submenu.submenu-left > .nav-submenu{display:none}
   .site-header .header-bar .quick-links .has-submenu.submenu-left.open > .nav-submenu{display:block}
+}
+
+/* Small safeguards to avoid clipping on ultra-narrow widths */
+@media (max-width:480px){
+  .site-header .header-bar .quick-links{width:min(92vw, 420px)}
+  .site-header .header-bar .quick-links .has-submenu.submenu-left > .nav-submenu{
+    right:calc(100% + .35rem);
+    width:min(75vw, 320px);
+  }
 }
 /* Safeguard: if JS or old CSS attempts to force desktop, override below 1200px */
 @media (max-width:1200px){
