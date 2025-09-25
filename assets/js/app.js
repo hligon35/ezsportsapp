@@ -319,6 +319,8 @@ const Store = {
   this.ensureSEO();
   this.ensurePerformanceOptimizations();
   this.ensureServiceWorkerRegistered();
+  // Render page-specific product grids from external prodList.json if present
+  this.ensurePageProductGrid();
 
     // Runtime responsive enforcement (in case stale CSS served from cache briefly)
     this.enforceResponsiveBehaviors();
@@ -436,15 +438,13 @@ const Store = {
           </div>
           <div>
             <h4>Shop</h4>
-            <a href="bats.html">Bats</a><br/>
-            <a href="gloves.html">Gloves</a><br/>
             <a href="ez-nets.html">EZ Nets</a><br/>
-            <a href="gear.html">Gear</a>
+            <a href="l-screens.html">L-Screens</a><br/>
+            <a href="accessories.html">Accessories</a>
           </div>
           <div>
             <h4>Company</h4>
             <a href="about.html">About</a><br/>
-            <a href="careers.html">Careers</a><br/>
             <a href="support.html">Support</a>
           </div>
           <div class="subscribe">
@@ -661,7 +661,6 @@ const Store = {
       actions = document.createElement('div');
       actions.id = 'header-actions';
       actions.className = 'header-actions';
-      // Insert after search form if present, else at end
       const search = header.querySelector('.search');
       if (search && search.nextSibling) {
         header.insertBefore(actions, search.nextSibling);
@@ -670,10 +669,10 @@ const Store = {
       }
     }
 
-      // Move cart button out of nav directly into header (not actions) for flexible row placement
-      const nav = document.getElementById('primary-nav') || header.querySelector('nav.quick-links');
-      const cartBtn = nav ? nav.querySelector('.cart-btn') : null;
-      if (cartBtn) header.appendChild(cartBtn);
+    // Remove previous relocation of cart button; keep it in nav as trailing item
+    // const nav = document.getElementById('primary-nav') || header.querySelector('nav.quick-links');
+    // const cartBtn = nav ? nav.querySelector('.cart-btn') : null;
+    // if (cartBtn) header.appendChild(cartBtn);
 
     // Standardize search bar (placeholder, button classes/text)
     const search = header.querySelector('.search');
@@ -713,56 +712,86 @@ const Store = {
     const nav = document.getElementById('primary-nav') || document.querySelector('nav.quick-links');
     if (!nav) return;
 
-    // Canonical nav: rebuild to avoid legacy links and ensure correct order
-    const required = [
-      { href: 'deals.html', text: 'Deals' },
+    // Deactivate legacy nav (kept for later reference):
+    // const legacy = [ 'Deals','Bats','Gloves','Batting Gloves','Drip','Gear','Apparel','Facility & Field','Turf' ];
+
+    // Build new primary nav
+    const links = [
       { href: 'about.html', text: 'About' },
       { href: 'ez-nets.html', text: 'EZ Nets' },
-      { href: 'bats.html', text: 'Bats' },
-      { href: 'gloves.html', text: 'Gloves' },
-      { href: 'batting-gloves.html', text: 'Batting Gloves' },
-      { href: 'drip.html', text: 'Drip' },
-      { href: 'gear.html', text: 'Gear' },
-      { href: 'apparel.html', text: 'Apparel' },
-      { href: 'l-screens.html', text: 'L-Screens' },
-      { href: 'facility-field.html', text: 'Facility & Field' },
-      { href: 'turf.html', text: 'Turf' },
-      { href: 'contactus.html', text: 'Contact Us' }
+      { href: 'l-screens.html', text: 'L-Screens', submenu: [
+        { href: 'baseball-l-screens.html', text: 'Baseball L-Screens' },
+        { href: 'protective-screens.html', text: 'Protective Screens' },
+        { href: 'pitchers-pocket.html', text: "Pitcher's Pocket" },
+        { href: 'replacement-screens.html', text: 'Replacement Screens' },
+      ]},
+      { href: 'accessories.html', text: 'Accessories' },
+      { href: 'contactus.html', text: 'Contact Us' },
     ];
 
-    // Preserve cart button if it sits inside nav (will be moved by ensureHeaderLayout)
+    // Preserve cart button if present
     const cartBtn = nav.querySelector('.cart-btn');
 
-    // Remove all anchor links
-    nav.querySelectorAll('a').forEach(a => a.remove());
+    // Clear existing links
+    nav.innerHTML = '';
 
-    // Append required links in order
-    required.forEach(link => {
-      const a = document.createElement('a');
-      a.href = link.href;
-      a.textContent = link.text;
-      nav.appendChild(a);
+    // Create links
+    links.forEach(item => {
+      if (item.submenu) {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'has-submenu';
+        const a = document.createElement('a');
+        a.href = item.href || '#'; a.textContent = item.text; a.setAttribute('aria-haspopup','true'); a.setAttribute('aria-expanded','false');
+        const ul = document.createElement('div');
+        ul.className = 'nav-submenu';
+        item.submenu.forEach(sub => {
+          const subA = document.createElement('a'); subA.href = sub.href; subA.textContent = sub.text; ul.appendChild(subA);
+        });
+        wrapper.appendChild(a);
+        wrapper.appendChild(ul);
+        nav.appendChild(wrapper);
+
+        // Desktop: open on hover; Mobile: toggle on tap
+        const isFinePointer = typeof window.matchMedia === 'function' && window.matchMedia('(hover:hover) and (pointer:fine)').matches;
+        if (isFinePointer) {
+          wrapper.addEventListener('mouseenter', () => { wrapper.classList.add('open'); a.setAttribute('aria-expanded','true'); });
+          wrapper.addEventListener('mouseleave', () => { wrapper.classList.remove('open'); a.setAttribute('aria-expanded','false'); });
+          // Allow click to navigate to l-screens.html
+        } else {
+          a.addEventListener('click', (e) => {
+            e.preventDefault();
+            const open = wrapper.classList.toggle('open');
+            a.setAttribute('aria-expanded', String(open));
+          });
+        }
+      } else {
+        const a = document.createElement('a');
+        a.href = item.href; a.textContent = item.text; nav.appendChild(a);
+      }
     });
 
-  // Removed EZ Nets mega menu per request
+    // Restore cart button at end if existed
+    if (cartBtn) nav.appendChild(cartBtn);
 
-
-    // Highlight current page
+    // Active link highlighting
     const path = location.pathname.split('/').pop() || 'index.html';
-    const active = Array.from(nav.querySelectorAll('a')).find(a => (a.getAttribute('href') || '').endsWith(path));
-    if (active) { active.classList.add('is-active'); active.setAttribute('aria-current', 'page'); }
+    const candidates = Array.from(nav.querySelectorAll('a')).filter(a => a.getAttribute('href') && !a.closest('.nav-submenu'));
+    const active = candidates.find(a => (a.getAttribute('href') || '').endsWith(path));
+    if (active) { active.classList.add('is-active'); active.setAttribute('aria-current','page'); }
   },
 
 
   updateNavigation() {
     const actions = document.getElementById('header-actions') || document.querySelector('.header-actions');
-    if (!actions) return;
+    const nav = document.getElementById('primary-nav') || document.querySelector('nav.quick-links');
+    if (!nav) return;
 
-    // Remove existing auth elements from actions
-    actions.querySelectorAll('.auth-link, .user-menu').forEach(el => el.remove());
+    // Clear any existing auth/user elements inside nav to avoid duplicates
+    nav.querySelectorAll('.auth-link, .user-menu').forEach(el => el.remove());
+    // Also clear prior ones in actions (legacy)
+    if (actions) actions.querySelectorAll('.auth-link, .user-menu').forEach(el => el.remove());
 
     if (this.state.user) {
-      // User is logged in — show compact profile avatar with dropdown
       const userMenu = document.createElement('div');
       userMenu.className = 'user-menu';
       const initials = (this.state.user.name || this.state.user.email || 'U').split(/\s+/).map(s=>s[0]).slice(0,2).join('').toUpperCase();
@@ -780,41 +809,42 @@ const Store = {
           ${this.state.user.isAdmin ? '<a href="admin.html" role="menuitem">Admin</a>' : ''}
           <button type="button" data-logout role="menuitem">Logout</button>
         </div>`;
-      actions.appendChild(userMenu);
+      nav.appendChild(userMenu);
 
-      // Wire dropdown toggle and outside click
       const btn = userMenu.querySelector('#profile-btn');
       const dd = userMenu.querySelector('#user-dropdown');
       const close = () => { dd.classList.remove('open'); btn.setAttribute('aria-expanded','false'); dd.setAttribute('aria-hidden','true'); };
       const open = () => { dd.classList.add('open'); btn.setAttribute('aria-expanded','true'); dd.setAttribute('aria-hidden','false'); };
       btn.addEventListener('click', (e)=>{ e.stopPropagation(); dd.classList.contains('open')?close():open(); });
       document.addEventListener('click', (e)=>{ if (!userMenu.contains(e.target)) close(); }, { capture:true });
-      // Logout wiring
       const logoutBtn = userMenu.querySelector('[data-logout]');
       if (logoutBtn) logoutBtn.addEventListener('click', ()=> this.logout());
     } else {
-      // User is not logged in
       const loginLink = document.createElement('a');
       loginLink.href = 'login.html';
       loginLink.className = 'auth-link';
       loginLink.textContent = 'Login';
-      actions.appendChild(loginLink);
+      nav.appendChild(loginLink);
     }
-    // Ensure a header break element exists to force second row for toggle/search/cart (only once)
+
+    // Hide header-actions if empty
+    if (actions && actions.children.length === 0) actions.style.display = 'none';
+
+    // Ensure header break element still exists for layout but not needed for actions now
     (function(){
-        try {
-          const header = document.querySelector('.site-header .header-bar');
-          if (!header) return;
-          if (!header.querySelector('.header-break')) {
-            const br = document.createElement('span');
-            br.className = 'header-break';
-            br.setAttribute('aria-hidden','true');
-            const menu = header.querySelector('.menu-toggle');
-            if (menu) header.insertBefore(br, menu);
-            else header.appendChild(br);
-          }
-        } catch {}
-      })();
+      try {
+        const header = document.querySelector('.site-header .header-bar');
+        if (!header) return;
+        if (!header.querySelector('.header-break')) {
+          const br = document.createElement('span');
+          br.className = 'header-break';
+          br.setAttribute('aria-hidden','true');
+          const menu = header.querySelector('.menu-toggle');
+          if (menu) header.insertBefore(br, menu);
+          else header.appendChild(br);
+        }
+      } catch {}
+    })();
   },
   ensureBreadcrumbs() {
     // Avoid duplicates
@@ -835,21 +865,25 @@ const Store = {
       'admin.html': 'Admin',
       'order-history.html': 'Order History',
       'netting-calculator.html': 'Netting Calculator',
-  'hitting-facility.html':'Hitting Facility',
-  'batting-cage.html':'Batting Cage',
-  'foul-ball.html':'Foul Ball Netting',
-  'backstop.html':'Backstop Netting',
-  'baseball-l-screen.html':'Baseball L-Screen',
-  'pitchers-pocket.html':"Pitcher's Pocket",
-  'training-facility.html':'Training Facility',
-  'residential-golf.html':'Residential Golf Netting',
-  'sports-netting.html':'Sports Netting',
-  'basketball.html':'Basketball Netting',
-  'hockey.html':'Hockey Netting',
-  'softball.html':'Softball Netting',
-  'tennis.html':'Tennis Netting',
-  'volleyball.html':'Volleyball Netting',
-  'commercial-netting.html':'Commercial Netting',
+    'hitting-facility.html':'Hitting Facility',
+    'batting-cage.html':'Batting Cage',
+    'foul-ball.html':'Foul Ball Netting',
+    'backstop.html':'Backstop Netting',
+    // L-Screens subpages
+    'baseball-l-screens.html':'Baseball L-Screens',
+    'protective-screens.html':'Protective Screens',
+    'pitchers-pocket.html':"Pitcher's Pocket",
+    'replacement-screens.html':'Replacement Screens',
+    // Netting categories
+    'training-facility.html':'Training Facility',
+    'residential-golf.html':'Residential Golf Netting',
+    'sports-netting.html':'Sports Netting',
+    'basketball.html':'Basketball Netting',
+    'hockey.html':'Hockey Netting',
+    'softball.html':'Softball Netting',
+    'tennis.html':'Tennis Netting',
+    'volleyball.html':'Volleyball Netting',
+    'commercial-netting.html':'Commercial Netting',
       'ez-nets.html': 'EZ Nets',
       'baseball-netting.html': 'Baseball Netting',
       'golf-netting.html': 'Golf Netting',
@@ -863,6 +897,7 @@ const Store = {
       'gear.html': 'Gear',
       'apparel.html': 'Apparel',
       'l-screens.html': 'L-Screens',
+      'accessories.html': 'Accessories',
       'facility-field.html': 'Facility & Field'
     };
 
@@ -1036,6 +1071,92 @@ const Store = {
     } catch(e) { /* silent */ }
   },
 
+  // Dynamically render products for the current page from prodList.json
+  async ensurePageProductGrid() {
+    try {
+      const grid = document.getElementById('page-product-grid');
+      if (!grid) return; // Only run on pages that declare a page-level grid
+
+      // If prodList.json isn't present yet, fail gracefully
+      const data = await this.fetchProdList();
+      if (!data || typeof data !== 'object') {
+        this.renderEmptyState(grid);
+        return;
+      }
+
+      const pageKey = (location.pathname.split('/').pop() || '').toLowerCase().replace(/\.html$/, '');
+      const items = Array.isArray(data[pageKey]) ? data[pageKey] : [];
+      if (!items.length) {
+        this.renderEmptyState(grid);
+        return;
+      }
+
+      grid.innerHTML = '';
+      items.forEach(p => {
+        const card = this.buildProductCard(p);
+        if (card) grid.appendChild(card);
+      });
+
+      // Bind add buttons
+      grid.querySelectorAll('.js-add').forEach(btn => {
+        if (btn._bound) return; btn._bound = true;
+        btn.addEventListener('click', () => {
+          const d = btn.dataset;
+          const product = { id: d.id, title: d.title, price: Number(d.price)||0, category: d.category || (pageKey || 'misc'), img: d.img };
+          try { window.Store && window.Store.add(product); } catch (e) { console.error(e); }
+        });
+      });
+    } catch (e) {
+      console.warn('Page product grid failed:', e);
+    }
+  },
+
+  async fetchProdList() {
+    // Cache result during session to avoid repeated fetches
+    if (this._prodList) return this._prodList;
+    try {
+      const res = await fetch('prodList.json', { credentials: 'same-origin' });
+      if (!res.ok) throw new Error('prodList.json not found');
+      const json = await res.json();
+      this._prodList = json;
+      return json;
+    } catch (e) {
+      // Not present yet or invalid; caller will handle empty state
+      return null;
+    }
+  },
+
+  buildProductCard(prod) {
+    try {
+      if (!prod || !prod.id) return null;
+      const id = String(prod.id);
+      const title = String(prod.title || 'Untitled');
+      const price = Number(prod.price || 0);
+      const img = String(prod.img || 'assets/img/netting.jpg');
+      const displayPrice = isFinite(price) && price > 0 ? currency.format(price) : '';
+
+      const article = document.createElement('article');
+      article.className = 'card';
+      article.innerHTML = `
+        <div class="media"><img src="${img}" alt="${title}" loading="lazy" /></div>
+        <div class="body">
+          <h3 class="h3-tight">${title}</h3>
+          <div class="price-row">
+            ${displayPrice ? `<span class="price">${displayPrice}</span>` : ''}
+            <button class="btn btn-ghost js-add" data-id="${id}" data-title="${title.replace(/"/g,'&quot;')}" data-price="${price}" data-category="${prod.category || ''}" data-img="${img}">Add</button>
+          </div>
+        </div>`;
+      return article;
+    } catch {
+      return null;
+    }
+  },
+
+  renderEmptyState(grid) {
+    if (!grid) return;
+    grid.innerHTML = '<div class="muted">No products available yet for this page.</div>';
+  },
+
   // Inject a bottom "Talk with a Netting Expert" CTA on all pages except contact page
   ensureExpertCTA() {
     try {
@@ -1193,12 +1314,12 @@ const Store = {
           <div class="variant-row">
             <label class="text-sm text-muted">Size
               <select class="sel-size ml-025">
-                ${['XS','S','M','L','XL'].map(s=>`<option value=\"${s}\">${s}</option>`).join('')}
+                ${['XS','S','M','L','XL'].map(s => `<option value="${s}">${s}</option>`).join('')}
               </select>
             </label>
-            <label class="text-sm text-muted">Color
+            <label class="text-sm text-muted ml-05">Color
               <select class="sel-color ml-025">
-                ${['Black','White','Red','Blue','Green'].map(c=>`<option value=\"${c}\">${c}</option>`).join('')}
+                ${['Black','White','Red','Blue','Green'].map(c => `<option value="${c}">${c}</option>`).join('')}
               </select>
             </label>
           </div>

@@ -343,6 +343,8 @@ img{max-width:100%;display:block}
 /* Header */
 .site-header{position:sticky;top:0;z-index:30;background:#000000;color:#fff;border-bottom:1px solid rgba(255,255,255,.08);padding-top:25px}
 .header-bar{display:flex;align-items:center;gap:1rem;min-height:51px;flex-wrap:wrap}
+/* Recenter header contents globally */
+.site-header .header-bar{justify-content:center}
 .brand{display:flex;align-items:center;gap:.6rem;color:#fff;text-decoration:none;font-weight:900;letter-spacing:.3px}
 .brand img{filter:drop-shadow(0 4px 12px rgba(0,0,0,.25));border-radius:0.75rem;background:#ffffff;}
 
@@ -378,6 +380,14 @@ img[src*="/logo.svg"]{
 .nav-ready .site-header .header-bar{visibility:visible}
 .quick-links a{color:#d3d0d7;text-decoration:none;opacity:.95}
 .quick-links .auth-link{color:#d3d0d7;text-decoration:none;opacity:.95;background:none;border:none;cursor:pointer;font:inherit;}
+
+/* Primary nav submenu (L-Screens) */
+.quick-links .has-submenu{position:relative}
+.quick-links .has-submenu > a::after{content:"▾";margin-left:.35rem;font-size:.85em}
+.quick-links .nav-submenu{position:absolute;top:calc(100% + .4rem);left:0;background:#0b0b0b;border:1px solid var(--border);border-radius:.6rem;box-shadow:0 8px 24px rgba(0,0,0,.32);display:none;min-width:220px;padding:.4rem;z-index:80}
+.quick-links .has-submenu.open > .nav-submenu{display:block}
+.quick-links .nav-submenu a{display:block;padding:.5rem .6rem;border-radius:.4rem;background:transparent;color:#d3d0d7}
+.quick-links .nav-submenu a:hover{background:#121212;color:#fff}
 .user-menu{display:flex;align-items:center;gap:.8rem;font-size:.9rem;position:relative}
 .user-menu span{color:#d3d0d7;opacity:.8;}
 .profile-btn{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:999px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.12);cursor:pointer}
@@ -408,6 +418,8 @@ img[src*="/logo.svg"]{
 
 /* Top-row actions container */
 .header-actions{margin-left:auto;display:flex;align-items:center;gap:.75rem}
+/* Hide empty header-actions to avoid pushing layout */
+.header-actions:empty{display:none}
 /* Header break element to create second row in mid-range widths */
 .header-break{flex-basis:100%;height:0;display:none}
 /* Large / default single-row ordering: brand, search, login, cart, menu toggle */
@@ -477,6 +489,11 @@ img[src*="/logo.svg"]{
   .quick-links{flex-basis:100%;order:4;display:none;flex-direction:column;align-items:flex-start;background:#000000;padding:.6rem .6rem 1rem;border-radius:.85rem;margin-top:.55rem;box-shadow:0 4px 18px rgba(0,0,0,.25)}
   .quick-links a{padding:.55rem .75rem;border-radius:.55rem;width:100%;}
   .quick-links.is-open{display:flex}
+  /* Submenu stacks under its trigger on mobile */
+  .quick-links .has-submenu{width:100%}
+  .quick-links .nav-submenu{position:static;display:none;width:100%;margin-top:.25rem;padding:.25rem;border:none;border-radius:.5rem;background:#0a0a0a;box-shadow:none}
+  .quick-links .has-submenu.open > .nav-submenu{display:block}
+  .quick-links .nav-submenu a{width:100%}
   body.nav-open{overflow:hidden}
   /* Convert collapsed nav into an overlay dropdown that does NOT push header content */
   .site-header .header-bar{position:relative}
@@ -721,6 +738,12 @@ img[src*="/logo.svg"]{
 .brand--light{opacity:1}
 .subscribe .row{display:flex;gap:.5rem}
 .subscribe input{flex:1;padding:.65rem .8rem;border-radius:.6rem;border:1px solid var(--border);background:#fff;color:var(--ink)}
+.site-footer a[href="careers.html"],
+.site-footer li a[href="careers.html"],
+nav.quick-links a[href="careers.html"],
+nav.quick-links li a[href="careers.html"]{
+  display:none !important;
+}
 
 /* Expert help footer form */
 /* Ensure all footer columns align to the top */
