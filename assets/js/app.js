@@ -754,8 +754,27 @@ const Store = {
         // Desktop: open on hover; Mobile: toggle on tap
         const isFinePointer = typeof window.matchMedia === 'function' && window.matchMedia('(hover:hover) and (pointer:fine)').matches;
         if (isFinePointer) {
-          wrapper.addEventListener('mouseenter', () => { wrapper.classList.add('open'); a.setAttribute('aria-expanded','true'); });
-          wrapper.addEventListener('mouseleave', () => { wrapper.classList.remove('open'); a.setAttribute('aria-expanded','false'); });
+          // Desktop hover: add a small hide-delay so users can move into the submenu
+          // even if there's a visual gap; cancel the timer on re-enter.
+          let hideTimer = null;
+          const openMenu = () => {
+            if (hideTimer) { clearTimeout(hideTimer); hideTimer = null; }
+            wrapper.classList.add('open');
+            a.setAttribute('aria-expanded','true');
+          };
+          const scheduleClose = () => {
+            if (hideTimer) clearTimeout(hideTimer);
+            hideTimer = setTimeout(() => {
+              wrapper.classList.remove('open');
+              a.setAttribute('aria-expanded','false');
+              hideTimer = null;
+            }, 200); // 200ms grace period
+          };
+          wrapper.addEventListener('mouseenter', openMenu);
+          wrapper.addEventListener('mouseleave', scheduleClose);
+          // Also listen on submenu to keep it open while hovering over it
+          ul.addEventListener('mouseenter', openMenu);
+          ul.addEventListener('mouseleave', scheduleClose);
           // Allow click to navigate to l-screens.html
         } else {
           a.addEventListener('click', (e) => {

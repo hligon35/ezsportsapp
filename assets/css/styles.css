@@ -386,6 +386,8 @@ img[src*="/logo.svg"]{
 .quick-links .has-submenu > a::after{content:"▾";margin-left:.35rem;font-size:.85em}
 .quick-links .nav-submenu{position:absolute;top:calc(100% + .4rem);left:0;background:#0b0b0b;border:1px solid var(--border);border-radius:.6rem;box-shadow:0 8px 24px rgba(0,0,0,.32);display:none;min-width:220px;padding:.4rem;z-index:80}
 .quick-links .has-submenu.open > .nav-submenu{display:block}
+/* Keep submenu open when any child has focus (keyboard users) */
+.quick-links .has-submenu:focus-within > .nav-submenu{display:block}
 .quick-links .nav-submenu a{display:block;padding:.5rem .6rem;border-radius:.4rem;background:transparent;color:#d3d0d7}
 .quick-links .nav-submenu a:hover{background:#121212;color:#fff}
 .user-menu{display:flex;align-items:center;gap:.8rem;font-size:.9rem;position:relative}
