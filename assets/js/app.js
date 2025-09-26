@@ -363,10 +363,12 @@ const Store = {
         msg.className = 'alert alert-warn';
         msg.style.cssText = 'background:#331;padding:12px 16px;border:1px solid #663;color:#ffc;border-radius:6px;margin:12px 0;font:14px/1.4 system-ui, sans-serif;';
         msg.innerHTML = `
-          <strong>No live products loaded.</strong><br/>
-          The backend API did not return any products. This usually means the Node server is not running or the dataset has not been synced.<br/>
-          <em>Next steps:</em>
-          <ol style="margin:6px 0 0 18px;padding:0;">
+        // Enforce maximum display count (cap at 12 for page grids)
+        const MAX_PAGE_ITEMS = 12;
+        items.slice(0, MAX_PAGE_ITEMS).forEach(p => {
+          const card = this.buildProductCard(this.normalizeProdListItem(p));
+          if (card) grid.appendChild(card);
+        });
             <li>Start the server (e.g. <code>npm run start</code> or <code>node server/index.js</code>).</li>
             <li>Run the product sync script if needed (e.g. <code>node server/scripts/sync-products.js</code>).</li>
             <li>Click Retry below once the server is up.</li>
@@ -385,6 +387,7 @@ const Store = {
     });
 
     // Mobile nav toggle
+        // (Admin local append removed to keep strict prodList source and honor max cap)
     const toggle = document.querySelector('.menu-toggle');
     const nav = document.getElementById('primary-nav') || document.querySelector('nav.quick-links');
     if (toggle && nav) {
@@ -1187,7 +1190,31 @@ const Store = {
         for (const c of cats) {
           if (Array.isArray(data.categories[c])) items = items.concat(data.categories[c]);
         }
-        // No additional filtering needed now that categories map directly
+        // Page-specific trimming logic: For baseball-l-screens & protective-screens pages
+        // only show products up to and including the core 10x10 screen (exclude pad kits, replacement nets, etc.)
+        if ((pageKey === 'baseball-l-screens' || pageKey === 'protective-screens') && items.length) {
+          // Identify the first item whose sku or name references a 10x10 core screen.
+          // Accept patterns: '10x10' and not containing 'replacement' or 'pad kit'
+          const idx = items.findIndex(p => {
+            const sku = (p.sku||'').toString().toLowerCase();
+            const name = (p.name||p.title||'').toString().toLowerCase();
+            const text = sku + ' ' + name;
+            if (!/10x10/.test(text)) return false;
+            if (/replacement/.test(text)) return false; // skip replacement nets
+            if (/pad kit|pad\s*kit/.test(text)) return false; // skip pad kits
+            return true;
+          });
+          if (idx !== -1) {
+            // Keep everything up to and including idx
+            items = items.slice(0, idx + 1);
+          } else {
+            // Fallback: filter out obvious pad kits & replacement nets even if 10x10 not matched
+            items = items.filter(p => {
+              const name = (p.name||p.title||'').toLowerCase();
+              return !/pad kit|replacement/.test(name);
+            });
+          }
+        }
       }
       if (!items.length) {
         this.renderEmptyState(grid);
@@ -1195,29 +1222,12 @@ const Store = {
       }
 
       grid.innerHTML = '';
-      items.forEach(p => {
+      const MAX_PAGE_ITEMS = 12;
+      items.slice(0, MAX_PAGE_ITEMS).forEach(p => {
         const card = this.buildProductCard(this.normalizeProdListItem(p));
         if (card) grid.appendChild(card);
       });
-
-      // If admin-managed products exist locally for this category page, append them too
-      try {
-        const raw = localStorage.getItem('adminProducts');
-        if (raw) {
-          const admin = JSON.parse(raw);
-          if (Array.isArray(admin) && admin.length) {
-            const pageKey = (location.pathname.split('/').pop() || '').toLowerCase().replace(/\.html$/, '');
-            const catHint = pageKey.replace(/-/g, ' ');
-            admin.filter(p => {
-              const c = (p.category || '').toString().toLowerCase();
-              return c && (pageKey.includes(c) || c.includes(pageKey) || c.includes(catHint));
-            }).forEach(p => {
-              const card = this.buildProductCard({ id: p.id, title: p.name || p.title || p.id, price: p.price, category: p.category, img: p.image || p.img || 'assets/EZSportslogo.png' });
-              if (card) grid.appendChild(card);
-            });
-          }
-        }
-      } catch {}
+      // Admin append removed to enforce strict prodList-only display and max cap
 
       // Bind add buttons
       grid.querySelectorAll('.js-add').forEach(btn => {
