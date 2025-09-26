@@ -4,10 +4,43 @@
 const NCurrency = new Intl.NumberFormat(undefined, { style: 'currency', currency: 'USD' });
 
 const MESHES = [
+  // Existing presets
   { id: 'baseball-1-7-8', label: 'Baseball (1-7/8" x 1-7/8" Sq Mesh)', priceSqFt: 1.25, sport: 'baseball' },
-  { id: 'golf-1', label: 'Golf (1" x 1" Sq Mesh)', priceSqFt: 0.95 },
-  { id: 'lacrosse-1-1-2', label: 'Lacrosse (1-1/2" x 1-1/2" Sq Mesh)', priceSqFt: 1.20 },
-  { id: 'soccer-4', label: 'Soccer (4" x 4" Sq Mesh)', priceSqFt: 0.80 }
+  { id: 'golf-1', label: 'Golf (1" x 1" Sq Mesh)', priceSqFt: 0.95, sport: 'golf' },
+  { id: 'lacrosse-1-1-2', label: 'Lacrosse (1-1/2" x 1-1/2" Sq Mesh)', priceSqFt: 1.20, sport: 'lacrosse' },
+  { id: 'soccer-4', label: 'Soccer (4" x 4" Sq Mesh)', priceSqFt: 0.80, sport: 'soccer' },
+
+  // User-provided meshes (prices kept at full precision; UI displays two decimals only)
+  // Baseball gauges (#xx)
+  { id: 'baseball-18', label: '#18', priceSqFt: 0.2699, sport: 'baseball' },
+  { id: 'baseball-21', label: '#21', priceSqFt: 0.3267, sport: 'baseball' },
+  { id: 'baseball-30', label: '#30', priceSqFt: 0.4235, sport: 'baseball' },
+  { id: 'baseball-36', label: '#36', priceSqFt: 0.4961, sport: 'baseball' },
+  { id: 'baseball-42', label: '#42', priceSqFt: 0.5687, sport: 'baseball' },
+  { id: 'baseball-60', label: '#60', priceSqFt: 0.847, sport: 'baseball' },
+  { id: 'baseball-96', label: '#96', priceSqFt: 1.5125, sport: 'baseball' },
+
+  // Golf variants
+  { id: 'golf-golf', label: 'Golf', priceSqFt: 0.46, sport: 'golf' },
+  { id: 'golf-30', label: 'Golf 30', priceSqFt: 0.9075, sport: 'golf' },
+  { id: 'golf-ntp', label: 'NTPGolf', priceSqFt: 0.242, sport: 'golf' },
+
+  // Soccer variants
+  { id: 'soccer-21', label: 'Soccer 21', priceSqFt: 0.1573, sport: 'soccer' },
+  { id: 'soccer-36', label: 'Soccer 36', priceSqFt: 0.2662, sport: 'soccer' },
+
+  // Lacrosse variants
+  { id: 'lacrosse-21', label: 'Lax 21', priceSqFt: 0.363, sport: 'lacrosse' },
+  { id: 'lacrosse-30', label: 'Lax 30', priceSqFt: 0.5082, sport: 'lacrosse' },
+
+  // Poly / NOVA / DN variants (categorized as other)
+  { id: 'poly-21', label: 'Poly 21', priceSqFt: 0.218405, sport: 'other' },
+  { id: 'poly-36', label: 'Poly 36', priceSqFt: 0.3267, sport: 'other' },
+  { id: 'nova-24', label: 'NOVA24', priceSqFt: 0.58212, sport: 'other' },
+  { id: 'nova-30', label: 'NOVA30', priceSqFt: 0.627, sport: 'other' },
+  { id: 'nova-44', label: 'NOVA44', priceSqFt: 0.8925, sport: 'other' },
+  { id: 'dn-6', label: 'DN6', priceSqFt: 0.6, sport: 'other' },
+  { id: 'dn-18', label: 'DN18', priceSqFt: 1.6, sport: 'other' }
 ];
 
 const BORDER_SURCHARGE_PER_FT = 0.35; // sewn border adds this per linear foot
@@ -101,8 +134,10 @@ function setup(){
   Object.keys(groups).forEach(key=>{
     options += `<optgroup label="${sportLabels[key]||key}">` +
       groups[key].map(m=>{
-        // Create a concise label (Sport only) for the option text to keep select width tight
-        const short = (m.sport || m.label.split('(')[0]).trim().replace(/\s+\(.*$/,'');
+        // Keep compact labels but preserve identifiers like "#18" and specific names when already short
+        const hasParen = m.label.includes('(');
+        const short = hasParen ? (m.sport || m.label.split('(')[0]).trim().replace(/\s+\(.*$/,'') : m.label.trim();
+        // Display price with two decimals via currency formatter; calculations retain full precision
         return `<option value="${m.id}" data-full="${m.label}">${short} — ${NCurrency.format(m.priceSqFt)}/sq ft</option>`;
       }).join('') + '</optgroup>';
   });
@@ -140,7 +175,8 @@ function setup(){
       if (!mesh){
         helper.textContent = 'Select a sport mesh size to view pricing per square foot.';
       } else {
-        const rate = `${NCurrency.format(mesh.priceSqFt)}/sq ft`;
+  // Display-only rounding to two decimals; keeps internal precision for calc
+  const rate = `${NCurrency.format(Math.round(mesh.priceSqFt * 100) / 100)}/sq ft`;
         let extra = '';
         if(isBaseball) extra = ' Choose a usage profile for more tailored recommendations.';
   helper.textContent = `${mesh.label} — ${rate}.${extra}`;
