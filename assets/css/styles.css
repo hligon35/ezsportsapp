@@ -146,22 +146,65 @@ body, .container, .footer-grid, .about-inner, .category-tiles .tiles, .grid, .ba
   .netting-subnav a { font-size:.75rem; padding:.5rem .75rem; }
 }
 
-/* Consistent horizontal breathing room for netting hero sections */
+/* Consistent horizontal breathing room + palette-coordinated backgrounds for EZ Nets heroes */
 .netting-hero, .net-hero {
   /* preserve existing top/bottom padding from inline styles, only adjust sides */
   padding-left:clamp(.85rem,2.5vw,1.75rem) !important;
   padding-right:clamp(.85rem,2.5vw,1.75rem) !important;
-  /* Brighter, more orange gradient (reduced black, added warm glow) */
+  /* Brand-forward gradient using site palette (deep purple) with subtle highlight */
   background:
-    radial-gradient(circle at 82% 18%, color-mix(in oklab,var(--brand) 85%, #fff 15%) 0%, transparent 60%),
-    linear-gradient(132deg,
-      color-mix(in oklab,var(--brand) 100%, #fff 4%) 0%,
-      color-mix(in oklab,var(--brand) 96%, #000 4%) 40%,
-      color-mix(in oklab,var(--brand) 88%, #000 12%) 72%,
-      color-mix(in oklab,var(--brand) 78%, #000 22%) 100%) !important;
+    radial-gradient(circle at 80% 20%, color-mix(in oklab, var(--brand) 86%, #fff 14%) 0%, transparent 62%),
+    linear-gradient(135deg,
+      color-mix(in oklab, var(--brand) 96%, #000 4%) 0%,
+      color-mix(in oklab, var(--brand) 82%, #fff 18%) 100%) !important;
   color:#fff !important;
   border-radius:1.15rem !important;
   box-shadow:0 10px 38px -12px rgba(0,0,0,.55),0 4px 18px -6px rgba(0,0,0,.45);
+}
+
+/* Sport-specific variants (kept within site palette) */
+.netting-hero--baseball,
+.nh-baseball {
+  background:
+    radial-gradient(circle at 78% 22%, color-mix(in oklab, var(--brand) 88%, #fff 12%) 0%, transparent 62%),
+    linear-gradient(135deg,
+      color-mix(in oklab, var(--brand) 98%, #000 2%) 0%,
+      color-mix(in oklab, var(--brand) 78%, #fff 22%) 100%) !important;
+}
+
+.netting-hero--golf,
+.nh-golf {
+  background:
+    radial-gradient(circle at 78% 22%, color-mix(in oklab, color-mix(in oklab, var(--brand) 70%, var(--blue) 30%), #fff 14%) 0%, transparent 62%),
+    linear-gradient(135deg,
+      color-mix(in oklab, var(--brand) 75%, var(--blue) 25%) 0%,
+      color-mix(in oklab, var(--brand) 65%, #fff 35%) 100%) !important;
+}
+
+.netting-hero--lacrosse,
+.nh-lacrosse {
+  background:
+    radial-gradient(circle at 78% 22%, color-mix(in oklab, var(--brand) 80%, #fff 20%) 0%, transparent 62%),
+    linear-gradient(135deg,
+      color-mix(in oklab, var(--brand) 90%, #000 10%) 0%,
+      color-mix(in oklab, var(--brand) 70%, #fff 30%) 100%) !important;
+}
+
+.netting-hero--soccer,
+.nh-soccer {
+  background:
+    radial-gradient(circle at 78% 22%, color-mix(in oklab, var(--brand) 84%, #fff 16%) 0%, transparent 62%),
+    linear-gradient(135deg,
+      color-mix(in oklab, var(--brand) 94%, #000 6%) 0%,
+      color-mix(in oklab, var(--brand) 76%, #fff 24%) 100%) !important;
+}
+
+.nh-commercial-netting {
+  background:
+    radial-gradient(circle at 78% 22%, color-mix(in oklab, var(--brand) 92%, #fff 8%) 0%, transparent 62%),
+    linear-gradient(135deg,
+      color-mix(in oklab, var(--brand) 98%, #000 2%) 0%,
+      color-mix(in oklab, var(--brand) 74%, #fff 26%) 100%) !important;
 }
 
 /* Contact hero spacing (align with netting hero horizontal rhythm) */
