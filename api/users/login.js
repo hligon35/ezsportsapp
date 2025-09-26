@@ -1,4 +1,4 @@
-const { ensureSchema, findUserByIdentifier, verifyPassword, updateLastLogin, publicUser } = require('../_lib_db');
+const { ensureSchema, ensureOwnerAdmin, findUserByIdentifier, verifyPassword, updateLastLogin, publicUser } = require('../_lib_db');
 const { signSession, setSessionCookie } = require('../_lib_auth');
 
 module.exports = async function handler(req, res) {
@@ -10,7 +10,9 @@ module.exports = async function handler(req, res) {
   }
   if (req.method !== 'POST') return res.status(405).json({ message: 'Method Not Allowed' });
   try {
-    await ensureSchema();
+  await ensureSchema();
+  // Ensure owner admin exists so they can log in immediately in production
+  await ensureOwnerAdmin();
   const body = typeof req.body === 'string' ? JSON.parse(req.body||'{}') : (req.body || {});
   const { identifier, password } = body;
     if (!identifier || !password) return res.status(400).json({ message: 'Missing credentials' });

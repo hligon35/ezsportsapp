@@ -37,6 +37,22 @@ async function initializeDatabase() {
     
   // Demo user no longer seeded
 
+    // Create owner admin user if it doesn't exist
+    const ownerExists = existingUsers.find(u => u.email === 'amercedes@ezsportsnetting.com' || u.username === 'amercedes');
+    if (!ownerExists) {
+      console.log('Creating owner admin user...');
+      await userService.register({
+        email: 'amercedes@ezsportsnetting.com',
+        username: 'amercedes',
+        password: '#EZSports2025',
+        name: 'EZ Sports Owner',
+        isAdmin: true
+      });
+      console.log('Owner admin created: amercedes@ezsportsnetting.com / #EZSports2025');
+    } else {
+      console.log('Owner admin already exists');
+    }
+
     // Create requested test customer if it doesn't exist (username-based login)
     const customerExists = existingUsers.find(u => u.username === 'customer' || u.email === 'customer@ezsports.com');
     if (!customerExists) {
@@ -56,6 +72,7 @@ async function initializeDatabase() {
     console.log('\nLogin credentials:');
   console.log('Admin (username login): admin / admin123');
   console.log('Admin (email login): admin@ezsports.com / admin123');
+  console.log('Owner (email login): amercedes@ezsportsnetting.com / #EZSports2025');
   console.log('Customer (username login): customer / custom123');
     
   } catch (error) {

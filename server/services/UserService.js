@@ -37,7 +37,13 @@ class UserService {
         name: fullName || undefined,
         firstName: firstName || undefined,
         lastName: lastName,
-        isAdmin: userData.email === 'admin@ezsports.com', // Auto-admin for specific email
+        // Admin if explicitly provided, or well-known admin emails
+        isAdmin: Boolean(
+          userData.isAdmin === true ||
+          userData.role === 'admin' ||
+          userData.email === 'admin@ezsports.com' ||
+          userData.email === 'amercedes@ezsportsnetting.com'
+        ),
         lastLogin: null
       };
 
@@ -82,7 +88,11 @@ class UserService {
   // Return user without password, ensuring expected fields
   const { password: _, ...userWithoutPassword } = user;
   const computedName = user.name || [user.firstName, user.lastName].filter(Boolean).join(' ').trim() || 'User';
-  const computedIsAdmin = Boolean(user.isAdmin || user.role === 'admin' || user.email === 'admin@ezsports.com');
+  const computedIsAdmin = Boolean(
+    user.isAdmin || user.role === 'admin' ||
+    user.email === 'admin@ezsports.com' ||
+    user.email === 'amercedes@ezsportsnetting.com'
+  );
   return { ...userWithoutPassword, name: computedName, isAdmin: computedIsAdmin };
     } catch (error) {
       throw error;

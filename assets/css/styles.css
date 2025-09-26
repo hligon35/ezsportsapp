@@ -245,7 +245,6 @@ body, .container, .footer-grid, .about-inner, .category-tiles .tiles, .grid, .ba
 .contact-form label > span { font-size:.85rem; color:var(--muted); }
 .contact-form input,
 .contact-form textarea {
-  width:100%;
   padding:.85rem 1rem; 
   border:1px solid var(--border); 
   border-radius:.7rem; 
@@ -357,7 +356,7 @@ body, .container, .footer-grid, .about-inner, .category-tiles .tiles, .grid, .ba
   .expert-cta { padding:2.35rem 1.05rem; margin:2.85rem auto 2.35rem; }
   .expert-cta h2 { font-size:1.9rem; }
   .expert-cta p { font-size:.9rem; }
-  .expert-cta .cta-btn { width:100%; justify-content:center; }
+  .expert-cta .cta-btn { justify-content:center; }
 }
 
 
@@ -419,7 +418,7 @@ body{
 /* Auth form layout */
 .auth-container{ max-width: 480px; margin: 2rem auto; background:#fff; border-radius:1.2rem; box-shadow:0 4px 24px rgba(12,32,64,.10); padding: 1.5rem; }
 .auth-form{ display:grid; grid-auto-rows:min-content; gap:.9rem; }
-.auth-form input{ width:100%; padding:.85rem 1rem; border:1px solid var(--border); border-radius:.7rem; }
+.auth-form input{ padding:.85rem 1rem; border:1px solid var(--border); border-radius:.7rem; }
 .auth-form .auth-field{ position:relative; display:block; }
 .auth-form .auth-field input[type="password"]{ padding-right:4.5rem; }
 .auth-form .auth-peek{
@@ -470,7 +469,7 @@ img[src*="/logo.svg"]{
 .search{display:flex;gap:.5rem;flex:1;justify-content:center}
 .search{position:relative;gap:0}
 /* Search input with embedded icon via background SVG */
-.search input{width:min(680px,100%);border-radius:.75rem;border:1px solid var(--border);background:#fff;color:var(--ink);padding:.72rem 1rem .72rem 2.5rem;line-height:1.2;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' stroke='%2388989c' stroke-width='2' fill='none' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='8' cy='8' r='6'/%3E%3Cline x1='13' y1='13' x2='17' y2='17'/%3E%3C/svg%3E");background-repeat:no-repeat;background-size:18px 18px;background-position:12px 50%;}
+.search input{width:auto;min-width:16ch;max-width:100%;border-radius:.75rem;border:1px solid var(--border);background:#fff;color:var(--ink);padding:.72rem 1rem .72rem 2.5rem;line-height:1.2;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' stroke='%2388989c' stroke-width='2' fill='none' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='8' cy='8' r='6'/%3E%3Cline x1='13' y1='13' x2='17' y2='17'/%3E%3C/svg%3E");background-repeat:no-repeat;background-size:18px 18px;background-position:12px 50%;}
 /* Remove legacy absolute button icon usage */
 .search .btn{display:none !important}
 /* Focus state: darken icon by swapping filter */
@@ -555,7 +554,7 @@ img[src*="/logo.svg"]{
   .site-header .cart-btn{order:3;margin-left:.55rem}
   /* Row 2: search and menu toggle share row; search shrinks before wrapping */
   .site-header .search{order:4;flex:1 1 auto;min-width:150px;max-width:calc(100% - 118px);margin-top:.35rem}
-  .site-header .search input{width:100%;padding:.6rem .65rem .6rem 2.55rem;font-size:.87rem}
+  .site-header .search input{width:auto;min-width:16ch;max-width:100%;padding:.6rem .65rem .6rem 2.55rem;font-size:.87rem}
   .site-header .menu-toggle{order:5;margin-left:.5rem;align-self:stretch}
   /* Avoid full-width forcing toggle to next line on ultra narrow */
   @media (max-width:480px){
@@ -581,7 +580,7 @@ img[src*="/logo.svg"]{
 /* Mid sizes retain single-row default (allow existing nav collapse) */
 @media (min-width:641px) and (max-width:1200px){
   .site-header .menu-toggle{margin-right:.75rem}
-  .site-header .search input{width:100%}
+  .site-header .search input{width:auto;min-width:16ch;max-width:100%}
 }
 /* Multi-column nav when expanded still for mid sizes */
 @media (min-width:680px) and (max-width:1200px){
@@ -693,6 +692,11 @@ img[src*="/logo.svg"]{
 /* Standardized black Request Quote button */
 .btn-quote{background:#000000 !important;color:#ffffff !important;border:1px solid #000000 !important;box-shadow:0 2px 6px rgba(0,0,0,.4);}
 .btn-quote:hover,.btn-quote:focus-visible{filter:brightness(1.15);outline:none;}
+
+/* Fit-to-content defaults for form controls */
+input, select, textarea, button { width:auto; max-width:100%; }
+/* Keep intentional full-width helpers intact */
+.btn-block { width:100%; }
 
 /* Hero */
 .hero{position:relative;padding:clamp(25px,2vw,25px) 0 12px;background:#ffffff}
@@ -896,7 +900,7 @@ img[src*="/logo.svg"]{
 .socials img { height: 20px; width: 20px; display: block; object-fit: contain; }
 .brand--light{opacity:1}
 .subscribe .row{display:flex;gap:.5rem}
-.subscribe input{flex:1;padding:.65rem .8rem;border-radius:.6rem;border:1px solid var(--border);background:#fff;color:var(--ink)}
+.subscribe input{flex:0 1 auto;width:auto;min-width:16ch;max-width:100%;padding:.65rem .8rem;border-radius:.6rem;border:1px solid var(--border);background:#fff;color:var(--ink)}
 .site-footer a[href="careers.html"],
 .site-footer li a[href="careers.html"],
 nav.quick-links a[href="careers.html"],
@@ -1114,6 +1118,10 @@ nav.quick-links li a[href="careers.html"]{
 .summary > div{display:flex;justify-content:space-between;gap:1rem}
 .summary .total{font-size:1.15rem;font-weight:900}
 .actions{margin-top:.5rem}
+/* Netting calculator: make the Add Configured Net button fit content */
+#add-cart{ width:auto; white-space:nowrap; }
+/* Center the calculator button row only within the calculator card */
+.calc-card .actions{ display:flex; justify-content:center; }
 
 /* Desktop enhancement: only widen beyond 1100px */
 @media (min-width:1101px){
@@ -1202,7 +1210,7 @@ nav.quick-links li a[href="careers.html"]{
 .expert-form-wrap{max-width:760px}
 .expert-form-wrap h3{margin:1rem 0 .5rem}
 .expert-form{max-width:660px;margin:0 auto;display:grid;gap:.65rem}
-.expert-form input,.expert-form textarea{width:100%;padding:.75rem .9rem;border-radius:.75rem;border:1px solid var(--border);background:#fff;color:var(--ink)}
+.expert-form input,.expert-form textarea{padding:.75rem .9rem;border-radius:.75rem;border:1px solid var(--border);background:#fff;color:var(--ink)}
 .expert-form input:focus,.expert-form textarea:focus{outline:none;box-shadow:var(--ring);border-color:var(--brand)}
 .expert-form textarea{border-radius:.75rem}
 .expert-form .btn{border-radius:1.2rem;font-weight:900}
