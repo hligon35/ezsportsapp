@@ -4,13 +4,7 @@
 const NCurrency = new Intl.NumberFormat(undefined, { style: 'currency', currency: 'USD' });
 
 const MESHES = [
-  // Existing presets
-  { id: 'baseball-1-7-8', label: 'Baseball (1-7/8" x 1-7/8" Sq Mesh)', priceSqFt: 1.25, sport: 'baseball' },
-  { id: 'golf-1', label: 'Golf (1" x 1" Sq Mesh)', priceSqFt: 0.95, sport: 'golf' },
-  { id: 'lacrosse-1-1-2', label: 'Lacrosse (1-1/2" x 1-1/2" Sq Mesh)', priceSqFt: 1.20, sport: 'lacrosse' },
-  { id: 'soccer-4', label: 'Soccer (4" x 4" Sq Mesh)', priceSqFt: 0.80, sport: 'soccer' },
-
-  // User-provided meshes (prices kept at full precision; UI displays two decimals only)
+  // Meshes (prices kept at full precision; UI displays two decimals only)
   // Baseball gauges (#xx)
   { id: 'baseball-18', label: '#18', priceSqFt: 0.2699, sport: 'baseball' },
   { id: 'baseball-21', label: '#21', priceSqFt: 0.3267, sport: 'baseball' },
