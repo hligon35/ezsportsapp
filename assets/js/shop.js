@@ -78,21 +78,12 @@ const Shop = {
     // 4) Final fallback to static catalog (mirrors individual pages)
     if (!this.state.products || this.state.products.length === 0) {
       try {
-        if (Array.isArray(window.CATALOG_PRODUCTS) && window.CATALOG_PRODUCTS.length) {
-          this.state.products = window.CATALOG_PRODUCTS;
-          try { localStorage.setItem('shopProducts', JSON.stringify(this.state.products)); } catch {}
-          // Developer hint so it's obvious we're not seeing live data
-          setTimeout(()=>{
-            if (!document.getElementById('fallback-warning')) {
-              const warn = document.createElement('div');
-              warn.id = 'fallback-warning';
-              warn.style.cssText = 'background:#432;padding:10px 14px;margin:12px 0;border:1px solid #765;color:#fdb;font:14px system-ui;border-radius:6px;';
-              warn.innerHTML = '<strong>Showing static fallback catalog.</strong> Live API returned no products. Start the backend server on port 4242 and clear localStorage key <code>shopProducts</code> then reload to view real data.';
-              const main = document.querySelector('main');
-              if (main) main.insertBefore(warn, main.firstChild);
-            }
-          }, 50);
-        }
+            window.addEventListener('catalog:ready', (e)=>{
+              if (!this.state.products.length && Array.isArray(window.CATALOG_PRODUCTS)) {
+                this.state.products = window.CATALOG_PRODUCTS;
+                this.renderProducts(this.state.products);
+              }
+            }, { once:true });
       } catch {}
     }
 
@@ -164,6 +155,7 @@ const Shop = {
     if ((!products || products.length === 0) && Array.isArray(window.CATALOG_PRODUCTS)) {
       products = window.CATALOG_PRODUCTS;
     }
+    // Removed reliance on window.CATALOG_PRODUCTS here
 
     const q = (this.state.search||'').toLowerCase();
     const cat = this.state.category;

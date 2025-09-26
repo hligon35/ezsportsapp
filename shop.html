@@ -118,7 +118,8 @@
 
   <script type="module" src="assets/js/analytics.js"></script>
   <script type="module" src="assets/js/app.js"></script>
-  <!-- Unified catalog to ensure Shop has products even if server/local cache is empty -->
+  <script src="assets/js/product-loader.js"></script>
+  <!-- Legacy static catalog kept as fallback if prodList fails -->
   <script src="assets/js/catalog.js"></script>
   <script type="module" src="assets/js/shop.js"></script>
   <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
