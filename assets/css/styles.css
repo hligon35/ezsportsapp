@@ -883,7 +883,16 @@ input, select, textarea, button { width:auto; max-width:100%; }
 .wide{grid-column:span 2}
 
 /* About */
-.about-inner{display:grid;grid-template-columns:1.1fr .9fr;gap:1.2rem;align-items:center;margin-top:1rem}
+.about-inner{display:grid;grid-template-columns:1.05fr .95fr;gap:1.4rem;align-items:center;margin-top:1rem}
+.about-inner > div { display:flex; flex-direction:column; justify-content:center; align-self:center; max-width:620px; }
+.about-inner > div h1 { line-height:1.05; }
+.about-inner > div p.muted { margin:0 0 .9rem; font-size:clamp(.95rem,1.05rem + .2vw,1.15rem); line-height:1.35; }
+@media (min-width:1200px){
+  .about-inner{grid-template-columns:1fr 1fr;}
+}
+@media (max-width:860px){
+  .about-inner > div { max-width:100%; }
+}
 .about .checks{list-style:none;padding:0;margin:1rem 0 0;display:grid;gap:.4rem}
 .about .checks li{position:relative;padding-left:1.5rem}
 .about .checks li::before{content:"✔";position:absolute;left:0;top:0;color:#69e480}
@@ -1105,6 +1114,18 @@ nav.quick-links li a[href="careers.html"]{
 .netting-hero--lacrosse { background: linear-gradient(135deg,#000 0%,var(--brand) 100%) !important; color:#fff; border-radius:1.1rem; }
 .netting-hero--soccer { background: linear-gradient(135deg,#000 0%,var(--brand) 100%) !important; color:#fff; border-radius:1.1rem; }
 .netting-hero h1 { margin:0 0 .4rem; font-size:clamp(1.7rem,4.2vw,2.8rem); text-transform:uppercase; letter-spacing:.6px; font-weight:900 }
+
+/* L-Screens hero specific: center CTA buttons and let them size to content */
+.netting-hero .hero-ctas { display:flex; justify-content:center; flex-wrap:wrap; gap:.6rem; margin-top:.85rem; }
+.netting-hero .hero-ctas .btn { width:auto; }
+
+/* Ensure 4-up layout for Shop by Type tiles on wider screens */
+@media (min-width: 900px){
+  .category-tiles .tiles { grid-template-columns: repeat(4,1fr) !important; gap:1.15rem !important; }
+  .category-tiles .tile { width:100%; max-width:310px; }
+  .category-tiles .tile .media img { aspect-ratio:4/3; object-fit:cover; }
+  .category-tiles .tile .tile-head { padding:.75rem .85rem .65rem; }
+}
 
 /* Netting layout helpers */
 .net-cols { display:grid; gap:1.25rem; margin:1.25rem 0 1.75rem; grid-template-columns:1fr; }
