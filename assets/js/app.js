@@ -669,10 +669,16 @@ const Store = {
       }
     }
 
-    // Remove previous relocation of cart button; keep it in nav as trailing item
-    // const nav = document.getElementById('primary-nav') || header.querySelector('nav.quick-links');
-    // const cartBtn = nav ? nav.querySelector('.cart-btn') : null;
-    // if (cartBtn) header.appendChild(cartBtn);
+    // Ensure cart button lives in the header-actions (right side), not inside the nav
+    try {
+      const nav = document.getElementById('primary-nav') || header.querySelector('nav.quick-links');
+      const cartBtnInNav = nav ? nav.querySelector('.cart-btn') : null;
+      const cartBtnLoose = header.querySelector('.cart-btn');
+      const cartBtn = cartBtnInNav || cartBtnLoose;
+      if (cartBtn && actions && cartBtn.parentElement !== actions) {
+        actions.appendChild(cartBtn);
+      }
+    } catch {}
 
     // Standardize search bar (placeholder, button classes/text)
     const search = header.querySelector('.search');
@@ -709,7 +715,7 @@ const Store = {
   },
 
   ensureCoreNav() {
-    const nav = document.getElementById('primary-nav') || document.querySelector('nav.quick-links');
+  const nav = document.getElementById('primary-nav') || document.querySelector('nav.quick-links');
     if (!nav) return;
 
     // Deactivate legacy nav (kept for later reference):
@@ -728,9 +734,6 @@ const Store = {
       { href: 'accessories.html', text: 'Accessories' },
       { href: 'contactus.html', text: 'Contact Us' },
     ];
-
-    // Preserve cart button if present
-    const cartBtn = nav.querySelector('.cart-btn');
 
     // Clear existing links
     nav.innerHTML = '';
@@ -793,8 +796,7 @@ const Store = {
       }
     });
 
-    // Restore cart button at end if existed
-    if (cartBtn) nav.appendChild(cartBtn);
+  // Cart button is handled by ensureHeaderLayout (moved into header-actions)
 
     // Active link highlighting
     const path = location.pathname.split('/').pop() || 'index.html';
@@ -832,7 +834,8 @@ const Store = {
           ${this.state.user.isAdmin ? '<a href="admin.html" role="menuitem">Admin</a>' : ''}
           <button type="button" data-logout role="menuitem">Logout</button>
         </div>`;
-      nav.appendChild(userMenu);
+  // Prefer right-side header actions for the user menu; fallback to nav if needed
+  if (actions) actions.appendChild(userMenu); else nav.appendChild(userMenu);
 
       const btn = userMenu.querySelector('#profile-btn');
       const dd = userMenu.querySelector('#user-dropdown');
@@ -847,11 +850,11 @@ const Store = {
       loginLink.href = 'login.html';
       loginLink.className = 'auth-link';
       loginLink.textContent = 'Login';
-      nav.appendChild(loginLink);
+      if (actions) actions.appendChild(loginLink); else nav.appendChild(loginLink);
     }
 
-    // Hide header-actions if empty
-    if (actions && actions.children.length === 0) actions.style.display = 'none';
+  // Hide header-actions if empty
+  if (actions && actions.children.length === 0) actions.style.display = 'none';
 
     // Ensure header break element still exists for layout but not needed for actions now
     (function(){
