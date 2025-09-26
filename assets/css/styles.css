@@ -118,6 +118,7 @@ body, .container, .footer-grid, .about-inner, .category-tiles .tiles, .grid, .ba
   gap:.65rem !important; 
   margin:.85rem 0 1.35rem !important; 
 }
+.netting-subnav:not(.is-ready) { display:none !important; }
 .netting-subnav a { 
   padding:.55rem .9rem !important; 
   border:1px solid var(--border) !important; 
@@ -205,6 +206,14 @@ body, .container, .footer-grid, .about-inner, .category-tiles .tiles, .grid, .ba
     linear-gradient(135deg,
       color-mix(in oklab, var(--brand) 98%, #000 2%) 0%,
       color-mix(in oklab, var(--brand) 74%, #fff 26%) 100%) !important;
+}
+
+/* Training facility hero: align with brand (remove teal/blue) */
+.net-hero.nh-training-facility {
+  background: linear-gradient(135deg,
+    color-mix(in oklab, var(--brand) 96%, #000 4%),
+    color-mix(in oklab, var(--brand) 76%, #000 24%)) !important;
+  color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem;
 }
 
 /* Contact hero spacing (align with netting hero horizontal rhythm) */
@@ -1279,7 +1288,7 @@ nav.quick-links li a[href="careers.html"]{
 }
 
 /* Page-specific net hero gradients (replaces per-page inline styles) */
-.net-hero.nh-training-facility { background: linear-gradient(135deg,#0f2f50,#093150) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
+.net-hero.nh-training-facility { background: linear-gradient(135deg, color-mix(in oklab, var(--brand) 96%, #000 4%), color-mix(in oklab, var(--brand) 76%, #000 24%)) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
 .net-hero.nh-sports-netting { background: linear-gradient(135deg,#162a44,#0f2f50) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
 .net-hero.nh-commercial-netting { background: linear-gradient(135deg,#102535,#0b1b28) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
 .net-hero.nh-hitting-facility { background: linear-gradient(135deg,#0f2f50,#23496c) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }

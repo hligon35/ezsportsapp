@@ -953,7 +953,7 @@ const Store = {
   // Standardize the EZ Nets sub-navigation across all netting-related pages and append Expert CTA action
   ensureNettingSubnav() {
     try {
-      const container = document.getElementById('netting-subnav');
+  const container = document.getElementById('netting-subnav');
       if (!container) return;
       // Canonical order for EZ Nets category navigation
       const TOP = [
@@ -969,6 +969,7 @@ const Store = {
   const base = (location.pathname.split('/').pop() || '').toLowerCase();
   const html = TOP.map(i => `<a href="${i.href}">${i.label}</a>`).join('');
   container.innerHTML = html;
+  container.classList.add('is-ready');
       [...container.querySelectorAll('a')].forEach(a => {
         if ((a.getAttribute('href') || '').toLowerCase() === base) a.classList.add('is-active');
       });
