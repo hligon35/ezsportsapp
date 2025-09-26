@@ -418,21 +418,16 @@ window.deleteProduct = deleteProduct;
 window.cancelEdit = cancelEdit;
 // Marketing helpers
 async function renderMarketing(){
-  // Load subscribers
-  try {
-    const subsRes = await fetchAdmin(`/api/marketing/admin/subscribers?activeOnly=true`);
-    const subs = subsRes.ok ? await subsRes.json() : [];
-    const subsList = document.getElementById('subs-list');
-    if (subsList) subsList.innerHTML = subs.length ? (`<ul>` + subs.map(s=>`<li>${s.email}${s.name?` — ${s.name}`:''}</li>`).join('') + `</ul>`) : '<p>No subscribers yet.</p>';
-  } catch { /* ignore */ }
-
-  // Load coupons
-  loadCoupons();
+  // Initial loads
+  await loadSubscribers();
+  await loadCoupons();
+  await populateMarketingWidgets();
 
   // Wire newsletter form
   const nlForm = document.getElementById('newsletter-form');
   const nlStatus = document.getElementById('nl-status');
-  if (nlForm) {
+  if (nlForm && !nlForm.__wired) {
+    nlForm.__wired = true;
     nlForm.addEventListener('submit', async (e)=>{
       e.preventDefault();
       nlStatus.textContent = 'Queuing…';
@@ -448,13 +443,14 @@ async function renderMarketing(){
         nlStatus.textContent = `Queued ${data.queued||0} emails.`;
         nlForm.reset();
       } catch (e) { nlStatus.textContent = e.message || 'Failed'; }
-    }, { once: true });
+    });
   }
 
   // Wire coupon form
   const cpForm = document.getElementById('coupon-form');
   const cpStatus = document.getElementById('coupon-status');
-  if (cpForm) {
+  if (cpForm && !cpForm.__wired) {
+    cpForm.__wired = true;
     cpForm.addEventListener('submit', async (e)=>{
       e.preventDefault();
       cpStatus.textContent = 'Creating…';
@@ -473,17 +469,26 @@ async function renderMarketing(){
         if (!res.ok) throw new Error(data.message||'Failed');
         cpStatus.textContent = 'Created.';
         cpForm.reset();
-        loadCoupons();
+        await loadCoupons();
       } catch (e) { cpStatus.textContent = e.message || 'Failed'; }
-    }, { once: true });
+    });
   }
+
+  // Refresh buttons
+  const couRefresh = document.getElementById('coupons-refresh');
+  if (couRefresh && !couRefresh.__wired) { couRefresh.__wired = true; couRefresh.addEventListener('click', async () => { await loadCoupons(); await populateMarketingWidgets(); }); }
+  const subsRefresh = document.getElementById('subs-refresh');
+  if (subsRefresh && !subsRefresh.__wired) { subsRefresh.__wired = true; subsRefresh.addEventListener('click', async () => { await loadSubscribers(); await populateMarketingWidgets(); }); }
 }
 
 async function loadCoupons(){
   try {
+    const el = document.getElementById('coupons-list');
+    const err = document.getElementById('coupons-error');
+    if (el) el.innerHTML = '<p class="muted">Loading coupons…</p>';
+    if (err) err.style.display = 'none';
     const res = await fetchAdmin('/api/marketing/admin/coupons');
     const list = res.ok ? await res.json() : [];
-    const el = document.getElementById('coupons-list');
     if (!el) return;
     if (!list.length) { el.innerHTML = '<p>No coupons created.</p>'; return; }
     el.innerHTML = list.map(c => `
@@ -505,10 +510,66 @@ async function loadCoupons(){
           const r = await fetchAdmin(`/api/marketing/admin/coupons/${encodeURIComponent(code)}/deactivate`, { method:'POST' });
           if (!r.ok) throw new Error('Failed');
           loadCoupons();
-        } catch { alert('Failed to deactivate.'); }
+        } catch (e) {
+          if (err) { err.style.display = ''; err.textContent = e.message || 'Failed to deactivate.'; }
+        }
       });
     });
-  } catch { /* ignore */ }
+  } catch (e) {
+    const el = document.getElementById('coupons-list');
+    const err = document.getElementById('coupons-error');
+    if (el) el.innerHTML = '';
+    if (err) { err.style.display = ''; err.textContent = e.message || 'Failed to load coupons.'; }
+  }
+}
+
+async function loadSubscribers(){
+  const subsList = document.getElementById('subs-list');
+  const err = document.getElementById('subs-error');
+  if (subsList) subsList.innerHTML = '<p class="muted">Loading subscribers…</p>';
+  if (err) err.style.display = 'none';
+  try {
+    const subsRes = await fetchAdmin(`/api/marketing/admin/subscribers?activeOnly=true`);
+    const subs = subsRes.ok ? await subsRes.json() : [];
+    if (subsList) subsList.innerHTML = subs.length ? (`<ul>` + subs.map(s=>`<li>${s.email}${s.name?` — ${s.name}`:''}</li>`).join('') + `</ul>`) : '<p>No subscribers yet.</p>';
+  } catch (e) {
+    if (subsList) subsList.innerHTML = '';
+    if (err) { err.style.display=''; err.textContent = e.message || 'Failed to load subscribers.'; }
+  }
+}
+
+async function populateMarketingWidgets(){
+  // Subscribers active count
+  try {
+    const res = await fetchAdmin(`/api/marketing/admin/subscribers?activeOnly=true`);
+    const list = res.ok ? await res.json() : [];
+    const el = document.getElementById('w-subs-active');
+    if (el) el.textContent = Array.isArray(list) ? list.length : '0';
+  } catch { const el = document.getElementById('w-subs-active'); if (el) el.textContent = '—'; }
+
+  // Coupons aggregates & top codes
+  try {
+    const res = await fetchAdmin('/api/marketing/admin/coupons');
+    const list = res.ok ? await res.json() : [];
+    const total = list.length;
+    const active = list.filter(c=>c.active!==false).length;
+    const usedSum = list.reduce((s,c)=> s + (Number(c.used||0)), 0);
+    const top = list.slice().sort((a,b)=>(b.used||0)-(a.used||0)).slice(0,5);
+    const fmt = (n)=> (typeof n==='number' ? n.toLocaleString() : n);
+    const elTotal = document.getElementById('w-coupons-total'); if (elTotal) elTotal.textContent = fmt(total);
+    const elActive = document.getElementById('w-coupons-active'); if (elActive) elActive.textContent = fmt(active);
+    const elUsed = document.getElementById('w-coupons-used'); if (elUsed) elUsed.textContent = fmt(usedSum);
+    const listEl = document.getElementById('w-top-codes');
+    if (listEl) {
+      if (!top.length) listEl.innerHTML = '<li>No redemptions yet.</li>';
+      else listEl.innerHTML = top.map(c => `<li><strong>${c.code}</strong> — used ${Number(c.used||0)}${c.expiresAt?`, exp ${new Date(c.expiresAt).toLocaleDateString()}`:''}</li>`).join('');
+    }
+  } catch {
+    const elTotal = document.getElementById('w-coupons-total'); if (elTotal) elTotal.textContent = '—';
+    const elActive = document.getElementById('w-coupons-active'); if (elActive) elActive.textContent = '—';
+    const elUsed = document.getElementById('w-coupons-used'); if (elUsed) elUsed.textContent = '—';
+    const listEl = document.getElementById('w-top-codes'); if (listEl) listEl.innerHTML = '<li class="muted">Unavailable</li>';
+  }
 }
 
 // Invoices

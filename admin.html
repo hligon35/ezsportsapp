@@ -127,6 +127,28 @@
       <div id="marketing-section" class="admin-section hidden">
         <h3>Marketing</h3>
         <div class="stack-05">
+          <section style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1rem;">
+            <div class="card" style="background:#f7faff;border:1px solid #e6edf6;border-radius:.8rem;padding:1rem;">
+              <div class="muted" style="font-size:.8rem;">Active subscribers</div>
+              <div id="w-subs-active" style="font-size:1.6rem;font-weight:800;">–</div>
+            </div>
+            <div class="card" style="background:#f7faff;border:1px solid #e6edf6;border-radius:.8rem;padding:1rem;">
+              <div class="muted" style="font-size:.8rem;">Coupons (total)</div>
+              <div id="w-coupons-total" style="font-size:1.6rem;font-weight:800;">–</div>
+            </div>
+            <div class="card" style="background:#f7faff;border:1px solid #e6edf6;border-radius:.8rem;padding:1rem;">
+              <div class="muted" style="font-size:.8rem;">Active coupons</div>
+              <div id="w-coupons-active" style="font-size:1.6rem;font-weight:800;">–</div>
+            </div>
+            <div class="card" style="background:#f7faff;border:1px solid #e6edf6;border-radius:.8rem;padding:1rem;">
+              <div class="muted" style="font-size:.8rem;">Total redemptions</div>
+              <div id="w-coupons-used" style="font-size:1.6rem;font-weight:800;">–</div>
+            </div>
+          </section>
+          <section>
+            <h4>Top codes</h4>
+            <ul id="w-top-codes" class="muted" style="margin:0;"></ul>
+          </section>
           <section>
             <h4>Send Newsletter</h4>
             <form id="newsletter-form" class="product-form" style="grid-template-columns:1fr;">
@@ -157,12 +179,14 @@
             <div id="coupon-status" class="muted" style="margin-top:.5rem;"></div>
           </section>
           <section>
-            <h4>Coupons</h4>
-            <div id="coupons-list"></div>
+            <div class="flex-row space-between items-center"><h4>Coupons</h4><button id="coupons-refresh" class="btn btn-ghost" type="button">Refresh</button></div>
+            <div id="coupons-list" class="product-list"><p class="muted">Loading coupons…</p></div>
+            <div id="coupons-error" class="muted" style="display:none;color:#b00;"></div>
           </section>
           <section>
-            <h4>Subscribers</h4>
-            <div id="subs-list"></div>
+            <div class="flex-row space-between items-center"><h4>Subscribers</h4><button id="subs-refresh" class="btn btn-ghost" type="button">Refresh</button></div>
+            <div id="subs-list" class="product-list"><p class="muted">Loading subscribers…</p></div>
+            <div id="subs-error" class="muted" style="display:none;color:#b00;"></div>
           </section>
         </div>
       </div>

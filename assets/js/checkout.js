@@ -63,6 +63,19 @@ function updateSummary(cart, shippingMethod, applied){
   return { sub, ship, discount, total };
 }
 
+function computeDiscountCents(sub, ship, applied) {
+  let discount = 0;
+  if (applied && applied.type && applied.value) {
+    if (applied.type === 'percent') {
+      discount = Math.round((sub + ship) * (Number(applied.value)||0) / 100);
+    } else if (applied.type === 'fixed') {
+      discount = Math.round(Number(applied.value||0) * 100);
+    }
+    if (discount > (sub + ship)) discount = (sub + ship);
+  }
+  return discount;
+}
+
 async function initialize() {
   const form = document.getElementById('payment-form');
   const cart = readCart();
@@ -205,7 +218,8 @@ async function initialize() {
         const shipMethod = fd.get('shippingMethod') || 'standard';
         const sub = calcSubtotalCents(cart);
         const ship = calcShippingCents(sub, shipMethod);
-        const total = sub + ship;
+        const discount = computeDiscountCents(sub, ship, appliedCoupon);
+        const total = sub + ship - discount;
         let orderId = Date.now();
         if (resp.ok) {
           const data = await resp.json();
@@ -213,7 +227,15 @@ async function initialize() {
         }
         // Build a local order snapshot for confirmation
         const items = cart.map(i=>({ productName: i.title || i.id, id: i.id, quantity: i.qty, price: Number(i.price)||0, subtotal: (Number(i.price)||0) * (i.qty||0) }));
-        const order = { id: orderId, items, total: Math.round(total)/100 };
+        const order = {
+          id: orderId,
+          items,
+          total: Math.round(total)/100,
+          subtotal: Math.round(sub)/100,
+          shipping: Math.round(ship)/100,
+          discount: Math.round(discount)/100,
+          couponCode: appliedCoupon?.code || null
+        };
         // Save for confirmation page
         try{ sessionStorage.setItem('lastOrder', JSON.stringify(order)); }catch{}
   localStorage.removeItem('cart');
@@ -230,8 +252,22 @@ async function initialize() {
     // Save a lightweight snapshot for confirmation page UI
     try {
       const items = cart.map(i=>({ productName: i.title || i.id, id: i.id, quantity: i.qty, price: Number(i.price)||0, subtotal: (Number(i.price)||0) * (i.qty||0) }));
-      const total = amount || (calcSubtotalCents(cart) + calcShippingCents(calcSubtotalCents(cart), new FormData(form).get('shippingMethod')||'standard'));
-      const order = { id: orderId, items, total: Math.round(total)/100 };
+      const fd = new FormData(form);
+      const shipMethod = fd.get('shippingMethod') || 'standard';
+      const sub = calcSubtotalCents(cart);
+      const ship = calcShippingCents(sub, shipMethod);
+      const fallbackTotal = sub + ship;
+      const totalCents = typeof amount === 'number' && amount > 0 ? amount : fallbackTotal;
+      const discount = Math.max(0, fallbackTotal - totalCents);
+      const order = {
+        id: orderId,
+        items,
+        total: Math.round(totalCents)/100,
+        subtotal: Math.round(sub)/100,
+        shipping: Math.round(ship)/100,
+        discount: Math.round(discount)/100,
+        couponCode: appliedCoupon?.code || null
+      };
       sessionStorage.setItem('lastOrder', JSON.stringify(order));
     } catch {}
     const _stripe = await getStripe();

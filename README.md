@@ -106,6 +106,44 @@ Endpoints:
 
 Product/price sync (Stripe): If a product lacks a Stripe Product or matching Price, the sync script creates them (unless `--no-stripe`). Price changes create a new Stripe Price (never mutate old ones).
 
+## Marketing: Subscribers, Newsletters, and Coupons
+
+This project includes a simple marketing system backed by the JSON DB:
+
+- Subscribers: Public signup via footer forms posts to `/api/marketing/subscribe` (no auth). Admins can list subscribers.
+- Newsletters: Admins can queue messages to all active subscribers (queued to an "outbox" file for demo—no real provider integration by default).
+- Coupons/Promo codes: Admins can create/list/deactivate codes and optionally restrict them to specific emails. Checkout validates/applies codes and Stripe metadata records the code; successful payment consumes the coupon.
+
+Admin UI
+- Open `admin.html` → Marketing tab
+	- Send Newsletter: Enter Subject + HTML/Text content and click “Queue Newsletter” (emails go to outbox in `server/database/emails.json`).
+	- Create Coupon: Choose Type (percent/fixed), Value, optional expiration & max uses, optional restricted emails (comma separated), then Create.
+	- Coupons: Lists all, with a Deactivate action.
+	- Subscribers: Lists active subscribers.
+
+API Endpoints
+- Public
+	- `POST /api/marketing/subscribe` → `{ email, name? }` → adds/updates subscriber
+	- `POST /api/marketing/unsubscribe` → `{ email }` → marks subscriber inactive
+	- `POST /api/marketing/validate-coupon` → `{ code, email? }` → `{ valid, reason?, coupon? }`
+- Admin (require admin auth)
+	- `GET /api/marketing/admin/subscribers?activeOnly=true`
+	- `GET /api/marketing/admin/coupons`
+	- `POST /api/marketing/admin/coupons` → `{ code, type: 'percent'|'fixed', value, expiresAt?, maxUses?, userEmails?[] }`
+	- `POST /api/marketing/admin/coupons/:code/deactivate`
+	- `POST /api/marketing/admin/newsletter` → `{ subject, html, text? }` queues emails for all active subscribers
+
+Checkout + Coupons
+- Checkout page has a Promo Code input. Clicking Apply validates via `/api/marketing/validate-coupon`.
+- The server’s `POST /api/create-payment-intent` accepts `couponCode` and applies discount server-side to the PaymentIntent `amount`; it also sets metadata `coupon_code`.
+- Stripe webhook (`/webhook/stripe`) consumes the coupon on `payment_intent.succeeded`.
+
+Quick test
+1) Add a product to the cart and go to Checkout.
+2) Admin → Marketing → Create Coupon (e.g., code `SAVE10`, type `percent`, value `10`).
+3) Back in Checkout, enter `SAVE10` and Apply. You should see a Discount row and reduced Total.
+4) With Stripe keys configured, complete a test payment; the coupon will be marked as used on success (webhook).
+
 ## Analytics Events
 Client emits (console by default via `window.trackEvent`):
 - `view_item_list`, `view_item`, `add_to_cart`, `view_cart`, `begin_checkout`, `purchase`

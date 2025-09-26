@@ -21,6 +21,14 @@
           document.getElementById('total').textContent = currency(order.total||0);
           const lines=(order.items||[]).map(i=>`<li>${i.productName||i.id} × ${i.quantity||i.qty}</li>`).join('');
           document.getElementById('lines').innerHTML = lines || '<li>No items</li>';
+          const extras = document.getElementById('order-extras');
+          if (extras) {
+            const bits = [];
+            if (typeof order.subtotal === 'number') bits.push(`<div>Subtotal: <strong>${currency(order.subtotal)}</strong></div>`);
+            if (typeof order.shipping === 'number') bits.push(`<div>Shipping: <strong>${currency(order.shipping)}</strong></div>`);
+            if (typeof order.discount === 'number' && order.discount>0) bits.push(`<div>Discount${order.couponCode?` (${order.couponCode})`:''}: <strong>-${currency(order.discount)}</strong></div>`);
+            extras.innerHTML = bits.join('');
+          }
         } else {
           document.getElementById('order-id').textContent = id || '—';
         }
@@ -35,7 +43,8 @@
         <p class="muted">Your order <strong>#<span id="order-id">—</span></strong> has been received. A confirmation email will be sent shortly.</p>
         <h3>Order details</h3>
         <ul id="lines"></ul>
-        <p><strong>Total:</strong> <span id="total">$0.00</span></p>
+  <div id="order-extras" class="muted" style="margin:.5rem 0 1rem;"></div>
+  <p><strong>Total:</strong> <span id="total">$0.00</span></p>
         <div class="row gap-04">
           <a class="btn btn-primary" href="order-history.html">View your orders</a>
           <a class="btn btn-ghost" href="index.html">Continue shopping</a>
