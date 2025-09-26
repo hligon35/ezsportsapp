@@ -175,10 +175,10 @@ body, .container, .footer-grid, .about-inner, .category-tiles .tiles, .grid, .ba
 .netting-hero--golf,
 .nh-golf {
   background:
-    radial-gradient(circle at 78% 22%, color-mix(in oklab, color-mix(in oklab, var(--brand) 70%, var(--blue) 30%), #fff 14%) 0%, transparent 62%),
+    radial-gradient(circle at 78% 22%, color-mix(in oklab, var(--brand) 86%, #fff 14%) 0%, transparent 62%),
     linear-gradient(135deg,
-      color-mix(in oklab, var(--brand) 75%, var(--blue) 25%) 0%,
-      color-mix(in oklab, var(--brand) 65%, #fff 35%) 100%) !important;
+      color-mix(in oklab, var(--brand) 94%, #000 6%) 0%,
+      color-mix(in oklab, var(--brand) 70%, #fff 30%) 100%) !important;
 }
 
 .netting-hero--lacrosse,
@@ -1079,7 +1079,7 @@ nav.quick-links li a[href="careers.html"]{
 .netting-hero, .net-hero, .contact-hero, .turf-hero { padding-inline:clamp(.9rem,4vw,2rem) !important; }
 /* Sport-specific netting hero variants */
 .netting-hero--baseball { background: linear-gradient(135deg,#111 0%,var(--brand) 100%) !important; color:#fff; border-radius:1.1rem; }
-.netting-hero--golf { background: linear-gradient(135deg,#061b2f 0%,var(--brand) 100%) !important; color:#fff; border-radius:1.1rem; }
+.netting-hero--golf { background: linear-gradient(135deg, color-mix(in oklab, var(--brand) 92%, #000 8%) 0%, color-mix(in oklab, var(--brand) 70%, #fff 30%) 100%) !important; color:#fff; border-radius:1.1rem; }
 .netting-hero--lacrosse { background: linear-gradient(135deg,#102b1f 0%,var(--brand) 100%) !important; color:#fff; border-radius:1.1rem; }
 .netting-hero--soccer { background: linear-gradient(135deg,#091b33 0%,var(--brand) 100%) !important; color:#fff; border-radius:1.1rem; }
 .netting-hero h1 { margin:0 0 .4rem; font-size:clamp(1.7rem,4.2vw,2.8rem); text-transform:uppercase; letter-spacing:.6px; font-weight:900 }
@@ -1290,8 +1290,8 @@ nav.quick-links li a[href="careers.html"]{
 .net-hero.nh-baseball-l-screen { background: linear-gradient(135deg,#102d46,#1c4d70) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
 .net-hero.nh-pitchers-pocket { background: linear-gradient(135deg,#0f2f50,#1d4d72) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
 .net-hero.nh-diving-range { background: linear-gradient(135deg,#15324b,#214b6a) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
-.net-hero.nh-golf-course { background: linear-gradient(135deg,#142c42,#1f4866) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
-.net-hero.nh-golf-cube { background: linear-gradient(135deg,#132d43,#1e4a68) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
+.net-hero.nh-golf-course { background: linear-gradient(135deg, color-mix(in oklab, var(--brand) 96%, #000 4%), color-mix(in oklab, var(--brand) 76%, #000 24%)) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
+.net-hero.nh-golf-cube { background: linear-gradient(135deg, color-mix(in oklab, var(--brand) 94%, #000 6%), color-mix(in oklab, var(--brand) 74%, #000 26%)) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
 .net-hero.nh-sports-baseball { background: linear-gradient(135deg,#142f46,#1f4b6a) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
 .net-hero.nh-basketball { background: linear-gradient(135deg,#132e44,#1d4a69) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
 .net-hero.nh-cricket-football { background: linear-gradient(135deg,#122b42,#1c4765) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
