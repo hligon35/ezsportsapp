@@ -1085,12 +1085,14 @@ nav.quick-links li a[href="careers.html"]{
 /* Ensures all hero variants have consistent     */
 /* left/right breathing room across pages        */
 /* --------------------------------------------- */
-.netting-hero, .net-hero, .contact-hero, .turf-hero { padding-inline:clamp(.9rem,4vw,2rem) !important; }
+.netting-hero, .net-hero, .contact-hero, .turf-hero, .hero { padding-inline:clamp(.9rem,4vw,2rem) !important; }
+/* Ensure consistent vertical breathing room for all hero containers */
+.netting-hero, .net-hero, .contact-hero, .turf-hero, .hero { padding-block:clamp(1.8rem,5vw,3.2rem) !important; }
 /* Sport-specific netting hero variants */
 .netting-hero--baseball { background: linear-gradient(135deg,#111 0%,var(--brand) 100%) !important; color:#fff; border-radius:1.1rem; }
 .netting-hero--golf { background: linear-gradient(135deg, color-mix(in oklab, var(--brand) 92%, #000 8%) 0%, color-mix(in oklab, var(--brand) 70%, #fff 30%) 100%) !important; color:#fff; border-radius:1.1rem; }
-.netting-hero--lacrosse { background: linear-gradient(135deg,#102b1f 0%,var(--brand) 100%) !important; color:#fff; border-radius:1.1rem; }
-.netting-hero--soccer { background: linear-gradient(135deg,#091b33 0%,var(--brand) 100%) !important; color:#fff; border-radius:1.1rem; }
+.netting-hero--lacrosse { background: linear-gradient(135deg,#000 0%,var(--brand) 100%) !important; color:#fff; border-radius:1.1rem; }
+.netting-hero--soccer { background: linear-gradient(135deg,#000 0%,var(--brand) 100%) !important; color:#fff; border-radius:1.1rem; }
 .netting-hero h1 { margin:0 0 .4rem; font-size:clamp(1.7rem,4.2vw,2.8rem); text-transform:uppercase; letter-spacing:.6px; font-weight:900 }
 
 /* Netting layout helpers */
@@ -1289,32 +1291,32 @@ nav.quick-links li a[href="careers.html"]{
 
 /* Page-specific net hero gradients (replaces per-page inline styles) */
 .net-hero.nh-training-facility { background: linear-gradient(135deg, color-mix(in oklab, var(--brand) 96%, #000 4%), color-mix(in oklab, var(--brand) 76%, #000 24%)) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
-.net-hero.nh-sports-netting { background: linear-gradient(135deg,#162a44,#0f2f50) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
-.net-hero.nh-commercial-netting { background: linear-gradient(135deg,#102535,#0b1b28) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
-.net-hero.nh-hitting-facility { background: linear-gradient(135deg,#0f2f50,#23496c) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
-.net-hero.nh-batting-cage { background: linear-gradient(135deg,#16324c,#214d72) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
-.net-hero.nh-foul-ball { background: linear-gradient(135deg,#132a40,#1c4768) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
-.net-hero.nh-overhead { background: linear-gradient(135deg,#0d2539,#153a56) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
-.net-hero.nh-backstop { background: linear-gradient(135deg,#0c253e,#114061) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
-.net-hero.nh-baseball-l-screen { background: linear-gradient(135deg,#102d46,#1c4d70) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
-.net-hero.nh-pitchers-pocket { background: linear-gradient(135deg,#0f2f50,#1d4d72) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
-.net-hero.nh-diving-range { background: linear-gradient(135deg,#15324b,#214b6a) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
+.net-hero.nh-sports-netting { background: linear-gradient(135deg, color-mix(in oklab, var(--brand) 95%, #000 5%), color-mix(in oklab, var(--brand) 72%, #000 28%)) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
+.net-hero.nh-commercial-netting { background: linear-gradient(135deg, color-mix(in oklab, var(--brand) 98%, #000 2%), color-mix(in oklab, var(--brand) 74%, #000 26%)) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
+.net-hero.nh-hitting-facility { background: linear-gradient(135deg, color-mix(in oklab, var(--brand) 94%, #000 6%), color-mix(in oklab, var(--brand) 68%, #000 32%)) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
+.net-hero.nh-batting-cage { background: linear-gradient(135deg, color-mix(in oklab, var(--brand) 96%, #000 4%), color-mix(in oklab, var(--brand) 72%, #000 28%)) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
+.net-hero.nh-foul-ball { background: linear-gradient(135deg, color-mix(in oklab, var(--brand) 97%, #000 3%), color-mix(in oklab, var(--brand) 70%, #000 30%)) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
+.net-hero.nh-overhead { background: linear-gradient(135deg, color-mix(in oklab, var(--brand) 93%, #000 7%), color-mix(in oklab, var(--brand) 66%, #000 34%)) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
+.net-hero.nh-backstop { background: linear-gradient(135deg, color-mix(in oklab, var(--brand) 95%, #000 5%), color-mix(in oklab, var(--brand) 68%, #000 32%)) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
+.net-hero.nh-baseball-l-screen { background: linear-gradient(135deg, color-mix(in oklab, var(--brand) 96%, #000 4%), color-mix(in oklab, var(--brand) 72%, #000 28%)) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
+.net-hero.nh-pitchers-pocket { background: linear-gradient(135deg, color-mix(in oklab, var(--brand) 95%, #000 5%), color-mix(in oklab, var(--brand) 70%, #000 30%)) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
+.net-hero.nh-diving-range { background: linear-gradient(135deg, color-mix(in oklab, var(--brand) 94%, #000 6%), color-mix(in oklab, var(--brand) 68%, #000 32%)) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
 .net-hero.nh-golf-course { background: linear-gradient(135deg, color-mix(in oklab, var(--brand) 96%, #000 4%), color-mix(in oklab, var(--brand) 76%, #000 24%)) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
 .net-hero.nh-golf-cube { background: linear-gradient(135deg, color-mix(in oklab, var(--brand) 94%, #000 6%), color-mix(in oklab, var(--brand) 74%, #000 26%)) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
-.net-hero.nh-sports-baseball { background: linear-gradient(135deg,#142f46,#1f4b6a) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
-.net-hero.nh-basketball { background: linear-gradient(135deg,#132e44,#1d4a69) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
-.net-hero.nh-cricket-football { background: linear-gradient(135deg,#122b42,#1c4765) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
-.net-hero.nh-sports-golf { background: linear-gradient(135deg,#112b41,#1d4764) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
-.net-hero.nh-hockey { background: linear-gradient(135deg,#102a40,#1a4562) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
-.net-hero.nh-sports-lacrosse { background: linear-gradient(135deg,#10283d,#1a435f) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
-.net-hero.nh-multi-sport { background: linear-gradient(135deg,#0f273b,#183f59) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
-.net-hero.nh-sports-soccer { background: linear-gradient(135deg,#11283c,#1b425d) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
-.net-hero.nh-softball { background: linear-gradient(135deg,#10273b,#1a425d) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
-.net-hero.nh-tennis { background: linear-gradient(135deg,#0f2539,#193f59) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
-.net-hero.nh-volleyball { background: linear-gradient(135deg,#0e2539,#183d56) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
-.net-hero.nh-auto-drone { background: linear-gradient(135deg,#0f2437,#173b54) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
-.net-hero.nh-drone-enclosure { background: linear-gradient(135deg,#0f2234,#16374d) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
-.net-hero.nh-warehouse { background: linear-gradient(135deg,#0e2233,#15374d) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
-.net-hero.nh-safety-netting { background: linear-gradient(135deg,#0d2232,#15384e) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
-.net-hero.nh-debris-netting { background: linear-gradient(135deg,#0c2232,#14374c) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
-.net-hero.nh-landfill-netting { background: linear-gradient(135deg,#0b2130,#133549) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
+.net-hero.nh-sports-baseball { background: linear-gradient(135deg, color-mix(in oklab, var(--brand) 96%, #000 4%), color-mix(in oklab, var(--brand) 74%, #000 26%)) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
+.net-hero.nh-basketball { background: linear-gradient(135deg, color-mix(in oklab, var(--brand) 95%, #000 5%), color-mix(in oklab, var(--brand) 70%, #000 30%)) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
+.net-hero.nh-cricket-football { background: linear-gradient(135deg, color-mix(in oklab, var(--brand) 94%, #000 6%), color-mix(in oklab, var(--brand) 72%, #000 28%)) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
+.net-hero.nh-sports-golf { background: linear-gradient(135deg, color-mix(in oklab, var(--brand) 96%, #000 4%), color-mix(in oklab, var(--brand) 74%, #000 26%)) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
+.net-hero.nh-hockey { background: linear-gradient(135deg, color-mix(in oklab, var(--brand) 97%, #000 3%), color-mix(in oklab, var(--brand) 72%, #000 28%)) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
+.net-hero.nh-sports-lacrosse { background: linear-gradient(135deg, color-mix(in oklab, var(--brand) 95%, #000 5%), color-mix(in oklab, var(--brand) 70%, #000 30%)) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
+.net-hero.nh-multi-sport { background: linear-gradient(135deg, color-mix(in oklab, var(--brand) 94%, #000 6%), color-mix(in oklab, var(--brand) 68%, #000 32%)) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
+.net-hero.nh-sports-soccer { background: linear-gradient(135deg, color-mix(in oklab, var(--brand) 95%, #000 5%), color-mix(in oklab, var(--brand) 70%, #000 30%)) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
+.net-hero.nh-softball { background: linear-gradient(135deg, color-mix(in oklab, var(--brand) 96%, #000 4%), color-mix(in oklab, var(--brand) 72%, #000 28%)) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
+.net-hero.nh-tennis { background: linear-gradient(135deg, color-mix(in oklab, var(--brand) 94%, #000 6%), color-mix(in oklab, var(--brand) 68%, #000 32%)) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
+.net-hero.nh-volleyball { background: linear-gradient(135deg, color-mix(in oklab, var(--brand) 93%, #000 7%), color-mix(in oklab, var(--brand) 66%, #000 34%)) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
+.net-hero.nh-auto-drone { background: linear-gradient(135deg, color-mix(in oklab, var(--brand) 95%, #000 5%), color-mix(in oklab, var(--brand) 70%, #000 30%)) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
+.net-hero.nh-drone-enclosure { background: linear-gradient(135deg, color-mix(in oklab, var(--brand) 94%, #000 6%), color-mix(in oklab, var(--brand) 68%, #000 32%)) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
+.net-hero.nh-warehouse { background: linear-gradient(135deg, color-mix(in oklab, var(--brand) 93%, #000 7%), color-mix(in oklab, var(--brand) 66%, #000 34%)) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
+.net-hero.nh-safety-netting { background: linear-gradient(135deg, color-mix(in oklab, var(--brand) 92%, #000 8%), color-mix(in oklab, var(--brand) 64%, #000 36%)) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
+.net-hero.nh-debris-netting { background: linear-gradient(135deg, color-mix(in oklab, var(--brand) 92%, #000 8%), color-mix(in oklab, var(--brand) 64%, #000 36%)) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
+.net-hero.nh-landfill-netting { background: linear-gradient(135deg, color-mix(in oklab, var(--brand) 92%, #000 8%), color-mix(in oklab, var(--brand) 64%, #000 36%)) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
