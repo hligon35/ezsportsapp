@@ -23,8 +23,10 @@ try {
 const DatabaseManager = require('./database/DatabaseManager');
 const ProductService = require('./services/ProductService');
 const OrderService = require('./services/OrderService');
+const CouponService = require('./services/CouponService');
 const InvoiceService = require('./services/InvoiceService');
 const AnalyticsService = require('./services/AnalyticsService');
+const couponService = new CouponService();
 const { requireAdmin } = require('./middleware/auth');
 
 // Initialize database
@@ -44,6 +46,7 @@ const orderRoutes = require('./routes/orders');
 const inventoryRoutes = require('./routes/inventory');
 const invoiceRoutes = require('./routes/invoices');
 const analyticsRoutes = require('./routes/analytics');
+const marketingRoutes = require('./routes/marketing');
 const app = express();
 // Respect reverse proxy (needed for secure cookies and correct IPs when behind nginx/Heroku)
 if (process.env.TRUST_PROXY) {
@@ -113,7 +116,19 @@ app.post('/webhook/stripe', express.raw({ type: 'application/json' }), async (re
     // For dropship model, do not mutate stock on payment events
     // Optionally, mark related order as paid via metadata in the future
     if (event.type === 'payment_intent.succeeded') {
-      // no-op for inventory
+      try {
+        const pi = event.data.object;
+        const orderId = pi?.metadata?.order_id;
+        const couponCode = pi?.metadata?.coupon_code;
+        if (orderId) {
+          await orderService.updateOrderStatus(orderId, 'paid');
+        }
+        if (couponCode) {
+          try { await couponService.consume(String(couponCode)); } catch (e) { console.warn('Coupon consume failed:', e.message); }
+        }
+      } catch (e) {
+        console.warn('Order status update on webhook failed:', e.message);
+      }
     }
     res.json({ received: true });
   } catch (e) {
@@ -132,6 +147,7 @@ app.use('/api/orders', orderRoutes);
 app.use('/api/inventory', inventoryRoutes);
 app.use('/api/invoices', invoiceRoutes);
 app.use('/api/analytics', analyticsRoutes);
+app.use('/api/marketing', marketingRoutes);
 
 // Legacy redirects for removed static pages (migrated from previous hosting config)
 const redirects = [
@@ -257,16 +273,50 @@ function calcShippingCents(subtotalCents, method = 'standard'){
 
 // Create payment intent with server-side calculation
 app.post('/api/create-payment-intent', async (req, res) => {
-  const { items = [], customer = {}, shipping = {}, shippingMethod = 'standard', currency = 'usd' } = req.body;
+  const { items = [], customer = {}, shipping = {}, shippingMethod = 'standard', currency = 'usd', couponCode = '', existingOrderId = null } = req.body;
   try {
     if (!stripe) {
       return res.status(503).json({ error: 'Stripe is not configured on the server.' });
     }
     const subtotal = await calcSubtotalCents(items);
     const shippingCents = calcShippingCents(subtotal, shippingMethod);
-    const amount = subtotal + shippingCents; // taxes omitted in demo
+    let amount = subtotal + shippingCents; // taxes omitted in demo
+
+    // Optional: apply coupon
+    let appliedCoupon = null;
+    if (couponCode) {
+      try {
+        const v = await couponService.validate(couponCode, customer.email || '');
+        if (v.valid) {
+          appliedCoupon = v.coupon;
+          amount = couponService.applyDiscount(amount, appliedCoupon);
+        }
+      } catch (e) {
+        // ignore invalid coupon; frontend can call validate endpoint for messaging
+      }
+    }
 
     const description = `EZ Sports order — ${items.map(i => `${i.id}x${i.qty}`).join(', ')}`;
+    // Create a local order first for analytics/visibility
+    let newOrder = null;
+    try {
+      const orderPayload = {
+        userId: null,
+        userEmail: customer.email || undefined,
+        items: items.map(i => ({ id: i.id, qty: i.qty })),
+        shippingAddress: shipping,
+        customerInfo: customer,
+        paymentInfo: { method: 'stripe' }
+      };
+      if (existingOrderId) {
+        newOrder = { id: existingOrderId };
+      } else {
+        newOrder = await orderService.createOrder(orderPayload);
+      }
+    } catch (e) {
+      // Keep going; order will still be created on /api/order fallback
+      newOrder = null;
+    }
 
     const paymentIntent = await stripe.paymentIntents.create({
       amount,
@@ -276,7 +326,9 @@ app.post('/api/create-payment-intent', async (req, res) => {
         email: customer.email || '',
         name: customer.name || '',
         shipping_method: shippingMethod,
-        items: items.map(i => `${i.id}:${i.qty}`).join('|')
+        items: items.map(i => `${i.id}:${i.qty}`).join('|'),
+        order_id: newOrder?.id ? String(newOrder.id) : '',
+        coupon_code: appliedCoupon ? String(appliedCoupon.code) : ''
       },
       automatic_payment_methods: { enabled: true },
       receipt_email: customer.email || undefined,
@@ -292,7 +344,8 @@ app.post('/api/create-payment-intent', async (req, res) => {
         }
       }
     });
-    res.json({ clientSecret: paymentIntent.client_secret, amount });
+    // Return client secret and linked order id so the frontend can keep them in sync
+    res.json({ clientSecret: paymentIntent.client_secret, amount, orderId: newOrder?.id || null, couponApplied: appliedCoupon ? { code: appliedCoupon.code, type: appliedCoupon.type, value: appliedCoupon.value } : null });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: err.message });

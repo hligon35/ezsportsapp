@@ -34,20 +34,43 @@ function calcShippingCents(subtotalCents, method){
   if (method === 'express') return 2500;
   return 1000; // standard
 }
-function updateSummary(cart, shippingMethod){
+function updateSummary(cart, shippingMethod, applied){
   const sub = calcSubtotalCents(cart);
   const ship = calcShippingCents(sub, shippingMethod);
-  const total = sub + ship;
+  let discount = 0;
+  if (applied && applied.type && applied.value) {
+    if (applied.type === 'percent') {
+      discount = Math.round((sub + ship) * (Number(applied.value)||0) / 100);
+    } else if (applied.type === 'fixed') {
+      discount = Math.round(Number(applied.value||0) * 100);
+    }
+    if (discount > (sub + ship)) discount = (sub + ship);
+  }
+  const total = sub + ship - discount;
   const el = (id) => document.getElementById(id);
   if (el('sum-subtotal')) el('sum-subtotal').textContent = currencyFmt(fromCents(sub));
   if (el('sum-shipping')) el('sum-shipping').textContent = currencyFmt(fromCents(ship));
+  if (discount > 0) {
+    const row = document.getElementById('discount-row');
+    if (row) row.style.display = '';
+    const dEl = document.getElementById('sum-discount');
+    if (dEl) dEl.textContent = '-' + currencyFmt(fromCents(discount));
+  } else {
+    const row = document.getElementById('discount-row');
+    if (row) row.style.display = 'none';
+  }
   if (el('sum-total')) el('sum-total').textContent = currencyFmt(fromCents(total));
-  return { sub, ship, total };
+  return { sub, ship, discount, total };
 }
 
 async function initialize() {
   const form = document.getElementById('payment-form');
   const cart = readCart();
+  let appliedCoupon = null; // { code, type, value }
+  let clientSecret = null;
+  let amount = 0;
+  let elements = null;
+  let orderId = null;
 
   // Render order lines with price and quantity
   const lines = cart.map(i => {
@@ -77,16 +100,12 @@ async function initialize() {
     const shippingMethod = fd.get('shippingMethod');
     // Send minimal items shape to backend
     const items = cart.map(i=>({ id: i.id, qty: i.qty }));
-    return { items, customer, shipping, shippingMethod };
+    return { items, customer, shipping, shippingMethod, couponCode: appliedCoupon?.code || '', existingOrderId: orderId };
   };
 
-  // Initialize Stripe and create PaymentIntent on backend if Stripe is enabled
-  let clientSecret = null;
-  let amount = 0;
-  let elements = null;
-  let orderId = null;
-  await getStripe();
-  if (stripeEnabled) {
+  async function createOrUpdatePaymentIntent() {
+    await getStripe();
+    if (!stripeEnabled) return;
     try {
       const intentResp = await fetch('/api/create-payment-intent', {
         method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(getPayload())
@@ -94,21 +113,32 @@ async function initialize() {
       if (intentResp && !intentResp.error) {
         clientSecret = intentResp.clientSecret;
         amount = intentResp.amount;
-        orderId = intentResp.orderId || null;
+        orderId = intentResp.orderId || orderId;
+        if (intentResp.couponApplied) {
+          appliedCoupon = intentResp.couponApplied;
+          document.getElementById('discount-row').style.display = '';
+          document.getElementById('discount-code-label').textContent = `(${appliedCoupon.code})`;
+        }
         const _stripe = await getStripe();
-        elements = _stripe.elements({ clientSecret, appearance: { theme: 'stripe' } });
-        const paymentElement = elements.create('payment', { layout: 'tabs' });
-        paymentElement.mount('#payment-element');
+        if (!elements) {
+          elements = _stripe.elements({ clientSecret, appearance: { theme: 'stripe' } });
+          const paymentElement = elements.create('payment', { layout: 'tabs' });
+          paymentElement.mount('#payment-element');
+        } else {
+          // Elements auto-updates with new clientSecret when recreating? Safer to re-create.
+          try { elements.update({ clientSecret }); } catch {}
+        }
       }
-    } catch (_) {
-      // ignore; test mode fallback will handle
-    }
+    } catch (_) { /* ignore */ }
   }
+
+  // Initialize Stripe and create PaymentIntent on backend if Stripe is enabled
+  await createOrUpdatePaymentIntent();
 
   // Always show a computed summary (even in test mode)
   const fd0 = new FormData(form);
   const shipMethod0 = fd0.get('shippingMethod') || 'standard';
-  const { total: computedTotal } = updateSummary(cart, shipMethod0);
+  const { total: computedTotal } = updateSummary(cart, shipMethod0, appliedCoupon);
   if (amount > 0) {
     document.getElementById('sum-total').textContent = currencyFmt(amount);
   } else {
@@ -123,12 +153,42 @@ async function initialize() {
   }
 
   // Recompute totals on shipping method change
-  const shipRadios = form.querySelectorAll('input[name="shippingMethod"]');
-  shipRadios.forEach(r => r.addEventListener('change', () => {
+  const shipSelect = form.querySelector('#shippingMethod');
+  if (shipSelect) shipSelect.addEventListener('change', async () => {
     const fd = new FormData(form);
     const method = fd.get('shippingMethod') || 'standard';
-    updateSummary(cart, method);
-  }));
+    updateSummary(cart, method, appliedCoupon);
+    // Refresh PI to reflect shipping (and coupon) changes
+    await createOrUpdatePaymentIntent();
+    if (amount > 0) document.getElementById('sum-total').textContent = currencyFmt(amount);
+  });
+
+  // Promo code apply handler
+  const applyBtn = document.getElementById('apply-code');
+  if (applyBtn) applyBtn.addEventListener('click', async () => {
+    const codeInput = document.getElementById('promo-code');
+    const msg = document.getElementById('promo-msg');
+    const code = (codeInput?.value || '').trim();
+    if (!code) { msg.textContent = 'Enter a code.'; return; }
+    try {
+      const res = await fetch('/api/marketing/validate-coupon', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ code, email: (new FormData(form)).get('email')||'' }) });
+      const data = await res.json();
+      if (data.valid) {
+        appliedCoupon = data.coupon ? { code: data.coupon.code, type: data.coupon.type, value: data.coupon.value } : { code, type:'percent', value:0 };
+        document.getElementById('discount-code-label').textContent = `(${appliedCoupon.code})`;
+        updateSummary(cart, (new FormData(form)).get('shippingMethod')||'standard', appliedCoupon);
+        await createOrUpdatePaymentIntent();
+        if (amount > 0) document.getElementById('sum-total').textContent = currencyFmt(amount);
+        msg.textContent = 'Code applied.';
+      } else {
+        appliedCoupon = null;
+        updateSummary(cart, (new FormData(form)).get('shippingMethod')||'standard', appliedCoupon);
+        msg.textContent = 'Invalid or expired code.';
+      }
+    } catch (e) {
+      msg.textContent = 'Could not validate code.';
+    }
+  });
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();

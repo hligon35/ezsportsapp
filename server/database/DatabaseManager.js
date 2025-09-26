@@ -11,7 +11,10 @@ class DatabaseManager {
       orders: 'orders.json',
       schema: 'schema.json',
   stock_movements: 'stock_movements.json',
-  analytics: 'analytics.json'
+  analytics: 'analytics.json',
+  subscribers: 'subscribers.json',
+  coupons: 'coupons.json',
+  emails: 'emails.json'
     };
   }
 
@@ -198,7 +201,10 @@ class DatabaseManager {
                   users: 1000,
                   products: 2000,
                   orders: 3000,
-                  analytics: 1
+                  analytics: 1,
+                  subscribers: 1,
+                  coupons: 1,
+                  emails: 1
                 },
                 inventoryThresholds: {
                   low: 10,

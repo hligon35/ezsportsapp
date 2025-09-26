@@ -33,7 +33,7 @@
         <span>EZ Sports Netting</span>
       </a>
       <form class="search" role="search" aria-label="Search store">
-        <input type="search" name="q" placeholder="Search bats, gloves, helmets…" aria-label="Search"/>
+  <input type="search" name="q" placeholder="Search…" aria-label="Search"/>
         <button type="submit" class="btn btn-primary">Search</button>
       </form>
       <nav id="primary-nav" class="quick-links nav-centered" aria-label="Primary">
@@ -55,6 +55,7 @@
   <button onclick="showSection('invoices', this)">Invoices</button>
     <button onclick="showSection('orders', this)">Orders</button>
     <button onclick="showSection('users', this)">Users</button>
+    <button onclick="showSection('marketing', this)">Marketing</button>
   <a class="btn btn-ghost ml-auto" href="analytics.html">Analytics →</a>
       </div>
 
@@ -120,6 +121,50 @@
   <div id="users-section" class="admin-section hidden">
         <h3>User Management</h3>
         <div id="users-list"></div>
+      </div>
+
+      <!-- Marketing Section -->
+      <div id="marketing-section" class="admin-section hidden">
+        <h3>Marketing</h3>
+        <div class="stack-05">
+          <section>
+            <h4>Send Newsletter</h4>
+            <form id="newsletter-form" class="product-form" style="grid-template-columns:1fr;">
+              <input type="text" id="nl-subject" placeholder="Subject" required />
+              <textarea id="nl-text" placeholder="Plain text content (optional)" rows="3"></textarea>
+              <textarea id="nl-html" placeholder="HTML content" rows="6"></textarea>
+              <div>
+                <button type="submit" class="btn btn-primary">Queue Newsletter</button>
+                <span id="nl-status" class="muted" style="margin-left:.5rem;"></span>
+              </div>
+            </form>
+          </section>
+          <hr/>
+          <section>
+            <h4>Create Coupon</h4>
+            <form id="coupon-form" class="product-form">
+              <input type="text" id="cp-code" placeholder="Code (e.g., SAVE10)" required />
+              <select id="cp-type" required aria-label="Coupon Type">
+                <option value="percent">Percent %</option>
+                <option value="fixed">Fixed $</option>
+              </select>
+              <input type="number" id="cp-value" placeholder="Value (e.g., 10)" step="0.01" required />
+              <input type="date" id="cp-expires" placeholder="Expires (optional)" />
+              <input type="number" id="cp-maxuses" placeholder="Max uses (0 = unlimited)" min="0" />
+              <input type="text" id="cp-emails" placeholder="Restrict to emails (comma-separated, optional)" />
+              <button type="submit" class="btn btn-primary">Create Coupon</button>
+            </form>
+            <div id="coupon-status" class="muted" style="margin-top:.5rem;"></div>
+          </section>
+          <section>
+            <h4>Coupons</h4>
+            <div id="coupons-list"></div>
+          </section>
+          <section>
+            <h4>Subscribers</h4>
+            <div id="subs-list"></div>
+          </section>
+        </div>
       </div>
     </div>
   </main>

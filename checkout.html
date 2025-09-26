@@ -32,7 +32,7 @@
         <span>EZ Sports Netting</span>
       </a>
       <form class="search" role="search" aria-label="Search store" onsubmit="event.preventDefault(); window.Store.search(this.q.value)">
-        <input type="search" name="q" placeholder="Search bats, gloves, helmets…" aria-label="Search"/>
+  <input type="search" name="q" placeholder="Search…" aria-label="Search"/>
         <button type="submit" class="btn btn-primary">Search</button>
       </form>
       <nav id="primary-nav" class="quick-links nav-centered" aria-label="Primary">
@@ -116,11 +116,20 @@
         </form>
         <aside class="order-card">
           <h3>Order Summary</h3>
+          <div class="stack-03" style="margin-bottom: .75rem;">
+            <label for="promo-code" style="font-weight:700;font-size:.9rem;">Promo code</label>
+            <div class="flex-row" style="gap:.5rem;align-items:center;">
+              <input id="promo-code" name="promo" placeholder="Enter code" style="flex:1;" />
+              <button id="apply-code" class="btn btn-secondary" type="button">Apply</button>
+            </div>
+            <div id="promo-msg" class="muted" role="status" aria-live="polite"></div>
+          </div>
           <div id="order-lines" class="stack-04"></div>
           <hr />
            <div class="stack-03">
              <div class="row-between"><span>Subtotal</span><strong id="sum-subtotal">$0.00</strong></div>
              <div class="row-between"><span>Shipping</span><strong id="sum-shipping">$0.00</strong></div>
+             <div class="row-between" id="discount-row" style="display:none;"><span>Discount <span id="discount-code-label"></span></span><strong id="sum-discount">-$0.00</strong></div>
              <div class="row-between"><span>Total</span><strong id="sum-total">$0.00</strong></div>
           </div>
         </aside>
@@ -198,6 +207,5 @@
   <script src="assets/js/checkout.js"></script>
   <script type="module" src="assets/js/analytics.js"></script>
   <script src="assets/js/app.js"></script>
-  <script type="module" src="assets/js/checkout.js"></script>
 </body>
 </html>

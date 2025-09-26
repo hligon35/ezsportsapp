@@ -107,7 +107,7 @@ async function fetchProducts() {
         }
       } catch (e) { lastErr = e; }
     }
-    if (!Array.isArray(data)) data = [];
+  if (!Array.isArray(data)) data = [];
     if (!data.length && lastErr) throw lastErr;
     // Normalize to UI shape
     const mapCategory = (raw) => {
@@ -121,7 +121,7 @@ async function fetchProducts() {
       if (/helm|protect/.test(c)) return 'helmets';
       return 'bats'; // fallback bucket for now
     };
-    PRODUCTS = data.map(p => {
+  PRODUCTS = data.map(p => {
       const normCat = mapCategory(p.category || p.department || p.type || '');
       // Salvage bad name cases like literal 'div' by deriving from id slug
       let rawName = p.name || p.title || p.id || '';
@@ -167,9 +167,32 @@ async function fetchProducts() {
     // Notify listeners that products are loaded
     try { window.dispatchEvent(new CustomEvent('products:loaded', { detail: { count: PRODUCTS.length } })); } catch {}
   } catch (e) {
-    console.warn('Product fetch failed, leaving PRODUCTS empty:', e.message);
+    console.warn('Product fetch failed, falling back to local adminProducts:', e.message);
     PRODUCTS = [];
   }
+  // Fallback: merge locally-managed admin products (created in admin panel) when API is empty/unavailable
+  try {
+    if (!PRODUCTS.length) {
+      const raw = localStorage.getItem('shopProducts') || localStorage.getItem('adminProducts');
+      if (raw) {
+        const local = JSON.parse(raw);
+        if (Array.isArray(local) && local.length) {
+          const mapped = local.map(p => ({
+            id: p.id,
+            title: p.title || p.name || p.id,
+            price: typeof p.price === 'number' ? p.price : Number(p.price) || 0,
+            category: (p.category || '').toString().toLowerCase() || 'misc',
+            img: p.img || p.image || 'assets/EZSportslogo.png',
+            images: p.images || (p.image ? [p.image] : []),
+            description: sanitizeDescription(p.description || ''),
+            features: Array.isArray(p.features) ? p.features.slice(0,25) : [],
+            stock: p.stock
+          }));
+          PRODUCTS = mapped;
+        }
+      }
+    }
+  } catch {}
 }
 // Augment PRODUCTS with locally built L-Screens catalog (screens-catalog.json) if present.
 (async function mergeLocalScreens(){
@@ -413,6 +436,35 @@ const Store = {
 
     // Reveal header/nav only after everything is standardized
     document.body.classList.add('nav-ready');
+
+    // Wire newsletter subscribe forms (public)
+    try {
+      document.querySelectorAll('form.subscribe').forEach(form => {
+        form.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const emailInput = form.querySelector('input[type="email"]');
+          const email = (emailInput?.value || '').trim();
+          if (!email) { alert('Please enter your email.'); return; }
+          let statusEl = form.querySelector('.subscribe-status');
+          if (!statusEl) {
+            statusEl = document.createElement('div');
+            statusEl.className = 'subscribe-status muted';
+            statusEl.style.marginTop = '.5rem';
+            form.appendChild(statusEl);
+          }
+          statusEl.textContent = 'Subscribing…';
+          try {
+            const res = await fetch('/api/marketing/subscribe', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ email }) });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.message||'Failed to subscribe');
+            statusEl.textContent = 'Subscribed! Check your inbox for future deals.';
+            emailInput.value = '';
+          } catch (err) {
+            statusEl.textContent = 'Could not subscribe right now.';
+          }
+        }, { once: true });
+      });
+    } catch {}
   },
 
   // Build or normalize a canonical footer structure across all pages
@@ -1105,7 +1157,7 @@ const Store = {
       if (!grid) return; // Only run on pages that declare a page-level grid
 
       // If prodList.json isn't present yet, fail gracefully
-      const data = await this.fetchProdList();
+  const data = await this.fetchProdList();
       if (!data || typeof data !== 'object') {
         this.renderEmptyState(grid);
         return;
@@ -1154,6 +1206,25 @@ const Store = {
         const card = this.buildProductCard(this.normalizeProdListItem(p));
         if (card) grid.appendChild(card);
       });
+
+      // If admin-managed products exist locally for this category page, append them too
+      try {
+        const raw = localStorage.getItem('adminProducts');
+        if (raw) {
+          const admin = JSON.parse(raw);
+          if (Array.isArray(admin) && admin.length) {
+            const pageKey = (location.pathname.split('/').pop() || '').toLowerCase().replace(/\.html$/, '');
+            const catHint = pageKey.replace(/-/g, ' ');
+            admin.filter(p => {
+              const c = (p.category || '').toString().toLowerCase();
+              return c && (pageKey.includes(c) || c.includes(pageKey) || c.includes(catHint));
+            }).forEach(p => {
+              const card = this.buildProductCard({ id: p.id, title: p.name || p.title || p.id, price: p.price, category: p.category, img: p.image || p.img || 'assets/EZSportslogo.png' });
+              if (card) grid.appendChild(card);
+            });
+          }
+        }
+      } catch {}
 
       // Bind add buttons
       grid.querySelectorAll('.js-add').forEach(btn => {

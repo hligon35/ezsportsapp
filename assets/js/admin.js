@@ -41,9 +41,37 @@ function getCurrentUser() {
   }
 }
 
-function getProducts() {
+// Source of truth: backend /api/products (admin only). Fallback to localStorage when offline.
+let __adminProductsCache = [];
+async function loadProductsFromServer() {
   try {
-    return JSON.parse(localStorage.getItem('adminProducts') || '[]');
+    const res = await fetchAdmin(`/api/products?includeInactive=true&refresh=true`);
+    if (!res.ok) throw new Error('Failed to load');
+    const items = await res.json();
+    if (Array.isArray(items)) {
+      __adminProductsCache = items.map(p => ({
+        id: p.id || p.sku || p.name || ('prod-' + Date.now()),
+        name: p.name || p.title || p.id,
+        price: typeof p.price === 'number' ? p.price : Number(p.price) || 0,
+        image: p.image || p.img || '',
+        category: (p.category || '').toString().toLowerCase() || 'misc',
+        description: p.description || '',
+        stock: p.stock || 0,
+        isActive: p.isActive !== false
+      }));
+      // Persist a lightweight copy for storefront fallback
+      saveProducts(__adminProductsCache);
+    }
+  } catch (e) {
+    // Keep cache as-is; rely on localStorage fallback
+  }
+}
+
+function getProducts() {
+  if (__adminProductsCache && __adminProductsCache.length) return __adminProductsCache;
+  try {
+    __adminProductsCache = JSON.parse(localStorage.getItem('adminProducts') || '[]');
+    return __adminProductsCache;
   } catch {
     return [];
   }
@@ -99,6 +127,7 @@ function showSection(section, btn) {
   if (section === 'products') renderProducts();
   if (section === 'orders') renderOrders();
   if (section === 'users') renderUsers();
+  if (section === 'marketing') renderMarketing();
   if (section === 'invoices') renderInvoices();
 }
 
@@ -224,15 +253,25 @@ function renderUsers() {
 }
 
 function addProduct(productData) {
-  const products = getProducts();
-  const newProduct = {
-    id: generateId(),
-    ...productData,
-    createdAt: new Date().toISOString()
-  };
-  products.push(newProduct);
-  saveProducts(products);
-  renderProducts();
+  // Try backend first
+  (async () => {
+    try {
+      const res = await fetchAdmin('/api/products', { method: 'POST', body: JSON.stringify(productData) });
+      if (!res.ok) throw new Error('Failed');
+      const created = await res.json();
+      __adminProductsCache = [created, ...getProducts().filter(p => p.id !== created.id)];
+      saveProducts(__adminProductsCache);
+      renderProducts();
+      return;
+    } catch (_) {
+      // Fallback to local-only when offline
+      const products = getProducts();
+      const newProduct = { id: generateId(), ...productData, createdAt: new Date().toISOString() };
+      products.push(newProduct);
+      saveProducts(products);
+      renderProducts();
+    }
+  })();
 }
 
 function editProduct(id) {
@@ -253,21 +292,44 @@ function editProduct(id) {
 }
 
 function updateProduct(id, productData) {
-  const products = getProducts();
-  const index = products.findIndex(p => p.id === id);
-  if (index !== -1) {
-    products[index] = { ...products[index], ...productData };
-    saveProducts(products);
-    renderProducts();
-  }
+  (async () => {
+    try {
+      const res = await fetchAdmin(`/api/products/${encodeURIComponent(id)}`, { method: 'PUT', body: JSON.stringify(productData) });
+      if (!res.ok) throw new Error('Failed');
+      const updated = await res.json();
+      __adminProductsCache = getProducts().map(p => p.id === id ? { ...p, ...updated } : p);
+      saveProducts(__adminProductsCache);
+      renderProducts();
+      return;
+    } catch (_) {
+      // Local fallback
+      const products = getProducts();
+      const index = products.findIndex(p => p.id === id);
+      if (index !== -1) {
+        products[index] = { ...products[index], ...productData };
+        saveProducts(products);
+        renderProducts();
+      }
+    }
+  })();
 }
 
 function deleteProduct(id) {
   if (!confirm('Are you sure you want to delete this product?')) return;
-
-  const products = getProducts().filter(p => p.id !== id);
-  saveProducts(products);
-  renderProducts();
+  (async () => {
+    try {
+      const res = await fetchAdmin(`/api/products/${encodeURIComponent(id)}`, { method: 'DELETE' });
+      if (!res.ok) throw new Error('Failed');
+      __adminProductsCache = getProducts().filter(p => p.id !== id);
+      saveProducts(__adminProductsCache);
+      renderProducts();
+      return;
+    } catch (_) {
+      const products = getProducts().filter(p => p.id !== id);
+      saveProducts(products);
+      renderProducts();
+    }
+  })();
 }
 
 function cancelEdit() {
@@ -334,6 +396,8 @@ document.addEventListener('DOMContentLoaded', () => {
   // Load initial data
   // Ensure the default tab (Products) is visible on load
   showSection('products', document.querySelector('.admin-nav button'));
+  // Sync products from server when possible so admin list reflects live data
+  loadProductsFromServer().then(() => { try { renderProducts(); } catch {} });
   // Orders filters
   const statusFilter = document.getElementById('orders-status-filter');
   const refreshBtn = document.getElementById('orders-refresh-btn');
@@ -352,6 +416,100 @@ window.showSection = showSection;
 window.editProduct = editProduct;
 window.deleteProduct = deleteProduct;
 window.cancelEdit = cancelEdit;
+// Marketing helpers
+async function renderMarketing(){
+  // Load subscribers
+  try {
+    const subsRes = await fetchAdmin(`/api/marketing/admin/subscribers?activeOnly=true`);
+    const subs = subsRes.ok ? await subsRes.json() : [];
+    const subsList = document.getElementById('subs-list');
+    if (subsList) subsList.innerHTML = subs.length ? (`<ul>` + subs.map(s=>`<li>${s.email}${s.name?` — ${s.name}`:''}</li>`).join('') + `</ul>`) : '<p>No subscribers yet.</p>';
+  } catch { /* ignore */ }
+
+  // Load coupons
+  loadCoupons();
+
+  // Wire newsletter form
+  const nlForm = document.getElementById('newsletter-form');
+  const nlStatus = document.getElementById('nl-status');
+  if (nlForm) {
+    nlForm.addEventListener('submit', async (e)=>{
+      e.preventDefault();
+      nlStatus.textContent = 'Queuing…';
+      try {
+        const body = {
+          subject: document.getElementById('nl-subject').value,
+          text: document.getElementById('nl-text').value,
+          html: document.getElementById('nl-html').value
+        };
+        const res = await fetchAdmin('/api/marketing/admin/newsletter', { method:'POST', body: JSON.stringify(body) });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.message||'Failed');
+        nlStatus.textContent = `Queued ${data.queued||0} emails.`;
+        nlForm.reset();
+      } catch (e) { nlStatus.textContent = e.message || 'Failed'; }
+    }, { once: true });
+  }
+
+  // Wire coupon form
+  const cpForm = document.getElementById('coupon-form');
+  const cpStatus = document.getElementById('coupon-status');
+  if (cpForm) {
+    cpForm.addEventListener('submit', async (e)=>{
+      e.preventDefault();
+      cpStatus.textContent = 'Creating…';
+      try {
+        const emails = (document.getElementById('cp-emails').value||'').split(',').map(e=>e.trim()).filter(Boolean);
+        const body = {
+          code: document.getElementById('cp-code').value,
+          type: document.getElementById('cp-type').value,
+          value: Number(document.getElementById('cp-value').value||0),
+          expiresAt: document.getElementById('cp-expires').value || null,
+          maxUses: Number(document.getElementById('cp-maxuses').value||0),
+          userEmails: emails
+        };
+        const res = await fetchAdmin('/api/marketing/admin/coupons', { method:'POST', body: JSON.stringify(body) });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.message||'Failed');
+        cpStatus.textContent = 'Created.';
+        cpForm.reset();
+        loadCoupons();
+      } catch (e) { cpStatus.textContent = e.message || 'Failed'; }
+    }, { once: true });
+  }
+}
+
+async function loadCoupons(){
+  try {
+    const res = await fetchAdmin('/api/marketing/admin/coupons');
+    const list = res.ok ? await res.json() : [];
+    const el = document.getElementById('coupons-list');
+    if (!el) return;
+    if (!list.length) { el.innerHTML = '<p>No coupons created.</p>'; return; }
+    el.innerHTML = list.map(c => `
+      <div class="product-item">
+        <div>
+          <strong>${c.code}</strong> — ${c.type==='percent'?c.value+'%':'$'+Number(c.value||0).toFixed(2)}
+          <br><small>Used ${c.used||0}${c.maxUses?` / ${c.maxUses}`:''} ${c.active===false?'(inactive)':''}</small>
+          ${c.expiresAt?`<br><small>Expires: ${new Date(c.expiresAt).toLocaleDateString()}</small>`:''}
+        </div>
+        <div>
+          ${c.active!==false?`<button class="btn btn-ghost" data-deact="${c.code}">Deactivate</button>`:''}
+        </div>
+      </div>
+    `).join('');
+    el.querySelectorAll('[data-deact]').forEach(btn => {
+      btn.addEventListener('click', async ()=>{
+        const code = btn.getAttribute('data-deact');
+        try {
+          const r = await fetchAdmin(`/api/marketing/admin/coupons/${encodeURIComponent(code)}/deactivate`, { method:'POST' });
+          if (!r.ok) throw new Error('Failed');
+          loadCoupons();
+        } catch { alert('Failed to deactivate.'); }
+      });
+    });
+  } catch { /* ignore */ }
+}
 
 // Invoices
 function renderInvoices() {

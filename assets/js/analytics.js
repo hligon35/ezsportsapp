@@ -116,15 +116,18 @@ async function loadAnalytics() {
   const uv = document.getElementById('uv');
   const orders = document.getElementById('orders');
   const revenue = document.getElementById('revenue');
+  const aov = document.getElementById('aov');
   if (pv) pv.textContent = String(traffic.totalPageviews || 0);
   if (uv) uv.textContent = String(traffic.uniqueVisitors || 0);
   if (orders) orders.textContent = String(orderStats.totalOrders || 0);
   if (revenue) revenue.textContent = `$${Number(orderStats.totalRevenue||0).toFixed(2)}`;
+  if (aov) aov.textContent = `$${Number(orderStats.avgOrderValue||0).toFixed(2)}`;
 
   // Lists
   const topPages = document.getElementById('top-pages');
   const topProducts = document.getElementById('top-products');
   const favProducts = document.getElementById('fav-products');
+  const statusBreakdown = document.getElementById('status-breakdown');
   if (topPages) {
     topPages.innerHTML = (traffic.topPages||[]).map(p=>`<li><strong>${p.count}</strong> — <code>${p.path}</code></li>`).join('') || '<li class="muted">No data</li>';
   }
@@ -135,6 +138,11 @@ async function loadAnalytics() {
     const fav = (toplists.topFavorited||[]).map(p=>`<li><strong>${p.count}</strong> — ${p.name||p.productId} <span class="muted">(favorited)</span></li>`).join('');
     const add = (toplists.topAddedToCart||[]).map(p=>`<li><strong>${p.count}</strong> — ${p.name||p.productId} <span class="muted">(added)</span></li>`).join('');
     favProducts.innerHTML = (fav + add) || '<li class="muted">No data</li>';
+  }
+  if (statusBreakdown) {
+    const sc = orderStats.statusCounts || {};
+    const entries = Object.keys(sc).sort().map(k=>`<li><strong>${sc[k]}</strong> — ${k}</li>`).join('');
+    statusBreakdown.innerHTML = entries || '<li class="muted">No data</li>';
   }
 }
 

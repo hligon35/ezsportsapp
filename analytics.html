@@ -16,7 +16,7 @@
         <span>EZ Sports Netting</span>
       </a>
       <form class="search" role="search" aria-label="Search store">
-        <input type="search" name="q" placeholder="Search bats, gloves, helmets…" aria-label="Search"/>
+  <input type="search" name="q" placeholder="Search…" aria-label="Search"/>
         <button type="submit" class="btn btn-primary">Search</button>
       </form>
       <nav id="primary-nav" class="quick-links nav-centered" aria-label="Primary">
@@ -52,6 +52,7 @@
       <div class="card-sm"><div class="muted">Unique Visitors</div><div class="kpi" id="uv">0</div></div>
       <div class="card-sm"><div class="muted">Orders</div><div class="kpi" id="orders">0</div></div>
       <div class="card-sm"><div class="muted">Revenue</div><div class="kpi" id="revenue">$0.00</div></div>
+      <div class="card-sm"><div class="muted">Avg Order Value</div><div class="kpi" id="aov">$0.00</div></div>
     </section>
 
   <section class="grid-2 mt-4">
@@ -68,6 +69,11 @@
   <section class="mt-4">
       <h3>Favorites & Add-to-cart</h3>
       <ul id="fav-products" class="product-list"></ul>
+    </section>
+
+  <section class="mt-4">
+      <h3>Order Status Breakdown</h3>
+      <ul id="status-breakdown" class="product-list"></ul>
     </section>
   </main>
 

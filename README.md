@@ -117,6 +117,31 @@ Extend by wiring `trackEvent` to POST `/api/analytics/event` (already scaffolded
 3. Stripe Elements (future) confirms the PaymentIntent.
 4. After successful confirmation call `Store.completePurchase(orderData)` to emit `purchase` analytics.
 
+## Admin Products + Storefront Coordination
+
+- Admin Panel (`admin.html`)
+	- Products are managed via `/api/products` (requires admin login). The UI falls back to localStorage if the API is offline, so you can still draft items.
+	- On load, the admin fetches the live list and saves a lightweight copy in `localStorage.adminProducts` for storefront fallback.
+	- Add/Update/Delete first try the API, then gracefully fall back to local storage if the network fails.
+
+- Storefront behavior (`assets/js/app.js`)
+	- Catalog fetch tries `/api/products` first.
+	- If the API is empty/unavailable, it falls back to `localStorage.shopProducts` or `localStorage.adminProducts` so products still render.
+	- Category pages that use `assets/prodList.json` continue to render curated items, then append any admin‑managed products that match the page category.
+
+- Stripe‑linked Orders
+	- On `/api/create-payment-intent`, the server creates a local order first and returns `orderId` alongside `clientSecret`.
+	- Stripe webhook marks that order as `paid` on `payment_intent.succeeded`, keeping sales data and analytics in sync automatically.
+
+### Quick Test (Dev)
+
+1) Start server locally and log in as admin.
+2) Go to Admin → add a product (Bats or Netting). Confirm it appears in the list.
+3) Open the homepage and category pages; you should see products. Kill the server and refresh — admin products still render via local fallback.
+4) Checkout:
+	 - Without Stripe keys → test mode: order is still recorded via `/api/order` and confirmation page loads.
+	 - With Stripe keys and webhook secret set → complete a test card payment; webhook should mark the order `paid`.
+
 ## Environment Variables Summary
 ```env
 PORT=4242
