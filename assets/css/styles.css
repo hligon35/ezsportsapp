@@ -106,6 +106,10 @@ body, .container, .footer-grid, .about-inner, .category-tiles .tiles, .grid, .ba
   --muted:#5a5a5a;         /* muted text; stays readable on white */
   /* Adjusted focus ring to work with deeper purple hue (slightly higher alpha) */
   --ring: 0 0 0 3px color-mix(in oklab, white 8%, var(--brand) 70% / 28%);
+  /* Gold CTA palette (accessible with white text) */
+  --gold:#8a6a00;          /* base (contrast AA with white) */
+  --gold-hover:#a07c00;    /* hover/ focus */
+  --gold-active:#6d5200;   /* active/ pressed */
 }
 
 /* Spacing utilities */
@@ -678,22 +682,23 @@ img[src*="/logo.svg"]{
   .site-header .search input{padding:.7rem 1rem .7rem 2.45rem;line-height:1.25;font-size:.95rem}
 }
 
-/* Buttons */
-.btn{display:inline-flex;align-items:center;justify-content:center;padding:.8rem 1.1rem;border-radius:.9rem;font-weight:800;letter-spacing:.3px;border:1px solid var(--brand);text-decoration:none;cursor:pointer;transition:.18s ease-in-out;text-transform:uppercase;background:var(--brand);color:#fff}
+/* Buttons (gold primary theme) */
+.btn{display:inline-flex;align-items:center;justify-content:center;padding:.8rem 1.1rem;border-radius:.9rem;font-weight:800;letter-spacing:.3px;border:1px solid var(--gold);text-decoration:none;cursor:pointer;transition:.18s ease-in-out;text-transform:uppercase;background:var(--gold);color:#fff}
 .btn-quote{background:#000000;border-color:#000000;color:#fff}
 .btn-quote:hover{filter:brightness(1.12)}
 .btn.btn-dark{background:#000000;border-color:#000000;color:#fff}
 .btn.btn-dark:hover{filter:brightness(1.15)}
-.btn:hover{filter:brightness(1.05)}
-.btn-primary{background:var(--brand);border-color:var(--brand);color:#fff}
-.btn-ghost{background:var(--brand);border-color:var(--brand);color:#fff}
-.btn-ghost:hover{filter:brightness(1.05)}
-.btn-invert{background:var(--brand);border-color:var(--brand);color:#fff}
-.btn-block{width:100%}
-.btn-pill{border-radius:2rem;background:var(--brand);border:2px solid var(--brand);color:#fff;padding:.7rem 1.1rem;font-weight:900}
-/* Standardized black Request Quote button */
+.btn-primary{background:var(--gold);border-color:var(--gold);color:#fff}
+.btn-ghost{background:var(--gold);border-color:var(--gold);color:#fff}
+.btn-invert{background:var(--gold);border-color:var(--gold);color:#fff}
+.btn-pill{border-radius:2rem;background:var(--gold);border:2px solid var(--gold);color:#fff;padding:.7rem 1.1rem;font-weight:900}
+.btn:hover,.btn-primary:hover,.btn-ghost:hover,.btn-invert:hover,.btn-pill:hover{background:var(--gold-hover);border-color:var(--gold-hover);filter:none}
+.btn:active,.btn-primary:active,.btn-ghost:active,.btn-invert:active,.btn-pill:active{background:var(--gold-active);border-color:var(--gold-active);}
+.btn:focus-visible{outline:none;box-shadow:0 0 0 3px color-mix(in oklab, var(--gold) 65%, #fff 25%)}
+/* Preserve specialized quote button styling */
 .btn-quote{background:#000000 !important;color:#ffffff !important;border:1px solid #000000 !important;box-shadow:0 2px 6px rgba(0,0,0,.4);}
 .btn-quote:hover,.btn-quote:focus-visible{filter:brightness(1.15);outline:none;}
+.btn-block{width:100%}
 
 /* Fit-to-content defaults for form controls */
 input, select, textarea, button { width:auto; max-width:100%; }
