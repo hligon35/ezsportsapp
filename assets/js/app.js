@@ -1175,8 +1175,11 @@ const Store = {
         // Map page -> category arrays
         const pageToCategories = {
           'accessories': ['Accessories'],
-          'baseball-l-screens': ['Better Baseball Screens'],
-          'protective-screens': ['Better Baseball Screens'],
+          // Use precise L-Screens bucket for both baseball-l-screens and l-screens hub
+          'baseball-l-screens': ['Better Baseball L-Screens'],
+          'l-screens': ['Better Baseball L-Screens'],
+          // Protective screens currently share the same inventory bucket as L-Screens
+          'protective-screens': ['Better Baseball L-Screens'],
           'pitchers-pocket': ["Better Baseball Pitcher's Pocket"],
           'replacement-screens': ['Replacement Nets']
         };
@@ -1184,17 +1187,7 @@ const Store = {
         for (const c of cats) {
           if (Array.isArray(data.categories[c])) items = items.concat(data.categories[c]);
         }
-        // For protective-screens page, filter out only square/protective entries when using Better Baseball Screens bucket
-        if (pageKey === 'protective-screens' && items.length) {
-          items = items.filter(x => {
-            const n = (x.name || x.title || '').toLowerCase();
-            return /protective|square/.test(n) || /sock\s*net/.test(n) || /fast\s*pitch/.test(n) || /10x10|8x8|7x7/.test(n);
-          });
-        }
-        // For baseball-l-screens page, filter items that look like L-screens
-        if (pageKey === 'baseball-l-screens' && items.length) {
-          items = items.filter(x => /\bl[ -]?screen\b/i.test(x.name || x.title || ''));
-        }
+        // No additional filtering needed now that categories map directly
       }
       if (!items.length) {
         this.renderEmptyState(grid);
