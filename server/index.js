@@ -9,6 +9,7 @@ const helmet = require('helmet');
 const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
 const cookieParser = require('cookie-parser');
+const fsSync = require('fs');
 // Initialize Stripe client only if a secret key is provided (set in Render env)
 let stripe = null;
 try {
@@ -217,11 +218,28 @@ app.get('/favicon.ico', (req, res) => {
   }
 });
 
+// AVIF MIME correction & fallback middleware (before express.static)
+app.use((req, res, next) => {
+  if (req.url.endsWith('.avif')) {
+    const filePath = path.join(__dirname, '..', decodeURIComponent(req.path));
+    if (fsSync.existsSync(filePath)) {
+      res.type('image/avif');
+    } else {
+      // Fallback to an existing jpg placeholder if the avif is missing
+      const fallback = path.join(__dirname, '..', 'assets', 'img', 'bats.jpg');
+      if (fsSync.existsSync(fallback)) {
+        return res.sendFile(fallback);
+      }
+    }
+  }
+  next();
+});
+
 app.use(express.static(path.join(__dirname, '..')));
 
 // Static assets caching (1 year for immutable, 1 hour for html)
 app.use((req, res, next) => {
-  if (/\.(?:js|css|png|jpg|jpeg|svg|gif|webp|ico)$/i.test(req.url)) {
+  if (/\.(?:js|css|png|jpg|jpeg|svg|gif|webp|avif|ico)$/i.test(req.url)) {
     res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
   } else if (/\.(?:html)$/i.test(req.url)) {
     res.setHeader('Cache-Control', 'public, max-age=3600');
@@ -235,6 +253,14 @@ app.use((req, res, next) => {
 // 404 for unknown API routes
 app.use('/api', (req, res) => {
   res.status(404).json({ message: 'Not Found' });
+});
+
+// Fallback static 404 logger for assets (after express.static)
+app.use((req, res, next) => {
+  if (/\.(?:png|jpg|jpeg|svg|gif|webp|avif|ico)$/i.test(req.url)) {
+    console.warn('Asset 404 (image) ->', req.url);
+  }
+  next();
 });
 
 // Centralized error handler
