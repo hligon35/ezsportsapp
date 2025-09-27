@@ -329,6 +329,8 @@ const Store = {
     // Ensure layout and nav
   this.ensureHeaderLayout();
   this.ensureCoreNav();
+  // Defensive: ensure Home link is present & first (in case of legacy markup or race conditions)
+  this.ensureHomeFirst();
     this.ensureBreadcrumbs();
     this.updateNavigation();
   this.ensureNettingSubnav();
@@ -733,6 +735,19 @@ const Store = {
       if (cartBtn && actions && cartBtn.parentElement !== actions) {
         actions.appendChild(cartBtn);
       }
+      // If no cart button exists at all (legacy markup removed it), create one
+      if (!actions.querySelector('.cart-btn')) {
+        const btn = document.createElement('button');
+        btn.className = 'cart-btn';
+        btn.type = 'button';
+        btn.setAttribute('aria-haspopup','dialog');
+        btn.setAttribute('aria-controls','mini-cart');
+        btn.innerHTML = `<span class="icon">🛒</span> <span class="cart-count" id="cart-count">0</span>`;
+        btn.addEventListener('click', () => this.toggleCart());
+        actions.appendChild(btn);
+        // Update UI refs if they weren't bound yet
+        this.ui.count = document.getElementById('cart-count');
+      }
     } catch {}
 
     // Standardize search bar (placeholder, button classes/text)
@@ -778,6 +793,7 @@ const Store = {
 
     // Build new primary nav
     const links = [
+      { href: 'index.html', text: 'Home' },
       { href: 'about.html', text: 'About' },
       { href: 'ez-nets.html', text: 'EZ Nets' },
       { href: 'l-screens.html', text: 'L-Screens', submenu: [
@@ -805,45 +821,65 @@ const Store = {
         item.submenu.forEach(sub => {
           const subA = document.createElement('a'); subA.href = sub.href; subA.textContent = sub.text; ul.appendChild(subA);
         });
-        // For the L-Screens dropdown, align the submenu to the right so it opens to the left
-        if ((item.text || '').toLowerCase() === 'l-screens') {
-          wrapper.classList.add('submenu-left');
-        }
-        wrapper.appendChild(a);
-        wrapper.appendChild(ul);
-        nav.appendChild(wrapper);
-
-        // Desktop: open on hover; Mobile: toggle on tap
-        const isFinePointer = typeof window.matchMedia === 'function' && window.matchMedia('(hover:hover) and (pointer:fine)').matches;
-        if (isFinePointer) {
-          // Desktop hover: add a small hide-delay so users can move into the submenu
-          // even if there's a visual gap; cancel the timer on re-enter.
-          let hideTimer = null;
-          const openMenu = () => {
-            if (hideTimer) { clearTimeout(hideTimer); hideTimer = null; }
-            wrapper.classList.add('open');
-            a.setAttribute('aria-expanded','true');
-          };
-          const scheduleClose = () => {
-            if (hideTimer) clearTimeout(hideTimer);
-            hideTimer = setTimeout(() => {
-              wrapper.classList.remove('open');
-              a.setAttribute('aria-expanded','false');
-              hideTimer = null;
-            }, 200); // 200ms grace period
-          };
-          wrapper.addEventListener('mouseenter', openMenu);
-          wrapper.addEventListener('mouseleave', scheduleClose);
-          // Also listen on submenu to keep it open while hovering over it
-          ul.addEventListener('mouseenter', openMenu);
-          ul.addEventListener('mouseleave', scheduleClose);
-          // Allow click to navigate to l-screens.html
-        } else {
-          a.addEventListener('click', (e) => {
-            e.preventDefault();
-            const open = wrapper.classList.toggle('open');
-            a.setAttribute('aria-expanded', String(open));
+        const isLScreens = (item.text || '').toLowerCase() === 'l-screens';
+        if (isLScreens) {
+          // Externalize: build a dedicated horizontal subnav bar below header
+          let ext = document.getElementById('lscreens-subnav');
+          if (!ext) {
+            ext = document.createElement('div');
+            ext.id = 'lscreens-subnav';
+            ext.className = 'lscreens-subnav external-subnav';
+            // Insert right after the site header
+            const siteHeader = document.querySelector('.site-header');
+            if (siteHeader && siteHeader.parentNode) {
+              siteHeader.parentNode.insertBefore(ext, siteHeader.nextSibling);
+            } else {
+              document.body.insertAdjacentElement('afterbegin', ext);
+            }
+          }
+          // Populate external subnav
+            ul.classList.add('external');
+            // Clear existing then append links only (no wrapper)
+            ext.innerHTML = '';
+            const titleLink = document.createElement('a');
+            titleLink.href = item.href || '#';
+            titleLink.textContent = 'L-Screens';
+            titleLink.className = 'lscreens-home';
+            ext.appendChild(titleLink);
+            Array.from(ul.children).forEach(child => ext.appendChild(child.cloneNode(true)));
+          // Highlight active in external bar
+          const current = (location.pathname.split('/').pop() || '').toLowerCase();
+          ext.querySelectorAll('a').forEach(a => {
+            const href = (a.getAttribute('href')||'').toLowerCase();
+            if (href === current) a.classList.add('is-active');
           });
+          // In primary nav just place the top-level link (no dropdown)
+          wrapper.appendChild(a);
+          nav.appendChild(wrapper);
+          // Interaction: show overlay subnav on focus/hover of top-level link for keyboard accessibility
+          try {
+            const show = () => ext.classList.add('is-open');
+            const hideDelayed = (() => {
+              let t=null; return () => { if(t) clearTimeout(t); t=setTimeout(()=>{ ext.classList.remove('is-open'); },180); };
+            })();
+            a.addEventListener('mouseenter', show);
+            a.addEventListener('focus', show);
+            a.addEventListener('mouseleave', hideDelayed);
+            a.addEventListener('blur', hideDelayed);
+            ext.addEventListener('mouseenter', show);
+            ext.addEventListener('mouseleave', hideDelayed);
+            // Close on Escape
+            document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') ext.classList.remove('is-open'); });
+            // Mark aria-expanded
+            const sync = () => a.setAttribute('aria-expanded', ext.classList.contains('is-open') ? 'true':'false');
+            ['mouseenter','mouseleave','focus','blur'].forEach(ev=>a.addEventListener(ev, sync));
+            ext.addEventListener('transitionend', sync);
+          } catch {}
+        } else {
+          // Keep normal behavior for other dropdowns (currently none besides L-Screens)
+          wrapper.appendChild(a);
+          wrapper.appendChild(ul);
+          nav.appendChild(wrapper);
         }
       } else {
         const a = document.createElement('a');
@@ -858,6 +894,28 @@ const Store = {
     const candidates = Array.from(nav.querySelectorAll('a')).filter(a => a.getAttribute('href') && !a.closest('.nav-submenu'));
     const active = candidates.find(a => (a.getAttribute('href') || '').endsWith(path));
     if (active) { active.classList.add('is-active'); active.setAttribute('aria-current','page'); }
+  },
+
+  // Guarantee the Home link exists and is first in the primary nav even if
+  // pre-existing static markup or another script injected links earlier.
+  ensureHomeFirst() {
+    try {
+      const nav = document.getElementById('primary-nav') || document.querySelector('nav.quick-links');
+      if (!nav) return;
+      const children = Array.from(nav.children);
+      // Find an existing Home anchor (match by href ending or text content)
+      let home = children.find(el => el.tagName === 'A' && /index\.html$/i.test(el.getAttribute('href')||''))
+        || children.find(el => el.tagName === 'A' && (el.textContent||'').trim().toLowerCase() === 'home');
+      if (!home) {
+        home = document.createElement('a');
+        home.href = 'index.html';
+        home.textContent = 'Home';
+      }
+      // If Home is not the first child, move or insert it
+      if (nav.firstElementChild !== home) {
+        nav.insertBefore(home, nav.firstElementChild || null);
+      }
+    } catch {/* non-fatal */}
   },
 
 

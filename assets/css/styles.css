@@ -112,6 +112,166 @@ body, .container, .footer-grid, .about-inner, .category-tiles .tiles, .grid, .ba
   --gold-active:#6d5200;   /* active/ pressed */
 }
 
+/* Request Quote button state overrides (EZ Nets page) */
+.btn-quote { transition: background-color .25s, color .25s, box-shadow .25s; }
+.btn-quote:hover,
+.btn-quote:focus-visible { background: var(--gold-hover) !important; color:#000 !important; border-color: var(--gold-hover) !important; }
+.btn-quote:active { background:#ffffff !important; color:#000 !important; border-color: var(--brand) !important; }
+
+/* =====================================================================
+   Unified Brand Purple Palette Enforcement
+   Single hue: #241773. Differentiation via purple→white gradients only.
+   ===================================================================== */
+:root {
+  --brand:#241773 !important;
+  --brand-2:#241773 !important;
+  --primary:#241773 !important;
+  --ink-2:#241773 !important; /* secondary emphasis now purple when used */
+}
+
+/* Core gradient helper classes (directional variants) */
+.bg-purple-diag-1 { background:linear-gradient(135deg,#241773 0%, #ffffff 140%) !important; }
+.bg-purple-diag-2 { background:linear-gradient(45deg,#241773 0%, #ffffff 140%) !important; }
+.bg-purple-vert   { background:linear-gradient(180deg,#241773 0%, #ffffff 140%) !important; }
+.bg-purple-horiz  { background:linear-gradient(90deg,#241773 0%, #ffffff 140%) !important; }
+
+/* Replace multi‑hue purple backgrounds with single-hue gradients */
+.mega-hero, .net-hero, .netting-hero, .contact-hero, .turf-hero, .expert-cta, .spotlight-wrap,
+.banner, .banner.red, .banner.blue { background:linear-gradient(135deg,#241773 0%, #ffffff 160%) !important; }
+
+/* Remove decorative pseudo gradients that referenced older purples */
+.fr-card:before, .hero-card:before, .banner:before, .netting-hero:before, .mega-hero:after, .spotlight-wrap:after { background:none !important; }
+
+/* Buttons unify on purple except specialized quote button */
+.btn, .btn-primary, .btn-ghost, .btn-invert, .btn-pill, .icon-btn {
+  background:#241773 !important; border-color:#241773 !important; color:#ffffff !important;
+}
+.btn:hover, .btn-primary:hover, .btn-ghost:hover, .btn-invert:hover, .btn-pill:hover, .icon-btn:hover,
+.btn:focus-visible, .btn-primary:focus-visible { filter:brightness(1.06); }
+.btn:active, .btn-primary:active { filter:brightness(.9); }
+.btn-quote { background:#000 !important; border-color:#000 !important; color:#fff !important; }
+
+/* Nav & submenu */
+.quick-links a:hover, .quick-links .auth-link:hover { background:linear-gradient(135deg,#241773 0%, #241773 65%, #ffffff 140%) !important; color:#fff !important; }
+.quick-links a.is-active, .quick-links a[aria-current="page"] { background:linear-gradient(135deg,#241773 0%, #ffffff 130%) !important; color:#fff !important; }
+.quick-links .nav-submenu { background:#241773 !important; border-color:#241773 !important; }
+.quick-links .nav-submenu a { color:#fff !important; }
+.quick-links .nav-submenu a:hover { background:rgba(255,255,255,.15) !important; }
+
+/* Avatar */
+.profile-btn { background:#241773 !important; }
+.profile-btn:active { background:#ffffff !important; }
+
+/* Active chips / tags */
+.chip.is-active { background:#241773 !important; border-color:#241773 !important; color:#fff !important; }
+
+/* Focus rings keep readability */
+input:focus, textarea:focus, select:focus { border-color:#241773 !important; box-shadow:0 0 0 3px rgba(36,23,115,.35) !important; }
+
+/* Links */
+a, .inline-links a { color:#241773; }
+a:hover, .inline-links a:hover { text-decoration:underline; }
+
+/* Dropdown & mini-cart subtle accents */
+.user-dropdown a:hover, .user-dropdown button:hover { background:rgba(36,23,115,.08) !important; }
+.mini-cart__panel header { border-color:#241773 !important; }
+
+/* Selection */
+::selection { background:#241773; color:#fff; }
+
+/* External L-Screens sub-navigation bar */
+/* L-Screens overlay subnav (inverted: light surface over header) */
+#lscreens-subnav.external-subnav {
+  position:absolute;
+  left:50%;
+  top:100%;
+  transform:translate(-50%, 0); /* sits just below header; we will overlap on reveal */
+  display:flex;
+  gap:.55rem;
+  align-items:center;
+  background:#ffffff;
+  padding:.55rem .7rem .6rem;
+  border:1px solid rgba(0,0,0,.12);
+  border-radius:2.2rem;
+  box-shadow:0 10px 28px -10px rgba(0,0,0,.35);
+  z-index:60;
+  backdrop-filter:blur(6px);
+  -webkit-backdrop-filter:blur(6px);
+  opacity:0;
+  pointer-events:none;
+  visibility:hidden;
+  transition:opacity .18s ease, transform .18s ease, visibility .18s;
+}
+/* Show when parent header hovered or a trigger class applied */
+.site-header:hover + #lscreens-subnav.external-subnav,
+.site-header:focus-within + #lscreens-subnav.external-subnav,
+#lscreens-subnav.external-subnav.is-open {
+  opacity:1;
+  pointer-events:auto;
+  visibility:visible;
+  transform:translate(-50%, -4px); /* slight rise for layered look */
+}
+/* Ensure header is positioning context */
+.site-header { position:sticky; top:0; z-index:30; }
+
+#lscreens-subnav.external-subnav a {
+  text-decoration:none;
+  font-weight:700;
+  font-size:.7rem;
+  letter-spacing:.55px;
+  padding:.45rem .75rem;
+  border-radius:1.4rem;
+  background:#ffffff;
+  color:#241773;
+  line-height:1;
+  display:inline-flex;
+  align-items:center;
+  gap:.25rem;
+  transition:background .18s, color .18s, box-shadow .18s;
+  white-space:nowrap;
+  box-shadow:0 0 0 1px rgba(36,23,115,.25);
+}
+#lscreens-subnav.external-subnav a:hover,
+#lscreens-subnav.external-subnav a:focus-visible {
+  background:#241773;
+  color:#ffffff;
+  box-shadow:0 0 0 1px #241773,0 0 0 4px rgba(36,23,115,.35);
+  outline:none;
+}
+#lscreens-subnav.external-subnav a.lscreens-home { font-weight:800; }
+
+/* Active state highlight */
+#lscreens-subnav.external-subnav a.is-active { background:#241773; color:#ffffff; box-shadow:0 0 0 1px #241773,0 0 0 4px rgba(36,23,115,.3); }
+
+/* Responsive collapse: on narrow screens let main nav handle navigation (hide bar) */
+@media (max-width:680px){
+  #lscreens-subnav.external-subnav { display:none; }
+}
+
+/* Utility catch-all: any old purple class variants collapse to brand */
+[class*="purple"], [class*="violet"], [class*="lavender"] { color:#241773 !important; }
+
+/* Preserve footer black for contrast; don't override it here */
+
+/* Subscribe button state styling */
+.subscribe button.btn-primary {
+  background: var(--gold) !important;
+  border-color: var(--gold) !important;
+  color: #000 !important;
+  transition: background .25s, color .25s, border-color .25s;
+}
+.subscribe button.btn-primary:hover,
+.subscribe button.btn-primary:focus-visible {
+  background: var(--brand) !important; /* purple on hover */
+  border-color: var(--brand) !important;
+  color:#fff !important;
+}
+.subscribe button.btn-primary:active {
+  background: #ffffff !important; /* white during click */
+  color:#000 !important;
+  border-color: var(--brand) !important;
+}
+
 /* Spacing utilities */
 .space-y-xl{margin:2rem 0 3rem}
 
@@ -505,9 +665,11 @@ img[src*="/logo.svg"]{
 .quick-links .nav-submenu a:hover{background:#121212;color:#fff}
 .user-menu{display:flex;align-items:center;gap:.8rem;font-size:.9rem;position:relative}
 .user-menu span{color:#d3d0d7;opacity:.8;}
-.profile-btn{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:999px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.12);cursor:pointer}
-.profile-btn:hover{filter:brightness(1.05)}
-.avatar{display:inline-grid;place-items:center;width:28px;height:28px;border-radius:999px;background:#ffffff;color:var(--brand);font-weight:900}
+.profile-btn{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:999px;border:2px solid #d4af37; /* gold border */ background:#4b2b82; /* purple */ cursor:pointer;transition:background .18s ease, filter .18s ease, border-color .18s ease}
+.profile-btn:hover,.profile-btn:focus-visible{background:#5b3699;filter:brightness(1.05);outline:none}
+.profile-btn:active{background:#ffffff;border-color:#b89125}
+.profile-btn:active .avatar{background:#ffffff}
+.avatar{display:inline-grid;place-items:center;width:32px;height:32px;border-radius:999px;background:transparent;color:#000 !important;font-weight:900;font-size:.9rem;letter-spacing:.4px;line-height:1;white-space:nowrap;}
 .user-dropdown{position:absolute;right:0;left:auto;transform:none;top:calc(100% + .5rem);background:#fff;color:#0b2a4a;border:1px solid var(--border);border-radius:.6rem;box-shadow:0 8px 24px rgba(12,32,64,.18);min-width:200px;padding:.35rem;display:none;z-index:200}
 .user-dropdown.open{display:block}
 .user-dropdown a,.user-dropdown button{display:block;width:100%;text-align:left;padding:.5rem .6rem;border:none;background:none;color:#0b2a4a;text-decoration:none;cursor:pointer;border-radius:.4rem}
@@ -552,35 +714,31 @@ img[src*="/logo.svg"]{
    Row2: menu toggle, search (full width)
 */
 @media (max-width:640px){
-  .header-break{display:block}
-  .site-header .header-bar{align-items:flex-start}
-  /* Row 1 */
-  .site-header .brand{order:1}
-  .site-header .header-actions{order:2;margin-left:auto}
-  .site-header .cart-btn{order:3;margin-left:.55rem}
-  /* Row 2: search and menu toggle share row; search shrinks before wrapping */
-  .site-header .search{order:4;flex:1 1 auto;min-width:150px;max-width:calc(100% - 118px);margin-top:.35rem}
-  .site-header .search input{width:auto;min-width:16ch;max-width:100%;padding:.6rem .65rem .6rem 2.55rem;font-size:.87rem}
-  .site-header .menu-toggle{order:5;margin-left:.5rem;align-self:stretch}
-  /* Avoid full-width forcing toggle to next line on ultra narrow */
+  /* Mobile header: Row 1 brand centered; Row 2: search 60%, actions 20%, menu toggle 20% */
+  .site-header .header-bar{display:grid;grid-template-rows:auto auto;row-gap:.4rem;align-items:center;justify-items:stretch;grid-template-columns:100%;column-gap:.25rem;padding:0 .55rem .5rem}
+  .site-header .brand{grid-column:1 / -1;grid-row:1;justify-self:center;margin-inline:auto;margin-bottom:.4rem}
+  /* Second row defined with fractional distribution including gap fallback */
+  .site-header .header-bar{grid-template-columns:60% 20% 20%}
+  .site-header .search{grid-row:2;grid-column:1;order:unset;width:100%;min-width:0;margin:0;display:flex}
+  .site-header .search input{width:100%;min-width:0;padding:.6rem .65rem .6rem 2.4rem;font-size:.85rem}
+  .site-header .header-actions{grid-row:2;grid-column:2;order:unset;display:flex;justify-content:center;align-items:center;width:100%;margin:0;gap:.25rem}
+  .site-header .menu-toggle{grid-row:2;grid-column:3;order:unset;margin:0;justify-self:center;align-self:center;display:inline-flex;min-width:0}
+  .site-header .cart-btn{margin-left:.25rem}
+  .header-break{display:none}
+  /* Ensure inner elements shrink properly */
+  .site-header .header-actions .user-menu, .site-header .header-actions .auth-link, .site-header .header-actions .cart-btn{flex:0 1 auto}
+  /* Tighten extremely small widths */
   @media (max-width:480px){
-  .site-header .search{min-width:130px;max-width:calc(100% - 115px)}
+    .site-header .search input{font-size:.8rem;padding:.55rem .55rem .55rem 2.3rem}
   }
   @media (max-width:400px){
-  .site-header .search{min-width:115px;max-width:calc(100% - 110px)}
-  .site-header .search input{padding:.55rem .55rem .55rem 2.35rem;font-size:.8rem}
+    .site-header .search input{font-size:.78rem;padding:.5rem .5rem .5rem 2.15rem}
     .site-header .menu-toggle{padding:.5rem .55rem}
-    /* Icon-only search button */
-  /* Small variant inherits embedded style; tighten sizes */
-  .site-header .search .btn{width:38px;height:38px;left:.5rem}
-  .site-header .search input{padding:.6rem .6rem .6rem 2.4rem}
   }
   @media (max-width:360px){
-  .site-header .search{min-width:105px;max-width:calc(100% - 104px)}
-  .site-header .search input{padding:.5rem .5rem .5rem 2.2rem;font-size:.76rem}
-  .site-header .menu-toggle{font-size:.85rem}
-  .site-header .menu-toggle span{display:none}
-  .site-header .menu-toggle{padding:.55rem;width:42px;height:42px;display:inline-flex;align-items:center;justify-content:center}
+    .site-header .search input{font-size:.75rem;padding:.48rem .5rem .48rem 2.05rem}
+    .site-header .menu-toggle{font-size:.8rem;width:40px;height:40px;padding:.5rem}
+    .site-header .menu-toggle span{display:none}
   }
 }
 /* Mid sizes retain single-row default (allow existing nav collapse) */
@@ -992,7 +1150,17 @@ nav.quick-links li a[href="careers.html"]{
   .quick-links a{padding:.25rem .5rem;background:#000000;border-radius:.5rem}
   .btn{padding:.65rem .85rem;font-size:.78rem}
   .tile img{max-height:120px}
-  .footer-grid{grid-template-columns:1fr}
+  /* Footer: keep Brand top, show Shop + Company side-by-side, then Subscribe full width */
+  .footer-grid{grid-template-columns:1fr 1fr;grid-template-areas:
+    "brand brand"
+    "shop company"
+    "subscribe subscribe";}
+  .footer-grid > .footer-brand-block{grid-area:brand}
+  .footer-grid > nav:nth-of-type(1){grid-area:shop}
+  .footer-grid > nav:nth-of-type(2){grid-area:company}
+  .footer-grid > .subscribe{grid-area:subscribe}
+  .footer-grid > nav{align-items:flex-start}
+  .footer-grid > nav h4, .footer-grid > nav li, .footer-grid > nav a{text-align:left}
   .subfooter{flex-direction:column;gap:.5rem;text-align:center}
   .about-inner{gap:.9rem}
   .mini-cart__panel{width:min(100%,100vw)}
