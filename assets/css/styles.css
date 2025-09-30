@@ -37,7 +37,69 @@
 .product-card .price-row { display:flex; align-items:center; justify-content:space-between; gap:.5rem; margin-top:.45rem; }
 .product-card .price-row .actions { display:flex; gap:.35rem; }
 .product-card h3 { font-size:.9rem; font-weight:700; line-height:1.25; margin:.55rem 0 .25rem; min-height:2.4em; }
-@media (max-width:560px){ .grid, #category-grid { --col-min:170px; gap:.85rem; } .product-card h3 { font-size:.8rem; } }
+
+/* Color dots for products with multiple color options */
+.color-dots {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin: 8px 0 6px;
+  min-height: 28px;
+  align-items: flex-start;
+  max-width: 120px; /* Ensures wrapping for clean two-row layout */
+  justify-content: flex-start;
+}
+
+.color-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 1px solid rgba(0,0,0,0.15);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.color-dot:hover {
+  transform: scale(1.15);
+  border-color: rgba(0,0,0,0.3);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+}
+
+.color-dot.active {
+  transform: scale(1.2);
+  border-color: var(--brand);
+  border-width: 2px;
+  box-shadow: 0 0 0 1px rgba(36,23,115,0.2);
+}
+
+/* Color mappings */
+.color-dot.black { background-color: #000000; }
+.color-dot.white { background-color: #ffffff; border-color: rgba(0,0,0,0.3); }
+.color-dot.red { background-color: #dc2626; }
+.color-dot.blue { background-color: #2563eb; }
+.color-dot.navy { background-color: #1e40af; }
+.color-dot.green { background-color: #16a34a; }
+.color-dot.darkgreen { background-color: #15803d; }
+.color-dot.yellow { background-color: #eab308; }
+.color-dot.orange { background-color: #ea580c; }
+.color-dot.purple { background-color: #9333ea; }
+.color-dot.maroon { background-color: #991b1b; }
+.color-dot.royal { background-color: #3b82f6; }
+.color-dot.columbiablue { background-color: #60a5fa; }
+
+@media (max-width:560px){ 
+  .grid, #category-grid { --col-min:170px; gap:.85rem; } 
+  .product-card h3 { font-size:.8rem; } 
+  .color-dot { width: 10px; height: 10px; }
+  .color-dots { 
+    gap: 3px; 
+    margin: 6px 0 4px; 
+    min-height: 24px; 
+    max-width: 100px; /* Smaller max-width on mobile for better wrapping */
+  }
+}
 .pagination-btn.is-active,
 .pagination-btn[aria-current="page"] { background: var(--brand); color:#fff; box-shadow:0 0 0 2px rgba(255,255,255,.15),0 0 0 4px rgba(36,23,115,.35); }
 .pagination-btn:focus-visible { outline:none; box-shadow:0 0 0 3px rgba(36,23,115,.45); }

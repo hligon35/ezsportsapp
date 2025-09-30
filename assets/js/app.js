@@ -86,9 +86,13 @@ function sanitizeDescription(raw) {
 async function fetchProducts() {
   try {
     // Attempt multiple API bases so that when developing with Live Server (port 5500)
-    // and the backend on 4242 we still succeed. First try relative (same origin),
-    // then localhost variants. Stop at first success with >0 products.
-    const bases = [ '', 'http://127.0.0.1:4242', 'http://localhost:4242' ];
+    // and the backend on different ports we still succeed. Try common server ports first.
+    const bases = [ 
+      'http://127.0.0.1:4244', 'http://localhost:4244',
+      'http://127.0.0.1:4243', 'http://localhost:4243', 
+      'http://127.0.0.1:4242', 'http://localhost:4242',
+      '' // same origin as fallback
+    ];
     let data = [];
     let lastErr = null;
     for (const base of bases) {
@@ -254,6 +258,53 @@ async function fetchProducts() {
       try { window.dispatchEvent(new CustomEvent('products:loaded', { detail: { count: PRODUCTS.length, addedGloves: added } })); } catch {}
     }
   } catch(e) { /* silent */ }
+})();
+
+// Fallback: If no products loaded from API, try loading from local prodList.json
+(async function fallbackToProdList(){
+  try {
+    await new Promise(r=>setTimeout(r,500)); // Wait for API and other merges
+    if (PRODUCTS.length > 0) return; // Already have products, no need for fallback
+    
+    console.log('API not available, loading from local prodList.json');
+    const res = await fetch('assets/prodList.json', { cache: 'no-cache' });
+    if (!res.ok) return;
+    const prodList = await res.json();
+    
+    if (!prodList.categories) return;
+    
+    const fallbackProducts = [];
+    Object.keys(prodList.categories).forEach(categoryName => {
+      const products = prodList.categories[categoryName];
+      products.forEach(product => {
+        // Convert prodList format to app format
+        fallbackProducts.push({
+          id: product.sku,
+          title: product.name || product.sku,
+          price: product.details?.price || (product.variations?.[0]?.map) || 299,
+          category: 'netting',
+          img: product.img || 'assets/EZSportslogo.png',
+          images: product.images || (product.img ? [product.img] : []),
+          description: sanitizeDescription(product.details?.description || ''),
+          features: product.details?.features || [],
+          variations: product.variations,
+          stock: 10
+        });
+      });
+    });
+    
+    if (fallbackProducts.length > 0) {
+      PRODUCTS = fallbackProducts;
+      console.log(`Loaded ${fallbackProducts.length} products from fallback prodList.json`);
+      try { 
+        window.dispatchEvent(new CustomEvent('products:loaded', { 
+          detail: { count: PRODUCTS.length, source: 'fallback' } 
+        })); 
+      } catch {}
+    }
+  } catch(e) { 
+    console.warn('Fallback prodList.json also failed:', e);
+  }
 })();
 
 // Lightweight analytics dispatcher (fallback logs) – can later POST to /api/analytics/event
@@ -1375,17 +1426,64 @@ const Store = {
       const displayPrice = isFinite(price) && price > 0 ? currency.format(price) : '';
       const href = `product.html?pid=${encodeURIComponent(id)}`;
 
+      // Extract color variations for this product
+      const colors = this.extractProductColors(prod);
+      const colorDotsHtml = colors.length > 0 ? `
+        <div class="color-dots" data-product-id="${id}">
+          ${colors.map((color, index) => `
+            <div class="color-dot ${color.class} ${index === 0 ? 'active' : ''}" 
+                 data-color="${color.name}" 
+                 data-image="${color.image}"
+                 title="${color.name.charAt(0).toUpperCase() + color.name.slice(1)}"
+                 role="button" 
+                 tabindex="0"
+                 aria-label="Select ${color.name} color"></div>
+          `).join('')}
+        </div>
+      ` : '';
+
       const article = document.createElement('article');
       article.className = 'card';
       article.innerHTML = `
-        <a class="media" href="${href}"><img src="${img}" alt="${title}" loading="lazy" /></a>
+        <a class="media" href="${href}"><img src="${img}" alt="${title}" loading="lazy" class="product-main-image" /></a>
         <div class="body">
           <h3 class="h3-tight"><a href="${href}">${title}</a></h3>
+          ${colorDotsHtml}
           <div class="price-row">
             ${displayPrice ? `<span class="price">${displayPrice}</span>` : ''}
             <button class="btn btn-ghost js-add" data-id="${id}" data-title="${title.replace(/"/g,'&quot;')}" data-price="${price}" data-category="${prod.category || ''}" data-img="${img}">Add</button>
           </div>
         </div>`;
+      
+      // Bind color dot interactions for this card
+      const colorDots = article.querySelectorAll('.color-dot');
+      colorDots.forEach(dot => {
+        dot.addEventListener('click', (ev) => {
+          const colorDot = ev.target;
+          const colorDotsContainer = colorDot.closest('.color-dots');
+          const card = colorDot.closest('article');
+          const productImage = card.querySelector('.product-main-image');
+          const newImageSrc = colorDot.dataset.image;
+          
+          // Update active state
+          colorDotsContainer.querySelectorAll('.color-dot').forEach(d => d.classList.remove('active'));
+          colorDot.classList.add('active');
+          
+          // Update product image
+          if (productImage && newImageSrc) {
+            productImage.src = newImageSrc;
+          }
+        });
+
+        // Keyboard support
+        dot.addEventListener('keydown', (ev) => {
+          if (ev.key === 'Enter' || ev.key === ' ') {
+            ev.preventDefault();
+            ev.target.click();
+          }
+        });
+      });
+      
       return article;
     } catch {
       return null;
@@ -1525,6 +1623,55 @@ const Store = {
     if (cat) cat.scrollIntoView({ behavior: 'smooth', block: 'start' });
   },
 
+  // Extract color variants from product images array
+  extractProductColors(product) {
+    if (!product.images || !Array.isArray(product.images) || product.images.length <= 2) {
+      return []; // No color variations if 2 or fewer images
+    }
+
+    const colorMap = {
+      'black': 'black',
+      'white': 'white', 
+      'red': 'red',
+      'blue': 'blue',
+      'navy': 'navy',
+      'green': 'green',
+      'darkgreen': 'darkgreen',
+      'yellow': 'yellow',
+      'orange': 'orange',
+      'purple': 'purple',
+      'maroon': 'maroon',
+      'royal': 'royal',
+      'columbiablue': 'columbiablue'
+    };
+
+    const colors = new Set();
+    const colorImages = {};
+
+    product.images.forEach(imagePath => {
+      const filename = imagePath.split('/').pop().toLowerCase();
+      
+      // Skip zoom versions (with _a suffix or (1) suffix) for primary color extraction
+      if (filename.includes('_a.') || filename.includes('(1).')) return;
+      
+      // Extract color from filename
+      Object.keys(colorMap).forEach(colorKey => {
+        if (filename.includes(colorKey)) {
+          colors.add(colorKey);
+          if (!colorImages[colorKey]) {
+            colorImages[colorKey] = imagePath;
+          }
+        }
+      });
+    });
+
+    return Array.from(colors).map(color => ({
+      name: color,
+      class: colorMap[color],
+      image: colorImages[color]
+    }));
+  },
+
   renderProducts(query = '') {
     if (!this.ui.grid) return;
     // Determine source list: homepage uses FEATURED (if non-empty), other pages full PRODUCTS
@@ -1541,30 +1688,53 @@ const Store = {
     const html = list.map(p => {
       const desc = p.description ? p.description.slice(0, 140) + (p.description.length > 140 ? '…' : '') : '';
       const featPreview = (p.features && p.features.length) ? p.features.slice(0,3).map(f=>`<li>${f}</li>`).join('') : '';
+      
+      // Extract color variations for this product
+      const colors = this.extractProductColors(p);
+      const colorDotsHtml = colors.length > 0 ? `
+        <div class="color-dots" data-product-id="${p.id}">
+          ${colors.map((color, index) => `
+            <div class="color-dot ${color.class} ${index === 0 ? 'active' : ''}" 
+                 data-color="${color.name}" 
+                 data-image="${color.image}"
+                 title="${color.name.charAt(0).toUpperCase() + color.name.slice(1)}"
+                 role="button" 
+                 tabindex="0"
+                 aria-label="Select ${color.name} color"></div>
+          `).join('')}
+        </div>
+      ` : '';
+      
+      // Calculate price display (range if variations exist)
+      let priceDisplay;
+      if (p.variations && p.variations.length > 1) {
+        const prices = p.variations.map(v => v.map || v.price || 0).filter(price => price > 0);
+        if (prices.length > 1) {
+          const minPrice = Math.min(...prices);
+          const maxPrice = Math.max(...prices);
+          priceDisplay = minPrice === maxPrice ? 
+            currency.format(minPrice) : 
+            `${currency.format(minPrice)} - ${currency.format(maxPrice)}`;
+        } else {
+          priceDisplay = currency.format(prices[0] || p.price || 0);
+        }
+      } else {
+        priceDisplay = currency.format(p.price || 0);
+      }
+      
       return `
       <article class="card ${p.category === 'netting' ? '' : ''}" data-product-id="${p.id}" ${p.stripe?.defaultPriceId ? `data-stripe-price="${p.stripe.defaultPriceId}"` : ''}>
         <div class="media no-link">
-          <img src="${p.img}" alt="${p.title}" loading="lazy" draggable="false" style="pointer-events:none;" onerror="this.onerror=null;this.src='https://placehold.co/600x400?text=Image+Unavailable';"/>
+          <img src="${p.img}" alt="${p.title}" loading="lazy" draggable="false" style="pointer-events:none;" onerror="this.onerror=null;this.src='https://placehold.co/600x400?text=Image+Unavailable';" class="product-main-image"/>
         </div>
         <div class="body">
           <h3 class="h3-tight">${p.title}</h3>
           ${desc ? `<p class=\"desc text-sm\">${desc}</p>` : ''}
           ${featPreview ? `<ul class=\"text-xs features-preview\">${featPreview}</ul>` : ''}
+          ${colorDotsHtml}
           ${p.stock !== undefined ? `<p class=\"text-xs text-muted my-025\">Stock: ${p.stock}</p>` : ''}
-          <div class="variant-row">
-            <label class="text-sm text-muted">Size
-              <select class="sel-size ml-025">
-                ${['XS','S','M','L','XL'].map(s => `<option value="${s}">${s}</option>`).join('')}
-              </select>
-            </label>
-            <label class="text-sm text-muted ml-05">Color
-              <select class="sel-color ml-025">
-                ${['Black','White','Red','Blue','Green'].map(c => `<option value="${c}">${c}</option>`).join('')}
-              </select>
-            </label>
-          </div>
           <div class="price-row">
-            <span class="price">${currency.format(p.price)}</span>
+            <span class="price">${priceDisplay}</span>
             <div class="actions">
               <button class="btn btn-ghost" data-add="${p.id}" ${p.stock === 0 ? 'disabled' : ''}>${p.stock === 0 ? 'Out of Stock' : 'Add'}</button>
               <button class="btn btn-ghost" data-detail="${p.id}" aria-label="View details for ${p.title}">Details</button>
@@ -1619,9 +1789,12 @@ const Store = {
       const id = btn.dataset.add;
       const product = PRODUCTS.find(p => p.id === id);
       const card = ev.target.closest('article');
-      const sizeSel = card.querySelector('.sel-size');
-      const colorSel = card.querySelector('.sel-color');
-      const opts = { size: sizeSel ? sizeSel.value : undefined, color: colorSel ? colorSel.value : undefined };
+      
+      // Get selected color from active color dot
+      const activeColorDot = card.querySelector('.color-dot.active');
+      const selectedColor = activeColorDot ? activeColorDot.dataset.color : undefined;
+      
+      const opts = { color: selectedColor };
       this.add(product, opts);
       try { window.trackEvent && window.trackEvent('add_to_cart', { id: product.id, price: product.price, stripePrice: product.stripe?.defaultPriceId }); } catch {}
     }));
@@ -1633,6 +1806,34 @@ const Store = {
       if (!product) return;
       this.openProductDetail(product);
     }));
+
+    // Bind color dot interactions
+    this.ui.grid.querySelectorAll('.color-dot').forEach(dot => {
+      dot.addEventListener('click', (ev) => {
+        const colorDot = ev.target;
+        const colorDotsContainer = colorDot.closest('.color-dots');
+        const card = colorDot.closest('article');
+        const productImage = card.querySelector('.product-main-image');
+        const newImageSrc = colorDot.dataset.image;
+        
+        // Update active state
+        colorDotsContainer.querySelectorAll('.color-dot').forEach(d => d.classList.remove('active'));
+        colorDot.classList.add('active');
+        
+        // Update product image
+        if (productImage && newImageSrc) {
+          productImage.src = newImageSrc;
+        }
+      });
+
+      // Keyboard support
+      dot.addEventListener('keydown', (ev) => {
+        if (ev.key === 'Enter' || ev.key === ' ') {
+          ev.preventDefault();
+          ev.target.click();
+        }
+      });
+    });
 
     // Record lightweight view_item events (on initial render for visible items only)
     try {
