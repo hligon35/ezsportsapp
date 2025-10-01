@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Gear | EZ Sports Netting</title>
-  <meta name="description" content="Shop baseball gear at EZ Sports Netting." />
+  <title>Facility & Field | EZ Sports Netting</title>
+  <meta name="description" content="Shop Facility & Field products at EZ Sports Netting." />
   <link rel="icon" type="image/png" href="assets/EZSportslogo.png" />
   <link rel="icon" type="image/png" href="assets/img/favicon-32.png" sizes="32x32" />
   <link rel="stylesheet" href="assets/css/styles.css" />
@@ -23,7 +23,6 @@
         <button type="submit" class="btn btn-primary">Search</button>
       </form>
       <nav id="primary-nav" class="quick-links nav-centered" aria-label="Primary">
-        <a href="deals.html">Deals</a>
         <a href="about.html">About</a>
         <a href="netting-calculator.html">Netting Calculator</a>
         <button class="cart-btn" aria-haspopup="dialog" aria-controls="mini-cart" onclick="Store.toggleCart()">
@@ -33,10 +32,11 @@
       </nav>
     </div>
   </header>
-  <main id="main" class="container">
-    <h1>Accessories</h1>
-    <p class="muted">Browse accessories and training add-ons.</p>
-    <section id="page-product-grid" class="grid grid-3 product-grid"></section>
+  <main id="main" class="container" data-category="facility-field">
+    <h1>Facility & Field</h1>
+    <p class="muted">Unified live catalog (equipment, coaching tools, mounds & training) loads below.</p>
+    <div id="category-grid" data-grid class="grid"></div>
+    <div id="category-pagination" data-pagination class="pagination-controls mt-4"></div>
   </main>
   <footer class="site-footer">
     <div class="container footer-grid">
@@ -68,7 +68,7 @@
         <ul>
           <li><a href="about.html">About</a></li>
           <li><a href="careers.html">Careers</a></li>
-          <li><a href="support.html">Support</a></li>
+          <li><a href="contactus.html">Contact Us</a></li>
         </ul>
       </nav>
       <form class="subscribe" onsubmit="event.preventDefault(); alert('Thanks for subscribing!')">
@@ -107,7 +107,7 @@
   </dialog>
 
   <script type="module" src="assets/js/analytics.js"></script>
-  <script type="module" src="assets/js/product-loader.js"></script>
   <script type="module" src="assets/js/app.js"></script>
+  <script src="assets/js/category-page.js"></script>
 </body>
 </html>

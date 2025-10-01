@@ -79,13 +79,60 @@
       if (cand) primary = cand;
     }
     const gallery = [];
-    if (p.images && Array.isArray(p.images.all)) gallery.push(...p.images.all.filter(isUsableSrc));
+  // Collect gallery candidates from various shapes:
+  // 1) images.all (object shape)
+  if (p.images && Array.isArray(p.images.all)) gallery.push(...p.images.all.filter(isUsableSrc));
+  // 2) images (plain array shape)
+  if (Array.isArray(p.images)) gallery.push(...p.images.filter(isUsableSrc));
     if (p.details && p.details.images && Array.isArray(p.details.images.all)) gallery.push(...p.details.images.all.filter(isUsableSrc));
     if (Array.isArray(dl)) gallery.push(...dl.filter(isUsableSrc));
     if (primary && !gallery.length) gallery.push(primary);
     const features = Array.isArray(p.features) ? p.features : (p.details && Array.isArray(p.details.features) ? p.details.features : []);
     const description = p.description || (p.details && p.details.description) || '';
-    return { id, title, price, primary, gallery: Array.from(new Set(gallery)).slice(0,8), features, description };
+  const unique = Array.from(new Set(gallery)).slice(0,20);
+
+    // Build a mapping of thumb -> large image using filename heuristics.
+    // Patterns handled:
+    //  - base + color + optional letter (e.g., bulletjrbb1a.avif) -> try removing trailing letter 'a'
+    //  - files containing '(1)' treated as large hero already
+    //  - if file ends with '1a' and a sibling without the 'a' exists, pair them
+    //  - if a colored variant (e.g., _black_a) exists along with _black (hero), associate
+    const byName = new Set(unique.map(u=>u.split('/').pop()));
+    function deriveLarge(src){
+      const parts = src.split('/');
+      const file = parts.pop();
+      if (!/\.avif$/i.test(file)) return src; // only transform avif heuristics
+      // Already a hero candidate if contains '(1)'
+      if (/\(1\)\.avif$/i.test(file)) return parts.concat(file).join('/');
+      // bulletjrbb1a.avif -> bulletjrbb1.avif -> bulletjrbb.avif preference
+      let base = file;
+      if (/1a\.avif$/i.test(base)) {
+        const withoutA = base.replace(/1a\.avif$/i,'1.avif');
+        if (byName.has(withoutA)) base = withoutA;
+      }
+      // If ends with '1.avif' and variant without digit exists, use that as large
+      if (/1\.avif$/i.test(base)) {
+        const noDigit = base.replace(/1\.avif$/i,'.avif');
+        if (byName.has(noDigit)) base = noDigit;
+      }
+      // *_black_a.avif -> *_black.avif
+      if (/_([a-z]+)_a\.avif$/i.test(base)) {
+        const cand = base.replace(/_([a-z]+)_a\.avif$/i,'_$1.avif');
+        if (byName.has(cand)) base = cand;
+      }
+      return parts.concat(base).join('/');
+    }
+
+    // Build structured gallery entries
+    const galleryPairs = unique.map(src => ({ thumb: src, large: deriveLarge(src) }));
+    // Ensure primary is one of the LARGE versions; if not, pick first large
+    const largeSet = new Set(galleryPairs.map(g=>g.large));
+    if (!primary || !largeSet.has(primary)) {
+      // Prefer a hero containing (1) or lacking color suffix
+      const hero = galleryPairs.find(g=>/\(1\)\.avif$/i.test(g.large)) || galleryPairs[0];
+      primary = hero ? hero.large : (primary || galleryPairs[0]?.large);
+    }
+    return { id, title, price, primary, galleryPairs, features, description };
   }
 
   function render(prod){
@@ -96,7 +143,7 @@
       return;
     }
     const priceHtml = prod.price > 0 ? `<div class="price h3">$${prod.price.toFixed(2)}</div>` : '';
-    const thumbs = prod.gallery.map((src,i)=>`<button class="thumb" data-index="${i}" aria-label="Show image ${i+1}"><img src="${src}" alt="${prod.title} image ${i+1}" loading="lazy"/></button>`).join('');
+  const thumbs = prod.galleryPairs.map((g,i)=>`<button class="thumb" data-index="${i}" aria-label="Show image ${i+1}" data-large="${g.large}"><img src="${g.thumb}" alt="${prod.title} image ${i+1}" loading="lazy"/></button>`).join('');
     const features = Array.isArray(prod.features) && prod.features.length ? `<ul class="features">${prod.features.map(f=>`<li>${f}</li>`).join('')}</ul>` : '';
     el.innerHTML = `
       <div class="pd-grid">
@@ -122,8 +169,12 @@
     document.querySelectorAll('.pd-thumbs .thumb').forEach(btn=>{
       btn.addEventListener('click',()=>{
         const i = Number(btn.dataset.index);
-        if (Number.isFinite(i) && prod.gallery[i]) {
-          main.src = prod.gallery[i];
+        if (!Number.isFinite(i)) return;
+        const pair = prod.galleryPairs[i];
+        if (pair && pair.large) {
+          main.src = pair.large;
+          // Visual active state
+          document.querySelectorAll('.pd-thumbs .thumb').forEach(b=>b.classList.toggle('is-active', b===btn));
         }
       });
     });

@@ -3,57 +3,45 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Shop Categories — EZ Sports Netting</title>
-  <meta name="description" content="Browse all categories and products: apparel, bats, gloves, netting, helmets, and more." />
-  <link rel="icon" type="image/png" href="assets/img/favicon-32.png" />
+  <title>Bats | EZ Sports Netting</title>
+  <meta name="description" content="Shop baseball bats at EZ Sports Netting." />
+  <link rel="icon" type="image/png" href="assets/EZSportslogo.png" />
+  <link rel="icon" type="image/png" href="assets/img/favicon-32.png" sizes="32x32" />
   <link rel="stylesheet" href="assets/css/styles.css?v=6" />
 </head>
 <body>
   <a class="skip" href="#main">Skip to content</a>
-
   <header class="site-header">
     <div class="container header-bar">
       <button class="menu-toggle" aria-label="Toggle menu" aria-expanded="false" aria-controls="primary-nav">☰</button>
       <a class="brand" href="index.html">
-  <img src="assets/EZSportslogo.png" alt="EZ Sports Netting logo" height="40" />
+  <img src="assets/EZSportslogo.png" alt="EZ Sports Netting logo" height="40"/>
         <span>EZ Sports Netting</span>
       </a>
-      <form class="search" role="search" aria-label="Search store">
-        <input type="search" name="q" placeholder="Search…" aria-label="Search" />
+      <form class="search" role="search" aria-label="Search store" onsubmit="event.preventDefault(); window.Store.search(this.q.value)">
+  <input type="search" name="q" placeholder="Search…" aria-label="Search"/>
         <button type="submit" class="btn btn-primary">Search</button>
       </form>
-      <nav id="primary-nav" class="quick-links nav-centered" aria-label="Primary"></nav>
+      <nav id="primary-nav" class="quick-links nav-centered" aria-label="Primary">
+        <a href="about.html">About</a>
+        <a href="netting-calculator.html">Netting Calculator</a>
+        <button class="cart-btn" aria-haspopup="dialog" aria-controls="mini-cart" onclick="Store.toggleCart()">
+          <span class="icon">🛒</span>
+          <span class="cart-count" id="cart-count">0</span>
+        </button>
+      </nav>
     </div>
   </header>
-
-  <main id="main" class="container wrap">
-    <h1 class="section-title mt-4">Shop All Categories</h1>
-
-    <div class="shop-layout">
-      <aside class="shop-sidebar" aria-label="Categories">
-        <div class="card-sm">
-          <h3>Categories</h3>
-          <ul id="cat-list" class="cat-list"></ul>
-        </div>
-      </aside>
-
-      <section class="shop-content">
-        <div class="catalog-bar">
-          <div class="filters" id="cat-chips"></div>
-          <div class="shop-tools">
-            <input id="shop-search" class="input" type="search" placeholder="Search…" aria-label="Search products" />
-          </div>
-        </div>
-        <div id="shop-grid" class="grid"></div>
-      </section>
-    </div>
+  <main id="main" class="container" data-category="bats">
+    <h1>Bats</h1>
+    <div id="category-grid" data-grid class="grid"></div>
+    <div id="category-pagination" data-pagination class="mt-4 pagination-controls"></div>
   </main>
-
   <footer class="site-footer">
     <div class="container footer-grid">
       <div class="footer-brand-block">
         <a class="brand brand--light" href="index.html">
-          <img src="assets/EZSportslogo.png" alt="EZ Sports Netting logo" height="36" />
+          <img src="assets/EZSportslogo.png" alt="EZ Sports Netting logo" height="36"/>
           <span>EZ Sports Netting</span>
         </a>
         <p class="muted">Better baseball through better gear.</p>
@@ -68,10 +56,10 @@
       <nav aria-label="Footer">
         <h4>Shop</h4>
         <ul>
-          <li><a href="bats.html">Bats</a></li>
-          <li><a href="gloves.html">Gloves</a></li>
-          <li><a href="ez-nets.html">Netting</a></li>
-          <li><a href="apparel.html">Apparel</a></li>
+          <li><a href="index.html#catalog" onclick="Store.filter('bats')">Bats</a></li>
+          <li><a href="index.html#catalog" onclick="Store.filter('gloves')">Gloves</a></li>
+          <li><a href="index.html#catalog" onclick="Store.filter('netting')">Netting</a></li>
+          <li><a href="index.html#catalog" onclick="Store.filter('helmets')">Helmets</a></li>
         </ul>
       </nav>
       <nav>
@@ -91,10 +79,11 @@
       </form>
     </div>
     <div class="subfooter container">
-      <p>© <span id="year"></span> EZ Sports Netting. All rights reserved.</p>
+  <p>© <span id="year"></span> EZ Sports Netting. All rights reserved.</p>
     </div>
   </footer>
 
+  <!-- Mini cart -->
   <dialog id="mini-cart" class="mini-cart" aria-labelledby="cart-title">
     <form method="dialog" class="mini-cart__backdrop" onclick="this.closest('dialog').close()"></form>
     <section class="mini-cart__panel" role="document">
@@ -108,8 +97,8 @@
           <span>Subtotal</span>
           <strong id="cart-subtotal">$0.00</strong>
         </div>
-        <div class="stack-05">
-          <button type="button" class="btn btn-primary btn-block" onclick="Store.checkout()">Secure Checkout</button>
+  <div class="btn-col">
+          <button class="btn btn-primary btn-block" onclick="Store.checkout()">Secure Checkout</button>
           <a class="btn btn-ghost btn-block" href="index.html#catalog">Continue Shopping</a>
         </div>
       </footer>
@@ -118,8 +107,6 @@
 
   <script type="module" src="assets/js/analytics.js"></script>
   <script type="module" src="assets/js/app.js"></script>
-  <script src="assets/js/product-loader.js"></script>
-  <script type="module" src="assets/js/shop.js"></script>
-  <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+  <script src="assets/js/category-page.js"></script>
 </body>
 </html>

@@ -3,25 +3,18 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Baseball Gear Deals & Closeouts | EZ Sports Netting</title>
-  <meta name="description" content="Save on closeout baseball bats, gloves, netting and protective gear. Limited time deals updated frequently." />
-  <meta name="robots" content="index,follow" />
-  <link rel="canonical" href="https://ezsportsnetting.com/deals.html" />
+  <title>Gear | EZ Sports Netting</title>
+  <meta name="description" content="Shop baseball gear at EZ Sports Netting." />
   <link rel="icon" type="image/png" href="assets/EZSportslogo.png" />
   <link rel="icon" type="image/png" href="assets/img/favicon-32.png" sizes="32x32" />
   <link rel="stylesheet" href="assets/css/styles.css" />
-  <meta property="og:title" content="Baseball Gear Deals" />
-  <meta property="og:description" content="Closeout bats, gloves, netting & more." />
-  <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://ezsportsnetting.com/deals.html" />
-  <meta property="og:image" content="https://images.unsplash.com/photo-1521417531039-89f040b8d69e?q=80&w=1200&auto=format&fit=crop" />
 </head>
 <body>
   <a class="skip" href="#main">Skip to content</a>
   <header class="site-header">
     <div class="container header-bar">
       <button class="menu-toggle" aria-label="Toggle menu" aria-expanded="false" aria-controls="primary-nav">☰</button>
-  <a class="brand" href="index.html">
+      <a class="brand" href="index.html">
   <img src="assets/EZSportslogo.png" alt="EZ Sports Netting logo" height="40"/>
         <span>EZ Sports Netting</span>
       </a>
@@ -29,42 +22,20 @@
   <input type="search" name="q" placeholder="Search…" aria-label="Search"/>
         <button type="submit" class="btn btn-primary">Search</button>
       </form>
-  <nav id="primary-nav" class="quick-links nav-centered" aria-label="Primary">
-    <a href="deals.html" aria-current="page" class="is-active">Deals</a>
-    <a href="about.html">About</a>
-    <a href="netting-calculator.html">Netting Calculator</a>
-    <button class="cart-btn" aria-haspopup="dialog" aria-controls="mini-cart" onclick="Store.toggleCart()">
-      <span class="icon">🛒</span>
-      <span class="cart-count" id="cart-count">0</span>
-    </button>
-  </nav>
+      <nav id="primary-nav" class="quick-links nav-centered" aria-label="Primary">
+        <a href="about.html">About</a>
+        <a href="netting-calculator.html">Netting Calculator</a>
+        <button class="cart-btn" aria-haspopup="dialog" aria-controls="mini-cart" onclick="Store.toggleCart()">
+          <span class="icon">🛒</span>
+          <span class="cart-count" id="cart-count">0</span>
+        </button>
+      </nav>
     </div>
   </header>
-  <main id="main">
-    <section id="deals" class="banner-row container">
-      <article class="banner red">
-  <img src="./assets/img/bats2.jpg" alt="Closeout bats" loading="lazy" width="1600" height="900"/>
-        <div class="content">
-          <h3>CLOSEOUT BATS</h3>
-          <a class="btn btn-invert" href="index.html#catalog" onclick="Store.filter('bats')">Shop now</a>
-        </div>
-      </article>
-      <article class="banner blue">
-        <img src="./assets/img/gloves2.jpg" alt="Closeout gloves" loading="lazy" width="1600" height="900"/>
-        <div class="content">
-          <h3>CLOSEOUT GLOVES</h3>
-          <a class="btn btn-invert" href="index.html#catalog" onclick="Store.filter('gloves')">Shop now</a>
-        </div>
-      </article>
-    </section>
-
-    <!-- Placeholder Deals Grid (dynamic) -->
-    <section class="container">
-      <div class="catalog-bar">
-        <h2 class="section-title">Hot Deals</h2>
-      </div>
-      <div id="deals-grid" class="grid"></div>
-    </section>
+  <main id="main" class="container">
+    <h1>Accessories</h1>
+    <p class="muted">Browse accessories and training add-ons.</p>
+    <section id="page-product-grid" class="grid grid-3 product-grid"></section>
   </main>
   <footer class="site-footer">
     <div class="container footer-grid">
@@ -96,7 +67,7 @@
         <ul>
           <li><a href="about.html">About</a></li>
           <li><a href="careers.html">Careers</a></li>
-          <li><a href="contactus.html">Contact Us</a></li>
+          <li><a href="support.html">Support</a></li>
         </ul>
       </nav>
       <form class="subscribe" onsubmit="event.preventDefault(); alert('Thanks for subscribing!')">
@@ -111,6 +82,8 @@
   <p>© <span id="year"></span> EZ Sports Netting. All rights reserved.</p>
     </div>
   </footer>
+
+  <!-- Mini cart -->
   <dialog id="mini-cart" class="mini-cart" aria-labelledby="cart-title">
     <form method="dialog" class="mini-cart__backdrop" onclick="this.closest('dialog').close()"></form>
     <section class="mini-cart__panel" role="document">
@@ -131,8 +104,9 @@
       </footer>
     </section>
   </dialog>
+
   <script type="module" src="assets/js/analytics.js"></script>
+  <script type="module" src="assets/js/product-loader.js"></script>
   <script type="module" src="assets/js/app.js"></script>
-  <script type="module" src="assets/js/deals.js"></script>
 </body>
 </html>

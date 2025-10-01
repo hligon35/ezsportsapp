@@ -1046,7 +1046,6 @@ const Store = {
     const base = (location.pathname.split('/').pop() || 'index.html').toLowerCase();
   const TITLES = {
       'index.html': 'Home',
-      'deals.html': 'Deals',
       'about.html': 'About',
   'careers.html': 'Careers',
       'careers.html': 'Careers',
@@ -1290,8 +1289,8 @@ const Store = {
           // Use precise L-Screens bucket for both baseball-l-screens and l-screens hub
           'baseball-l-screens': ['Better Baseball L-Screens'],
           'l-screens': ['Better Baseball L-Screens'],
-          // Protective screens currently share the same inventory bucket as L-Screens
-          'protective-screens': ['Better Baseball L-Screens'],
+          // We'll derive protective screens via name pattern (below) for tighter relevance
+          'protective-screens': ['Better Baseball L-Screens'], // initial fallback; will refine
           'pitchers-pocket': ["Better Baseball Pitcher's Pocket"],
           'replacement-screens': ['Replacement Nets']
         };
@@ -1299,9 +1298,47 @@ const Store = {
         for (const c of cats) {
           if (Array.isArray(data.categories[c])) items = items.concat(data.categories[c]);
         }
+        // Custom refinement for protective-screens page: only show Bullet Protective Screens (7x7, 8x8, 10x10 etc.)
+        if (pageKey === 'protective-screens') {
+          const protective = [];
+          const seen = new Set();
+          const pushIf = (p) => {
+            if (!p || typeof p !== 'object') return;
+            const name = String(p.name || p.title || '').toLowerCase();
+            // Must contain 'protective screen'
+            if (!/protective\s+screen/.test(name)) return;
+            // Exclude pad kits, replacement nets, combo L screens, wheel kits, and explicit replacement language
+            if (/pad kit|replacement|combo|wheel kit/.test(name)) return;
+            // Accept primary frame products only
+            const sku = String(p.sku || p.id || name);
+            if (seen.has(sku)) return;
+            seen.add(sku);
+            protective.push(p);
+          };
+          // Scan all categories to be resilient if source category changes
+            if (data.categories && typeof data.categories === 'object') {
+              for (const key of Object.keys(data.categories)) {
+                const arr = data.categories[key];
+                if (Array.isArray(arr)) arr.forEach(pushIf);
+              }
+            }
+          // If we found a meaningful subset, replace items
+          if (protective.length) {
+            // Sort by extracted size (e.g., 7x7, 8x8, 10x10) ascending
+            const sizeRank = (p) => {
+              const text = (p.name || p.title || '').toLowerCase();
+              const m = text.match(/(\d{1,2})x(\d{1,2})/);
+              if (m) return parseInt(m[1],10) * 100 + parseInt(m[2],10); // basic weight
+              return 9999; // push unknown sizes to end
+            };
+            protective.sort((a,b)=> sizeRank(a) - sizeRank(b));
+            items = protective;
+          }
+        }
         // Page-specific trimming logic: For baseball-l-screens & protective-screens pages
         // only show products up to and including the core 10x10 screen (exclude pad kits, replacement nets, etc.)
-        if ((pageKey === 'baseball-l-screens' || pageKey === 'protective-screens') && items.length) {
+        // NOTE: This trimming previously applied to protective-screens but was producing unintended cuts.
+        if ((pageKey === 'baseball-l-screens') && items.length) {
           // Identify the first item whose sku or name references a 10x10 core screen.
           // Accept patterns: '10x10' and not containing 'replacement' or 'pad kit'
           const idx = items.findIndex(p => {
@@ -1411,6 +1448,60 @@ const Store = {
     if (!img && dl && dl.length) {
       const cand = dl.find(isUsableSrc);
       if (cand) img = cand;
+    }
+    // If we have multiple candidate images under p.images (array) or details, apply a hero selection heuristic.
+    // Hero selection priorities (higher first):
+    //  1. filename contains '1a' (e.g., bulletjrbb1a.avif)
+    //  2. filename ends with '1' before extension or pattern '(1)'
+    //  3. filename contains '_a' or ends with 'a'
+    //  4. fallback to longest filename (often more specific)
+    const collectAll = () => {
+      const out = new Set();
+      const pushArr = (arr) => Array.isArray(arr) && arr.forEach(s => { if (isUsableSrc(s)) out.add(s); });
+      if (p.images) {
+        if (Array.isArray(p.images)) pushArr(p.images);
+        if (Array.isArray(p.images.all)) pushArr(p.images.all);
+        if (p.images.primary && isUsableSrc(p.images.primary)) out.add(p.images.primary);
+      }
+      if (p.details && p.details.images) {
+        const di = p.details.images;
+        if (Array.isArray(di)) pushArr(di);
+        if (Array.isArray(di.all)) pushArr(di.all);
+        if (di.primary && isUsableSrc(di.primary)) out.add(di.primary);
+      }
+      if (Array.isArray(p.downloaded_images)) pushArr(p.downloaded_images);
+      if (p.details && Array.isArray(p.details.downloaded_images)) pushArr(p.details.downloaded_images);
+      return Array.from(out);
+    };
+    if (img) {
+      // We already chose something explicit; still see if a higher-priority hero exists among candidates.
+      const candidates = collectAll();
+      if (candidates.length) {
+        const score = (s) => {
+            const name = s.split('/').pop().toLowerCase();
+            if (/1a\./.test(name)) return 100;
+            if (/\(1\)\./.test(name)) return 90;
+            if (/(?:^|[^\d])1\./.test(name)) return 85; // plain 1 before extension
+            if (/_a\.|a\./.test(name)) return 70;
+            return 10 + name.length; // prefer longer descriptive names
+        };
+        const best = candidates.sort((a,b)=> score(b)-score(a))[0];
+        if (best && best !== img) img = best;
+      }
+    } else {
+      // No explicit single image yet, attempt hero pick from aggregated candidates
+      const candidates = collectAll();
+      if (candidates.length) {
+        const score = (s) => {
+          const name = s.split('/').pop().toLowerCase();
+          if (/1a\./.test(name)) return 100;
+          if (/\(1\)\./.test(name)) return 90;
+          if (/(?:^|[^\d])1\./.test(name)) return 85;
+          if (/_a\.|a\./.test(name)) return 70;
+          return 10 + name.length;
+        };
+        img = candidates.sort((a,b)=> score(b)-score(a))[0];
+      }
     }
     if (!img) img = 'assets/EZSportslogo.png';
     return { id, title, price, img, category: (p.category || '').toString().toLowerCase() };
