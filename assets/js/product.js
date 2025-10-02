@@ -194,6 +194,10 @@
           <h1 class="pd-title">${prod.title}</h1>
           ${priceHtml}
           <div class="stack-05">
+            <label class="text-xs" for="pd-model-select" style="font-weight:700;letter-spacing:.4px;">Model</label>
+            <select id="pd-model-select" class="pd-model-select" style="padding:.7rem .8rem;border:1px solid var(--border);border-radius:.6rem;font-weight:600;">
+              <option value="">Choose an Option...</option>
+            </select>
             <button class="btn btn-primary" id="pd-add">Add to Cart</button>
             <a class="btn" href="javascript:history.back()">Back</a>
           </div>
@@ -217,9 +221,37 @@
         }
       });
     });
+    // Populate model select from gallery (basic heuristic labels)
+    try {
+      const sel = document.getElementById('pd-model-select');
+      if (sel && prod.displayPairs) {
+        const seen = new Set();
+        prod.displayPairs.forEach(pair => {
+          const file = pair.large.split('/').pop();
+          let label = file.replace(/\.avif$/i,'').replace(/[-_]/g,' ').replace(/\(1\)/,'').trim();
+          if (label.length > 48) label = label.slice(0,48)+'…';
+          const key = label.toLowerCase();
+          if (!seen.has(key)) {
+            seen.add(key);
+            const opt = document.createElement('option');
+            opt.value = pair.large;
+            opt.textContent = label.charAt(0).toUpperCase()+label.slice(1);
+            sel.appendChild(opt);
+          }
+        });
+        sel.addEventListener('change', ()=>{
+          if (sel.value) {
+            main.src = sel.value;
+          }
+        });
+      }
+    } catch {}
+
     document.getElementById('pd-add')?.addEventListener('click', ()=>{
       try {
-        window.Store && window.Store.add({ id: prod.id, title: prod.title, price: prod.price, img: prod.primary, category: 'misc' });
+        const sel = document.getElementById('pd-model-select');
+        const chosen = sel && sel.value ? sel.options[sel.selectedIndex].textContent : prod.title;
+        window.Store && window.Store.add({ id: prod.id, title: chosen || prod.title, price: prod.price, img: main.src || prod.primary, category: 'misc' });
       } catch {}
     });
   }

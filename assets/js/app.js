@@ -1097,6 +1097,11 @@ const Store = {
 
     const crumbs = [];
     crumbs.push({ label: 'Home', href: 'index.html' });
+    // Inject L-Screens parent for its subpages
+    const L_SUBPAGES = new Set(['baseball-l-screens.html','protective-screens.html','pitchers-pocket.html','replacement-screens.html']);
+    if (L_SUBPAGES.has(base)) {
+      crumbs.push({ label: 'L-Screens', href: 'l-screens.html' });
+    }
     if (base !== 'index.html') {
       crumbs.push({ label: TITLES[base] || (document.title?.split('—')[0].trim() || 'Current'), href: null });
     }
@@ -1825,9 +1830,15 @@ const Store = {
 
   // Extract color variants from product images array
   extractProductColors(product) {
-    if (!product.images || !Array.isArray(product.images) || product.images.length <= 2) {
-      return []; // No color variations if 2 or fewer images
+    // Accept multiple possible image sources: product.images (API), product.raw.images (catalog), or raw.gallery
+    let sources = [];
+    if (Array.isArray(product.images)) sources = product.images.slice();
+    else if (product.raw) {
+      if (Array.isArray(product.raw.images)) sources = product.raw.images.slice();
+      else if (Array.isArray(product.raw.gallery)) sources = product.raw.gallery.slice();
     }
+    // Nothing to derive
+    if (!sources.length) return [];
 
     const colorMap = {
       'black': 'black',
@@ -1848,7 +1859,7 @@ const Store = {
     const colors = new Set();
     const colorImages = {};
 
-    product.images.forEach(imagePath => {
+    sources.forEach(imagePath => {
       const filename = imagePath.split('/').pop().toLowerCase();
       
       // Skip zoom versions (with _a suffix or (1) suffix) for primary color extraction

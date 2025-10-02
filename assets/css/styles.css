@@ -995,7 +995,7 @@ input, select, textarea, button { width:auto; max-width:100%; }
 }
 
 /* About image height constraint */
-.about-inner img{max-height:520px;object-fit:cover;width:100%}
+.about-inner img{max-height:520px;object-fit:contain;width:100%;background:#fff;padding:.4rem;border-radius:.75rem}
 
 @media (max-width: 800px){
   .about-inner img{max-height:380px}
@@ -1094,7 +1094,8 @@ input, select, textarea, button { width:auto; max-width:100%; }
 .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-top:1rem}
 .card{background:var(--surface);border:1px solid var(--border);border-radius:1rem;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 8px 24px rgba(12,32,64,.06)}
 .card .media{background:#ffffff}
-.card .media img{width:100%;height:auto;aspect-ratio:4/3;object-fit:cover;display:block}
+.card .media{position:relative;display:flex;align-items:center;justify-content:center;height:clamp(150px,18vh,210px);}
+.card .media img{width:100%;height:100%;aspect-ratio:4/3;object-fit:contain;display:block;padding:.4rem;background:#fff;border-radius:.6rem}
 .card .body{padding:.9rem;display:flex;flex-direction:column;flex:1}
 .price-row{display:flex;justify-content:space-between;align-items:center;margin-top:auto;padding-top:.4rem}
 .price-row{gap:.5rem;flex-wrap:wrap}
@@ -1307,7 +1308,7 @@ nav.quick-links li a[href="careers.html"]{
 .turf-grid{display:grid;gap:1.1rem;margin:1.75rem 0 2.5rem;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
 .turf-card{background:#fff;border:1px solid var(--border);border-radius:1rem;padding:1rem;box-shadow:0 4px 18px rgba(12,32,64,.06);display:flex;flex-direction:column;gap:.55rem;position:relative}
 .turf-card h3{margin:.2rem 0 .3rem;font-size:1rem;text-transform:uppercase;letter-spacing:.5px;font-weight:900}
-.turf-media img{display:block;width:100%;height:auto;border-radius:.75rem;box-shadow:0 6px 18px rgba(12,32,64,.15);object-fit:cover}
+.turf-media img{display:block;width:100%;height:auto;border-radius:.75rem;box-shadow:0 6px 18px rgba(12,32,64,.15);object-fit:contain;background:#fff;padding:.4rem}
 .badge-turf{position:absolute;top:.65rem;right:.65rem;background:var(--brand);color:#fff;font-size:.6rem;font-weight:800;padding:.3rem .5rem;border-radius:.45rem;letter-spacing:.5px}
 .inventory-callouts{display:grid;gap:1rem;margin:2.5rem 0 3rem;grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
 .inventory-box{background:#ffffff;border:2px dashed var(--border);border-radius:1rem;padding:1.1rem;display:flex;flex-direction:column;gap:.65rem;align-items:flex-start;box-shadow:0 2px 10px rgba(0,0,0,.04)}
@@ -1542,8 +1543,8 @@ nav.quick-links li a[href="careers.html"]{
 .product-page .product-detail { margin-top: 1rem; }
 .pd-grid { display: grid; grid-template-columns: 1.15fr .85fr; gap: 1rem; align-items: start; }
 .pd-media { min-width: 0; }
-.pd-main { background:#f5f5f7; border:1px solid var(--border); border-radius:.75rem; display:grid; place-items:center; aspect-ratio:4/3; overflow:hidden; }
-.pd-main img { width:100%; height:100%; object-fit:contain; }
+.pd-main { background:#fff; border:1px solid var(--border); border-radius:.85rem; display:flex; align-items:center; justify-content:center; aspect-ratio:4/3; overflow:hidden; padding:.6rem; }
+.pd-main img { width:100%; height:100%; object-fit:contain; max-height:100%; }
 .pd-media { max-width:100%; }
 /* If image natural ratio is taller, prevent vertical clipping by allowing auto height under a max */
 .pd-main img { max-height:100%; }
