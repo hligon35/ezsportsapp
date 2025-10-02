@@ -343,6 +343,8 @@ a:hover, .inline-links a:hover { text-decoration:underline; }
   flex-wrap:wrap !important; 
   gap:.65rem !important; 
   margin:.85rem 0 1.35rem !important; 
+  justify-content:center !important; /* center pills so CTA naturally centers beneath */
+  text-align:center !important;
 }
 .netting-subnav:not(.is-ready) { display:none !important; }
 .netting-subnav a { 
@@ -939,10 +941,10 @@ input, select, textarea, button { width:auto; max-width:100%; }
 .category-tiles .tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem}
 .category-tiles .tiles{justify-items:center}
 .tile{position:relative;border-radius:1.1rem;overflow:hidden;text-decoration:none;color:var(--ink);background:var(--surface);border:1px solid var(--border);padding:.85rem .9rem .95rem;display:flex;flex-direction:column;gap:.5rem}
-.tile .tile-head h3{margin:.1rem 0 0;font-size:clamp(1.05rem,2.6vw,1.45rem);letter-spacing:.6px;text-transform:uppercase;color:var(--ink);text-align:center;line-height:1.05}
+.tile .tile-head h3{margin:.1rem 0 0;font-size:clamp(1rem,2.4vw,1.35rem);letter-spacing:.55px;text-transform:uppercase;color:var(--ink);text-align:center;line-height:1.15;word-break:break-word;overflow-wrap:anywhere}
 .tile .tile-head p{margin:0;color:var(--muted);text-align:center;font-weight:700;letter-spacing:.45px;text-transform:uppercase;font-size:clamp(.55rem,1.7vw,.65rem)}
 .tile .media{position:relative}
-.tile img{aspect-ratio:2/1;/* wider => shorter */object-fit:cover;border-radius:.75rem;box-shadow:0 8px 22px rgba(10,42,74,.10);max-height:clamp(140px,20vh,200px)}
+.tile img{aspect-ratio:2/1;/* wider => shorter */object-fit:contain;border-radius:.75rem;box-shadow:0 8px 22px rgba(10,42,74,.10);max-height:clamp(150px,22vh,220px);background:#fff;padding:.35rem}
 .tile .tile-cta{position:absolute;left:50%;bottom:10px;transform:translateX(-50%);max-width:90%;}
 .tile .tile-cta .btn.btn-pill{white-space:nowrap;padding:.7rem 1.55rem;font-size:.72rem;letter-spacing:.6px;}
 @media (max-width:600px){
@@ -1352,8 +1354,9 @@ nav.quick-links li a[href="careers.html"]{
 /* Ensure 4-up layout for Shop by Type tiles on wider screens */
 @media (min-width: 900px){
   .category-tiles .tiles { grid-template-columns: repeat(4,1fr) !important; gap:1.15rem !important; }
-  .category-tiles .tile { width:100%; max-width:310px; }
-  .category-tiles .tile .media img { aspect-ratio:4/3; object-fit:cover; }
+  .category-tiles .tile { width:100%; max-width:330px; display:flex; flex-direction:column; }
+  .category-tiles .tile .media { height:clamp(160px,17vh,230px); display:flex; align-items:center; justify-content:center; }
+  .category-tiles .tile .media img { aspect-ratio:4/3; object-fit:contain; max-height:100%; width:100%; background:#fff; padding:.35rem; }
   .category-tiles .tile .tile-head { padding:.75rem .85rem .65rem; }
 }
 
