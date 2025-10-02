@@ -493,6 +493,17 @@ const Store = {
     // Reveal header/nav only after everything is standardized
     document.body.classList.add('nav-ready');
 
+    // Defensive: remove any lingering hero CTA link to baseball-l-screens on l-screens hub page (cache / SW stale HTML)
+    try {
+      const basePage = (location.pathname.split('/').pop()||'').toLowerCase();
+      if (basePage === 'l-screens.html' || basePage === 'l-screens') {
+        const heroCtas = document.querySelector('.hero-ctas');
+        if (heroCtas) {
+          heroCtas.querySelectorAll('a[href*="baseball-l-screens"]').forEach(a=>a.remove());
+        }
+      }
+    } catch {}
+
     // Wire newsletter subscribe forms (public)
     try {
       document.querySelectorAll('form.subscribe').forEach(form => {
@@ -888,15 +899,9 @@ const Store = {
               document.body.insertAdjacentElement('afterbegin', ext);
             }
           }
-          // Populate external subnav
+          // Populate external subnav (omit hub/home L-Screens tab per request)
             ul.classList.add('external');
-            // Clear existing then append links only (no wrapper)
             ext.innerHTML = '';
-            const titleLink = document.createElement('a');
-            titleLink.href = item.href || '#';
-            titleLink.textContent = 'L-Screens';
-            titleLink.className = 'lscreens-home';
-            ext.appendChild(titleLink);
             Array.from(ul.children).forEach(child => ext.appendChild(child.cloneNode(true)));
           // Highlight active in external bar
           const current = (location.pathname.split('/').pop() || '').toLowerCase();
@@ -1275,6 +1280,67 @@ const Store = {
       }
 
       const pageKey = (location.pathname.split('/').pop() || '').toLowerCase().replace(/\.html$/, '');
+
+      // Special collective page: replacement-screens
+      if (pageKey === 'replacement-screens') {
+        // Gather all replacement nets from categories irrespective of single category mapping
+        const all = [];
+        if (data.categories && typeof data.categories === 'object') {
+          for (const [cat, arr] of Object.entries(data.categories)) {
+            if (!Array.isArray(arr)) continue;
+            arr.forEach(p => {
+              const name = (p.name || p.title || '').toLowerCase();
+              const sku = String(p.sku || '').toLowerCase();
+              if (/replacement/.test(name) || /replacement/.test(sku)) all.push(p);
+            });
+          }
+        }
+        if (!all.length) {
+          this.renderEmptyState(grid);
+          return;
+        }
+        // De-dupe by sku
+        const seen = new Set();
+        const unique = all.filter(p => { const k = (p.sku||p.id||p.name); if (seen.has(k)) return false; seen.add(k); return true; });
+        // Sort for predictable order (alphabetical by name then sku)
+        unique.sort((a,b)=> (a.name||a.title||'').localeCompare(b.name||b.title||'') || String(a.sku||'').localeCompare(String(b.sku||'')));
+        // Build richer collective layout
+        grid.classList.remove('grid','grid-3','product-grid');
+        grid.classList.add('collective-list');
+        const heroPick = (p) => {
+          // Reuse normalize logic for hero image
+          const n = this.normalizeProdListItem(p);
+          return n.img;
+        };
+        const currencyFmt = (v) => (isFinite(v) && v>0) ? currency.format(v) : '';
+        grid.innerHTML = unique.map(p => {
+          const id = String(p.sku || p.id || p.name || p.title);
+          const title = String(p.name || p.title || id);
+            const price = Number(p.price ?? p.map ?? p.wholesale ?? 0) || 0;
+          const img = heroPick(p);
+          const feats = Array.isArray(p.details?.features) ? p.details.features.slice(0,6) : [];
+          const featHtml = feats.length ? `<ul class="mini-features">${feats.map(f=>`<li>${f}</li>`).join('')}</ul>` : '';
+          return `<article class="collective-item" data-sku="${id}">
+            <figure class="media"><img src="${img}" alt="${title}" loading="lazy" decoding="async"/></figure>
+            <div class="info">
+              <h3 class="item-title"><a href="product.html?pid=${encodeURIComponent(id)}">${title}</a></h3>
+              ${price?`<div class="price">${currencyFmt(price)}</div>`:''}
+              ${featHtml}
+              <div class="actions"><button class="btn btn-ghost js-add" data-id="${id}" data-title="${title.replace(/"/g,'&quot;')}" data-price="${price}" data-category="replacement" data-img="${img}">Add</button></div>
+            </div>
+          </article>`;
+        }).join('');
+        // Bind add buttons
+        grid.querySelectorAll('.js-add').forEach(btn => {
+          if (btn._bound) return; btn._bound = true;
+          btn.addEventListener('click', () => {
+            const d = btn.dataset;
+            const product = { id: d.id, title: d.title, price: Number(d.price)||0, category: d.category || 'replacement', img: d.img };
+            try { window.Store && window.Store.add(product); } catch (e) { console.error(e); }
+          });
+        });
+        return; // Skip normal grid rendering
+      }
       let items = [];
       // Support two schemas:
       // 1) Legacy: { "accessories": [...], "baseball-l-screens": [...] }
@@ -1333,6 +1399,49 @@ const Store = {
             };
             protective.sort((a,b)=> sizeRank(a) - sizeRank(b));
             items = protective;
+          }
+        }
+        // Custom BULLET aggregation for baseball-l-screens: include every product whose name or sku starts with Bullet (excluding obvious accessories like pad kits & wheel kits)
+        if (pageKey === 'baseball-l-screens' && data.categories && typeof data.categories === 'object') {
+          const bullet = [];
+          const seen = new Set();
+          const reject = /pad kit|wheel kit/i;
+          for (const arr of Object.values(data.categories)) {
+            if (!Array.isArray(arr)) continue;
+            for (const p of arr) {
+              if (!p) continue;
+              const sku = String(p.sku||'');
+              const name = String(p.name||p.title||'');
+              if (/^BULLET/i.test(sku) || /^Bullet\b/i.test(name)) {
+                if (reject.test(name)) continue; // skip accessories
+                const key = sku || name;
+                if (seen.has(key)) continue;
+                seen.add(key);
+                bullet.push(p);
+              }
+            }
+          }
+          if (bullet.length) {
+            // Sort by a preferred size/order sequence if detectable (JR < L < Front Toss < Combo < Fast Pitch < Overhead < Protective (size ascending))
+            const rank = (p) => {
+              const t = (p.name||'').toLowerCase();
+              if (/jr\b/.test(t)) return 10;
+              if (/\bl\b/.test(t) && !/jr/.test(t)) return 20;
+              if (/front toss/.test(t)) return 30;
+              if (/fast pitch/.test(t)) return 40;
+              if (/combo/.test(t) && /overhead/.test(t)) return 50;
+              if (/combo/.test(t)) return 55;
+              if (/overhead/.test(t)) return 60;
+              if (/protective/.test(t)) {
+                // size extraction 7x7 etc.
+                const m = t.match(/(\d{1,2})x(\d{1,2})/);
+                if (m) return 100 + parseInt(m[1],10);
+                return 120;
+              }
+              return 200; // fallback
+            };
+            bullet.sort((a,b)=> rank(a)-rank(b));
+            items = bullet;
           }
         }
         // Page-specific trimming logic: For baseball-l-screens & protective-screens pages

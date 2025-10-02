@@ -125,6 +125,45 @@
 
     // Build structured gallery entries
     const galleryPairs = unique.map(src => ({ thumb: src, large: deriveLarge(src) }));
+    // Large/hero variants to keep in visible gallery: filenames containing (1) OR 1a before extension OR _a variant suffix
+  // Include hero variants: (1), 1a, _a, or plain trailing 'a' before extension
+  const largePattern = /(\(1\)\.|1a\.|_a\.|[^\w]a\.)/i;
+    let displayPairs = galleryPairs.filter(g => {
+      const name = g.large.split('/').pop().toLowerCase();
+      return largePattern.test(name);
+    });
+    // If filtering nuked everything (edge case), fallback to originals
+    if (!displayPairs.length) displayPairs = galleryPairs.slice();
+
+    // Deduplicate by base color/slug keeping highest quality variant order: (1) > _a > 1a > a > plain
+    const orderScore = (name) => {
+      if (/\(1\)\./.test(name)) return 500;
+      if (/_a\./.test(name)) return 400;
+      if (/1a\./.test(name)) return 300;
+      if (/[^\w]a\./.test(name)) return 200;
+      return 100; // plain fallback
+    };
+    const baseKey = (name) => {
+      // Remove (1), remove _a, 1a, trailing 'a' (non-word) before extension, collapse color suffix groups
+      let base = name
+        .replace(/\(1\)/,'')
+        .replace(/_a\./,'.')
+        .replace(/1a\./,'1.')
+        .replace(/([^\w])a\./,'$1.')
+        .replace(/\s+/g,'');
+      return base;
+    };
+    const bestByBase = new Map();
+    displayPairs.forEach(p => {
+      const filename = p.large.split('/').pop().toLowerCase();
+      const key = baseKey(filename);
+      const score = orderScore(filename);
+      const existing = bestByBase.get(key);
+      if (!existing || score > existing.score) {
+        bestByBase.set(key, { pair: p, score });
+      }
+    });
+    displayPairs = Array.from(bestByBase.values()).sort((a,b)=> b.score - a.score).map(v=>v.pair);
     // Ensure primary is one of the LARGE versions; if not, pick first large
     const largeSet = new Set(galleryPairs.map(g=>g.large));
     if (!primary || !largeSet.has(primary)) {
@@ -132,7 +171,7 @@
       const hero = galleryPairs.find(g=>/\(1\)\.avif$/i.test(g.large)) || galleryPairs[0];
       primary = hero ? hero.large : (primary || galleryPairs[0]?.large);
     }
-    return { id, title, price, primary, galleryPairs, features, description };
+    return { id, title, price, primary, galleryPairs, displayPairs, features, description };
   }
 
   function render(prod){
@@ -143,12 +182,12 @@
       return;
     }
     const priceHtml = prod.price > 0 ? `<div class="price h3">$${prod.price.toFixed(2)}</div>` : '';
-  const thumbs = prod.galleryPairs.map((g,i)=>`<button class="thumb" data-index="${i}" aria-label="Show image ${i+1}" data-large="${g.large}"><img src="${g.thumb}" alt="${prod.title} image ${i+1}" loading="lazy"/></button>`).join('');
+  const thumbs = prod.displayPairs.map((g,i)=>`<button class="thumb" data-index="${i}" aria-label="Show image ${i+1}" data-large="${g.large}"><img src="${g.thumb}" alt="${prod.title} image ${i+1}" loading="lazy"/></button>`).join('');
     const features = Array.isArray(prod.features) && prod.features.length ? `<ul class="features">${prod.features.map(f=>`<li>${f}</li>`).join('')}</ul>` : '';
     el.innerHTML = `
       <div class="pd-grid">
         <div class="pd-media">
-          <div class="pd-main"><img id="pd-main-img" src="${prod.primary}" alt="${prod.title}"/></div>
+          <div class="pd-main"><img id="pd-main-img" src="${prod.primary}" alt="${prod.title}" loading="eager" fetchpriority="high" decoding="async"/></div>
           <div class="pd-thumbs" role="tablist">${thumbs}</div>
         </div>
         <div class="pd-info">
@@ -170,7 +209,7 @@
       btn.addEventListener('click',()=>{
         const i = Number(btn.dataset.index);
         if (!Number.isFinite(i)) return;
-        const pair = prod.galleryPairs[i];
+        const pair = prod.displayPairs[i];
         if (pair && pair.large) {
           main.src = pair.large;
           // Visual active state

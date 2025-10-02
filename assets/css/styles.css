@@ -1541,6 +1541,14 @@ nav.quick-links li a[href="careers.html"]{
 .pd-media { min-width: 0; }
 .pd-main { background:#f5f5f7; border:1px solid var(--border); border-radius:.75rem; display:grid; place-items:center; aspect-ratio:4/3; overflow:hidden; }
 .pd-main img { width:100%; height:100%; object-fit:contain; }
+.pd-media { max-width:100%; }
+/* If image natural ratio is taller, prevent vertical clipping by allowing auto height under a max */
+.pd-main img { max-height:100%; }
+.pd-thumbs { display:flex; flex-wrap:wrap; gap:.5rem; margin-top:.5rem; }
+.pd-thumbs.is-scroll { flex-wrap:nowrap; overflow-x:auto; padding-bottom:.25rem; }
+.pd-thumbs .thumb { border:1px solid var(--border); background:#fff; border-radius:.5rem; padding:2px; cursor:pointer; }
+.pd-thumbs .thumb.is-active { border-color:var(--brand); box-shadow:0 0 0 2px color-mix(in oklab, white 50%, var(--brand) 60%); }
+.pd-thumbs .thumb img { width:54px; height:54px; object-fit:contain; display:block; }
 .pd-thumbs { display:flex; flex-wrap:wrap; gap:.5rem; margin-top:.5rem; }
 .pd-thumbs .thumb { border:1px solid var(--border); background:#fff; border-radius:.5rem; padding:2px; cursor:pointer; }
 .pd-thumbs .thumb:focus-visible, .pd-thumbs .thumb:hover { outline:none; border-color:var(--brand); box-shadow:0 0 0 2px color-mix(in oklab, white 50%, var(--brand) 60%); }
