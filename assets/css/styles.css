@@ -241,74 +241,7 @@ a:hover, .inline-links a:hover { text-decoration:underline; }
 /* Selection */
 ::selection { background:#241773; color:#fff; }
 
-/* External L-Screens sub-navigation bar */
-/* L-Screens overlay subnav (inverted: light surface over header) */
-#lscreens-subnav.external-subnav {
-  position:absolute;
-  left:50%;
-  top:100%;
-  transform:translate(-50%, 0); /* sits just below header; we will overlap on reveal */
-  display:flex;
-  gap:.55rem;
-  align-items:center;
-  background:#ffffff;
-  padding:.55rem .7rem .6rem;
-  border:1px solid rgba(0,0,0,.12);
-  border-radius:2.2rem;
-  box-shadow:0 10px 28px -10px rgba(0,0,0,.35);
-  z-index:60;
-  backdrop-filter:blur(6px);
-  -webkit-backdrop-filter:blur(6px);
-  opacity:0;
-  pointer-events:none;
-  visibility:hidden;
-  transition:opacity .18s ease, transform .18s ease, visibility .18s;
-}
-/* Show when parent header hovered or a trigger class applied */
-.site-header:hover + #lscreens-subnav.external-subnav,
-.site-header:focus-within + #lscreens-subnav.external-subnav,
-#lscreens-subnav.external-subnav.is-open {
-  opacity:1;
-  pointer-events:auto;
-  visibility:visible;
-  transform:translate(-50%, -4px); /* slight rise for layered look */
-}
-/* Ensure header is positioning context */
-.site-header { position:sticky; top:0; z-index:30; }
-
-#lscreens-subnav.external-subnav a {
-  text-decoration:none;
-  font-weight:700;
-  font-size:.7rem;
-  letter-spacing:.55px;
-  padding:.45rem .75rem;
-  border-radius:1.4rem;
-  background:#ffffff;
-  color:#241773;
-  line-height:1;
-  display:inline-flex;
-  align-items:center;
-  gap:.25rem;
-  transition:background .18s, color .18s, box-shadow .18s;
-  white-space:nowrap;
-  box-shadow:0 0 0 1px rgba(36,23,115,.25);
-}
-#lscreens-subnav.external-subnav a:hover,
-#lscreens-subnav.external-subnav a:focus-visible {
-  background:#241773;
-  color:#ffffff;
-  box-shadow:0 0 0 1px #241773,0 0 0 4px rgba(36,23,115,.35);
-  outline:none;
-}
-#lscreens-subnav.external-subnav a.lscreens-home { font-weight:800; }
-
-/* Active state highlight */
-#lscreens-subnav.external-subnav a.is-active { background:#241773; color:#ffffff; box-shadow:0 0 0 1px #241773,0 0 0 4px rgba(36,23,115,.3); }
-
-/* Responsive collapse: on narrow screens let main nav handle navigation (hide bar) */
-@media (max-width:680px){
-  #lscreens-subnav.external-subnav { display:none; }
-}
+/* (Removed: legacy #lscreens-subnav external sub-navigation styles) */
 
 /* Utility catch-all: any old purple class variants collapse to brand */
 [class*="purple"], [class*="violet"], [class*="lavender"] { color:#241773 !important; }
@@ -346,6 +279,9 @@ a:hover, .inline-links a:hover { text-decoration:underline; }
   justify-content:center !important; /* center pills so CTA naturally centers beneath */
   text-align:center !important;
 }
+/* Center EZ Nets sub-navigation and its trailing quote button across all netting pages */
+#netting-subnav{justify-content:center}
+#netting-subnav + .btn, #netting-subnav + .btn-primary, #netting-subnav + .btn-quote{display:block;margin:0.75rem auto 0}
 .netting-subnav:not(.is-ready) { display:none !important; }
 .netting-subnav a { 
   padding:.55rem .9rem !important; 

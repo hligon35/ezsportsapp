@@ -853,95 +853,27 @@ const Store = {
     // Deactivate legacy nav (kept for later reference):
     // const legacy = [ 'Deals','Bats','Gloves','Batting Gloves','Drip','Gear','Apparel','Facility & Field','Turf' ];
 
-    // Build new primary nav
-    const links = [
+    // Clear any pre-existing anchors (static markup or earlier scripts) to enforce a canonical nav
+  // Preserve a cart button if it already exists inside nav so we can re-append after links
+  let cartBtn = nav.querySelector('.cart-btn');
+  try { while (nav.firstChild) nav.removeChild(nav.firstChild); } catch {}
+
+    // Canonical nav definition (mirrors ez-nets.html requirement and applied site‑wide)
+    const canonical = [
       { href: 'index.html', text: 'Home' },
       { href: 'about.html', text: 'About' },
       { href: 'ez-nets.html', text: 'EZ Nets' },
-      { href: 'l-screens.html', text: 'L-Screens', submenu: [
-        { href: 'baseball-l-screens.html', text: 'Baseball L-Screens' },
-        { href: 'protective-screens.html', text: 'Protective Screens' },
-        { href: 'pitchers-pocket.html', text: "Pitcher's Pocket" },
-        { href: 'replacement-screens.html', text: 'Replacement Screens' },
-      ]},
+      { href: 'l-screens.html', text: 'L-Screens' },
       { href: 'accessories.html', text: 'Accessories' },
-      { href: 'contactus.html', text: 'Contact Us' },
+      { href: 'contactus.html', text: 'Contact Us' }
     ];
-
-    // Clear existing links
-    nav.innerHTML = '';
-
-    // Create links
-    links.forEach(item => {
-      if (item.submenu) {
-        const wrapper = document.createElement('div');
-        wrapper.className = 'has-submenu';
-        const a = document.createElement('a');
-        a.href = item.href || '#'; a.textContent = item.text; a.setAttribute('aria-haspopup','true'); a.setAttribute('aria-expanded','false');
-        const ul = document.createElement('div');
-        ul.className = 'nav-submenu';
-        item.submenu.forEach(sub => {
-          const subA = document.createElement('a'); subA.href = sub.href; subA.textContent = sub.text; ul.appendChild(subA);
-        });
-        const isLScreens = (item.text || '').toLowerCase() === 'l-screens';
-        if (isLScreens) {
-          // Externalize: build a dedicated horizontal subnav bar below header
-          let ext = document.getElementById('lscreens-subnav');
-          if (!ext) {
-            ext = document.createElement('div');
-            ext.id = 'lscreens-subnav';
-            ext.className = 'lscreens-subnav external-subnav';
-            // Insert right after the site header
-            const siteHeader = document.querySelector('.site-header');
-            if (siteHeader && siteHeader.parentNode) {
-              siteHeader.parentNode.insertBefore(ext, siteHeader.nextSibling);
-            } else {
-              document.body.insertAdjacentElement('afterbegin', ext);
-            }
-          }
-          // Populate external subnav (omit hub/home L-Screens tab per request)
-            ul.classList.add('external');
-            ext.innerHTML = '';
-            Array.from(ul.children).forEach(child => ext.appendChild(child.cloneNode(true)));
-          // Highlight active in external bar
-          const current = (location.pathname.split('/').pop() || '').toLowerCase();
-          ext.querySelectorAll('a').forEach(a => {
-            const href = (a.getAttribute('href')||'').toLowerCase();
-            if (href === current) a.classList.add('is-active');
-          });
-          // In primary nav just place the top-level link (no dropdown)
-          wrapper.appendChild(a);
-          nav.appendChild(wrapper);
-          // Interaction: show overlay subnav on focus/hover of top-level link for keyboard accessibility
-          try {
-            const show = () => ext.classList.add('is-open');
-            const hideDelayed = (() => {
-              let t=null; return () => { if(t) clearTimeout(t); t=setTimeout(()=>{ ext.classList.remove('is-open'); },180); };
-            })();
-            a.addEventListener('mouseenter', show);
-            a.addEventListener('focus', show);
-            a.addEventListener('mouseleave', hideDelayed);
-            a.addEventListener('blur', hideDelayed);
-            ext.addEventListener('mouseenter', show);
-            ext.addEventListener('mouseleave', hideDelayed);
-            // Close on Escape
-            document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') ext.classList.remove('is-open'); });
-            // Mark aria-expanded
-            const sync = () => a.setAttribute('aria-expanded', ext.classList.contains('is-open') ? 'true':'false');
-            ['mouseenter','mouseleave','focus','blur'].forEach(ev=>a.addEventListener(ev, sync));
-            ext.addEventListener('transitionend', sync);
-          } catch {}
-        } else {
-          // Keep normal behavior for other dropdowns (currently none besides L-Screens)
-          wrapper.appendChild(a);
-          wrapper.appendChild(ul);
-          nav.appendChild(wrapper);
-        }
-      } else {
-        const a = document.createElement('a');
-        a.href = item.href; a.textContent = item.text; nav.appendChild(a);
-      }
+    canonical.forEach(item => {
+      const a = document.createElement('a');
+      a.href = item.href;
+      a.textContent = item.text;
+      nav.appendChild(a);
     });
+    if (cartBtn) nav.appendChild(cartBtn);
 
   // Cart button is handled by ensureHeaderLayout (moved into header-actions)
 
@@ -950,6 +882,24 @@ const Store = {
     const candidates = Array.from(nav.querySelectorAll('a')).filter(a => a.getAttribute('href') && !a.closest('.nav-submenu'));
     const active = candidates.find(a => (a.getAttribute('href') || '').endsWith(path));
     if (active) { active.classList.add('is-active'); active.setAttribute('aria-current','page'); }
+
+    // (De-duplication obsolete after hard reset, retained defensively for any runtime injections)
+    try {
+      const seen = new Set();
+      Array.from(nav.querySelectorAll(':scope > a')).forEach(a => {
+        const key = (a.getAttribute('href')||'').trim() + '::' + (a.textContent||'').trim().toLowerCase();
+        if (seen.has(key)) a.remove(); else seen.add(key);
+      });
+    } catch {}
+
+    // Page-specific nav adjustment: On L-Screens page, hide Netting Calculator link if present
+    try {
+      const basePage = path.toLowerCase();
+      if (basePage === 'l-screens.html' || basePage === 'l-screens') {
+        const calc = Array.from(nav.querySelectorAll('a')).find(a => /netting-calculator\.html$/i.test(a.getAttribute('href')||''));
+        if (calc) calc.remove();
+      }
+    } catch {}
   },
 
   // Guarantee the Home link exists and is first in the primary nav even if
@@ -1157,15 +1107,19 @@ const Store = {
   ensureNettingCarousel() {
     try {
       const base = (location.pathname.split('/').pop() || '').toLowerCase();
+      // Define slide titles for each netting page. These are intentionally concise for dot aria-labels & captions.
       const DATA = {
-  'baseball-netting.html': [ 'Hitting Facility','Batting Cage','Foul Ball','Overhead','Backstop','L-Screen','Pitcher Pocket' ],
-  'golf-netting.html': [ 'Driving Range','Golf Course','Golf Cube','Residential' ],
-  'commercial-netting.html': [ 'Auto-Drone','Drone Enclosure','Warehouse','Safety','Debris','Landfill' ],
-  'sports-netting.html': [ 'Baseball','Basketball','Cricket Football','Golf','Hockey','Lacrosse','Multi-Sport','Soccer','Softball','Tennis','Volleyball' ],
-        'training-facility.html': [
-          'Lane Divider Systems','Ceiling Track','Retractable Shell','Impact Panels'
-        ]
+        'baseball-netting.html': [ 'Hitting Facility','Batting Cage','Foul Ball','Overhead','Backstop','L-Screen','Pitcher Pocket' ],
+        'golf-netting.html': [ 'Driving Range','Golf Course','Golf Cube','Residential' ],
+        'commercial-netting.html': [ 'Auto-Drone','Drone Enclosure','Warehouse','Safety','Debris','Landfill' ],
+        // Split the previous combined label 'Cricket Football' into two separate slides
+        'sports-netting.html': [ 'Baseball','Basketball','Cricket','Football','Golf','Hockey','Lacrosse','Multi-Sport','Soccer','Softball','Tennis','Volleyball' ],
+        'training-facility.html': [ 'Lane Divider Systems','Ceiling Track','Retractable Shell','Impact Panels' ]
       };
+      // Provide a broad showcase carousel on overview page if present using a curated subset
+      if (base === 'ez-nets.html') {
+        DATA[base] = [ 'Baseball','Golf','Lacrosse','Soccer','Softball','Tennis','Volleyball','Warehouse','Safety','Drone','Debris','Multi-Sport' ];
+      }
       if (!DATA[base] || DATA[base].length === 0) return;
       // Avoid duplicate build
       if (document.querySelector('.net-carousel')) return;
@@ -1185,44 +1139,41 @@ const Store = {
       const track = section.querySelector('.carousel-track');
       const dotsWrap = section.querySelector('.carousel-dots');
       const slides = DATA[base];
-      // Title->image heuristic mapping (best available match from assets/img/netting)
-      const IMG_BASE = 'assets/img/netting/';
-      const AVAILABLE = [
-        'backstopnetting.jpg','cage.jpg','cage2.jpg','netting.jpg','netting2.jpg','netting3.jpg','overheadnetting.webp','screen6.avif','equip6.avif'
+      // Image selection rule: Use image only if a file exists whose name equals the normalized slide title.
+      // Normalization: lower-case, remove non-alphanumeric. Then we look for `${key}.png` in assets/eznets/eznets.
+      const IMG_BASE = 'assets/eznets/eznets/';
+      const KNOWN_FILENAMES = [
+        'baseball','basketball','cricket','football','golf','hockey','lacrosse','multisport','soccer','softball','tennis','volleyball',
+        'warehouse','safety','debris','drone','landfill'
       ];
-      const IMG_MAP = {
-        'Hitting Facility':'cage2.jpg',
-        'Batting Cage':'cage.jpg',
-        'Foul Ball':'backstopnetting.jpg',
-        'Overhead':'overheadnetting.webp',
-        'Backstop':'backstopnetting.jpg',
-        'L-Screen':'screen6.avif',
-        'Pitcher Pocket':'screen6.avif',
-        'Golf Cube':'netting2.jpg',
-        'Residential':'netting3.jpg',
-        'Ceiling Track':'overheadnetting.webp',
-        'Retractable Shell':'overheadnetting.webp',
-        'Impact Panels':'netting3.jpg'
+      const normalize = (str) => (str||'').toLowerCase().replace(/[^a-z0-9]+/g,'');
+      const imageFor = (title) => {
+        const k = normalize(title);
+        return KNOWN_FILENAMES.includes(k) ? (k + '.png') : null;
       };
-      function pickImage(title){
-        const direct = IMG_MAP[title];
-        if (direct && AVAILABLE.includes(direct)) return direct;
-        // Random fallback for any unmapped title
-        return AVAILABLE[Math.floor(Math.random()*AVAILABLE.length)];
-      }
       slides.forEach((title, idx) => {
-        const imgFile = pickImage(title);
+        const imgFile = imageFor(title);
         const slide = document.createElement('div');
         slide.className = 'carousel-slide';
         slide.setAttribute('data-index', String(idx));
         // First image eager, others lazy
         const loading = idx === 0 ? 'eager' : 'lazy';
-        slide.innerHTML = `
-          <figure class="slide-media">
-            <img src="${IMG_BASE + imgFile}" alt="${title} netting solution" loading="${loading}" width="480" height="320" />
-            <figcaption class="visually-hidden">${title}</figcaption>
-          </figure>
-          <h3 class="slide-title">${title}</h3>`;
+        // If no direct image match, leave placeholder styling (no <img>) with overlayed title text.
+        if (imgFile) {
+          slide.innerHTML = `
+            <figure class="slide-media">
+              <img src="${IMG_BASE + imgFile}" alt="${title} netting" loading="${loading}" width="480" height="320" />
+              <figcaption class="visually-hidden">${title}</figcaption>
+            </figure>
+            <h3 class="slide-title">${title}</h3>`;
+        } else {
+          slide.innerHTML = `
+            <figure class="slide-media">
+              <span>${title}</span>
+              <figcaption class="visually-hidden">${title}</figcaption>
+            </figure>
+            <h3 class="slide-title">${title}</h3>`;
+        }
         track.appendChild(slide);
         const dot = document.createElement('button');
         dot.type = 'button';
