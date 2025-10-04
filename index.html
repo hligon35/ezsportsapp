@@ -25,8 +25,8 @@
   <meta name="twitter:image" content="assets/img/bats2.jpg" />
   <meta name="theme-color" content="#241773" />
   <link rel="manifest" href="manifest.webmanifest" />
-  <link rel="icon" type="image/png" href="assets/EZSportslogo.png" />
-  <link rel="icon" type="image/png" href="assets/img/favicon-32.png" sizes="32x32" />
+  <link rel="icon" type="image/png" href="assets/img/EZSportslogo.png" />
+  <link rel="icon" type="image/png" href="assets/img/EZSportslogo.png" sizes="32x32" />
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/css/styles.css?v=6" />
   <style>
@@ -53,6 +53,8 @@
     .hc-foot{font-size:.65rem;font-weight:600;color:#5e4a80;opacity:.9;letter-spacing:.5px;}
     .tilt{transition:transform .5s cubic-bezier(.22,1,.27,1);}
     .tilt:hover{transform:translateY(-6px) rotate3d(.7, .3, .1, 8deg);}
+  /* Hero logo replacement */
+  .hero-logo{display:block;margin-inline:auto;width:clamp(180px,40vw,420px);height:auto;filter:drop-shadow(0 12px 30px rgba(0,0,0,.25));}
     @media (max-width:960px){.hero-grid{grid-template-columns:1fr;text-align:center}.stat-bar{margin-top:1.4rem}.cta-row{justify-content:center}.hero-punch{margin-inline:auto}}
     /* Feature ribbons */
     .feature-ribbon{display:grid;gap:clamp(1.2rem,2vw,2.5rem);grid-template-columns:repeat(auto-fit,minmax(260px,1fr));margin:clamp(2.8rem,6vw,4.4rem) auto;max-width:1200px;padding:0 clamp(.75rem,3vw,1.25rem);} 
@@ -84,8 +86,8 @@
   <header class="site-header transparent">
     <div class="container header-bar">
       <button class="menu-toggle" aria-label="Toggle menu" aria-expanded="false" aria-controls="primary-nav">☰</button>
-      <a class="brand" href="index.html">
-        <img src="assets/EZSportslogo.png" alt="EZ Sports Netting logo" height="40"/>
+    <a class="brand" href="index.html">
+  <img src="assets/img/EZSportslogo.png" alt="EZ Sports Netting logo" height="40"/>
         <span>EZ Sports Netting</span>
       </a>
       <form class="search" role="search" aria-label="Search store" onsubmit="event.preventDefault(); window.Store.search(this.q.value)">
@@ -116,28 +118,13 @@
             <a href="contactus.html" class="btn btn-ghost">Expert Help</a>
           </div>
           <div class="stat-bar" aria-label="store policies and support">
-            <div class="stat"><strong>Free</strong><small>Shipping $75+</small></div>
             <div class="stat"><strong>30‑Day</strong><small>Easy Returns</small></div>
             <div class="stat"><strong>1‑Year</strong><small>Net Warranty</small></div>
             <div class="stat"><strong>Support</strong><small>Real Humans</small></div>
           </div>
         </div>
-        <div class="hero-media">
-          <div class="hero-card tilt">
-            <span class="hc-title">EZ Nets</span>
-            <span class="hc-value" id="hero-net">Custom</span>
-            <span class="hc-foot">Design & Quote</span>
-          </div>
-          <div class="hero-card tilt">
-            <span class="hc-title">L‑Screens</span>
-            <span class="hc-value">Shields</span>
-            <span class="hc-foot">Practice Core</span>
-          </div>
-          <div class="hero-card tilt">
-            <span class="hc-title">Accessories</span>
-            <span class="hc-value">Hardware</span>
-            <span class="hc-foot">Dialed Setup</span>
-          </div>
+        <div class="hero-media" aria-label="Brand logo">
+          <img class="hero-logo" src="assets/img/EZSportslogo.png" alt="EZ Sports Netting logo" />
         </div>
       </div>
     </section>
@@ -186,14 +173,14 @@
     <div class="container footer-grid">
       <div class="footer-brand-block">
         <a class="brand brand--light" href="index.html">
-          <img src="assets/EZSportslogo.png" alt="EZ Sports Netting logo" height="36"/>
+          <img src="assets/img/EZSportslogo.png" alt="EZ Sports Netting logo" height="36"/>
           <span>EZ Sports Netting</span>
         </a>
         <p class="muted">Better baseball through better gear.</p>
         <div class="socials" aria-label="social links">
           <a href="https://www.facebook.com/Ezsportsnetting/" aria-label="Facebook" target="_blank" rel="noopener"><img src="assets/img/facebook.png" alt="Facebook" /></a>
           <a href="#" aria-label="Instagram"><img src="assets/img/instagram.png" alt="Instagram" /></a>
-          <a href="#" aria-label="X"><img src="assets/img/xwhite.png" alt="X" /></a>
+          <a href="#" aria-label="X"><img src="assets/img/xblack.png" alt="X" /></a>
         </div>
       </div>
       <nav aria-label="Footer">
@@ -248,18 +235,7 @@
   <script type="module" src="assets/js/app.js"></script>
   <script>
     // Dynamic hero sample data injection (non-blocking)
-    document.addEventListener('DOMContentLoaded',()=>{
-      try {
-        const products = JSON.parse(localStorage.getItem('shopProducts')||'[]');
-        if(products.length){
-          const pick = (cat)=> products.find(p=> (p.category||'').toLowerCase()===cat);
-          const bat = pick('bats'); const glove = pick('gloves'); const net = pick('netting');
-          if(bat) document.getElementById('hero-bat').textContent = bat.title.split(/\s+/).slice(0,2).join(' ');
-          if(glove) document.getElementById('hero-glove').textContent = glove.title.split(/\s+/).slice(0,2).join(' ');
-          if(net) document.getElementById('hero-net').textContent = net.title.split(/\s+/).slice(0,2).join(' ');
-        }
-      } catch {}
-    });
+    document.addEventListener('DOMContentLoaded',()=>{});
     // SW handling same as prior version
     if ('serviceWorker' in navigator) {
       const isProd = (location.protocol === 'https:') && !/^(localhost|127\.0\.0\.1)$/i.test(location.hostname);

@@ -42,7 +42,14 @@
   function toDisplayItem(p){
     const id = String(p.sku || p.id || p.name || p.title || Math.random().toString(36).slice(2));
     const title = String(p.name || p.title || id);
-    const price = Number(p.price ?? p.map ?? p.wholesale ?? 0) || 0;
+    const variations = Array.isArray(p.variations) ? p.variations.slice() : [];
+    // Compute price and price range from variations first (map preferred), else fallback
+    const varPrices = variations
+      .map(v => Number(v.map ?? v.price ?? 0))
+      .filter(n => Number.isFinite(n) && n > 0);
+    const priceMin = varPrices.length ? Math.min(...varPrices) : null;
+    const priceMax = varPrices.length ? Math.max(...varPrices) : null;
+    const price = varPrices.length ? priceMin : (Number(p.price ?? p.map ?? p.wholesale ?? 0) || 0);
     const isUsableSrc = (s) => typeof s === 'string' && /^(https?:|\/|assets\/)/i.test(s);
     let primary = null;
     // 1) explicit p.img
@@ -171,7 +178,7 @@
       const hero = galleryPairs.find(g=>/\(1\)\.avif$/i.test(g.large)) || galleryPairs[0];
       primary = hero ? hero.large : (primary || galleryPairs[0]?.large);
     }
-    return { id, title, price, primary, galleryPairs, displayPairs, features, description };
+    return { id, title, price, priceMin, priceMax, primary, galleryPairs, displayPairs, features, description, variations };
   }
 
   function render(prod){
@@ -181,7 +188,15 @@
       el.innerHTML = '<div class="alert">Product not found.</div>';
       return;
     }
-    const priceHtml = prod.price > 0 ? `<div class="price h3">$${prod.price.toFixed(2)}</div>` : '';
+    // Render price or price range; will update dynamically on option change
+    const basePriceHtml = (() => {
+      if (prod.priceMin && prod.priceMax && prod.priceMax !== prod.priceMin) {
+        return `<div class="price h3" id="pd-price">$${prod.priceMin.toFixed(2)} - $${prod.priceMax.toFixed(2)}</div>`;
+      } else if (prod.price && prod.price > 0) {
+        return `<div class="price h3" id="pd-price">$${prod.price.toFixed(2)}</div>`;
+      }
+      return `<div class="price h3" id="pd-price"></div>`;
+    })();
   const thumbs = prod.displayPairs.map((g,i)=>`<button class="thumb" data-index="${i}" aria-label="Show image ${i+1}" data-large="${g.large}"><img src="${g.thumb}" alt="${prod.title} image ${i+1}" loading="lazy"/></button>`).join('');
     const features = Array.isArray(prod.features) && prod.features.length ? `<ul class="features">${prod.features.map(f=>`<li>${f}</li>`).join('')}</ul>` : '';
     el.innerHTML = `
@@ -192,12 +207,20 @@
         </div>
         <div class="pd-info">
           <h1 class="pd-title">${prod.title}</h1>
-          ${priceHtml}
-          <div class="stack-05">
-            <label class="text-xs" for="pd-model-select" style="font-weight:700;letter-spacing:.4px;">Model</label>
-            <select id="pd-model-select" class="pd-model-select" style="padding:.7rem .8rem;border:1px solid var(--border);border-radius:.6rem;font-weight:600;">
-              <option value="">Choose an Option...</option>
-            </select>
+          ${basePriceHtml}
+          <div class="stack-05" id="pd-option-block" style="margin-top:.5rem;">
+            ${prod.variations && prod.variations.length ? `
+              <label class="text-xs" for="pd-option-select" style="font-weight:700;letter-spacing:.4px;">Options</label>
+              <select id="pd-option-select" class="pd-option-select" style="padding:.7rem .8rem;border:1px solid var(--border);border-radius:.6rem;font-weight:600;">
+                <option value="">Choose an Option...</option>
+                ${prod.variations.map((v,i)=>{
+                  const vPrice = Number(v.map ?? v.price ?? 0) || 0;
+                  const label = v.option || `Option ${i+1}`;
+                  const priceText = vPrice > 0 ? ` - $${vPrice.toFixed(2)}` : '';
+                  return `<option value="${label.replace(/"/g,'&quot;')}" data-price="${vPrice}">${label}${priceText}</option>`;
+                }).join('')}
+              </select>
+            ` : ''}
             <button class="btn btn-primary" id="pd-add">Add to Cart</button>
             <a class="btn" href="javascript:history.back()">Back</a>
           </div>
@@ -221,37 +244,52 @@
         }
       });
     });
-    // Populate model select from gallery (basic heuristic labels)
+    // Wire option select to update price dynamically
     try {
-      const sel = document.getElementById('pd-model-select');
-      if (sel && prod.displayPairs) {
-        const seen = new Set();
-        prod.displayPairs.forEach(pair => {
-          const file = pair.large.split('/').pop();
-          let label = file.replace(/\.avif$/i,'').replace(/[-_]/g,' ').replace(/\(1\)/,'').trim();
-          if (label.length > 48) label = label.slice(0,48)+'…';
-          const key = label.toLowerCase();
-          if (!seen.has(key)) {
-            seen.add(key);
-            const opt = document.createElement('option');
-            opt.value = pair.large;
-            opt.textContent = label.charAt(0).toUpperCase()+label.slice(1);
-            sel.appendChild(opt);
+      const priceEl = document.getElementById('pd-price');
+      const optSel = document.getElementById('pd-option-select');
+      if (optSel && priceEl) {
+        const updatePrice = () => {
+          const opt = optSel.options[optSel.selectedIndex];
+          const p = Number(opt?.dataset?.price||0) || 0;
+          if (p > 0) {
+            priceEl.textContent = `$${p.toFixed(2)}`;
+          } else if (prod.priceMin && prod.priceMax && prod.priceMax !== prod.priceMin) {
+            priceEl.textContent = `$${prod.priceMin.toFixed(2)} - $${prod.priceMax.toFixed(2)}`;
+          } else if (prod.price > 0) {
+            priceEl.textContent = `$${prod.price.toFixed(2)}`;
+          } else {
+            priceEl.textContent = '';
           }
-        });
-        sel.addEventListener('change', ()=>{
-          if (sel.value) {
-            main.src = sel.value;
-          }
-        });
+        };
+        optSel.addEventListener('change', updatePrice);
+        // If there's exactly one option, preselect it and update price
+        if (optSel.options.length === 2) { // includes the "Choose" placeholder
+          optSel.selectedIndex = 1;
+          updatePrice();
+        }
       }
     } catch {}
 
     document.getElementById('pd-add')?.addEventListener('click', ()=>{
       try {
-        const sel = document.getElementById('pd-model-select');
-        const chosen = sel && sel.value ? sel.options[sel.selectedIndex].textContent : prod.title;
-        window.Store && window.Store.add({ id: prod.id, title: chosen || prod.title, price: prod.price, img: main.src || prod.primary, category: 'misc' });
+        // Determine selected variation (if any)
+        const optSel = document.getElementById('pd-option-select');
+        let chosenLabel = prod.title;
+        let chosenPrice = prod.price || 0;
+        if (optSel && optSel.value) {
+          chosenLabel = `${prod.title} — ${optSel.value}`;
+          const optEl = optSel.options[optSel.selectedIndex];
+          const p = Number(optEl?.dataset?.price||0) || 0;
+          if (p > 0) chosenPrice = p;
+        } else if (prod.variations && prod.variations.length) {
+          alert('Please choose an option.');
+          return;
+        }
+        // Pass option as size to preserve cart key uniqueness
+        const size = (optSel && optSel.value) ? optSel.value : undefined;
+        const product = { id: prod.id, title: chosenLabel, price: chosenPrice, img: main.src || prod.primary, category: 'netting' };
+        window.Store && window.Store.add(product, { size });
       } catch {}
     });
   }

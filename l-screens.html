@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>L-Screens | EZ Sports Netting</title>
   <meta name="description" content="Shop L-Screens at EZ Sports Netting." />
-  <link rel="icon" type="image/png" href="assets/EZSportslogo.png" />
-  <link rel="icon" type="image/png" href="assets/img/favicon-32.png" sizes="32x32" />
+  <link rel="icon" type="image/png" href="assets/img/EZSportslogo.png" />
+  <link rel="icon" type="image/png" href="assets/img/EZSportslogo.png" sizes="32x32" />
   <link rel="stylesheet" href="assets/css/styles.css" />
 </head>
 <body>
@@ -15,7 +15,7 @@
     <div class="container header-bar">
       <button class="menu-toggle" aria-label="Toggle menu" aria-expanded="false" aria-controls="primary-nav">☰</button>
       <a class="brand" href="index.html">
-  <img src="assets/EZSportslogo.png" alt="EZ Sports Netting logo" height="40"/>
+  <img src="assets/img/EZSportslogo.png" alt="EZ Sports Netting logo" height="40"/>
         <span>EZ Sports Netting</span>
       </a>
       <form class="search" role="search" aria-label="Search store" onsubmit="event.preventDefault(); window.Store.search(this.q.value)">
@@ -48,11 +48,13 @@
             <a class="btn" href="contactus.html">Talk to a Netting Expert</a>
           </div>
         </div>
-  <picture>
-    <source srcset="assets/img/screen2.avif" type="image/avif" />
-    <source srcset="assets/img/bats.jpg" type="image/jpeg" />
-    <img src="assets/img/screen2.avif" alt="L-screen in use during batting practice" loading="eager" width="1400" height="875" />
-  </picture>
+  <div class="hero-rotator" data-rotate="screen2,screen3,screen4,screen5,screen6" aria-hidden="true">
+    <img class="hr-slide is-active" src="assets/img/screen2.avif" alt="" width="1400" height="875" loading="eager" />
+    <img class="hr-slide" src="assets/img/screen3.avif" alt="" width="1400" height="875" loading="lazy" />
+    <img class="hr-slide" src="assets/img/screen4.avif" alt="" width="1400" height="875" loading="lazy" />
+    <img class="hr-slide" src="assets/img/screen5.avif" alt="" width="1400" height="875" loading="lazy" />
+    <img class="hr-slide" src="assets/img/screen6.avif" alt="" width="1400" height="875" loading="lazy" />
+  </div>
       </div>
     </section>
 
@@ -83,7 +85,7 @@
     <div class="container footer-grid">
       <div class="footer-brand-block">
         <a class="brand brand--light" href="index.html">
-          <img src="assets/EZSportslogo.png" alt="EZ Sports Netting logo" height="36"/>
+          <img src="assets/img/EZSportslogo.png" alt="EZ Sports Netting logo" height="36"/>
           <span>EZ Sports Netting</span>
         </a>
         <p class="muted">Better baseball through better gear.</p>
@@ -92,7 +94,7 @@
             <img src="assets/img/facebook.png" alt="Facebook" />
           </a>
           <a href="#" aria-label="Instagram"><img src="assets/img/instagram.png" alt="Instagram" /></a>
-          <a href="#" aria-label="X"><img src="assets/img/xwhite.png" alt="X" /></a>
+          <a href="#" aria-label="X"><img src="assets/img/xblack.png" alt="X" /></a>
         </div>
       </div>
       <nav aria-label="Footer">

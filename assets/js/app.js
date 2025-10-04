@@ -136,12 +136,12 @@ async function fetchProducts() {
           .slice(0, 120);
       }
       const cleanedDesc = sanitizeDescription(p.description || '');
-      return {
+  return {
         id: p.id,
         title: rawName,
         price: typeof p.price === 'number' ? p.price : Number(p.price) || 0,
         category: normCat,
-        img: p.image || 'assets/EZSportslogo.png',
+  img: p.image || 'assets/img/EZSportslogo.png',
         images: Array.isArray(p.images) ? p.images.filter(x=>typeof x==='string' && x.trim()).slice(0,8) : (p.image ? [p.image] : []),
         stripe: p.stripe || null,
         stock: p.stock,
@@ -186,7 +186,7 @@ async function fetchProducts() {
             title: p.title || p.name || p.id,
             price: typeof p.price === 'number' ? p.price : Number(p.price) || 0,
             category: (p.category || '').toString().toLowerCase() || 'misc',
-            img: p.img || p.image || 'assets/EZSportslogo.png',
+            img: p.img || p.image || 'assets/img/EZSportslogo.png',
             images: p.images || (p.image ? [p.image] : []),
             description: sanitizeDescription(p.description || ''),
             features: Array.isArray(p.features) ? p.features.slice(0,25) : [],
@@ -201,6 +201,8 @@ async function fetchProducts() {
 // Augment PRODUCTS with locally built L-Screens catalog (screens-catalog.json) if present.
 (async function mergeLocalScreens(){
   try {
+    // Avoid 404s in dev: only fetch local catalogs when explicitly enabled
+    if (!(window.ENABLE_LOCAL_CATALOG || /[?&]local-catalog=1\b/.test(location.search))) return;
     // Wait a tick for initial fetch to complete
     await new Promise(r=>setTimeout(r,300));
     const res = await fetch('assets/info/prodInfo/screens-catalog.json', { cache: 'no-cache' });
@@ -215,7 +217,7 @@ async function fetchProducts() {
         title: p.title || p.name,
         price: p.price || 0,
         category: 'l-screens',
-        img: p.image || p.img || 'assets/EZSportslogo.png',
+  img: p.image || p.img || 'assets/img/EZSportslogo.png',
         images: Array.isArray(p.images) ? p.images : (p.image ? [p.image] : []),
         description: sanitizeDescription(p.description || ''),
         features: Array.isArray(p.features) ? p.features.slice(0,25) : []
@@ -231,6 +233,8 @@ async function fetchProducts() {
 // Augment PRODUCTS with locally built Gloves catalog (gloves-catalog.json) if present.
 (async function mergeLocalGloves(){
   try {
+    // Avoid 404s in dev: only fetch local catalogs when explicitly enabled
+    if (!(window.ENABLE_LOCAL_CATALOG || /[?&]local-catalog=1\b/.test(location.search))) return;
     await new Promise(r=>setTimeout(r,400)); // slight delay after screens merge
     const res = await fetch('assets/info/prodInfo/gloves-catalog.json', { cache: 'no-cache' });
     if (!res.ok) return;
@@ -245,7 +249,7 @@ async function fetchProducts() {
           title: p.title || p.name,
           price: p.price || 0,
           category: 'gloves',
-          img: p.image || p.img || 'assets/EZSportslogo.png',
+          img: p.image || p.img || 'assets/img/EZSportslogo.png',
           images: Array.isArray(p.images) ? p.images : (p.image ? [p.image] : []),
           description: sanitizeDescription(p.description || ''),
           features: Array.isArray(p.features) ? p.features.slice(0,25) : []
@@ -267,7 +271,7 @@ async function fetchProducts() {
     if (PRODUCTS.length > 0) return; // Already have products, no need for fallback
     
     console.log('API not available, loading from local prodList.json');
-    const res = await fetch('assets/prodList.json', { cache: 'no-cache' });
+  const res = await fetch('assets/prodList.json', { cache: 'no-cache' });
     if (!res.ok) return;
     const prodList = await res.json();
     
@@ -283,7 +287,7 @@ async function fetchProducts() {
           title: product.name || product.sku,
           price: product.details?.price || (product.variations?.[0]?.map) || 299,
           category: 'netting',
-          img: product.img || 'assets/EZSportslogo.png',
+          img: product.img || 'assets/img/EZSportslogo.png',
           images: product.images || (product.img ? [product.img] : []),
           description: sanitizeDescription(product.details?.description || ''),
           features: product.details?.features || [],
@@ -386,6 +390,7 @@ const Store = {
     this.updateNavigation();
   this.ensureNettingSubnav();
   this.ensureNettingCarousel();
+  this.ensureHeroRotator();
   this.ensureUniformFooter();
   this.ensureExpertCTA();
   this.ensureQuoteButtons();
@@ -547,7 +552,7 @@ const Store = {
       const html = `
         <div class="container footer-grid">
           <div class="footer-brand-block">
-            <img src="assets/EZSportslogo.png" height="36" alt="EZ Sports Netting logo"/>
+            <img src="assets/img/EZSportslogo.png" height="36" alt="EZ Sports Netting logo"/>
             <strong>EZ Sports Netting</strong>
             <p>Better baseball through better gear.</p>
             <div class="socials" aria-label="social links">
@@ -622,7 +627,7 @@ const Store = {
       const descEl = head.querySelector('meta[name="description"]');
       const desc = (descEl && descEl.getAttribute('content')) || 'Shop premium baseball nets, bats, gloves, helmets & training gear.';
       const url = (head.querySelector('link[rel="canonical"]')?.getAttribute('href')) || location.href;
-  const defaultImage = (location.origin || '') + '/assets/EZSportslogo.png';
+  const defaultImage = (location.origin || '') + '/assets/img/EZSportslogo.png';
       const og = {
         'og:site_name': 'EZ Sports Netting',
         'og:type': 'website',
@@ -653,6 +658,18 @@ const Store = {
           head.appendChild(m);
         }
       });
+      // Ensure favicon uses current brand image
+      let fav = head.querySelector('link[rel="icon"]');
+      if (!fav) {
+        fav = document.createElement('link');
+        fav.rel = 'icon';
+        fav.type = 'image/png';
+        head.appendChild(fav);
+      }
+  const desiredFavicon = 'assets/img/EZSportslogo.png';
+      if (fav.getAttribute('href') !== desiredFavicon) {
+        fav.setAttribute('href', desiredFavicon);
+      }
       // JSON-LD Organization (if not already present)
       const hasOrg = Array.from(head.querySelectorAll('script[type="application/ld+json"]')).some(s => /"@type"\s*:\s*"Organization"/i.test(s.textContent || ''));
       if (!hasOrg) {
@@ -663,7 +680,7 @@ const Store = {
           '@type': 'Organization',
           name: 'EZ Sports Netting',
           url: (location.origin || '') + '/',
-          logo: (location.origin || '') + '/assets/EZSportslogo.png',
+          logo: (location.origin || '') + '/assets/img/EZSportslogo.png',
           sameAs: []
         });
         head.appendChild(s);
@@ -991,24 +1008,37 @@ const Store = {
       } catch {}
     })();
   },
-  ensureBreadcrumbs() {
-    // Avoid duplicates
-    if (document.querySelector('nav.breadcrumbs')) return;
+  async ensureBreadcrumbs() {
+    const existing = document.querySelector('nav.breadcrumbs');
     const main = document.querySelector('main#main') || document.querySelector('main');
     if (!main) return;
-
-    // Resolve current page
     const base = (location.pathname.split('/').pop() || 'index.html').toLowerCase();
+
+    // Special handling for product detail page: defer until products loaded so we can get title/category
+    if (base === 'product.html') {
+      // If we already rendered product breadcrumbs, exit
+      if (existing && existing.hasAttribute('data-product-bc')) return;
+      // Remove any generic breadcrumbs so we can rebuild with product context
+      if (existing && !existing.hasAttribute('data-product-bc')) existing.remove();
+    } else {
+      // Non-product pages: if breadcrumbs already exist, exit
+      if (existing) return;
+    }
   const TITLES = {
       'index.html': 'Home',
       'about.html': 'About',
-  'careers.html': 'Careers',
-      'careers.html': 'Careers',
+    'careers.html': 'Careers',
       'login.html': 'Login',
       'checkout.html': 'Checkout',
       'admin.html': 'Admin',
       'order-history.html': 'Order History',
       'netting-calculator.html': 'Netting Calculator',
+    // Primary nav canonical set
+    'ez-nets.html': 'EZ Nets',
+    'l-screens.html': 'L-Screens',
+    'accessories.html': 'Accessories',
+    'contactus.html': 'Contact Us',
+    // Product category landing pages & legacy/shop links (ensure breadcrumb coverage if linked internally)
     'hitting-facility.html':'Hitting Facility',
     'batting-cage.html':'Batting Cage',
     'foul-ball.html':'Foul Ball Netting',
@@ -1017,7 +1047,9 @@ const Store = {
     'baseball-l-screens.html':'Baseball L-Screens',
     'protective-screens.html':'Protective Screens',
     'pitchers-pocket.html':"Pitcher's Pocket",
-    'replacement-screens.html':'Replacement Screens',
+  'replacement-screens.html':'Replacement Screens',
+  'bullet-pad-kits.html': 'Bullet Pad Kits',
+  'pre-made-cages.html': 'Pre-Made Cages',
     // Netting categories
     'training-facility.html':'Training Facility',
     'residential-golf.html':'Residential Golf Netting',
@@ -1028,31 +1060,96 @@ const Store = {
     'tennis.html':'Tennis Netting',
     'volleyball.html':'Volleyball Netting',
     'commercial-netting.html':'Commercial Netting',
-      'ez-nets.html': 'EZ Nets',
       'baseball-netting.html': 'Baseball Netting',
       'golf-netting.html': 'Golf Netting',
       'lacrosse-netting.html': 'Lacrosse Netting',
       'soccer-netting.html': 'Soccer Netting',
-      'contactus.html': 'Contact Us',
       'bats.html': 'Bats',
       'gloves.html': 'Gloves',
       'batting-gloves.html': 'Batting Gloves',
       'drip.html': 'Drip',
       'gear.html': 'Gear',
       'apparel.html': 'Apparel',
-      'l-screens.html': 'L-Screens',
-      'accessories.html': 'Accessories',
+  'l-screens.html': 'L-Screens',
+  'accessories.html': 'Accessories',
       'facility-field.html': 'Facility & Field'
     };
 
     const crumbs = [];
     crumbs.push({ label: 'Home', href: 'index.html' });
-    // Inject L-Screens parent for its subpages
-    const L_SUBPAGES = new Set(['baseball-l-screens.html','protective-screens.html','pitchers-pocket.html','replacement-screens.html']);
+  const L_SUBPAGES = new Set(['baseball-l-screens.html','protective-screens.html','pitchers-pocket.html','replacement-screens.html','bullet-pad-kits.html']);
     if (L_SUBPAGES.has(base)) {
       crumbs.push({ label: 'L-Screens', href: 'l-screens.html' });
     }
-    if (base !== 'index.html') {
+    if (base === 'product.html') {
+      const params = new URLSearchParams(location.search);
+      const pid = params.get('pid');
+      let prod = null;
+      let foundCategoryName = '';
+      // 1) Try unified catalog if present (product-loader)
+      try {
+        if (!prod && Array.isArray(window.CATALOG_PRODUCTS) && window.CATALOG_PRODUCTS.length && pid) {
+          const rec = window.CATALOG_PRODUCTS.find(r => String(r.id) === pid || String(r.sourceSKU||'') === pid);
+          if (rec) { prod = rec.raw || rec; }
+        }
+      } catch {}
+      // 2) Try API products
+      if (!prod && Array.isArray(PRODUCTS) && PRODUCTS.length && pid) {
+        prod = PRODUCTS.find(p => String(p.id) === pid || String(p.sku) === pid);
+      }
+      // 3) Fallback to prodList.json
+      if (!prod && pid) {
+        try {
+          const data = await this.fetchProdList();
+          if (data && data.categories && typeof data.categories === 'object') {
+            for (const [catName, arr] of Object.entries(data.categories)) {
+              if (!Array.isArray(arr)) continue;
+              const hit = arr.find(p => String(p.sku||p.id) === pid);
+              if (hit) { prod = hit; foundCategoryName = catName; break; }
+            }
+          }
+        } catch {}
+      }
+      // Derive category mapping to page
+      const resolveCategory = (p) => {
+        const name = (p?.name || p?.title || '').toLowerCase();
+        const sku = String(p?.sku || p?.id || '').toLowerCase();
+        const pathName = (Array.isArray(p?.details?.category_path) && p.details.category_path[0]) || '';
+        const catName = pathName || foundCategoryName;
+        // Direct category name mapping
+        const direct = {
+          "Baseball L-Screens": { label: 'Baseball L-Screens', href: 'baseball-l-screens.html' },
+          "Better Baseball L-Screens": { label: 'Baseball L-Screens', href: 'baseball-l-screens.html' },
+          "Pitcher's Pocket": { label: "Pitcher's Pocket", href: 'pitchers-pocket.html' },
+          "Replacement Nets": { label: 'Replacement Screens', href: 'replacement-screens.html' },
+          "Accessories": { label: 'Accessories', href: 'accessories.html' },
+          "Pre-Made Cages": { label: 'Pre-Made Cages', href: 'pre-made-cages.html' },
+          "Bullet Pad Kits": { label: 'Bullet Pad Kits', href: 'bullet-pad-kits.html' }
+        };
+        if (catName && direct[catName]) return direct[catName];
+        // Heuristics by product name/sku
+        if (/replacement/.test(name) || /\brn-/.test(sku)) return { label: 'Replacement Screens', href: 'replacement-screens.html' };
+        if (/pitcher|pocket/.test(name) || /bbpp/.test(sku)) return { label: "Pitcher's Pocket", href: 'pitchers-pocket.html' };
+        if (/protective\s+screen/.test(name)) return { label: 'Protective Screens', href: 'protective-screens.html' };
+        if (/l[- ]?screen/.test(name) || /^bullet/.test(name)) return { label: 'Baseball L-Screens', href: 'baseball-l-screens.html' };
+        if (/pad\s*kit/.test(name) || /^pk-/.test(sku)) return { label: 'Bullet Pad Kits', href: 'bullet-pad-kits.html' };
+        return { label: 'EZ Nets', href: 'ez-nets.html' };
+      };
+      if (prod) {
+        const catCrumb = resolveCategory(prod);
+        // If this is an L-Screens subpage, also place parent L-Screens hub before category where applicable
+        const lScreenPages = new Set(['baseball-l-screens.html','protective-screens.html','pitchers-pocket.html','replacement-screens.html','bullet-pad-kits.html']);
+        if (lScreenPages.has(catCrumb.href)) {
+          crumbs.push({ label: 'L-Screens', href: 'l-screens.html' });
+        }
+        crumbs.push(catCrumb);
+        const title = String(prod.title || prod.name || pid);
+        crumbs.push({ label: title, href: null });
+      } else {
+        // Fallback without product: just show Product
+        crumbs.push({ label: 'Product', href: null });
+      }
+    } else if (base !== 'index.html') {
       crumbs.push({ label: TITLES[base] || (document.title?.split('—')[0].trim() || 'Current'), href: null });
     }
 
@@ -1072,8 +1169,10 @@ const Store = {
       ol.appendChild(li);
     });
     nav.appendChild(ol);
-    // Insert before main
+    if (base === 'product.html') nav.setAttribute('data-product-bc','');
     main.parentNode.insertBefore(nav, main);
+    // Re-run SEO injection now that breadcrumbs exist so JSON-LD BreadcrumbList is added
+    try { this.ensureSEO(); } catch {}
   },
 
   // Standardize the EZ Nets sub-navigation across all netting-related pages and append Expert CTA action
@@ -1141,7 +1240,7 @@ const Store = {
       const slides = DATA[base];
       // Image selection rule: Use image only if a file exists whose name equals the normalized slide title.
       // Normalization: lower-case, remove non-alphanumeric. Then we look for `${key}.png` in assets/eznets/eznets.
-      const IMG_BASE = 'assets/eznets/eznets/';
+  const IMG_BASE = 'assets/img/eznets/';
       const KNOWN_FILENAMES = [
         'baseball','basketball','cricket','football','golf','hockey','lacrosse','multisport','soccer','softball','tennis','volleyball',
         'warehouse','safety','debris','drone','landfill'
@@ -1222,103 +1321,245 @@ const Store = {
     } catch(e) { /* silent */ }
   },
 
-  // Dynamically render products for the current page from prodList.json
+  // Soft cross-fade hero rotator on L-Screens hub (screen2 -> screen6, 1s interval)
+  ensureHeroRotator() {
+    try {
+      if (!/l-screens\.html$/i.test(location.pathname)) return;
+      const rotator = document.querySelector('.hero-rotator');
+      if (!rotator) return;
+      const slides = [...rotator.querySelectorAll('.hr-slide')];
+      if (slides.length < 2) return;
+      let idx = 0;
+      const next = () => {
+        slides[idx].classList.remove('is-active');
+        idx = (idx + 1) % slides.length;
+        slides[idx].classList.add('is-active');
+      };
+      if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        setInterval(next, 1000); // 1 second fade cadence
+      }
+    } catch(err) { console.warn('hero rotator failed', err); }
+  },
+
+  // Dynamically render products for the current page from unified catalog (product-loader -> prodList.json)
   async ensurePageProductGrid() {
     try {
       const grid = document.getElementById('page-product-grid');
       if (!grid) return; // Only run on pages that declare a page-level grid
-
-      // If prodList.json isn't present yet, fail gracefully
-  const data = await this.fetchProdList();
-      if (!data || typeof data !== 'object') {
-        this.renderEmptyState(grid);
-        return;
-      }
-
       const pageKey = (location.pathname.split('/').pop() || '').toLowerCase().replace(/\.html$/, '');
+
+      // Prefer unified catalog loaded by product-loader; if not ready yet, wait briefly then fallback to prodList.json
+      let catalog = Array.isArray(window.CATALOG_PRODUCTS) ? window.CATALOG_PRODUCTS : [];
+      if (!catalog.length) {
+        // Wait for catalog:ready up to ~1s
+        const awaited = await new Promise(resolve => {
+          let done = false;
+          const timer = setTimeout(()=>{ if (!done) { done = true; resolve(false); } }, 1000);
+          window.addEventListener('catalog:ready', ()=>{ if (!done) { clearTimeout(timer); done = true; resolve(true); } }, { once:true });
+          window.addEventListener('catalog:error', ()=>{ if (!done) { clearTimeout(timer); done = true; resolve(false); } }, { once:true });
+        });
+        if (awaited) catalog = Array.isArray(window.CATALOG_PRODUCTS) ? window.CATALOG_PRODUCTS : [];
+      }
+      // Fallback to prodList.json legacy shape if catalog still empty
+      let prodListData = null;
+      if (!catalog.length) {
+        prodListData = await this.fetchProdList();
+        if (!prodListData || typeof prodListData !== 'object') {
+          this.renderEmptyState(grid);
+          return;
+        }
+      }
 
       // Special collective page: replacement-screens
       if (pageKey === 'replacement-screens') {
-        // Gather all replacement nets from categories irrespective of single category mapping
-        const all = [];
-        if (data.categories && typeof data.categories === 'object') {
-          for (const [cat, arr] of Object.entries(data.categories)) {
+        // Gather all replacement nets from unified catalog when available; else scan prodList
+        let all = [];
+        if (Array.isArray(window.CATALOG_PRODUCTS) && window.CATALOG_PRODUCTS.length) {
+          const raws = window.CATALOG_PRODUCTS.map(r => r.raw || r);
+          all = raws.filter(p => {
+            const name = (p.name || p.title || '').toLowerCase();
+            const sku = String(p.sku || '').toLowerCase();
+            if (!(/replacement/.test(name) || /replacement/.test(sku))) return false;
+            // Exclude wheels/wheel kits from replacement nets page
+            if (/wheel/.test(name) || /wheel/.test(sku)) return false;
+            return true;
+          });
+        } else if (prodListData && prodListData.categories && typeof prodListData.categories === 'object') {
+          for (const arr of Object.values(prodListData.categories)) {
             if (!Array.isArray(arr)) continue;
             arr.forEach(p => {
               const name = (p.name || p.title || '').toLowerCase();
               const sku = String(p.sku || '').toLowerCase();
-              if (/replacement/.test(name) || /replacement/.test(sku)) all.push(p);
+              if ((/replacement/.test(name) || /replacement/.test(sku)) && !(/wheel/.test(name) || /wheel/.test(sku))) all.push(p);
             });
           }
         }
-        if (!all.length) {
-          this.renderEmptyState(grid);
-          return;
-        }
+        if (!all.length) { this.renderEmptyState(grid); return; }
         // De-dupe by sku
         const seen = new Set();
         const unique = all.filter(p => { const k = (p.sku||p.id||p.name); if (seen.has(k)) return false; seen.add(k); return true; });
-        // Sort for predictable order (alphabetical by name then sku)
-        unique.sort((a,b)=> (a.name||a.title||'').localeCompare(b.name||b.title||'') || String(a.sku||'').localeCompare(String(b.sku||'')));
-        // Build richer collective layout
+        // Sort predictable order (group by size then name)
+        const sizeRank = (p) => {
+          const t = (p.name||p.title||'').toLowerCase();
+          const m = t.match(/(7x7|8x8|10x10|jr|front toss|combo|overhead|fast pitch|socknet|l\s*w\/\s*overhead)/);
+          if (!m) return 999;
+          const key = m[1];
+          return ({ 'jr':1, '7x7':2, 'socknet':3, '8x8':4, '10x10':5, 'front toss':6, 'combo':7, 'l w/ overhead':8, 'overhead':9, 'fast pitch':10 }[key] || 500);
+        };
+        unique.sort((a,b)=> sizeRank(a) - sizeRank(b) || (a.name||'').localeCompare(b.name||''));
+        // Build single collective card with gallery + model dropdown
         grid.classList.remove('grid','grid-3','product-grid');
         grid.classList.add('collective-list');
-        const heroPick = (p) => {
-          // Reuse normalize logic for hero image
-          const n = this.normalizeProdListItem(p);
-          return n.img;
-        };
-        const currencyFmt = (v) => (isFinite(v) && v>0) ? currency.format(v) : '';
-        grid.innerHTML = unique.map(p => {
+        const modelData = unique.map(p => {
           const id = String(p.sku || p.id || p.name || p.title);
           const title = String(p.name || p.title || id);
-            const price = Number(p.price ?? p.map ?? p.wholesale ?? 0) || 0;
-          const img = heroPick(p);
-          const feats = Array.isArray(p.details?.features) ? p.details.features.slice(0,6) : [];
-          const featHtml = feats.length ? `<ul class="mini-features">${feats.map(f=>`<li>${f}</li>`).join('')}</ul>` : '';
-          return `<article class="collective-item" data-sku="${id}">
-            <figure class="media"><img src="${img}" alt="${title}" loading="lazy" decoding="async"/></figure>
-            <div class="info">
-              <h3 class="item-title"><a href="product.html?pid=${encodeURIComponent(id)}">${title}</a></h3>
-              ${price?`<div class="price">${currencyFmt(price)}</div>`:''}
-              ${featHtml}
-              <div class="actions"><button class="btn btn-ghost js-add" data-id="${id}" data-title="${title.replace(/"/g,'&quot;')}" data-price="${price}" data-category="replacement" data-img="${img}">Add</button></div>
+          const price = Number(p.price ?? p.map ?? p.wholesale ?? 0) || 0;
+          const img = this.normalizeProdListItem(p).img;
+          const features = Array.isArray(p?.details?.features) ? p.details.features : (Array.isArray(p?.features) ? p.features : []);
+          return { id, title, price, img, features };
+        });
+        const prices = modelData.map(m=>m.price).filter(v=>isFinite(v) && v>0);
+        const minP = prices.length? Math.min(...prices):0;
+        const maxP = prices.length? Math.max(...prices):0;
+        const rangeHtml = prices.length ? (minP===maxP? `${currency.format(minP)}` : `${currency.format(minP)} - ${currency.format(maxP)}`) : '';
+        const thumbs = modelData.map((m,i)=>`<button class="thumb" data-index="${i}" data-sku="${m.id}" aria-label="View ${m.title}"><img src="${m.img}" alt="${m.title}" loading="lazy"/></button>`).join('');
+        const options = [`<option value="">Choose a Model…</option>`].concat(modelData.map(m=>`<option value="${m.id}" data-price="${m.price}">${m.title} — ${currency.format(m.price)}</option>`)).join('');
+  const firstImg = modelData[0]?.img || 'assets/img/EZSportslogo.png';
+        grid.innerHTML = `
+          <article class="collective-card replacement-aggregator">
+            <div class="pd-grid">
+              <div class="pd-media">
+                <div class="pd-main"><img id="agg-main-img" src="${firstImg}" alt="Replacement screen" loading="eager" decoding="async"/></div>
+                <div class="pd-thumbs" role="tablist">${thumbs}</div>
+              </div>
+              <div class="pd-info">
+                <h1 class="pd-title">Replacement Nets</h1>
+                <div class="price h3" id="agg-price">${rangeHtml}</div>
+                <div class="stack-05" style="margin-top:.5rem;">
+                  <label class="text-xs" for="agg-model-select" style="font-weight:700;letter-spacing:.4px;">Model</label>
+                  <select id="agg-model-select" class="pd-option-select" style="padding:.7rem .8rem;border:1px solid var(--border);border-radius:.6rem;font-weight:600;">${options}</select>
+                  <div id="agg-selected" class="text-sm text-muted"></div>
+                  <ul id="agg-features" class="feature-list" style="margin:.5rem 0 0 1rem; padding-left:1rem; list-style:disc;"></ul>
+                  <button class="btn btn-primary" id="agg-add">Add to Cart</button>
+                </div>
+              </div>
             </div>
           </article>`;
-        }).join('');
-        // Bind add buttons
-        grid.querySelectorAll('.js-add').forEach(btn => {
-          if (btn._bound) return; btn._bound = true;
-          btn.addEventListener('click', () => {
-            const d = btn.dataset;
-            const product = { id: d.id, title: d.title, price: Number(d.price)||0, category: d.category || 'replacement', img: d.img };
-            try { window.Store && window.Store.add(product); } catch (e) { console.error(e); }
+        // Wire interactions
+        const main = document.getElementById('agg-main-img');
+        const priceEl = document.getElementById('agg-price');
+        const selectEl = document.getElementById('agg-model-select');
+        const selectedEl = document.getElementById('agg-selected');
+        const bySku = Object.fromEntries(modelData.map(m=>[m.id,m]));
+        const featuresEl = document.getElementById('agg-features');
+        const renderFeatures = (arr) => {
+          if (!featuresEl) return;
+          const list = Array.isArray(arr) ? arr.filter(x=>typeof x === 'string' && x.trim()) : [];
+          if (!list.length) { featuresEl.innerHTML = ''; return; }
+          const max = 10; // cap to avoid overly long lists
+          featuresEl.innerHTML = list.slice(0, max).map(f=>`<li>${f}</li>`).join('');
+        };
+        // Thumb click selects corresponding model
+        grid.querySelectorAll('.pd-thumbs .thumb').forEach(btn=>{
+          btn.addEventListener('click',()=>{
+            const i = Number(btn.dataset.index)||0;
+            const sku = btn.dataset.sku;
+            const m = modelData[i];
+            if (m?.img) main.src = m.img;
+            if (sku && selectEl) {
+              selectEl.value = sku;
+              const price = Number(bySku[sku]?.price||0) || 0;
+              priceEl.textContent = price>0 ? currency.format(price) : rangeHtml;
+              selectedEl.textContent = `${bySku[sku]?.title || ''}`;
+              renderFeatures(bySku[sku]?.features);
+            }
+            grid.querySelectorAll('.pd-thumbs .thumb').forEach(b=>b.classList.toggle('is-active', b===btn));
           });
+        });
+        // Dropdown change updates main image + price + label
+        selectEl?.addEventListener('change', ()=>{
+          const sku = selectEl.value;
+          const m = bySku[sku];
+          if (m) {
+            if (m.img) main.src = m.img;
+            priceEl.textContent = m.price>0 ? currency.format(m.price) : rangeHtml;
+            selectedEl.textContent = m.title;
+            renderFeatures(m.features);
+          } else {
+            priceEl.textContent = rangeHtml;
+            selectedEl.textContent = '';
+            renderFeatures([]);
+          }
+        });
+        // Add to cart requires a selection
+        document.getElementById('agg-add')?.addEventListener('click', ()=>{
+          const sku = selectEl?.value;
+          const m = sku ? bySku[sku] : null;
+          if (!m) { alert('Please choose a model.'); return; }
+          const product = { id: sku, title: m.title, price: m.price || 0, img: m.img, category: 'replacement' };
+          try { window.Store && window.Store.add(product, {}); } catch {}
         });
         return; // Skip normal grid rendering
       }
       let items = [];
-      // Support two schemas:
-      // 1) Legacy: { "accessories": [...], "baseball-l-screens": [...] }
-      if (Array.isArray(data[pageKey])) {
-        items = data[pageKey];
+      // Unified mapping using catalog slugs when available
+      const pageToCatSlug = {
+        'accessories': 'accessories',
+        'baseball-l-screens': 'baseball-l-screens',
+        'protective-screens': 'protective-screens',
+        'pitchers-pocket': 'pitchers-pocket',
+        'replacement-screens': 'replacement-nets',
+        'bullet-pad-kits': 'bullet-pad-kits',
+        'pre-made-cages': 'pre-made-cages'
+      };
+      const targetSlug = pageToCatSlug[pageKey];
+      if (targetSlug && window.CATALOG_BY_CATEGORY && Array.isArray(window.CATALOG_BY_CATEGORY[targetSlug])) {
+        items = window.CATALOG_BY_CATEGORY[targetSlug].map(r => r.raw || r);
       }
-      // 2) New: { schemaVersion, categories: { "Accessories": [...], "Better Baseball Screens": [...] } }
-      if (!items.length && data && data.categories && typeof data.categories === 'object') {
-        // Map page -> category arrays
-        const pageToCategories = {
+      // Fallback: if pageKey directly matches a catalog category slug
+      if (!items.length && window.CATALOG_BY_CATEGORY && Array.isArray(window.CATALOG_BY_CATEGORY[pageKey])) {
+        items = window.CATALOG_BY_CATEGORY[pageKey].map(r => r.raw || r);
+      }
+      // If still empty, attempt specialized derivations from unified catalog; else fallback to prodList scanning
+      if (!items.length) {
+        // Protective Screens page: derive from catalog across categories
+        if (pageKey === 'protective-screens' && Array.isArray(window.CATALOG_PRODUCTS) && window.CATALOG_PRODUCTS.length) {
+          const raws = window.CATALOG_PRODUCTS.map(r => r.raw || r);
+          const protective = [];
+          const seen = new Set();
+          raws.forEach(p => {
+            const name = String(p.name || p.title || '').toLowerCase();
+            if (!/protective\s+screen/.test(name)) return;
+            if (/pad kit|replacement|combo|wheel kit/.test(name)) return;
+            const key = String(p.sku || p.id || name);
+            if (seen.has(key)) return;
+            seen.add(key);
+            protective.push(p);
+          });
+          if (protective.length) {
+            const sizeRank = (p) => {
+              const text = (p.name || p.title || '').toLowerCase();
+              const m = text.match(/(\d{1,2})x(\d{1,2})/);
+              if (m) return parseInt(m[1],10) * 100 + parseInt(m[2],10);
+              return 9999;
+            };
+            protective.sort((a,b)=> sizeRank(a) - sizeRank(b));
+            items = protective;
+          }
+        }
+      }
+
+      if (!items.length && prodListData && prodListData.categories && typeof prodListData.categories === 'object') {
+        const fallbackMap = {
           'accessories': ['Accessories'],
-          // Use precise L-Screens bucket for both baseball-l-screens and l-screens hub
-          'baseball-l-screens': ['Better Baseball L-Screens'],
-          'l-screens': ['Better Baseball L-Screens'],
-          // We'll derive protective screens via name pattern (below) for tighter relevance
-          'protective-screens': ['Better Baseball L-Screens'], // initial fallback; will refine
-          'pitchers-pocket': ["Better Baseball Pitcher's Pocket"],
+          'baseball-l-screens': ['Baseball L-Screens','Better Baseball L-Screens'],
+          'protective-screens': ['Baseball L-Screens','Better Baseball L-Screens'],
+          "pitchers-pocket": ["Pitcher's Pocket"],
           'replacement-screens': ['Replacement Nets']
         };
-        const cats = pageToCategories[pageKey] || [];
-        for (const c of cats) {
-          if (Array.isArray(data.categories[c])) items = items.concat(data.categories[c]);
+        const names = fallbackMap[pageKey] || [];
+        for (const n of names) {
+          if (Array.isArray(prodListData.categories[n])) items = items.concat(prodListData.categories[n]);
         }
         // Custom refinement for protective-screens page: only show Bullet Protective Screens (7x7, 8x8, 10x10 etc.)
         if (pageKey === 'protective-screens') {
@@ -1338,9 +1579,9 @@ const Store = {
             protective.push(p);
           };
           // Scan all categories to be resilient if source category changes
-            if (data.categories && typeof data.categories === 'object') {
-              for (const key of Object.keys(data.categories)) {
-                const arr = data.categories[key];
+            if (prodListData.categories && typeof prodListData.categories === 'object') {
+              for (const key of Object.keys(prodListData.categories)) {
+                const arr = prodListData.categories[key];
                 if (Array.isArray(arr)) arr.forEach(pushIf);
               }
             }
@@ -1358,11 +1599,11 @@ const Store = {
           }
         }
         // Custom BULLET aggregation for baseball-l-screens: include every product whose name or sku starts with Bullet (excluding obvious accessories like pad kits & wheel kits)
-        if (pageKey === 'baseball-l-screens' && data.categories && typeof data.categories === 'object') {
+        if (pageKey === 'baseball-l-screens' && prodListData && prodListData.categories && typeof prodListData.categories === 'object') {
           const bullet = [];
           const seen = new Set();
           const reject = /pad kit|wheel kit/i;
-          for (const arr of Object.values(data.categories)) {
+          for (const arr of Object.values(prodListData.categories)) {
             if (!Array.isArray(arr)) continue;
             for (const p of arr) {
               if (!p) continue;
@@ -1568,7 +1809,7 @@ const Store = {
         img = candidates.sort((a,b)=> score(b)-score(a))[0];
       }
     }
-    if (!img) img = 'assets/EZSportslogo.png';
+  if (!img) img = 'assets/img/EZSportslogo.png';
     return { id, title, price, img, category: (p.category || '').toString().toLowerCase() };
   },
 
@@ -1710,18 +1951,15 @@ const Store = {
     } catch {}
   },
 
-  // Replace placeholder logo.svg with brand ezsportslogo.jpg in header & footer
+  // Replace placeholder logo.svg with new brand image in header & footer
   ensureBrandLogos() {
     try {
-  const BRAND_SRC = 'assets/EZSportslogo.png';
+  const BRAND_SRC = 'assets/img/EZSportslogo.png';
       const targets = [
         ...document.querySelectorAll('.site-header .brand img, .footer-brand-block img')
       ];
       targets.forEach(img => {
-        const src = img.getAttribute('src') || '';
-        if (/logo\.svg$/i.test(src) || /\/logo\.svg$/i.test(src)) {
-          img.setAttribute('src', BRAND_SRC);
-        }
+        img.setAttribute('src', BRAND_SRC);
         img.setAttribute('alt', 'EZ Sports Netting logo');
         // Standardize size if missing explicit height
         if (!img.getAttribute('height')) img.setAttribute('height', '40');
@@ -2020,8 +2258,31 @@ const Store = {
       dlg.className = 'product-detail-dialog';
       document.body.appendChild(dlg);
     }
-    const images = Array.isArray(product.images) && product.images.length ? product.images : [product.img];
-    const thumbs = images.map((src,i)=>`<button class="thumb" data-thumb-index="${i}" aria-label="View image ${i+1}"><img src="${src}" alt="${product.title} thumbnail ${i+1}"/></button>`).join('');
+    // Build a clean image list: drop empty, duplicate, or placeholder/removed tokens
+    let images = Array.isArray(product.images) ? product.images.slice() : [];
+    const isValidImg = (src) => {
+      if (!src || typeof src !== 'string') return false;
+      const s = src.trim(); if (!s) return false;
+      const lower = s.toLowerCase();
+      // Filter obvious placeholder markers
+      if (['removed','placeholder','n/a','na','null'].includes(lower)) return false;
+      if (lower.includes('placeholder') || lower.includes('noimage') || lower.includes('coming-soon')) return false;
+      // Must look like an image path or URL with a typical extension
+      if (!/[.](png|jpe?g|webp|avif|gif|svg)(\?|$)/.test(lower)) return false;
+      return true;
+    };
+    images = images.filter(isValidImg);
+    // Ensure primary product.img is first if valid and not already present
+    if (isValidImg(product.img)) {
+      images = images.filter(i => i !== product.img);
+      images.unshift(product.img);
+    }
+    // De-dupe while preserving order
+    const seenImgs = new Set();
+    images = images.filter(src => (seenImgs.has(src) ? false : (seenImgs.add(src), true)));
+    if (!images.length && isValidImg(product.img)) images = [product.img];
+    if (!images.length) images = [ 'https://placehold.co/800x600?text=Image+Unavailable' ];
+    const thumbs = images.map((src,i)=>`<button class="thumb" data-thumb-index="${i}" aria-label="View image ${i+1}"><img src="${src}" alt="${product.title} thumbnail ${i+1}" onerror="this.closest('button')?.remove()"/></button>`).join('');
     // Feature key:value formatting
     let featureList = '';
     if (product.features && product.features.length) {
@@ -2126,13 +2387,19 @@ const Store = {
   get cartDetailed() {
     return this.state.cart.map(i => {
       const found = PRODUCTS.find(p => p.id === i.id);
-      const product = found || {
+      const fallback = {
         id: i.id,
         title: i.title || 'Item',
         price: typeof i.price === 'number' ? i.price : Number(i.price) || 0,
-        img: i.img || 'assets/img/logo.svg',
+  img: i.img || 'assets/img/EZSportslogo.png',
         category: i.category || 'misc'
       };
+      const base = found || fallback;
+      // Prefer line-item price (e.g., selected option/variation) when provided
+      const effectivePrice = (typeof i.price === 'number' && isFinite(i.price) && i.price > 0)
+        ? i.price
+        : (typeof base.price === 'number' ? base.price : 0);
+      const product = { ...base, price: effectivePrice };
       return { ...i, product };
     });
   },
@@ -2145,7 +2412,7 @@ const Store = {
     const rows = this.cartDetailed.map(i => {
       const key = this.keyFor(i);
       const variant = `${(i.size || '').trim() ? `Size: ${i.size} ` : ''}${(i.color || '').trim() ? `Color: ${i.color}` : ''}`.trim();
-      const img = i.product?.img || 'assets/img/logo.svg';
+  const img = i.product?.img || 'assets/img/EZSportslogo.png';
       const title = i.product?.title || 'Item';
       const price = typeof i.product?.price === 'number' ? i.product.price : 0;
       return `
