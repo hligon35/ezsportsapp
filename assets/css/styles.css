@@ -60,6 +60,18 @@
   position: relative;
   flex-shrink: 0;
 }
+/* Optional number label inside neutral dots */
+.color-dot .dot-label {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 8px;
+  line-height: 1;
+  font-weight: 800;
+  color: #111;
+  pointer-events: none;
+}
 
 .color-dot:hover {
   transform: scale(1.15);
@@ -71,7 +83,7 @@
   transform: scale(1.2);
   border-color: var(--brand);
   border-width: 2px;
-  box-shadow: 0 0 0 1px rgba(36,23,115,0.2);
+  box-shadow: 0 0 0 2px rgba(36,23,115,0.25);
 }
 
 /* Color mappings */
@@ -88,6 +100,9 @@
 .color-dot.maroon { background-color: #991b1b; }
 .color-dot.royal { background-color: #3b82f6; }
 .color-dot.columbiablue { background-color: #60a5fa; }
+.color-dot.neutral { background-color: #cbd5e1; border-color: rgba(0,0,0,0.25); }
+/* Slightly larger dots on L‑Screens pages for better visibility */
+body.lscreens-subnav .color-dot { width: 14px; height: 14px; }
 
 @media (max-width:560px){ 
   .grid, #category-grid { --col-min:170px; gap:.85rem; } 
@@ -1041,6 +1056,15 @@ input, select, textarea, button { width:auto; max-width:100%; }
 .badge{background:var(--red);color:#fff;border-radius:.4rem;padding:.15rem .35rem;font-size:.72rem;font-weight:800}
 .wide{grid-column:span 2}
 
+/* L-Screens sub nav card tweaks: left-align price under title; color dots and Add on one row */
+/* Keep price block consistent but left-align specifically for L-Screens pages */
+.card .body .price-centered{ text-align:center; font-weight:800; margin:.15rem 0 .35rem; }
+body.lscreens-subnav .card .body .price-centered{ text-align:left; }
+/* Ensure variant row spaces color dots and Add button */
+body.lscreens-subnav .card .body .variant-row{ display:flex; align-items:center; justify-content:space-between; gap:.5rem; margin-top:.15rem; }
+body.lscreens-subnav .card .body .actions-row{ display:flex; justify-content:flex-end; margin-top:auto; }
+body.lscreens-subnav .card .body .actions-row.right{ justify-content:flex-end; }
+
 /* About */
 .about-inner{display:grid;grid-template-columns:1.05fr .95fr;gap:1.4rem;align-items:center;margin-top:1rem}
 .about-inner > div { display:flex; flex-direction:column; justify-content:center; align-self:center; max-width:620px; }
@@ -1424,8 +1448,8 @@ nav.quick-links li a[href="careers.html"]{
 .carousel-slide .slide-media img{width:100%;height:100%;object-fit:cover;object-position:50% 50%;display:block}
 
 /* Hero Rotator (L-Screens) */
-.hero-rotator{position:relative;max-width:660px;aspect-ratio:16/10;border-radius:1rem;overflow:hidden;isolation:isolate}
-.hero-rotator .hr-slide{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;opacity:0;transition:opacity 1s ease;will-change:opacity}
+.hero-rotator{position:relative;width:100%;max-width:100%;aspect-ratio:16/10;border-radius:1rem;overflow:hidden;isolation:isolate;background:#fff}
+.hero-rotator .hr-slide{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;object-position:center center;opacity:0;transition:opacity 1s ease;will-change:opacity;padding:0!important;background:transparent!important;border-radius:0!important}
 .hero-rotator .hr-slide.is-active{opacity:1}
 .carousel-slide .slide-media span{position:relative;z-index:2;padding:.35rem .75rem;border-radius:.5rem;background:rgba(255,255,255,.85);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
 .carousel-slide .slide-title{margin:0;font-size:clamp(.95rem,2.4vw,1.25rem);font-weight:900;text-transform:uppercase;letter-spacing:.5px;text-align:center}
@@ -1480,6 +1504,44 @@ nav.quick-links li a[href="careers.html"]{
 
 /* Variant row used in product cards */
 .variant-row { display:flex; gap:.5rem; align-items:center; margin:.25rem 0; }
+
+/* L-Screens: Title and price on one row; color dots on bottom */
+body.lscreens-subnav .card .body .title-price-row{ display:flex; align-items:baseline; justify-content:space-between; gap:.5rem; }
+body.lscreens-subnav .card .body .title-price-row .price{ font-weight:700; font-size:.95em; white-space:nowrap; }
+body.lscreens-subnav .card .body .color-dots{ margin-top:.4rem; }
+
+/* Product pages: make option dropdown and buttons fit content width */
+#product-detail .pd-info #pd-option-block { justify-items: start; align-items: start; }
+#product-detail .pd-info #pd-select-row { display:flex; gap:.5rem; flex-wrap:wrap; align-items:center; }
+#product-detail .pd-info .pd-option-select,
+#product-detail .pd-info .btn {
+  width: auto;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+#product-detail .pd-info .btn + .btn { margin-top: .5rem; }
+
+/* Modal detail (if used): same sizing */
+.product-detail-dialog .pd-info .stack-05 { justify-items: start; align-items: start; }
+.product-detail-dialog .pd-info #pd-select-row { display:flex; gap:.5rem; flex-wrap:wrap; align-items:center; }
+.product-detail-dialog .pd-info .pd-option-select,
+.product-detail-dialog .pd-info .btn {
+  width: auto;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+.product-detail-dialog .pd-info .btn + .btn { margin-top: .5rem; }
+
+/* Replacement aggregator card */
+.collective-card .pd-info .stack-05 { justify-items: start; align-items: start; }
+.collective-card .pd-info #pd-select-row { display:flex; gap:.5rem; flex-wrap:wrap; align-items:center; }
+.collective-card .pd-info .pd-option-select,
+.collective-card .pd-info .btn {
+  width: auto;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+.collective-card .pd-info .btn + .btn { margin-top: .5rem; }
 
 /* Product detail page layout (gallery + info) */
 .product-page .product-detail { margin-top: 1rem; }
@@ -1540,3 +1602,11 @@ nav.quick-links li a[href="careers.html"]{
 .net-hero.nh-safety-netting { background: linear-gradient(135deg, color-mix(in oklab, var(--brand) 92%, #000 8%), color-mix(in oklab, var(--brand) 64%, #000 36%)) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
 .net-hero.nh-debris-netting { background: linear-gradient(135deg, color-mix(in oklab, var(--brand) 92%, #000 8%), color-mix(in oklab, var(--brand) 64%, #000 36%)) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
 .net-hero.nh-landfill-netting { background: linear-gradient(135deg, color-mix(in oklab, var(--brand) 92%, #000 8%), color-mix(in oklab, var(--brand) 64%, #000 36%)) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
+
+/* L-Screens subcategory intro */
+.subcategory-intro { margin: .25rem auto 1rem; }
+.subcategory-intro .intro-card{ background:#fff; border:1px solid var(--border); border-radius:.9rem; padding:1rem; box-shadow:0 4px 20px rgba(12,32,64,.06); }
+.subcategory-intro h2.h3{ margin:.1rem 0 .4rem; }
+.subcategory-intro p{ margin:0 0 .65rem; }
+.range-chips{ list-style:none; padding:0; margin:0; display:flex; gap:.4rem; flex-wrap:wrap; }
+.chip-static{ display:inline-flex; align-items:center; padding:.35rem .6rem; border:1px solid var(--border); border-radius:999px; font-weight:700; font-size:.8rem; background:#fafafa; }

@@ -351,6 +351,16 @@ const Store = {
     user: null,
   },
 
+  // Helper to robustly derive the current page key (handles trailing slash and .html)
+  getPageKey() {
+    try {
+      let path = (location.pathname || '').toLowerCase();
+      if (path.endsWith('/')) path = path.slice(0, -1);
+      const last = path.split('/').pop() || '';
+      return last.replace(/\.html$/, '');
+    } catch { return ''; }
+  },
+
   // Expose a way to retrieve the current products list (admin-managed or defaults)
   getProducts() {
     // Previously this called a removed helper `getProducts()` which caused a ReferenceError
@@ -389,8 +399,10 @@ const Store = {
     this.ensureBreadcrumbs();
     this.updateNavigation();
   this.ensureNettingSubnav();
+  this.ensureSubcategoryIntro();
   this.ensureNettingCarousel();
   this.ensureHeroRotator();
+  this.ensureRandomTypeTileImages();
   this.ensureUniformFooter();
   this.ensureExpertCTA();
   this.ensureQuoteButtons();
@@ -476,6 +488,27 @@ const Store = {
     // initial render will happen after fetch; if fetch stalls, show spinner
     if (this.ui.grid) this.ui.grid.innerHTML = '<p class="text-muted">Loading products…</p>';
     this.renderCart();
+
+    // Ensure the Continue Shopping button in the mini-cart just closes the panel
+    try {
+      const dlg = this.ui.dialog;
+      if (dlg && !dlg.dataset.wiredContinue) {
+        const footer = dlg.querySelector('.mini-cart__footer');
+        if (footer) {
+          footer.addEventListener('click', (e) => {
+            const a = e.target && e.target.closest ? e.target.closest('a') : null;
+            if (!a) return;
+            const label = (a.textContent || '').trim().toLowerCase();
+            // Only intercept the Continue Shopping link within the mini-cart footer
+            if (label.startsWith('continue shopping')) {
+              e.preventDefault();
+              try { dlg.close(); } catch {}
+            }
+          });
+        }
+        dlg.dataset.wiredContinue = '1';
+      }
+    } catch {}
 
     // Chips
     document.querySelectorAll('.chip').forEach(ch => ch.addEventListener('click', () => {
@@ -1321,6 +1354,15 @@ const Store = {
     } catch(e) { /* silent */ }
   },
 
+  // Insert a brief category intro + product range chips on L-Screens subcategory pages.
+  ensureSubcategoryIntro() {
+    // Feature disabled: ensure any existing intro is removed and do not insert a new one
+    try {
+      const existing = document.getElementById('subcategory-intro') || document.querySelector('.subcategory-intro');
+      if (existing) existing.remove();
+    } catch {}
+  },
+
   // Soft cross-fade hero rotator on L-Screens hub (screen2 -> screen6, 1s interval)
   ensureHeroRotator() {
     try {
@@ -1341,12 +1383,134 @@ const Store = {
     } catch(err) { console.warn('hero rotator failed', err); }
   },
 
+  // On the L-Screens hub, replace the static "Shop by Type" tile images with a random
+  // product image from the corresponding assets/prodImgs category folders.
+  ensureRandomTypeTileImages() {
+    try {
+      const page = (location.pathname.split('/').pop() || '').toLowerCase();
+      if (page !== 'l-screens.html' && page !== 'l-screens') return;
+      const tilesWrap = document.querySelector('.category-tiles .tiles');
+      if (!tilesWrap) return;
+
+      // Static manifest of available product images per type (relative URLs)
+      // Only minimal, representative sets are needed; add more as assets grow.
+      const BASE = 'assets/prodImgs';
+      const join = (...parts) => parts.join('/');
+
+      const MANIFEST = {
+        baseball: [
+          // BULLETCOMBO
+          ...[
+            'bulletcombo_blacklscreen_a.avif','bulletcombo_columbiabluelscreen_a.avif','bulletcombo_darkgreenlscreen_a.avif','bulletcombo_maroonlscreen_a.avif','bulletcombo_navylscreen_a.avif','bulletcombo_orangelscreen_a.avif','bulletcombo_purplelscreen_a.avif','bulletcombo_redlscreen_a.avif','bulletcombo_royallscreen_a.avif','bulletcombo_yellowlscreen_a.avif'
+          ].map(n => join(BASE, 'Baseball_L_Screens', 'BULLETCOMBO', n)),
+          // BULLETCOP
+          ...[
+            'bulletcop_black_screen_alt1 (1).avif','bulletcop_columbiablue_screen_alt1 (1).avif','bulletcop_darkgreen_screen_alt1 (1).avif','bulletcop_green_screen_alt1 (1).avif','bulletcop_maroon_screen_alt1 (1).avif','bulletcop_navy_screen_alt1 (1).avif','bulletcop_orange_screen_alt1 (1).avif','bulletcop_purplescreen_alt1 (1).avif','bulletcop_redscreen_alt1 (1).avif','bulletcop_royalscreen_alt1 (1).avif','bulletcop_yellowscreen (1).avif'
+          ].map(n => join(BASE, 'Baseball_L_Screens', 'BULLETCOP', n)),
+          // BULLETFP
+          ...[
+            'bulletfp_blackscreen_a.avif','bulletfp_columbiabluescreen_a.avif','bulletfp_darkgreenscreen_a.avif','bulletfp_greenscreen_a.avif','bulletfp_navyscreen_a.avif','bulletfp_orangescreen_a.avif','bulletfp_purplescreen_a.avif','bulletfp_redscreen_a.avif','bulletfp_royalscreen_a.avif','bulletfp_yellowscreen_a.avif'
+          ].map(n => join(BASE, 'Baseball_L_Screens', 'BULLETFP', n)),
+          // BULLETFPOH
+          ...[
+            'bulletfpoh_blacklscreen_a.avif','bulletfpoh_columbiabluelscreen_a.avif','bulletfpoh_darkgreenlscreen_a.avif','bulletfpoh_greenlscreen_a.avif','bulletfpoh_maroonlscreen_a.avif','bulletfpoh_navylscreen_a.avif','bulletfpoh_orangelscreen_a.avif','bulletfpoh_purplelscreen_a.avif','bulletfpoh_redlscreen_a.avif','bulletfpoh_royallscreen_a.avif','bulletfpoh_yellowlscreen_a.avif'
+          ].map(n => join(BASE, 'Baseball_L_Screens', 'BULLETFPOH', n)),
+          // BULLETFT
+          ...[
+            'bulletft_blacklscreen_a.avif','bulletft_columbiabluelscreen_a.avif','bulletft_darkgreenlscreen_a.avif','bulletft_greenlscreen_a.avif','bulletft_maroonlscreen_a.avif','bulletft_navylscreen_a.avif','bulletft_orangelscreen_a.avif','bulletft_purplelscreen_a.avif','bulletft_redlscreen_alt.avif','bulletft_royallscreen_a.avif','bulletft_yellowlscreen_a.avif'
+          ].map(n => join(BASE, 'Baseball_L_Screens', 'BULLETFT', n)),
+          // BULLETJRBB
+          ...[
+            'bulletjrbb1a.avif','bulletjrbb2a.avif','bulletjrbb3a.avif','bulletjrbb4a.avif','bulletjrbb5a.avif','bulletjrbb6a.avif','bulletjrbb7a.avif','bulletjrbb8a.avif','bulletjrbb9a.avif','bulletjrbb10a.avif','bulletjrbb11a.avif'
+          ].map(n => join(BASE, 'Baseball_L_Screens', 'BULLETJRBB', n)),
+          // BULLETL
+          ...[
+            'bulletl_blacklscreen_a.avif','bulletl_columbiabluelscreen_a.avif','bulletl_darkgreenlscreen_a.avif','bulletl_greenlscreen_a.avif','bulletl_maroonlscreen_a.avif','bulletl_navylscreen_a.avif','bulletl_orangelscreen_a.avif','bulletl_purplelscreen_a.avif','bulletl_redlscreen_a.avif','bulletl_royallscreen_a.avif','bulletl_yellowlscreen_a.avif'
+          ].map(n => join(BASE, 'Baseball_L_Screens', 'BULLETL', n)),
+          // BULLETLOP
+          ...[
+            'bulletlop_black_screen_a.avif','bulletlop_columbiablue_screen_a.avif','bulletlop_darkgreen_screen_a.avif','bulletlop_green_screen_a.avif','bulletlop_maroon_screen_a.avif','bulletlop_navy_screen_a.avif','bulletlop_orange_screen_a.avif','bulletlop_purple_screen_a.avif','bulletlop_red_screen_a.avif','bulletlop_royal_screen_a.avif','bulletlop_yellow_screen_a.avif'
+          ].map(n => join(BASE, 'Baseball_L_Screens', 'BULLETLOP', n)),
+          // SOCKNET7X7
+          ...[
+            'socknet7x7-black_a.avif','socknet7x7-columbiablue_a.avif','socknet7x7-darkgreen_a.avif','socknet7x7-green_a.avif','socknet7x7-maroon_a.avif','socknet7x7-navy_a.avif','socknet7x7-orange_a.avif','socknet7x7-purple_a.avif','socknet7x7-red_a.avif','socknet7x7-royal_a.avif','socknet7x7-yellow_a.avif'
+          ].map(n => join(BASE, 'Baseball_L_Screens', 'SOCKNET7X7', n))
+        ],
+        protective: [
+          // 10x10
+          ...[
+            'protective10x10_blackscreen (1).avif','protective10x10_columbiabluescreen (1).avif','protective10x10_darkgreenscreen (1).avif','protective10x10_greenscreen (1).avif','protective10x10_maroonscreen (1).avif','protective10x10_navyscreen (1).avif','protective10x10_orangescreen (1).avif','protective10x10_purplescreen (1).avif','protective10x10_redscreen (1).avif','protective10x10_ryoalscreen (1).avif','protective10x10_yellowscreen (1).avif'
+          ].map(n => join(BASE, 'Protective_Screens', 'PROTECTIVE10X10', n)),
+          // 7x7
+          ...[
+            'protective7x7_blackscreen (1).avif','protective7x7_columbiabluescreen (1).avif','protective7x7_darkgreenscreen (1).avif','protective7x7_greenscreen (1).avif','protective7x7_maroonscreen (1).avif','protective7x7_navyscreen (1).avif','protective7x7_orangescreen (1).avif','protective7x7_purplescreen (1).avif','protective7x7_redscreen (1).avif','protective7x7_royalscreen (1).avif','protective7x7_yellowscreen (1).avif'
+          ].map(n => join(BASE, 'Protective_Screens', 'PROTECTIVE7X7', n)),
+          // 8x8
+          ...[
+            'protective8x8_blackscreen (1).avif','protective8x8_columbiabluescreen (1).avif','protective8x8_darkgreenscreen (1).avif','protective8x8_greenscreen (1).avif','protective8x8_maroonscreen (1).avif','protective8x8_navyscreen (1).avif','protective8x8_orangescreen (1).avif','protective8x8_purplescreen (1).avif','protective8x8_redscreen (1).avif','protective8x8_royalscreen (1).avif','protective8x8_yellowscreen (1).avif'
+          ].map(n => join(BASE, 'Protective_Screens', 'PROTECTIVE8X8', n))
+        ],
+        pocket: [
+          // Pro
+          ...[
+            'pppro1a.avif','pppro2a.avif','pppro3a.avif','pppro4a.avif','pppro5a.avif','pppro6a.avif','pppro7a.avif','pppro8a.avif','pppro9a.avif','pppro10a.avif','pppro11a.avif','pppro12a.avif'
+          ].map(n => join(BASE, "Pitcher's_Pockets", 'BBPP-PRO', n)),
+          // 9-hole
+          ...[
+            'pitcher_spocket9hole_black_a.avif','pitcher_spocket9hole_columbiablue_a.avif','pitcher_spocket9hole_darkgreen_a.avif','pitcher_spocket9hole_green_a.avif','pitcher_spocket9hole_maroon_a.avif','pitcher_spocket9hole_navy_a.avif','pitcher_spocket9hole_orange_a.avif','pitcher_spocket9hole_purple_a.avif','pitcher_spocket9hole_red_a.avif','pitcher_spocket9hole_royal_a.avif','pitcher_spocket9hole_yellow_a.avif'
+          ].map(n => join(BASE, "Pitcher's_Pockets", 'PITCHERSPOCKET9', n))
+        ],
+        replacement: [
+          join(BASE, 'Replacement_Nets', 'RN-10X10 PROTECTIVE', 'replacement_net_10x10_a.avif'),
+          join(BASE, 'Replacement_Nets', 'RN-7X7 PROTECTIVE', 'replacement_net_7x7_a.avif'),
+          join(BASE, 'Replacement_Nets', 'RN-8X8 PROTECTIVE', 'replacement_net_8x8_a.avif'),
+          join(BASE, 'Replacement_Nets', 'RN-BULLETCOMBO', 'replacement_net_combo_a.avif'),
+          join(BASE, 'Replacement_Nets', 'RN-BULLETCOP', 'replacement_net_bulletcop_a.avif'),
+          join(BASE, 'Replacement_Nets', 'RN-BULLETFPOH', 'replacement_net_fpoh_a.avif'),
+          join(BASE, 'Replacement_Nets', 'RN-BULLETFT', 'replacement_net_fronttoss_a.avif'),
+          join(BASE, 'Replacement_Nets', 'RN-BULLETJR', 'replacement_net_bulletjr_a.avif'),
+          join(BASE, 'Replacement_Nets', 'RN-BULLETL', 'replacement_net_bulletl_a.avif'),
+          join(BASE, 'Replacement_Nets', 'RN-BULLETLOP', 'replacement_net_bulletlop_a.avif'),
+          join(BASE, 'Replacement_Nets', 'RN-7X7 SOCKNET', 'replacement_net_socknet_a.avif')
+        ]
+      };
+
+      const pickRandom = (arr) => arr[Math.floor(Math.random() * arr.length)];
+      const mapHrefToKey = (href) => {
+        const h = (href || '').toLowerCase();
+        if (h.endsWith('baseball-l-screens.html')) return 'baseball';
+        if (h.endsWith('protective-screens.html')) return 'protective';
+        if (h.endsWith('pitchers-pocket.html')) return 'pocket';
+        if (h.endsWith('replacement-screens.html')) return 'replacement';
+        return null;
+      };
+
+      tilesWrap.querySelectorAll('.tile').forEach(tile => {
+        const a = tile; // tiles are anchors in current markup
+        const key = mapHrefToKey(a.getAttribute('href'));
+        if (!key || !Array.isArray(MANIFEST[key]) || MANIFEST[key].length === 0) return;
+        const img = tile.querySelector('.media img');
+        if (!img) return;
+        const src = pickRandom(MANIFEST[key]);
+        if (src) img.src = src;
+      });
+    } catch (e) {
+      console.warn('ensureRandomTypeTileImages failed:', e);
+    }
+  },
+
   // Dynamically render products for the current page from unified catalog (product-loader -> prodList.json)
   async ensurePageProductGrid() {
     try {
       const grid = document.getElementById('page-product-grid');
       if (!grid) return; // Only run on pages that declare a page-level grid
-      const pageKey = (location.pathname.split('/').pop() || '').toLowerCase().replace(/\.html$/, '');
+      const pageKey = this.getPageKey();
+
+      // Tag body for L-Screens sub nav pages to allow page-specific styling
+      try {
+        const LS_PAGES = new Set(['baseball-l-screens','baseball-l-screen','protective-screens','pitchers-pocket','replacement-screens']);
+        if (LS_PAGES.has(pageKey)) document.body.classList.add('lscreens-subnav');
+      } catch {}
 
       // Prefer unified catalog loaded by product-loader; if not ready yet, wait briefly then fallback to prodList.json
       let catalog = Array.isArray(window.CATALOG_PRODUCTS) ? window.CATALOG_PRODUCTS : [];
@@ -1686,8 +1850,13 @@ const Store = {
         if (btn._bound) return; btn._bound = true;
         btn.addEventListener('click', () => {
           const d = btn.dataset;
-          const product = { id: d.id, title: d.title, price: Number(d.price)||0, category: d.category || (pageKey || 'misc'), img: d.img };
-          try { window.Store && window.Store.add(product); } catch (e) { console.error(e); }
+          const card = btn.closest('article');
+          const activeDot = card ? card.querySelector('.color-dot.active') : null;
+          const selectedColor = activeDot ? activeDot.dataset.color : undefined;
+          const imgEl = card ? card.querySelector('.product-main-image') : null;
+          const currentImg = imgEl?.getAttribute('src') || d.img;
+          const product = { id: d.id, title: d.title, price: Number(d.price)||0, category: d.category || (pageKey || 'misc'), img: currentImg };
+          try { window.Store && window.Store.add(product, { color: selectedColor }); } catch (e) { console.error(e); }
         });
       });
     } catch (e) {
@@ -1719,8 +1888,26 @@ const Store = {
     if (!p || typeof p !== 'object') return p;
     const id = String(p.sku || p.id || p.name || p.title || Math.random().toString(36).slice(2));
     const title = String(p.name || p.title || id);
-    // Prefer explicit price fields; fall back to map, then wholesale, else 0
-    const price = Number(p.price ?? p.map ?? p.wholesale ?? 0) || 0;
+    // Prefer explicit price fields; fall back to details.price, map, then wholesale, or derive from variations
+    let price = Number(p.price ?? p.map ?? p.wholesale ?? 0) || 0;
+    if ((!isFinite(price) || price <= 0) && p.details && (p.details.price != null)) {
+      const dp = Number(p.details.price);
+      if (isFinite(dp) && dp > 0) price = dp;
+    }
+    // Collect variation prices (if any) for min/max display and as a fallback
+    let varMin = null, varMax = null;
+    if (Array.isArray(p.variations) && p.variations.length) {
+      const prices = p.variations
+        .map(v => Number(v.map ?? v.price ?? 0))
+        .filter(v => isFinite(v) && v > 0);
+      if (prices.length) {
+        varMin = Math.min(...prices);
+        varMax = Math.max(...prices);
+      }
+    }
+    if ((!isFinite(price) || price <= 0) && (varMin != null)) {
+      price = varMin;
+    }
     // Robust image selection: prefer web URLs and known fields; avoid local file paths (e.g. C:\...)
     const isUsableSrc = (s) => typeof s === 'string' && /^(https?:|\/|assets\/)/i.test(s);
     let img = null;
@@ -1809,8 +1996,31 @@ const Store = {
         img = candidates.sort((a,b)=> score(b)-score(a))[0];
       }
     }
-  if (!img) img = 'assets/img/EZSportslogo.png';
-    return { id, title, price, img, category: (p.category || '').toString().toLowerCase() };
+    const imagesList = (function(){
+      try {
+        const all = collectAll();
+        // De-dupe and keep up to 10 for UI usage (color dots, etc.)
+        const seen = new Set();
+        const out = [];
+        for (const s of all) { if (!seen.has(s)) { seen.add(s); out.push(s); if (out.length >= 10) break; } }
+        return out;
+      } catch { return []; }
+    })();
+    if (!img) img = 'assets/img/EZSportslogo.png';
+    // Expose min/max price for UI (range display) while keeping price as the lowest
+    const minPrice = (function(){
+      const candidates = [price];
+      if (varMin != null) candidates.push(varMin);
+      return Math.min(...candidates.filter(v => isFinite(v) && v > 0)) || price || 0;
+    })();
+    const maxPrice = (function(){
+      const candidates = [];
+      if (isFinite(price) && price > 0) candidates.push(price);
+      if (varMax != null) candidates.push(varMax);
+      if (varMin != null) candidates.push(varMin);
+      return candidates.length ? Math.max(...candidates) : price || 0;
+    })();
+    return { id, title, price, minPrice, maxPrice, img, images: imagesList, category: (p.category || '').toString().toLowerCase() };
   },
 
   buildProductCard(prod) {
@@ -1820,43 +2030,75 @@ const Store = {
       const title = String(prod.title || 'Untitled');
       const price = Number(prod.price || 0);
       const img = String(prod.img || 'assets/img/netting.jpg');
-      const displayPrice = isFinite(price) && price > 0 ? currency.format(price) : '';
+      // Prefer showing a range when min/max are available; fall back to single price
+      let displayPrice = '';
+      const minP = Number(prod.minPrice ?? price ?? 0);
+      const maxP = Number(prod.maxPrice ?? minP);
+      if (isFinite(minP) && minP > 0) {
+        if (isFinite(maxP) && maxP > minP) {
+          displayPrice = `${currency.format(minP)} - ${currency.format(maxP)}`;
+        } else {
+          displayPrice = currency.format(minP);
+        }
+      }
       const href = `product.html?pid=${encodeURIComponent(id)}`;
 
-      // Extract color variations for this product
+      // Determine if this is one of the L-Screens sub nav pages for special layout
+  const pageKey = this.getPageKey();
+  const isLScreensSub = (new Set(['baseball-l-screens','baseball-l-screen','protective-screens','pitchers-pocket','replacement-screens'])).has(pageKey);
+
+      // Extract color variations for this product and randomly choose an initial color
       const colors = this.extractProductColors(prod);
+      const initialColorIndex = colors.length > 0 ? Math.floor(Math.random() * colors.length) : -1;
+      const initialImg = (initialColorIndex >= 0 && colors[initialColorIndex]?.image) ? colors[initialColorIndex].image : img;
       const colorDotsHtml = colors.length > 0 ? `
         <div class="color-dots" data-product-id="${id}">
           ${colors.map((color, index) => `
-            <div class="color-dot ${color.class} ${index === 0 ? 'active' : ''}" 
+            <div class="color-dot ${color.class} ${index === initialColorIndex ? 'active' : ''}" 
                  data-color="${color.name}" 
                  data-image="${color.image}"
-                 title="${color.name.charAt(0).toUpperCase() + color.name.slice(1)}"
+                 title="${(color.label ? `Image ${color.label}` : color.name.charAt(0).toUpperCase() + color.name.slice(1))}"
                  role="button" 
                  tabindex="0"
-                 aria-label="Select ${color.name} color"></div>
+                 aria-label="Select ${(color.label ? `image ${color.label}` : color.name)}">
+                 ${color.label ? `<span class="dot-label">${color.label}</span>` : ''}
+            </div>
           `).join('')}
         </div>
       ` : '';
 
       const article = document.createElement('article');
       article.className = 'card';
-      article.innerHTML = `
-        <a class="media" href="${href}"><img src="${img}" alt="${title}" loading="lazy" class="product-main-image" /></a>
-        <div class="body">
-          <h3 class="h3-tight"><a href="${href}">${title}</a></h3>
-          ${colorDotsHtml}
-          <div class="price-row">
-            ${displayPrice ? `<span class="price">${displayPrice}</span>` : ''}
-            <button class="btn btn-ghost js-add" data-id="${id}" data-title="${title.replace(/"/g,'&quot;')}" data-price="${price}" data-category="${prod.category || ''}" data-img="${img}">Add</button>
-          </div>
-        </div>`;
+      if (isLScreensSub) {
+        // L-Screens sub nav layout: title + price on same row, color dots on bottom row, no Add button
+        article.innerHTML = `
+          <a class="media" href="${href}"><img src="${initialImg}" alt="${title}" loading="lazy" class="product-main-image" /></a>
+          <div class="body">
+            <div class="title-price-row">
+              <h3 class="h3-tight"><a href="${href}">${title}</a></h3>
+              ${displayPrice ? `<div class="price">${displayPrice}</div>` : ''}
+            </div>
+            ${colorDotsHtml}
+          </div>`;
+      } else {
+        // Default layout
+        article.innerHTML = `
+          <a class="media" href="${href}"><img src="${initialImg}" alt="${title}" loading="lazy" class="product-main-image" /></a>
+          <div class="body">
+            <h3 class="h3-tight"><a href="${href}">${title}</a></h3>
+            ${colorDotsHtml}
+            <div class="price-row">
+              ${displayPrice ? `<span class="price">${displayPrice}</span>` : ''}
+              <button class="btn btn-ghost js-add" data-id="${id}" data-title="${title.replace(/"/g,'&quot;')}" data-price="${price}" data-category="${prod.category || ''}" data-img="${img}">Add</button>
+            </div>
+          </div>`;
+      }
       
       // Bind color dot interactions for this card
       const colorDots = article.querySelectorAll('.color-dot');
       colorDots.forEach(dot => {
         dot.addEventListener('click', (ev) => {
-          const colorDot = ev.target;
+          const colorDot = ev.currentTarget;
           const colorDotsContainer = colorDot.closest('.color-dots');
           const card = colorDot.closest('article');
           const productImage = card.querySelector('.product-main-image');
@@ -1876,10 +2118,17 @@ const Store = {
         dot.addEventListener('keydown', (ev) => {
           if (ev.key === 'Enter' || ev.key === ' ') {
             ev.preventDefault();
-            ev.target.click();
+            ev.currentTarget.click();
           }
         });
       });
+
+      // If this card is JR, rebuild dots using dynamic color classification to ensure 1:1 dot→image
+      try {
+        if (/bulletjrbb/i.test(id) || /\bjr\b/i.test(title)) {
+          this._recolorJRDots(article);
+        }
+      } catch {}
       
       return article;
     } catch {
@@ -2026,50 +2275,185 @@ const Store = {
       if (Array.isArray(product.raw.images)) sources = product.raw.images.slice();
       else if (Array.isArray(product.raw.gallery)) sources = product.raw.gallery.slice();
     }
-    // Nothing to derive
     if (!sources.length) return [];
 
-    const colorMap = {
-      'black': 'black',
-      'white': 'white', 
-      'red': 'red',
-      'blue': 'blue',
-      'navy': 'navy',
-      'green': 'green',
-      'darkgreen': 'darkgreen',
-      'yellow': 'yellow',
-      'orange': 'orange',
-      'purple': 'purple',
-      'maroon': 'maroon',
-      'royal': 'royal',
-      'columbiablue': 'columbiablue'
-    };
-
-    const colors = new Set();
-    const colorImages = {};
-
-    sources.forEach(imagePath => {
-      const filename = imagePath.split('/').pop().toLowerCase();
-      
-      // Skip zoom versions (with _a suffix or (1) suffix) for primary color extraction
-      if (filename.includes('_a.') || filename.includes('(1).')) return;
-      
-      // Extract color from filename
-      Object.keys(colorMap).forEach(colorKey => {
-        if (filename.includes(colorKey)) {
-          colors.add(colorKey);
-          if (!colorImages[colorKey]) {
-            colorImages[colorKey] = imagePath;
-          }
+    // Special-case: Bullet JR images are numbered without color tokens.
+    // Return all JR images as neutral for now; we'll classify and recolor dots after render.
+    try {
+      const lowerSources = sources.map(s => ({ src: s, name: (s.split('/').pop()||'').toLowerCase() }));
+      const looksLikeJR = lowerSources.some(it => /^bulletjrbb\d{1,2}(a)?\./.test(it.name))
+        || /bulletjrbb/i.test(String(product.id||product.sku||product.title||''));
+      if (looksLikeJR) {
+        // Prefer non-zoom ('a') first but include all up to 11
+        const seq = lowerSources.sort((a,b)=>{
+          const re = /bulletjrbb(\d{1,2})(a)?\./;
+          const ma = a.name.match(re); const mb = b.name.match(re);
+          const ia = ma ? parseInt(ma[1],10) : 999; const ib = mb ? parseInt(mb[1],10) : 999;
+          const aa = ma && ma[2] ? 1 : 0; const ab = mb && mb[2] ? 1 : 0; // 'a' comes first
+          return ia - ib || (ab - aa);
+        });
+        const out = [];
+        const seenIdx = new Set();
+        const re = /bulletjrbb(\d{1,2})(a)?\./;
+        for (const it of seq) {
+          const m = it.name.match(re);
+          if (!m) continue;
+          const n = parseInt(m[1],10);
+          if (seenIdx.has(n)) continue; // keep only best for each index
+          seenIdx.add(n);
+          out.push({ name: `jr-${n}`, class: 'neutral', image: it.src });
+          if (out.length >= 11) break;
         }
-      });
+        if (out.length) return out;
+      }
+    } catch {}
+
+    // Define colors with specific-first ordering and simple synonyms to avoid collisions
+    const colorDefs = [
+      { name: 'columbiablue', class: 'columbiablue', patterns: ['columbiablue','columbia'] },
+      { name: 'darkgreen', class: 'darkgreen', patterns: ['darkgreen'] },
+      { name: 'maroon', class: 'maroon', patterns: ['maroon'] },
+      { name: 'purple', class: 'purple', patterns: ['purple'] },
+      { name: 'orange', class: 'orange', patterns: ['orange'] },
+      { name: 'yellow', class: 'yellow', patterns: ['yellow'] },
+      { name: 'royal', class: 'royal', patterns: ['royal','ryoal'] },
+      { name: 'navy', class: 'navy', patterns: ['navy'] },
+      // Generics include excludes to avoid matching specific shades
+      { name: 'green', class: 'green', patterns: ['green'], excludes: ['darkgreen'] },
+      { name: 'blue', class: 'blue', patterns: ['blue'], excludes: ['columbiablue'] },
+      { name: 'red', class: 'red', patterns: ['red'] },
+      { name: 'white', class: 'white', patterns: ['white'] },
+      { name: 'black', class: 'black', patterns: ['black'] },
+    ];
+
+    const nonZoom = [];
+    const zoom = [];
+    sources.forEach(src => {
+      const name = src.split('/').pop().toLowerCase();
+      const isZoom = name.includes('_a.') || name.includes('(1).');
+      (isZoom ? zoom : nonZoom).push({ src, name });
     });
 
-    return Array.from(colors).map(color => ({
-      name: color,
-      class: colorMap[color],
-      image: colorImages[color]
-    }));
+    const picked = {};
+    const has = (color) => Object.prototype.hasOwnProperty.call(picked, color);
+    const findMatch = (list, patterns, excludes = []) => list.find(item => {
+      if (excludes.length && excludes.some(ex => item.name.includes(ex))) return false;
+      return patterns.some(p => item.name.includes(p));
+    });
+
+    colorDefs.forEach(def => {
+      // Prefer non-zoom; fallback to zoom if needed
+      const candidate = findMatch(nonZoom, def.patterns, def.excludes) || findMatch(zoom, def.patterns, def.excludes);
+      if (candidate && !has(def.name)) {
+        picked[def.name] = { class: def.class, image: candidate.src };
+      }
+    });
+
+    // Build output array in the defined order to ensure consistent dot ordering
+    const out = [];
+    colorDefs.forEach(def => {
+      if (has(def.name)) out.push({ name: def.name, class: def.class, image: picked[def.name].image });
+    });
+    // Fallback: if no explicit color matches but multiple images exist, create neutral variant dots
+    if (out.length === 0) {
+      const seq = nonZoom.concat(zoom); // prefer non-zoom first
+      const max = Math.min(6, seq.length);
+      for (let i = 0; i < max; i++) {
+        out.push({ name: `option${i+1}`, class: 'neutral', image: seq[i].src, label: String(i+1) });
+      }
+    }
+    return out;
+  },
+
+  // Palette and color utils for JR dynamic classification
+  _palette() {
+    return [
+      { name: 'black', class: 'black', rgb: [0,0,0] },
+      { name: 'white', class: 'white', rgb: [255,255,255] },
+      { name: 'red', class: 'red', rgb: [220,38,38] },
+      { name: 'maroon', class: 'maroon', rgb: [153,27,27] },
+      { name: 'orange', class: 'orange', rgb: [234,88,12] },
+      { name: 'yellow', class: 'yellow', rgb: [234,179,8] },
+      { name: 'green', class: 'green', rgb: [22,163,74] },
+      { name: 'darkgreen', class: 'darkgreen', rgb: [21,128,61] },
+      { name: 'navy', class: 'navy', rgb: [30,64,175] },
+      { name: 'royal', class: 'royal', rgb: [59,130,246] },
+      { name: 'columbiablue', class: 'columbiablue', rgb: [96,165,250] },
+      { name: 'purple', class: 'purple', rgb: [147,51,234] }
+    ];
+  },
+  _rgbToHsl(r,g,b){
+    r/=255; g/=255; b/=255; const max=Math.max(r,g,b), min=Math.min(r,g,b);
+    let h,s,l=(max+min)/2;
+    if(max===min){ h=s=0; }
+    else{ const d=max-min; s=l>0.5? d/(2-max-min):d/(max+min);
+      switch(max){case r:h=(g-b)/d+(g<b?6:0);break;case g:h=(b-r)/d+2;break;case b:h=(r-g)/d+4;break;} h/=6; }
+    return [h*360,s,l];
+  },
+  async _classifyImageToPalette(src){
+    return new Promise(resolve=>{
+      const img=new Image(); img.crossOrigin='anonymous'; img.decoding='async';
+      img.onload=()=>{
+        try{
+          const canvas=document.createElement('canvas'); const ctx=canvas.getContext('2d');
+          const W=32,H=32; canvas.width=W; canvas.height=H; ctx.drawImage(img,0,0,W,H);
+          const data=ctx.getImageData(0,0,W,H).data; const votes = new Map();
+          const pal=this._palette();
+          for(let i=0;i<data.length;i+=4){
+            const r=data[i], g=data[i+1], b=data[i+2], a=data[i+3]; if (a<200) continue;
+            const [h,s,l]=this._rgbToHsl(r,g,b);
+            if (s<0.25 || l<0.15 || l>0.85) continue; // ignore low saturation & extremes
+            // Map very dark to black
+            if (l<0.2) { votes.set('black',(votes.get('black')||0)+1); continue; }
+            // Pick nearest by simple RGB distance to palette
+            let best='black', bestD=1e9; for (const p of pal){
+              const dr=r-p.rgb[0], dg=g-p.rgb[1], db=b-p.rgb[2]; const d=dr*dr+dg*dg+db*db;
+              if (d<bestD){ bestD=d; best=p.name; }
+            }
+            votes.set(best,(votes.get(best)||0)+1);
+          }
+          let winner='black', max=0; votes.forEach((v,k)=>{ if (v>max){ max=v; winner=k; } });
+          resolve(winner);
+        } catch{ resolve('black'); }
+      };
+      img.onerror=()=>resolve('black');
+      img.src=src;
+    });
+  },
+  async _recolorJRDots(article){
+    try{
+      const wrap = article.querySelector('.color-dots'); if (!wrap) return;
+      const dots = Array.from(wrap.querySelectorAll('.color-dot'));
+      if (!dots.length) return;
+      const paletteOrder = ['black','columbiablue','darkgreen','green','maroon','navy','orange','purple','red','royal','yellow'];
+      const map = new Map();
+      // classify each image
+      await Promise.all(dots.map(async dot=>{
+        const src = dot.dataset.image; if (!src) return;
+        const color = await this._classifyImageToPalette(src);
+        if (!map.has(color)) map.set(color, src);
+      }));
+      // build new dots in palette order
+      const html = paletteOrder.filter(c=>map.has(c)).map((c,idx)=>{
+        const cls = c; const src = map.get(c);
+        return `<div class="color-dot ${cls} ${idx===0?'active':''}" data-color="${c}" data-image="${src}" role="button" tabindex="0" aria-label="Select ${c}"></div>`;
+      }).join('');
+      if (!html) return;
+      wrap.innerHTML = html;
+      const productImage = article.querySelector('.product-main-image');
+      const firstDot = wrap.querySelector('.color-dot.active') || wrap.querySelector('.color-dot');
+      if (firstDot && productImage) productImage.src = firstDot.dataset.image;
+      // Rebind interactions
+      wrap.querySelectorAll('.color-dot').forEach(dot=>{
+        dot.addEventListener('click', (ev)=>{
+          const colorDot = ev.currentTarget; const container = colorDot.closest('.color-dots');
+          const card = colorDot.closest('article'); const img = card.querySelector('.product-main-image');
+          container.querySelectorAll('.color-dot').forEach(d=>d.classList.remove('active'));
+          colorDot.classList.add('active'); if (img) img.src = colorDot.dataset.image;
+        });
+        dot.addEventListener('keydown', (ev)=>{ if (ev.key==='Enter'||ev.key===' '){ ev.preventDefault(); ev.currentTarget.click(); } });
+      });
+    }catch{}
   },
 
   renderProducts(query = '') {
@@ -2089,18 +2473,22 @@ const Store = {
       const desc = p.description ? p.description.slice(0, 140) + (p.description.length > 140 ? '…' : '') : '';
       const featPreview = (p.features && p.features.length) ? p.features.slice(0,3).map(f=>`<li>${f}</li>`).join('') : '';
       
-      // Extract color variations for this product
+      // Extract color variations for this product and randomly select an initial color
       const colors = this.extractProductColors(p);
+      const initialColorIndex = colors.length > 0 ? Math.floor(Math.random() * colors.length) : -1;
+      const initialImg = (initialColorIndex >= 0 && colors[initialColorIndex]?.image) ? colors[initialColorIndex].image : p.img;
       const colorDotsHtml = colors.length > 0 ? `
         <div class="color-dots" data-product-id="${p.id}">
           ${colors.map((color, index) => `
-            <div class="color-dot ${color.class} ${index === 0 ? 'active' : ''}" 
+            <div class="color-dot ${color.class} ${index === initialColorIndex ? 'active' : ''}" 
                  data-color="${color.name}" 
                  data-image="${color.image}"
-                 title="${color.name.charAt(0).toUpperCase() + color.name.slice(1)}"
+                 title="${(color.label ? `Image ${color.label}` : color.name.charAt(0).toUpperCase() + color.name.slice(1))}"
                  role="button" 
                  tabindex="0"
-                 aria-label="Select ${color.name} color"></div>
+                 aria-label="Select ${(color.label ? `image ${color.label}` : color.name)}">
+                 ${color.label ? `<span class="dot-label">${color.label}</span>` : ''}
+            </div>
           `).join('')}
         </div>
       ` : '';
@@ -2125,7 +2513,7 @@ const Store = {
       return `
       <article class="card ${p.category === 'netting' ? '' : ''}" data-product-id="${p.id}" ${p.stripe?.defaultPriceId ? `data-stripe-price="${p.stripe.defaultPriceId}"` : ''}>
         <div class="media no-link">
-          <img src="${p.img}" alt="${p.title}" loading="lazy" draggable="false" style="pointer-events:none;" onerror="this.onerror=null;this.src='https://placehold.co/600x400?text=Image+Unavailable';" class="product-main-image"/>
+          <img src="${initialImg}" alt="${p.title}" loading="lazy" draggable="false" style="pointer-events:none;" onerror="this.onerror=null;this.src='https://placehold.co/600x400?text=Image+Unavailable';" class="product-main-image"/>
         </div>
         <div class="body">
           <h3 class="h3-tight">${p.title}</h3>
@@ -2145,6 +2533,17 @@ const Store = {
     }).join('');
 
     this.ui.grid.innerHTML = html || `<p>No products found.</p>`;
+
+    // After render: dynamically recolor JR dots so colors match images
+    try {
+      this.ui.grid.querySelectorAll('article.card').forEach(card => {
+        const title = (card.querySelector('h3')?.textContent||'').toLowerCase();
+        const pid = card.getAttribute('data-product-id')||'';
+        if (/bullet\s*l\s*screen\s*jr/.test(title) || /BULLETJRBB/i.test(pid)) {
+          this._recolorJRDots(card);
+        }
+      });
+    } catch {}
 
     // Analytics: product impression (batched)
     try {
@@ -2189,14 +2588,15 @@ const Store = {
       const id = btn.dataset.add;
       const product = PRODUCTS.find(p => p.id === id);
       const card = ev.target.closest('article');
-      
-      // Get selected color from active color dot
-      const activeColorDot = card.querySelector('.color-dot.active');
+      // Get selected color and current image
+      const activeColorDot = card?.querySelector('.color-dot.active');
       const selectedColor = activeColorDot ? activeColorDot.dataset.color : undefined;
-      
+      const imgEl = card?.querySelector('.product-main-image');
+      const currentImg = imgEl?.getAttribute('src');
       const opts = { color: selectedColor };
+      if (product && currentImg) product.img = currentImg;
       this.add(product, opts);
-      try { window.trackEvent && window.trackEvent('add_to_cart', { id: product.id, price: product.price, stripePrice: product.stripe?.defaultPriceId }); } catch {}
+      try { window.trackEvent && window.trackEvent('add_to_cart', { id: product.id, price: product.price, stripePrice: product.stripe?.defaultPriceId, color: selectedColor }); } catch {}
     }));
 
     // Bind detail buttons
@@ -2210,7 +2610,7 @@ const Store = {
     // Bind color dot interactions
     this.ui.grid.querySelectorAll('.color-dot').forEach(dot => {
       dot.addEventListener('click', (ev) => {
-        const colorDot = ev.target;
+        const colorDot = ev.currentTarget;
         const colorDotsContainer = colorDot.closest('.color-dots');
         const card = colorDot.closest('article');
         const productImage = card.querySelector('.product-main-image');
@@ -2230,7 +2630,7 @@ const Store = {
       dot.addEventListener('keydown', (ev) => {
         if (ev.key === 'Enter' || ev.key === ' ') {
           ev.preventDefault();
-          ev.target.click();
+          ev.currentTarget.click();
         }
       });
     });
@@ -2356,6 +2756,8 @@ const Store = {
       exists.qty += 1;
     } else {
       // Store a snapshot for items that may not exist in PRODUCTS (e.g., dynamic pages like gloves)
+      let imgSrc = product.img;
+      try { if (imgSrc) imgSrc = new URL(imgSrc, location.href).href; } catch {}
       this.state.cart.push({
         id: product.id,
         qty: 1,
@@ -2363,7 +2765,7 @@ const Store = {
         color: opts.color,
         title: product.title || product.name,
         price: typeof product.price === 'number' ? product.price : Number(product.price) || 0,
-        img: product.img,
+        img: imgSrc || 'assets/img/EZSportslogo.png',
         category: product.category
       });
     }
@@ -2400,6 +2802,8 @@ const Store = {
         ? i.price
         : (typeof base.price === 'number' ? base.price : 0);
       const product = { ...base, price: effectivePrice };
+      // Prefer the specific image chosen on the line item (selected color) over catalog image
+      if (i.img) product.img = i.img;
       return { ...i, product };
     });
   },

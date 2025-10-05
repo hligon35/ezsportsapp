@@ -197,7 +197,28 @@
       }
       return `<div class="price h3" id="pd-price"></div>`;
     })();
-  const thumbs = prod.displayPairs.map((g,i)=>`<button class="thumb" data-index="${i}" aria-label="Show image ${i+1}" data-large="${g.large}"><img src="${g.thumb}" alt="${prod.title} image ${i+1}" loading="lazy"/></button>`).join('');
+    const thumbs = prod.displayPairs.map((g,i)=>`<button class="thumb" data-index="${i}" aria-label="Show image ${i+1}" data-large="${g.large}"><img src="${g.thumb}" alt="${prod.title} image ${i+1}" loading="lazy"/></button>`).join('');
+
+    // Build color choices from product images using Store's color extraction
+    let colorOptions = [];
+    try {
+      const imgs = Array.isArray(prod.displayPairs) ? prod.displayPairs.map(p => p.large) : (prod.primary ? [prod.primary] : []);
+      if (window.Store && typeof window.Store.extractProductColors === 'function') {
+        colorOptions = window.Store.extractProductColors({ images: imgs, id: (new URLSearchParams(location.search)).get('pid') || prod.id, sku: (new URLSearchParams(location.search)).get('pid') || prod.id, title: prod.title });
+      }
+      // De-duplicate by color name keeping first image
+      const seen = new Set();
+      colorOptions = colorOptions.filter(c => { if (seen.has(c.name)) return false; seen.add(c.name); return true; });
+    } catch {}
+    const colorSelectHtml = (colorOptions && colorOptions.length) ? `
+      <select id="pd-color-select" class="pd-option-select" aria-label="Color" style="padding:.7rem .8rem;border:1px solid var(--border);border-radius:.6rem;font-weight:600;">
+        <option value="">Choose a Color...</option>
+        ${colorOptions.map(c => {
+          const label = (c.label ? `Color ${c.label}` : (c.class && c.class !== 'neutral' ? (c.class.charAt(0).toUpperCase()+c.class.slice(1)) : (c.name.charAt(0).toUpperCase()+c.name.slice(1))));
+          return `<option value="${(c.name||'').replace(/"/g,'&quot;')}" data-image="${c.image}" data-color-class="${c.class||''}">${label}</option>`;
+        }).join('')}
+      </select>
+    ` : '';
     const features = Array.isArray(prod.features) && prod.features.length ? `<ul class="features">${prod.features.map(f=>`<li>${f}</li>`).join('')}</ul>` : '';
     el.innerHTML = `
       <div class="pd-grid">
@@ -209,18 +230,20 @@
           <h1 class="pd-title">${prod.title}</h1>
           ${basePriceHtml}
           <div class="stack-05" id="pd-option-block" style="margin-top:.5rem;">
-            ${prod.variations && prod.variations.length ? `
-              <label class="text-xs" for="pd-option-select" style="font-weight:700;letter-spacing:.4px;">Options</label>
-              <select id="pd-option-select" class="pd-option-select" style="padding:.7rem .8rem;border:1px solid var(--border);border-radius:.6rem;font-weight:600;">
-                <option value="">Choose an Option...</option>
-                ${prod.variations.map((v,i)=>{
-                  const vPrice = Number(v.map ?? v.price ?? 0) || 0;
-                  const label = v.option || `Option ${i+1}`;
-                  const priceText = vPrice > 0 ? ` - $${vPrice.toFixed(2)}` : '';
-                  return `<option value="${label.replace(/"/g,'&quot;')}" data-price="${vPrice}">${label}${priceText}</option>`;
-                }).join('')}
-              </select>
-            ` : ''}
+            <div class="row gap-06" id="pd-select-row">
+              ${prod.variations && prod.variations.length ? `
+                <select id="pd-option-select" class="pd-option-select" aria-label="Options" style="padding:.7rem .8rem;border:1px solid var(--border);border-radius:.6rem;font-weight:600;">
+                  <option value="">Choose an Option...</option>
+                  ${prod.variations.map((v,i)=>{
+                    const vPrice = Number(v.map ?? v.price ?? 0) || 0;
+                    const label = v.option || `Option ${i+1}`;
+                    const priceText = vPrice > 0 ? ` - $${vPrice.toFixed(2)}` : '';
+                    return `<option value="${label.replace(/"/g,'&quot;')}" data-price="${vPrice}">${label}${priceText}</option>`;
+                  }).join('')}
+                </select>
+              ` : ''}
+              ${colorSelectHtml}
+            </div>
             <button class="btn btn-primary" id="pd-add">Add to Cart</button>
             <a class="btn" href="javascript:history.back()">Back</a>
           </div>
@@ -271,10 +294,72 @@
       }
     } catch {}
 
+    // Wire color select to update main image
+    try {
+      const colorSel = document.getElementById('pd-color-select');
+      if (colorSel) {
+        const applyColorImage = () => {
+          const opt = colorSel.options[colorSel.selectedIndex];
+          const imgSrc = opt?.dataset?.image;
+          if (imgSrc) {
+            main.src = imgSrc;
+          }
+        };
+        colorSel.addEventListener('change', applyColorImage);
+        // Preselect based on current main image if a matching color exists; else default to first real color
+        const idx = Array.from(colorSel.options).findIndex(o => {
+          const dataImg = o.dataset?.image || '';
+          if (!dataImg) return false;
+          // Normalize: compare by file name tail to avoid absolute vs relative mismatch
+          const tail = (str) => (str||'').split('/').pop();
+          return tail(dataImg) === tail(main.src||'');
+        });
+        if (idx > 0) { colorSel.selectedIndex = idx; }
+        else if (colorSel.options.length > 1) { colorSel.selectedIndex = 1; applyColorImage(); }
+      }
+    } catch {}
+
+    // If this is a JR product (bulletjrbb) and we currently have neutral color entries, classify to palette and rebuild the dropdown
+    (async () => {
+      try {
+        const pid = (new URLSearchParams(location.search)).get('pid') || prod.id || '';
+        const looksLikeJR = /bulletjrbb/i.test(String(pid)) || /bullet\s*l\s*screen\s*jr/i.test(prod.title||'');
+        const colorSel = document.getElementById('pd-color-select');
+        if (!looksLikeJR || !colorSel || !window.Store || typeof window.Store._classifyImageToPalette !== 'function' || typeof window.Store._palette !== 'function') return;
+        // Detect if current options are neutral (no data-color-class or class == neutral)
+        const opts = Array.from(colorSel.options).slice(1); // skip placeholder
+        if (!opts.length) return;
+        const allNeutral = opts.every(o => (o.dataset.colorClass||o.getAttribute('data-color-class')||'neutral') === 'neutral');
+        if (!allNeutral) return;
+        // Classify each image to a palette color
+        const map = new Map();
+        for (const o of opts) {
+          const src = o.dataset.image; if (!src) continue;
+          const color = await window.Store._classifyImageToPalette(src);
+          if (!map.has(color)) map.set(color, src);
+        }
+        if (!map.size) return;
+        const order = ['black','columbiablue','darkgreen','green','maroon','navy','orange','purple','red','royal','yellow'];
+        const rebuilt = ['<option value="">Choose a Color...</option>'];
+        order.forEach(c => {
+          if (!map.has(c)) return;
+          const src = map.get(c);
+          const label = c.charAt(0).toUpperCase() + c.slice(1);
+          rebuilt.push(`<option value="${c}" data-image="${src}" data-color-class="${c}">${label}</option>`);
+        });
+        colorSel.innerHTML = rebuilt.join('');
+        // Select first and update image
+        if (colorSel.options.length > 1) {
+          colorSel.selectedIndex = 1; const img = colorSel.options[1].dataset.image; if (img) { main.src = img; }
+        }
+      } catch {}
+    })();
+
     document.getElementById('pd-add')?.addEventListener('click', ()=>{
       try {
         // Determine selected variation (if any)
         const optSel = document.getElementById('pd-option-select');
+        const colorSel = document.getElementById('pd-color-select');
         let chosenLabel = prod.title;
         let chosenPrice = prod.price || 0;
         if (optSel && optSel.value) {
@@ -288,8 +373,9 @@
         }
         // Pass option as size to preserve cart key uniqueness
         const size = (optSel && optSel.value) ? optSel.value : undefined;
+        const color = (colorSel && colorSel.value) ? colorSel.value : undefined;
         const product = { id: prod.id, title: chosenLabel, price: chosenPrice, img: main.src || prod.primary, category: 'netting' };
-        window.Store && window.Store.add(product, { size });
+        window.Store && window.Store.add(product, { size, color });
       } catch {}
     });
   }
