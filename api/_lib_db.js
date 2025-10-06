@@ -36,6 +36,8 @@ async function ensureSchema() {
   await sql`ALTER TABLE orders ADD COLUMN IF NOT EXISTS customer_name TEXT;`;
   await sql`ALTER TABLE orders ADD COLUMN IF NOT EXISTS shipping JSONB;`;
   await sql`ALTER TABLE orders ADD COLUMN IF NOT EXISTS summary TEXT;`;
+  // Stripe: map users -> stripe customer id for billing portal and future linkage
+  await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS stripe_customer_id TEXT;`;
 }
 
 // Ensure the owner admin exists in production DB without overwriting password on updates
@@ -127,6 +129,14 @@ module.exports = {
   ensureSchema,
   ensureOwnerAdmin,
   findUserByIdentifier,
+  // convenience helpers for email-based lookup used in admin portal
+  async getUserByEmail(email){
+    const { rows } = await sql`SELECT * FROM users WHERE lower(email)=lower(${email}) LIMIT 1;`;
+    return rows[0] || null;
+  },
+  async setUserStripeCustomer(email, customerId){
+    await sql`UPDATE users SET stripe_customer_id=${customerId} WHERE lower(email)=lower(${email});`;
+  },
   createUser,
   updateLastLogin,
   verifyPassword,

@@ -48,6 +48,7 @@ const inventoryRoutes = require('./routes/inventory');
 const invoiceRoutes = require('./routes/invoices');
 const analyticsRoutes = require('./routes/analytics');
 const marketingRoutes = require('./routes/marketing');
+const adminRoutes = require('./routes/admin');
 const app = express();
 // Respect reverse proxy (needed for secure cookies and correct IPs when behind nginx/Heroku)
 if (process.env.TRUST_PROXY) {
@@ -149,6 +150,7 @@ app.use('/api/inventory', inventoryRoutes);
 app.use('/api/invoices', invoiceRoutes);
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api/marketing', marketingRoutes);
+app.use('/api/admin', adminRoutes);
 
 // Legacy redirects for removed static pages (migrated from previous hosting config)
 const redirects = [

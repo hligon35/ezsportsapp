@@ -119,6 +119,13 @@
       <!-- Users Section -->
   <div id="users-section" class="admin-section hidden">
         <h3>User Management</h3>
+        <form id="billing-portal-form" class="toolbar" onsubmit="event.preventDefault(); window.openBillingPortal(document.getElementById('billing-email').value)">
+          <label>
+            <span>Billing email:</span>
+            <input id="billing-email" type="email" placeholder="customer@email.com" class="filter-select" required />
+          </label>
+          <button type="submit" class="btn btn-secondary">Open Billing Portal</button>
+        </form>
         <div id="users-list"></div>
       </div>
 

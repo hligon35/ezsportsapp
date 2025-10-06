@@ -6,7 +6,7 @@ if (!stripeSecret) {
   console.warn('STRIPE_SECRET_KEY is not set. Set it in Vercel env for secure payments.');
 }
 const stripe = require('stripe')(stripeSecret || 'sk_test_yourkey');
-const { ensureSchema, createOrderRecord, updateOrderStripePi } = require('./_lib_db');
+const { ensureSchema, createOrderRecord, updateOrderStripePi, getUserByEmail, setUserStripeCustomer } = require('./_lib_db');
 const { getPriceCents } = require('./_lib_products');
 
 function calcSubtotalCents(items = []){
@@ -45,11 +45,29 @@ module.exports = async function handler(req, res) {
       summary
     });
 
+    // Ensure a Stripe Customer exists and attach PI to it for portal continuity
+    let stripeCustomerId = null;
+    try {
+      if (customer && customer.email) {
+        // Lookup cached mapping if user exists
+        const rec = await getUserByEmail(customer.email).catch(()=>null);
+        stripeCustomerId = rec?.stripe_customer_id || null;
+        if (!stripeCustomerId) {
+          const search = await stripe.customers.search({ query: `email:'${customer.email.replace(/'/g, "\\'")}'` });
+          let c = search?.data?.[0] || null;
+          if (!c) c = await stripe.customers.create({ email: customer.email, name: customer.name || undefined });
+          stripeCustomerId = c.id;
+          if (rec) await setUserStripeCustomer(customer.email, stripeCustomerId).catch(()=>{});
+        }
+      }
+    } catch {}
+
     const paymentIntent = await stripe.paymentIntents.create({
       amount,
       currency,
       description,
       automatic_payment_methods: { enabled: true },
+      customer: stripeCustomerId || undefined,
       metadata: {
         order_id: String(orderRow.id),
         email: customer.email || '',

@@ -596,6 +596,7 @@ const Store = {
           <div>
             <h4>Shop</h4>
             <a href="ez-nets.html">EZ Nets</a><br/>
+            <a href="pre-made-cages.html">Pre-Made Cages</a><br/>
             <a href="l-screens.html">L-Screens</a><br/>
             <a href="accessories.html">Accessories</a>
           </div>
@@ -913,6 +914,7 @@ const Store = {
       { href: 'index.html', text: 'Home' },
       { href: 'about.html', text: 'About' },
       { href: 'ez-nets.html', text: 'EZ Nets' },
+      { href: 'pre-made-cages.html', text: 'Pre-Made Cages' },
       { href: 'l-screens.html', text: 'L-Screens' },
       { href: 'accessories.html', text: 'Accessories' },
       { href: 'contactus.html', text: 'Contact Us' }
@@ -1117,6 +1119,85 @@ const Store = {
     if (base === 'product.html') {
       const params = new URLSearchParams(location.search);
       const pid = params.get('pid');
+      // Special-case: Pre-Made Cages grouped product pages
+      const pidKey = (pid||'').toLowerCase();
+      const GROUP_TITLES = {
+        'cages-21nylon': '#21 Nylon',
+        'cages-36nylon': '#36 Nylon',
+        'cages-36poly': '#36 Poly'
+      };
+      if (GROUP_TITLES[pidKey]) {
+        crumbs.push({ label: 'Pre-Made Cages', href: 'pre-made-cages.html' });
+        crumbs.push({ label: GROUP_TITLES[pidKey], href: null });
+        // Build DOM immediately for this synthetic product case
+        const nav = document.createElement('nav');
+        nav.className = 'breadcrumbs container wrap';
+        nav.setAttribute('aria-label', 'Breadcrumb');
+        const ol = document.createElement('ol');
+        ol.className = 'crumbs';
+        crumbs.forEach((c, idx) => {
+          const li = document.createElement('li');
+          if (c.href && idx < crumbs.length - 1) {
+            const a = document.createElement('a'); a.href = c.href; a.textContent = c.label; li.appendChild(a);
+          } else {
+            const span = document.createElement('span'); span.textContent = c.label; span.setAttribute('aria-current', 'page'); li.appendChild(span);
+          }
+          ol.appendChild(li);
+        });
+        nav.appendChild(ol);
+        nav.setAttribute('data-product-bc','');
+        main.parentNode.insertBefore(nav, main);
+        try { this.ensureSEO(); } catch {}
+        return; // done
+      }
+      // Special-case: Forever Black Twine Spool grouped product page
+      if (pidKey === 'twine-forever-black') {
+        crumbs.push({ label: 'Accessories', href: 'accessories.html' });
+        crumbs.push({ label: 'Forever Black Twine Spool', href: null });
+        const nav = document.createElement('nav');
+        nav.className = 'breadcrumbs container wrap';
+        nav.setAttribute('aria-label', 'Breadcrumb');
+        const ol = document.createElement('ol');
+        ol.className = 'crumbs';
+        crumbs.forEach((c, idx) => {
+          const li = document.createElement('li');
+          if (c.href && idx < crumbs.length - 1) {
+            const a = document.createElement('a'); a.href = c.href; a.textContent = c.label; li.appendChild(a);
+          } else {
+            const span = document.createElement('span'); span.textContent = c.label; span.setAttribute('aria-current', 'page'); li.appendChild(span);
+          }
+          ol.appendChild(li);
+        });
+        nav.appendChild(ol);
+        nav.setAttribute('data-product-bc','');
+        main.parentNode.insertBefore(nav, main);
+        try { this.ensureSEO(); } catch {}
+        return;
+      }
+      // Special-case: Cable grouped product page
+      if (pidKey === 'cable-wire') {
+        crumbs.push({ label: 'Accessories', href: 'accessories.html' });
+        crumbs.push({ label: 'Cable', href: null });
+        const nav = document.createElement('nav');
+        nav.className = 'breadcrumbs container wrap';
+        nav.setAttribute('aria-label', 'Breadcrumb');
+        const ol = document.createElement('ol');
+        ol.className = 'crumbs';
+        crumbs.forEach((c, idx) => {
+          const li = document.createElement('li');
+          if (c.href && idx < crumbs.length - 1) {
+            const a = document.createElement('a'); a.href = c.href; a.textContent = c.label; li.appendChild(a);
+          } else {
+            const span = document.createElement('span'); span.textContent = c.label; span.setAttribute('aria-current', 'page'); li.appendChild(span);
+          }
+          ol.appendChild(li);
+        });
+        nav.appendChild(ol);
+        nav.setAttribute('data-product-bc','');
+        main.parentNode.insertBefore(nav, main);
+        try { this.ensureSEO(); } catch {}
+        return;
+      }
       let prod = null;
       let foundCategoryName = '';
       // 1) Try unified catalog if present (product-loader)
@@ -1534,7 +1615,7 @@ const Store = {
         }
       }
 
-      // Special collective page: replacement-screens
+  // Special collective page: replacement-screens
       if (pageKey === 'replacement-screens') {
         // Gather all replacement nets from unified catalog when available; else scan prodList
         let all = [];
@@ -1663,6 +1744,82 @@ const Store = {
           const product = { id: sku, title: m.title, price: m.price || 0, img: m.img, category: 'replacement' };
           try { window.Store && window.Store.add(product, {}); } catch {}
         });
+        return; // Skip normal grid rendering
+      }
+
+      // Special grouped page: pre-made-cages
+      if (pageKey === 'pre-made-cages') {
+        // Collect source items from unified catalog when available; else fallback to prodList.json category
+        let all = [];
+        if (Array.isArray(window.CATALOG_BY_CATEGORY?.['pre-made-cages']) && window.CATALOG_BY_CATEGORY['pre-made-cages'].length) {
+          all = window.CATALOG_BY_CATEGORY['pre-made-cages'].map(r => r.raw || r);
+        }
+        if (!all.length && prodListData && prodListData.categories && Array.isArray(prodListData.categories['Pre-Made Cages'])) {
+          all = prodListData.categories['Pre-Made Cages'];
+        }
+        if (!all.length) { this.renderEmptyState(grid); return; }
+
+        // Group into three families
+        const norm = (x) => (typeof x === 'string' ? x.trim().toLowerCase() : x);
+        const groups = [
+          { key: '21nylon', title: '#21 Nylon', match: (p) => String(p.material||'').toLowerCase()==='nylon' && Number(p.gauge||0)===21 },
+          { key: '36nylon', title: '#36 Nylon', match: (p) => String(p.material||'').toLowerCase()==='nylon' && Number(p.gauge||0)===36 },
+          { key: '36poly',  title: '#36 Poly',  match: (p) => String(p.material||'').toLowerCase()==='poly'  && Number(p.gauge||0)===36 }
+        ];
+
+        grid.innerHTML = '';
+        // Keep three-across layout
+        grid.classList.add('grid','grid-3','product-grid');
+
+        const makeModelData = (arr) => {
+          return arr.map(p => {
+            const id = String(p.sku || p.id || p.name || p.title);
+            const title = String(p.name || p.title || p.size || id);
+            const price = Number(p.map ?? p.price ?? p.wholesale ?? 0) || 0;
+            const img = this.normalizeProdListItem(p).img || 'assets/img/EZSportslogo.png';
+            const size = p.size || (title.match(/\b\d+x\d+x?\d*\b/i)?.[0] || '');
+            return { id, title, size, price, img, raw: p };
+          });
+        };
+        const buildRange = (models) => {
+          const prices = models.map(m=>m.price).filter(v=>isFinite(v) && v>0);
+          if (!prices.length) return '';
+          const minP = Math.min(...prices); const maxP = Math.max(...prices);
+          return minP===maxP ? currency.format(minP) : `${currency.format(minP)} - ${currency.format(maxP)}`;
+        };
+
+        const GROUP_IMGS = {
+          '21nylon': [ 'assets/prodImgs/Pre_Made_Cages/21Nylon.avif', 'assets/prodImgs/Pre_Made_Cages/21Nylon2.avif' ],
+          '36nylon': [ 'assets/prodImgs/Pre_Made_Cages/36Nylon.avif', 'assets/prodImgs/Pre_Made_Cages/36Nylon2.avif' ],
+          '36poly':  [ 'assets/prodImgs/Pre_Made_Cages/36Poly.avif',  'assets/prodImgs/Pre_Made_Cages/36Poly2.avif' ]
+        };
+
+        groups.forEach((g, gi) => {
+          const items = all.filter(g.match);
+          if (!items.length) return; // skip empty groups silently
+          const models = makeModelData(items);
+          // Build a standard product card layout that links to a group detail page; no inline sizes or add button
+          const uid = `cages-${g.key}`;
+          const first = models[0];
+          const firstImg = (GROUP_IMGS[g.key] && GROUP_IMGS[g.key][0]) || first?.img || 'assets/img/EZSportslogo.png';
+          const rangeHtml = buildRange(models);
+          const href = `product.html?pid=${encodeURIComponent(`cages-${g.key}`)}`;
+          const article = document.createElement('article');
+          article.className = 'card';
+          article.innerHTML = `
+            <a class="media" href="${href}"><img src="${firstImg}" alt="${g.title}" loading="lazy" class="product-main-image"/></a>
+            <div class="body">
+              <h3 class="h3-tight">Batting Cage Netting <a href="${href}">${g.title}</a></h3>
+              <div class="price-row">
+                <span class="price">${rangeHtml}</span>
+                <a class="btn btn-ghost" href="${href}" aria-label="View ${g.title}">View</a>
+              </div>
+            </div>`;
+          grid.appendChild(article);
+        });
+
+        // If none of the groups produced content, show empty
+        if (!grid.children.length) { this.renderEmptyState(grid); }
         return; // Skip normal grid rendering
       }
       let items = [];
@@ -1837,6 +1994,54 @@ const Store = {
         return;
       }
 
+      // Special aggregation on Accessories: group Twine Spool and Cable items into single cards with price ranges
+      if (pageKey === 'accessories') {
+        const isTwineSpool = (p) => /forever\s*black\s*twine\s*spool/i.test(String(p.name||p.title||''));
+        const isCable = (p) => /^CABLE/i.test(String(p.sku||''));
+        const twines = items.filter(isTwineSpool);
+        const cables = items.filter(isCable);
+        const others = items.filter(p => !isTwineSpool(p) && !isCable(p));
+        if (twines.length || cables.length) {
+          grid.innerHTML = '';
+          grid.classList.add('grid','grid-3','product-grid');
+          const MAX_PAGE_ITEMS = 12;
+          const groupCount = (twines.length?1:0) + (cables.length?1:0);
+          const room = Math.max(0, MAX_PAGE_ITEMS - groupCount);
+          // Render other accessories first
+          others.slice(0, room).forEach(p => {
+            const card = this.buildProductCard(this.normalizeProdListItem(p));
+            if (card) grid.appendChild(card);
+          });
+          // Helper to build a group card
+          const buildGroupCard = ({title, items, href, alt}) => {
+            const prices = items.map(p => Number(p.map ?? p.price ?? p.wholesale ?? 0) || 0).filter(v=>isFinite(v)&&v>0);
+            const minP = prices.length ? Math.min(...prices) : 0;
+            const maxP = prices.length ? Math.max(...prices) : 0;
+            const range = prices.length ? (minP===maxP ? currency.format(minP) : `${currency.format(minP)} - ${currency.format(maxP)}`) : '';
+            const firstImg = this.normalizeProdListItem(items[0]).img || 'assets/img/EZSportslogo.png';
+            const article = document.createElement('article');
+            article.className = 'card';
+            article.innerHTML = `
+              <a class="media" href="${href}"><img src="${firstImg}" alt="${alt||title}" loading="lazy" class="product-main-image"/></a>
+              <div class="body">
+                <h3 class="h3-tight"><a href="${href}">${title}</a></h3>
+                <div class="price-row">
+                  <span class="price">${range}</span>
+                  <a class="btn btn-ghost" href="${href}" aria-label="View ${title}">View</a>
+                </div>
+              </div>`;
+            return article;
+          };
+          if (twines.length) {
+            grid.appendChild(buildGroupCard({ title:'Forever Black Twine Spool', items: twines, href:'product.html?pid=twine-forever-black', alt:'Forever Black Twine Spool' }));
+          }
+          if (cables.length) {
+            grid.appendChild(buildGroupCard({ title:'Cable', items: cables, href:'product.html?pid=cable-wire', alt:'Galvanized Cable' }));
+          }
+          return; // done with custom rendering
+        }
+      }
+
       grid.innerHTML = '';
       const MAX_PAGE_ITEMS = 12;
       items.slice(0, MAX_PAGE_ITEMS).forEach(p => {
@@ -2007,6 +2212,51 @@ const Store = {
       } catch { return []; }
     })();
     if (!img) img = 'assets/img/EZSportslogo.png';
+
+    // Curated accessory image overrides
+    try {
+      const lowerId = (id || '').toLowerCase();
+      const lowerTitle = (title || '').toLowerCase();
+      // Screen Bulletz Leg Caps (Accessories)
+      if (lowerId === 'screen bulletz' || /screen\s*bulletz/.test(lowerTitle)) {
+        const base = 'assets/prodImgs/Accessories/Screen_bulletz';
+        const curated = [
+          `${base}/screen_bulletz_a.avif`,
+          `${base}/screen_bulletz1_a.avif`,
+          `${base}/screen_bulletz2_a.avif`,
+          `${base}/screen_bulletz3_a.avif`,
+          `${base}/screen_bulletz4_a.avif`,
+          `${base}/screen_bulletz5_a.avif`
+        ];
+        img = curated[0];
+        // Use curated list as images, but keep any additional valid ones after
+        const extra = Array.isArray(imagesList) ? imagesList.filter(s => !curated.includes(s)) : [];
+        imagesList.splice(0, imagesList.length, ...curated, ...extra);
+      }
+      // Bullet Wheeled Ball Basket (Accessories)
+      if (lowerId === 'wbasket' || /wheeled\s*ball\s*basket/.test(lowerTitle)) {
+        const hero = 'assets/prodImgs/Accessories/Wbasket/wbasket.avif';
+        img = hero;
+        const extra = Array.isArray(imagesList) ? imagesList.filter(s => s !== hero) : [];
+        imagesList.splice(0, imagesList.length, hero, ...extra);
+      }
+      // Pro Batting Mat (Accessories)
+      if (lowerId === 'battingmat' || /\bbatting\s*mat\b/.test(lowerTitle)) {
+        const base = 'assets/prodImgs/Battingmat';
+        const curated = [
+          `${base}/battingmata.avif`,
+          `${base}/battingmat_blacka.avif`,
+          `${base}/battingmat_browna.avif`,
+          `${base}/battingmat_greena.avif`,
+          `${base}/battingmat_orangea.avif`,
+          `${base}/battingmat_reda.avif`,
+          `${base}/battingmat_royala.avif`
+        ];
+        img = curated[0];
+        const extra = Array.isArray(imagesList) ? imagesList.filter(s => !curated.includes(s)) : [];
+        imagesList.splice(0, imagesList.length, ...curated, ...extra);
+      }
+    } catch {}
     // Expose min/max price for UI (range display) while keeping price as the lowest
     const minPrice = (function(){
       const candidates = [price];
@@ -2049,19 +2299,27 @@ const Store = {
 
       // Extract color variations for this product and randomly choose an initial color
       const colors = this.extractProductColors(prod);
+      const suppressDots = (() => {
+        try {
+          const lid = String(id).toLowerCase();
+          const lt = title.toLowerCase();
+          // Do not show dots for Screen Bulletz Leg Caps
+          if (lid === 'screen bulletz' || /screen\s*bulletz/.test(lt)) return true;
+        } catch {}
+        return false;
+      })();
       const initialColorIndex = colors.length > 0 ? Math.floor(Math.random() * colors.length) : -1;
       const initialImg = (initialColorIndex >= 0 && colors[initialColorIndex]?.image) ? colors[initialColorIndex].image : img;
-      const colorDotsHtml = colors.length > 0 ? `
+      const colorDotsHtml = (!suppressDots && colors.length > 0) ? `
         <div class="color-dots" data-product-id="${id}">
           ${colors.map((color, index) => `
             <div class="color-dot ${color.class} ${index === initialColorIndex ? 'active' : ''}" 
                  data-color="${color.name}" 
                  data-image="${color.image}"
-                 title="${(color.label ? `Image ${color.label}` : color.name.charAt(0).toUpperCase() + color.name.slice(1))}"
+                 title="${color.class && color.class !== 'neutral' ? (color.class.charAt(0).toUpperCase() + color.class.slice(1)) : 'Image'}"
                  role="button" 
                  tabindex="0"
-                 aria-label="Select ${(color.label ? `image ${color.label}` : color.name)}">
-                 ${color.label ? `<span class="dot-label">${color.label}</span>` : ''}
+                 aria-label="Select ${color.class && color.class !== 'neutral' ? color.class : 'image'}">
             </div>
           `).join('')}
         </div>
@@ -2123,9 +2381,11 @@ const Store = {
         });
       });
 
-      // If this card is JR, rebuild dots using dynamic color classification to ensure 1:1 dot→image
+      // If this card is JR or Pitcher's Pocket Pro, rebuild dots using dynamic color classification to ensure 1:1 dot→image
       try {
-        if (/bulletjrbb/i.test(id) || /\bjr\b/i.test(title)) {
+        const looksLikeJR = /bulletjrbb/i.test(id) || /\bjr\b/i.test(title);
+        const looksLikePocketPro = /pitcher'?s\s*pocket.*\bpro\b/i.test(title) || /BBPP[-_]?PRO/i.test(id) || /PPPRO/i.test(id);
+        if (looksLikeJR || looksLikePocketPro) {
           this._recolorJRDots(article);
         }
       } catch {}
@@ -2313,6 +2573,8 @@ const Store = {
       { name: 'columbiablue', class: 'columbiablue', patterns: ['columbiablue','columbia'] },
       { name: 'darkgreen', class: 'darkgreen', patterns: ['darkgreen'] },
       { name: 'maroon', class: 'maroon', patterns: ['maroon'] },
+      // Brown not used widely, but keep as a semantic placeholder; if CSS lacks .brown it will render neutral styling.
+      { name: 'brown', class: 'brown', patterns: ['brown'] },
       { name: 'purple', class: 'purple', patterns: ['purple'] },
       { name: 'orange', class: 'orange', patterns: ['orange'] },
       { name: 'yellow', class: 'yellow', patterns: ['yellow'] },
@@ -2354,14 +2616,29 @@ const Store = {
     colorDefs.forEach(def => {
       if (has(def.name)) out.push({ name: def.name, class: def.class, image: picked[def.name].image });
     });
-    // Fallback: if no explicit color matches but multiple images exist, create neutral variant dots
+    // Include any remaining images that didn't match a color as neutral (no numeric labels)
+    try {
+      const used = new Set(out.map(o => o.image));
+      const seq = nonZoom.concat(zoom);
+      seq.forEach(it => { if (!used.has(it.src)) out.push({ name: 'option', class: 'neutral', image: it.src }); });
+    } catch {}
+    // Fallback: if still nothing, add up to 6 neutral dots without numeric labels (avoid numbered dots on cards)
     if (out.length === 0) {
-      const seq = nonZoom.concat(zoom); // prefer non-zoom first
+      const seq = nonZoom.concat(zoom);
       const max = Math.min(6, seq.length);
       for (let i = 0; i < max; i++) {
-        out.push({ name: `option${i+1}`, class: 'neutral', image: seq[i].src, label: String(i+1) });
+        out.push({ name: 'option', class: 'neutral', image: seq[i].src });
       }
     }
+    // Special-case adjustments
+    try {
+      const pidish = String(product.id || product.sku || '').toLowerCase();
+      const tish = String(product.title || '').toLowerCase();
+      // Batting Mat: show only real color dots, remove any leftover neutral 'option' dot (generic hero)
+      if (pidish === 'battingmat' || /\bbatting\s*mat\b/.test(tish)) {
+        return out.filter(o => o.class && o.class !== 'neutral');
+      }
+    } catch {}
     return out;
   },
 
@@ -2534,12 +2811,15 @@ const Store = {
 
     this.ui.grid.innerHTML = html || `<p>No products found.</p>`;
 
-    // After render: dynamically recolor JR dots so colors match images
+    // After render: dynamically recolor JR and Pitcher's Pocket Pro dots so colors match images
     try {
       this.ui.grid.querySelectorAll('article.card').forEach(card => {
         const title = (card.querySelector('h3')?.textContent||'').toLowerCase();
         const pid = card.getAttribute('data-product-id')||'';
-        if (/bullet\s*l\s*screen\s*jr/.test(title) || /BULLETJRBB/i.test(pid)) {
+        const looksLikeJR = /bullet\s*l\s*screen\s*jr/.test(title) || /BULLETJRBB/i.test(pid);
+        // Pitcher's Pocket Pro detection: title mentions Pitcher's Pocket and Pro, or id/sku looks like BBPP-PRO or PPPRO
+        const looksLikePocketPro = /pitcher'?s\s*pocket.*\bpro\b/i.test(title) || /BBPP[-_]?PRO/i.test(pid) || /PPPRO/i.test(pid);
+        if (looksLikeJR || looksLikePocketPro) {
           this._recolorJRDots(card);
         }
       });

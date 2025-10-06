@@ -96,7 +96,51 @@
     if (primary && !gallery.length) gallery.push(primary);
     const features = Array.isArray(p.features) ? p.features : (p.details && Array.isArray(p.details.features) ? p.details.features : []);
     const description = p.description || (p.details && p.details.description) || '';
-  const unique = Array.from(new Set(gallery)).slice(0,20);
+  let unique = Array.from(new Set(gallery)).slice(0,20);
+
+    // Curated Accessories imagery overrides
+    try {
+      const lowerId = String(p.sku || id || '').toLowerCase();
+      const lowerTitle = String(p.name || p.title || title || '').toLowerCase();
+      // Screen Bulletz Leg Caps (4-Pack)
+      if (lowerId === 'screen bulletz' || /screen\s*bulletz/.test(lowerTitle)) {
+        const base = 'assets/prodImgs/Accessories/Screen_bulletz';
+        const curated = [
+          `${base}/screen_bulletz_a.avif`,
+          `${base}/screen_bulletz1_a.avif`,
+          `${base}/screen_bulletz2_a.avif`,
+          `${base}/screen_bulletz3_a.avif`,
+          `${base}/screen_bulletz4_a.avif`,
+          `${base}/screen_bulletz5_a.avif`
+        ];
+        primary = curated[0];
+        const extras = unique.filter(u => !curated.includes(u));
+        unique = [...curated, ...extras].slice(0, 20);
+      }
+      // Bullet Wheeled Ball Basket
+      if (lowerId === 'wbasket' || /wheeled\s*ball\s*basket/.test(lowerTitle)) {
+        const hero = 'assets/prodImgs/Accessories/Wbasket/wbasket.avif';
+        primary = hero;
+        const extras = unique.filter(u => u !== hero);
+        unique = [hero, ...extras].slice(0, 20);
+      }
+      // Pro Batting Mat (Accessories)
+      if (lowerId === 'battingmat' || /\bbatting\s*mat\b/.test(lowerTitle)) {
+        const base = 'assets/prodImgs/Battingmat';
+        const curated = [
+          `${base}/battingmata.avif`,
+          `${base}/battingmat_blacka.avif`,
+          `${base}/battingmat_browna.avif`,
+          `${base}/battingmat_greena.avif`,
+          `${base}/battingmat_orangea.avif`,
+          `${base}/battingmat_reda.avif`,
+          `${base}/battingmat_royala.avif`
+        ];
+        primary = curated[0];
+        const extras = unique.filter(u => !curated.includes(u));
+        unique = [...curated, ...extras].slice(0, 20);
+      }
+    } catch {}
 
     // Build a mapping of thumb -> large image using filename heuristics.
     // Patterns handled:
@@ -104,7 +148,7 @@
     //  - files containing '(1)' treated as large hero already
     //  - if file ends with '1a' and a sibling without the 'a' exists, pair them
     //  - if a colored variant (e.g., _black_a) exists along with _black (hero), associate
-    const byName = new Set(unique.map(u=>u.split('/').pop()));
+  const byName = new Set(unique.map(u=>u.split('/').pop()));
     function deriveLarge(src){
       const parts = src.split('/');
       const file = parts.pop();
@@ -188,6 +232,11 @@
       el.innerHTML = '<div class="alert">Product not found.</div>';
       return;
     }
+    // Detect Pre-Made Cages grouped pages to disable color dropdown
+    const isPreMadeCagesGroup = /^(cages-21nylon|cages-36nylon|cages-36poly)$/i.test(String(prod.id||''));
+  // Detect Twine Spool & Cable grouped pages to disable color dropdown
+  const isTwineSpoolGroup = /^twine-forever-black$/i.test(String(prod.id||''));
+  const isCableGroup = /^cable-wire$/i.test(String(prod.id||''));
     // Render price or price range; will update dynamically on option change
     const basePriceHtml = (() => {
       if (prod.priceMin && prod.priceMax && prod.priceMax !== prod.priceMin) {
@@ -200,16 +249,19 @@
     const thumbs = prod.displayPairs.map((g,i)=>`<button class="thumb" data-index="${i}" aria-label="Show image ${i+1}" data-large="${g.large}"><img src="${g.thumb}" alt="${prod.title} image ${i+1}" loading="lazy"/></button>`).join('');
 
     // Build color choices from product images using Store's color extraction
+    // Skip for Pre-Made Cages and Twine Spool grouped pages per request
     let colorOptions = [];
-    try {
-      const imgs = Array.isArray(prod.displayPairs) ? prod.displayPairs.map(p => p.large) : (prod.primary ? [prod.primary] : []);
-      if (window.Store && typeof window.Store.extractProductColors === 'function') {
-        colorOptions = window.Store.extractProductColors({ images: imgs, id: (new URLSearchParams(location.search)).get('pid') || prod.id, sku: (new URLSearchParams(location.search)).get('pid') || prod.id, title: prod.title });
-      }
-      // De-duplicate by color name keeping first image
-      const seen = new Set();
-      colorOptions = colorOptions.filter(c => { if (seen.has(c.name)) return false; seen.add(c.name); return true; });
-    } catch {}
+  if (!isPreMadeCagesGroup && !isTwineSpoolGroup && !isCableGroup) {
+      try {
+        const imgs = Array.isArray(prod.displayPairs) ? prod.displayPairs.map(p => p.large) : (prod.primary ? [prod.primary] : []);
+        if (window.Store && typeof window.Store.extractProductColors === 'function') {
+          colorOptions = window.Store.extractProductColors({ images: imgs, id: (new URLSearchParams(location.search)).get('pid') || prod.id, sku: (new URLSearchParams(location.search)).get('pid') || prod.id, title: prod.title });
+        }
+        // De-duplicate by color name keeping first image
+        const seen = new Set();
+        colorOptions = colorOptions.filter(c => { if (seen.has(c.name)) return false; seen.add(c.name); return true; });
+      } catch {}
+    }
     const colorSelectHtml = (colorOptions && colorOptions.length) ? `
       <select id="pd-color-select" class="pd-option-select" aria-label="Color" style="padding:.7rem .8rem;border:1px solid var(--border);border-radius:.6rem;font-weight:600;">
         <option value="">Choose a Color...</option>
@@ -238,7 +290,9 @@
                     const vPrice = Number(v.map ?? v.price ?? 0) || 0;
                     const label = v.option || `Option ${i+1}`;
                     const priceText = vPrice > 0 ? ` - $${vPrice.toFixed(2)}` : '';
-                    return `<option value="${label.replace(/"/g,'&quot;')}" data-price="${vPrice}">${label}${priceText}</option>`;
+                    const dataImg = v.img ? ` data-img="${(v.img||'').replace(/"/g,'&quot;')}"` : '';
+                    const dataSku = v.sku ? ` data-sku="${String(v.sku).replace(/"/g,'&quot;')}"` : '';
+                    return `<option value="${label.replace(/"/g,'&quot;')}" data-price="${vPrice}"${dataImg}${dataSku}>${label}${priceText}</option>`;
                   }).join('')}
                 </select>
               ` : ''}
@@ -275,6 +329,7 @@
         const updatePrice = () => {
           const opt = optSel.options[optSel.selectedIndex];
           const p = Number(opt?.dataset?.price||0) || 0;
+          const imgSrc = opt?.dataset?.img;
           if (p > 0) {
             priceEl.textContent = `$${p.toFixed(2)}`;
           } else if (prod.priceMin && prod.priceMax && prod.priceMax !== prod.priceMin) {
@@ -283,6 +338,11 @@
             priceEl.textContent = `$${prod.price.toFixed(2)}`;
           } else {
             priceEl.textContent = '';
+          }
+          // Update image when option carries an image
+          if (imgSrc) {
+            const main = document.getElementById('pd-main-img');
+            if (main) main.src = imgSrc;
           }
         };
         optSel.addEventListener('change', updatePrice);
@@ -318,6 +378,41 @@
         else if (colorSel.options.length > 1) { colorSel.selectedIndex = 1; applyColorImage(); }
       }
     } catch {}
+
+    // If this is a Pitcher's Pocket Pro and options are all neutral, classify images to palette and rebuild dropdown
+    (async () => {
+      try {
+        const pid = (new URLSearchParams(location.search)).get('pid') || prod.id || '';
+        const looksLikePocketPro = /pitcher'?s\s*pocket.*\bpro\b/i.test(String(prod.title||'')) || /BBPP[-_]?PRO/i.test(pid) || /PPPRO/i.test(pid);
+        const colorSel = document.getElementById('pd-color-select');
+        if (!looksLikePocketPro || !colorSel || !window.Store || typeof window.Store._classifyImageToPalette !== 'function') return;
+        const opts = Array.from(colorSel.options).slice(1);
+        if (!opts.length) return;
+        const allNeutral = opts.every(o => (o.dataset.colorClass||o.getAttribute('data-color-class')||'neutral') === 'neutral');
+        if (!allNeutral) return;
+        // Build classification map color -> first image
+        const map = new Map();
+        for (const o of opts) {
+          const src = o.dataset.image; if (!src) continue;
+          const color = await window.Store._classifyImageToPalette(src);
+          if (!map.has(color)) map.set(color, src);
+        }
+        if (!map.size) return;
+        const order = ['black','columbiablue','darkgreen','green','maroon','navy','orange','purple','red','royal','yellow'];
+        const rebuilt = ['<option value="">Choose a Color...</option>'];
+        order.forEach(c => {
+          if (!map.has(c)) return;
+          const src = map.get(c);
+          const label = c.charAt(0).toUpperCase() + c.slice(1);
+          rebuilt.push(`<option value="${c}" data-image="${src}" data-color-class="${c}">${label}</option>`);
+        });
+        colorSel.innerHTML = rebuilt.join('');
+        // Select first and update image
+        if (colorSel.options.length > 1) {
+          colorSel.selectedIndex = 1; const img = colorSel.options[1].dataset.image; if (img) { main.src = img; }
+        }
+      } catch {}
+    })();
 
     // If this is a JR product (bulletjrbb) and we currently have neutral color entries, classify to palette and rebuild the dropdown
     (async () => {
@@ -362,11 +457,13 @@
         const colorSel = document.getElementById('pd-color-select');
         let chosenLabel = prod.title;
         let chosenPrice = prod.price || 0;
+        let chosenImg = (document.getElementById('pd-main-img')?.getAttribute('src')) || prod.primary;
         if (optSel && optSel.value) {
           chosenLabel = `${prod.title} — ${optSel.value}`;
           const optEl = optSel.options[optSel.selectedIndex];
           const p = Number(optEl?.dataset?.price||0) || 0;
           if (p > 0) chosenPrice = p;
+          if (optEl?.dataset?.img) chosenImg = optEl.dataset.img;
         } else if (prod.variations && prod.variations.length) {
           alert('Please choose an option.');
           return;
@@ -374,7 +471,7 @@
         // Pass option as size to preserve cart key uniqueness
         const size = (optSel && optSel.value) ? optSel.value : undefined;
         const color = (colorSel && colorSel.value) ? colorSel.value : undefined;
-        const product = { id: prod.id, title: chosenLabel, price: chosenPrice, img: main.src || prod.primary, category: 'netting' };
+        const product = { id: prod.id, title: chosenLabel, price: chosenPrice, img: chosenImg, category: 'netting' };
         window.Store && window.Store.add(product, { size, color });
       } catch {}
     });
@@ -389,6 +486,153 @@
       const pid = qs('pid');
       const data = await getCatalog();
       const all = flattenItems(data);
+
+      // Handle Pre-Made Cages grouped detail pages
+      const groupMap = {
+        'cages-21nylon': { title: '#21 Nylon', material: 'nylon', gauge: 21 },
+        'cages-36nylon': { title: '#36 Nylon', material: 'nylon', gauge: 36 },
+        'cages-36poly':  { title: '#36 Poly',  material: 'poly',  gauge: 36 }
+      };
+      const pidKey = (pid||'').toLowerCase();
+      // Grouped detail: Forever Black Twine Spool (#XX options)
+      if (pidKey === 'twine-forever-black') {
+        // Collect twine items from catalog by name match
+        const twines = all.filter(p => /forever\s*black\s*twine\s*spool/i.test(String(p.name||p.title||'')));
+        if (!twines.length) { render(null); return; }
+        // Build variations labeled by #XX extracted from name
+        const parseGauge = (name) => {
+          const m = String(name||'').match(/#\s*(\d{1,3})/); return m ? m[1] : '';
+        };
+        const variations = twines.map((m,i) => {
+          const gauge = parseGauge(m.name||m.title) || `Var ${i+1}`;
+          const price = Number(m.map ?? m.price ?? m.wholesale ?? 0) || 0;
+          const opt = `#${gauge}`;
+          const img = (m.img || (m.images && (m.images.primary || (Array.isArray(m.images) && m.images[0])))) || '';
+          return { option: opt, map: price, price, sku: m.sku || m.id, img };
+        });
+        // Primary image & gallery: use first valid image
+        const first = twines[0] || {};
+        const primary = variations.find(v=>v.img)?.img || first.img || '';
+        const gallery = variations.map(v=>v.img).filter(Boolean);
+        const galleryPairs = (gallery.length ? gallery : [primary]).filter(Boolean).slice(0,12).map(src=>({thumb:src, large:src}));
+        const displayPairs = galleryPairs.slice(0, Math.min(8, galleryPairs.length));
+        // Price range
+        const prices = variations.map(v=>v.price).filter(n=>Number.isFinite(n) && n>0);
+        const priceMin = prices.length ? Math.min(...prices) : 0;
+        const priceMax = prices.length ? Math.max(...prices) : 0;
+        const features = (first.details && Array.isArray(first.details.features) ? first.details.features : (Array.isArray(first.features) ? first.features : []));
+        const description = (first.details && first.details.description) || first.description || '';
+        const synthetic = {
+          id: pidKey,
+          title: 'Forever Black Twine Spool',
+          price: priceMin || 0,
+          priceMin: priceMin || 0,
+          priceMax: priceMax || priceMin || 0,
+          primary: primary || '',
+          displayPairs,
+          features,
+          description,
+          variations
+        };
+        render(synthetic);
+        return;
+      }
+
+      // Grouped detail: Cable Wire (CABLE* SKUs) — single dropdown for size/length with price
+      if (pidKey === 'cable-wire') {
+        const cables = all.filter(p => /^CABLE/i.test(String(p.sku||'')));
+        if (!cables.length) { render(null); return; }
+        // Extract option label from product name, e.g., "500' of 1/4\" Cable" → "1/4\" — 500'"
+        const parseLabel = (name) => {
+          const n = String(name||'');
+          const len = (n.match(/(\d{2,4})'\b/) || [,''])[1];
+          const size = (n.match(/(1\/4\"|5\/16\")/) || [,''])[1];
+          if (size && len) return `${size} — ${len}'`;
+          return n;
+        };
+        const variations = cables.map(m => {
+          const price = Number(m.map ?? m.price ?? m.wholesale ?? 0) || 0;
+          const option = parseLabel(m.name||m.title);
+          const img = (m.img || (m.images && (m.images.primary || (Array.isArray(m.images) && m.images[0])))) || '';
+          return { option, map: price, price, sku: m.sku || m.id, img };
+        });
+        const first = cables[0] || {};
+        const primary = variations.find(v=>v.img)?.img || first.img || '';
+        const gallery = variations.map(v=>v.img).filter(Boolean);
+        const galleryPairs = (gallery.length ? gallery : [primary]).filter(Boolean).slice(0,12).map(src=>({thumb:src, large:src}));
+        const displayPairs = galleryPairs.slice(0, Math.min(8, galleryPairs.length));
+        const prices = variations.map(v=>v.price).filter(n=>Number.isFinite(n) && n>0);
+        const priceMin = prices.length ? Math.min(...prices) : 0;
+        const priceMax = prices.length ? Math.max(...prices) : 0;
+        const features = (first.details && Array.isArray(first.details.features) ? first.details.features : (Array.isArray(first.features) ? first.features : []));
+        const description = (first.details && first.details.description) || first.description || '';
+        const synthetic = {
+          id: pidKey,
+          title: 'Cable',
+          price: priceMin || 0,
+          priceMin: priceMin || 0,
+          priceMax: priceMax || priceMin || 0,
+          primary: primary || '',
+          displayPairs,
+          features,
+          description,
+          variations
+        };
+        render(synthetic);
+        return;
+      }
+      if (groupMap[pidKey]) {
+        const crit = groupMap[pidKey];
+        // Collect models from Pre-Made Cages that match material/gauge
+        const models = all.filter(p => String(p.material||'').toLowerCase() === crit.material && Number(p.gauge||0) === Number(crit.gauge||0));
+        if (!models.length) { render(null); return; }
+        // Build variations from sizes
+        let variations = models.map(m => ({
+          option: m.size || (m.name||m.title||m.sku),
+          map: Number(m.map ?? m.price ?? m.wholesale ?? 0) || 0,
+          price: Number(m.map ?? m.price ?? m.wholesale ?? 0) || 0,
+          sku: m.sku || m.id,
+          img: (m.img || (m.images && (m.images.primary || (Array.isArray(m.images) && m.images[0])))) || ''
+        }));
+        // Override imagery with curated group images
+        const GROUP_IMAGES = {
+          'cages-21nylon': [ 'assets/prodImgs/Pre_Made_Cages/21Nylon.avif', 'assets/prodImgs/Pre_Made_Cages/21Nylon2.avif' ],
+          'cages-36nylon': [ 'assets/prodImgs/Pre_Made_Cages/36Nylon.avif', 'assets/prodImgs/Pre_Made_Cages/36Nylon2.avif' ],
+          'cages-36poly':  [ 'assets/prodImgs/Pre_Made_Cages/36Poly.avif',  'assets/prodImgs/Pre_Made_Cages/36Poly2.avif' ]
+        };
+        const groupImgs = GROUP_IMAGES[pidKey] || [];
+        // Ensure each variation references a valid image (use group hero)
+        if (groupImgs.length) {
+          variations = variations.map(v => ({ ...v, img: groupImgs[0] }));
+        }
+        // Compute primary and gallery from curated images (fallback to variation images if needed)
+        const primary = (groupImgs[0]) || (variations.find(v => v.img)?.img) || (models[0]?.img) || '';
+        const gallery = groupImgs.length ? groupImgs.slice(0, 10) : variations.map(v => v.img).filter(Boolean);
+        const galleryPairs = (gallery.length ? gallery : [primary]).filter(Boolean).slice(0,20).map(src => ({ thumb: src, large: src }));
+        const displayPairs = galleryPairs.slice(0, Math.min(8, galleryPairs.length));
+        const prices = variations.map(v => v.price).filter(n=>Number.isFinite(n) && n>0);
+        const priceMin = prices.length ? Math.min(...prices) : 0;
+        const priceMax = prices.length ? Math.max(...prices) : 0;
+        const first = models[0] || {};
+        const features = (first.details && Array.isArray(first.details.features) ? first.details.features : (Array.isArray(first.features) ? first.features : []));
+        const description = (first.details && first.details.description) || first.description || '';
+        const synthetic = {
+          id: pidKey,
+          title: crit.title,
+          price: priceMin || 0,
+          priceMin: priceMin || 0,
+          priceMax: priceMax || priceMin || 0,
+          primary: primary || '',
+          displayPairs,
+          features,
+          description,
+          variations
+        };
+        render(synthetic);
+        return;
+      }
+
+      // Normal single-product detail
       const raw = all.find(p => String(p.sku||p.id) === pid);
       render(raw ? toDisplayItem(raw) : null);
     } catch (e) {

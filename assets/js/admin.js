@@ -41,61 +41,75 @@ function getCurrentUser() {
   }
 }
 
-// Source of truth: backend /api/products (admin only). Fallback to localStorage when offline.
-let __adminProductsCache = [];
-async function loadProductsFromServer() {
+// Products list (Admin) must come exclusively from assets/prodList.json
+let __prodListProducts = [];
+function __slug(str) {
+  return (str||'').toString().toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'');
+}
+function __pickPrice(obj) {
+  // Prefer MAP, then explicit price, then details.price, then wholesale
+  const from = (v) => (typeof v === 'number' ? v : (v && !isNaN(Number(v)) ? Number(v) : undefined));
+  return (
+    from(obj?.map) ??
+    from(obj?.price) ??
+    from(obj?.details?.price) ??
+    from(obj?.wholesale)
+  ) || 0;
+}
+async function loadProductsFromProdList(force=false) {
+  if (!force && __prodListProducts.length) return __prodListProducts;
   try {
-    const res = await fetchAdmin(`/api/products?includeInactive=true&refresh=true`);
-    if (!res.ok) throw new Error('Failed to load');
-    const items = await res.json();
-    if (Array.isArray(items)) {
-      __adminProductsCache = items.map(p => ({
-        id: p.id || p.sku || p.name || ('prod-' + Date.now()),
-        name: p.name || p.title || p.id,
-        price: typeof p.price === 'number' ? p.price : Number(p.price) || 0,
-        image: p.image || p.img || '',
-        category: (p.category || '').toString().toLowerCase() || 'misc',
-        description: p.description || '',
-        stock: p.stock || 0,
-        isActive: p.isActive !== false
-      }));
-      // Persist a lightweight copy for storefront fallback
-      saveProducts(__adminProductsCache);
+    const res = await fetch('assets/prodList.json', { credentials:'same-origin' });
+    if (!res.ok) throw new Error('Failed to load prodList.json');
+    const data = await res.json();
+    const out = [];
+    const categories = data && data.categories ? data.categories : {};
+    for (const [catName, items] of Object.entries(categories)) {
+      if (!Array.isArray(items)) continue;
+      for (const item of items) {
+        const base = {
+          sku: item.sku || '',
+          name: item.name || item.sku || 'Product',
+          image: item.img || (Array.isArray(item.images) ? item.images[0] : '') || '',
+          category: catName,
+          description: (item.details && item.details.description) || '',
+          isActive: true,
+          source: 'prodList'
+        };
+        if (Array.isArray(item.variations) && item.variations.length) {
+          for (const v of item.variations) {
+            const id = (item.sku ? `${item.sku}-${__slug(v.option||'opt')}` : `${__slug(base.name)}-${__slug(v.option||'opt')}`);
+            out.push({
+              id,
+              ...base,
+              name: `${base.name} (${v.option})`,
+              price: __pickPrice(v)
+            });
+          }
+        } else {
+          const id = item.sku || __slug(base.name) || ('prod-' + Date.now());
+          out.push({
+            id,
+            ...base,
+            price: __pickPrice(item)
+          });
+        }
+      }
     }
+    __prodListProducts = out;
   } catch (e) {
-    // Keep cache as-is; rely on localStorage fallback
+    console.error('Failed to load prodList.json', e);
+    __prodListProducts = [];
   }
+  return __prodListProducts;
 }
 
-function getProducts() {
-  if (__adminProductsCache && __adminProductsCache.length) return __adminProductsCache;
-  try {
-    __adminProductsCache = JSON.parse(localStorage.getItem('adminProducts') || '[]');
-    return __adminProductsCache;
-  } catch {
-    return [];
-  }
-}
-
-function saveProducts(products) {
-  localStorage.setItem('adminProducts', JSON.stringify(products));
-  // Also update the main PRODUCTS array for the shop
-  updateShopProducts(products);
-}
-
-function updateShopProducts(products) {
-  // Convert admin products to shop format
-  const shopProducts = products.map(p => ({
-    id: p.id,
-    title: p.name,
-    price: p.price,
-    category: p.category,
-    img: p.image || 'https://source.unsplash.com/600x400/?product',
-    description: p.description,
-    stock: p.stock
-  }));
-  localStorage.setItem('shopProducts', JSON.stringify(shopProducts));
-}
+// Legacy helpers retained for other admin features, but products list will not use them
+let __adminProductsCache = [];
+async function loadProductsFromServer() { return []; }
+function getProducts() { return __prodListProducts.slice(); }
+function saveProducts(_) { /* no-op for prod list enforcement */ }
+function updateShopProducts(_) { /* no-op for prod list enforcement */ }
 
 function getOrders() {
   try {
@@ -131,7 +145,8 @@ function showSection(section, btn) {
   if (section === 'invoices') renderInvoices();
 }
 
-function renderProducts() {
+async function renderProducts() {
+  if (!__prodListProducts.length) { await loadProductsFromProdList(); }
   const products = getProducts();
   const list = document.getElementById('products-list');
 
@@ -143,12 +158,11 @@ function renderProducts() {
   list.innerHTML = products.map(p => `
     <div class="product-item">
       <div>
-        <strong>${p.name}</strong> - $${p.price}
-        <br><small>${p.category} | Stock: ${p.stock || 0}</small>
+        <strong>${p.name}</strong> - $${Number(p.price||0).toFixed(2)}
+        <br><small>${p.category}${p.sku?` | SKU: ${p.sku}`:''}</small>
       </div>
       <div>
-        <button class="btn btn-ghost" onclick="editProduct('${p.id}')">Edit</button>
-        <button class="btn btn-ghost text-red" onclick="deleteProduct('${p.id}')">Delete</button>
+        <!-- Admin Products list is read-only and reflects assets/prodList.json -->
       </div>
     </div>
   `).join('');
@@ -190,6 +204,7 @@ function renderOrders() {
           <div class="flex-row gap-05 items-center">
             <strong>$${(order.total||0).toFixed(2)}</strong>
             <a class="btn btn-ghost" href="${(window.__API_BASE||'')}/api/invoices/INV-${order.id}/print" target="_blank" rel="noopener">View Invoice</a>
+            ${order.customerInfo?.email ? `<button class="btn btn-ghost" data-portal="${order.customerInfo.email}">Billing Portal</button>` : ''}
             <select data-order-id="${order.id}" class="order-status-select">
               ${['pending','paid','fulfilled','cancelled'].map(s=>`<option value="${s}" ${s===(order.status||'pending')?'selected':''}>${s}</option>`).join('')}
             </select>
@@ -207,6 +222,13 @@ function renderOrders() {
 
       list.innerHTML = html + pager;
 
+      // Wire billing portal buttons
+      list.querySelectorAll('[data-portal]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const email = btn.getAttribute('data-portal');
+          if (email) openBillingPortal(email);
+        });
+      });
       // Wire updates
       list.querySelectorAll('[data-update-status]')
         .forEach(btn => btn.addEventListener('click', () => {
@@ -245,9 +267,16 @@ function renderUsers() {
           </div>
           <div>
             <small>ID: ${user.id}</small>
+            <button class="btn btn-ghost" data-user-portal="${user.email}">Billing Portal</button>
           </div>
         </div>
       `).join('');
+      list.querySelectorAll('[data-user-portal]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const email = btn.getAttribute('data-user-portal');
+          if (email) openBillingPortal(email);
+        });
+      });
     })
   .catch((e)=>{ list.innerHTML = `<p>Failed to load users. ${e.message||''}</p>`; });
 }
@@ -396,8 +425,8 @@ document.addEventListener('DOMContentLoaded', () => {
   // Load initial data
   // Ensure the default tab (Products) is visible on load
   showSection('products', document.querySelector('.admin-nav button'));
-  // Sync products from server when possible so admin list reflects live data
-  loadProductsFromServer().then(() => { try { renderProducts(); } catch {} });
+  // Load products exclusively from prodList.json for Admin > Products
+  loadProductsFromProdList().then(() => { try { renderProducts(); } catch {} });
   // Orders filters
   const statusFilter = document.getElementById('orders-status-filter');
   const refreshBtn = document.getElementById('orders-refresh-btn');
@@ -416,6 +445,23 @@ window.showSection = showSection;
 window.editProduct = editProduct;
 window.deleteProduct = deleteProduct;
 window.cancelEdit = cancelEdit;
+window.openBillingPortal = async function(email){
+  try {
+    if (!email) { alert('Enter a customer email first.'); return; }
+    const base = window.__API_BASE || API_BASES[0] || '';
+    const res = await fetch(`${base}/api/admin/billing-portal`, {
+      method: 'POST',
+      credentials: 'include',
+      headers: { ...authHeaders(), 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, return_url: location.origin + '/admin.html' })
+    });
+    const data = await res.json().catch(()=>({}));
+    if (!res.ok || !data.url) throw new Error(data.message||'Failed to create portal session');
+    window.location.href = data.url;
+  } catch (e) {
+    alert(e.message || 'Unable to open billing portal');
+  }
+}
 // Marketing helpers
 async function renderMarketing(){
   // Initial loads

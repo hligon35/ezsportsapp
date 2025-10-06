@@ -100,6 +100,7 @@
 .color-dot.maroon { background-color: #991b1b; }
 .color-dot.royal { background-color: #3b82f6; }
 .color-dot.columbiablue { background-color: #60a5fa; }
+.color-dot.brown { background-color: #8B4513; }
 .color-dot.neutral { background-color: #cbd5e1; border-color: rgba(0,0,0,0.25); }
 /* Slightly larger dots on L‑Screens pages for better visibility */
 body.lscreens-subnav .color-dot { width: 14px; height: 14px; }
@@ -246,7 +247,7 @@ body, .container, .footer-grid, .about-inner, .category-tiles .tiles, .grid, .ba
 input:focus, textarea:focus, select:focus { border-color:#241773 !important; box-shadow:0 0 0 3px rgba(36,23,115,.35) !important; }
 
 /* Links */
-a, .inline-links a { color:#241773; }
+a, .inline-links a { color:#8a6a00; }
 a:hover, .inline-links a:hover { text-decoration:underline; }
 
 /* Dropdown & mini-cart subtle accents */
