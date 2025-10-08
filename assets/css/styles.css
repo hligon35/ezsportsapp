@@ -9,6 +9,11 @@
 .product-detail-dialog { width:min(100%,1000px); border:none; padding:0; background:transparent; }
 .product-detail-dialog::backdrop { background:rgba(0,0,0,.55); -webkit-backdrop-filter:blur(2px); backdrop-filter:blur(2px); }
 .product-detail-dialog .panel { max-height:90vh; overflow:auto; background:#fff; border-radius:12px; box-shadow:0 12px 34px -8px rgba(0,0,0,.3),0 4px 16px -4px rgba(0,0,0,.2); }
+/* Uniform padding rhythm for dialog sections */
+.product-detail-dialog .panel-head{display:flex;align-items:center;justify-content:space-between;padding:.85rem 1rem;border-bottom:1px solid var(--border)}
+.product-detail-dialog .panel-head h3{margin:0;font-size:1.1rem;font-weight:900}
+.product-detail-dialog .panel-body{padding:1rem}
+.product-detail-dialog .panel-foot{display:flex;gap:.5rem;justify-content:flex-end;padding:.85rem 1rem;border-top:1px solid var(--border)}
 .product-detail-layout { display:flex; flex-wrap:wrap; gap:2rem; }
 .product-detail-layout .gallery { flex:1 1 380px; min-width:320px; }
 .product-detail-layout .info { flex:1 1 340px; min-width:300px; }
@@ -25,6 +30,11 @@
 .product-detail-dialog .feature-list { list-style:disc; margin:.25rem 0 0 1.15rem; padding:0; font-size:.85rem; line-height:1.35; }
 .product-detail-dialog .feature-list li + li { margin-top:.25rem; }
 .product-detail-dialog .price-lg { font-size:1.4rem; font-weight:800; margin:.25rem 0 1rem; }
+/* Inputs in dialog: match site form aesthetics */
+.product-detail-dialog select, .product-detail-dialog input[type="number"], .product-detail-dialog input[type="text"]{
+  padding:.65rem .8rem; border:1px solid var(--border); border-radius:.6rem; background:#fff; color:var(--ink);
+}
+.product-detail-dialog .text-xs.muted{opacity:.8}
 @media (max-width:720px){
   .product-detail-layout { flex-direction:column; }
   .product-detail-dialog { width:min(100%,95vw); }
@@ -1047,6 +1057,7 @@ input, select, textarea, button { width:auto; max-width:100%; }
 .card{background:var(--surface);border:1px solid var(--border);border-radius:1rem;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 8px 24px rgba(12,32,64,.06)}
 .card .media{background:#ffffff}
 .card .media{position:relative;display:flex;align-items:center;justify-content:center;height:clamp(150px,18vh,210px);}
+.card .media.no-link{height:clamp(150px,18vh,210px);} /* ensure the rope group card matches standard card media height */
 .card .media img{width:100%;height:100%;aspect-ratio:4/3;object-fit:contain;display:block;padding:.4rem;background:#fff;border-radius:.6rem}
 .card .body{padding:.9rem;display:flex;flex-direction:column;flex:1}
 .price-row{display:flex;justify-content:space-between;align-items:center;margin-top:auto;padding-top:.4rem}
@@ -1521,6 +1532,8 @@ body.lscreens-subnav .card .body .color-dots{ margin-top:.4rem; }
   box-sizing: border-box;
 }
 #product-detail .pd-info .btn + .btn { margin-top: .5rem; }
+/* When buttons are placed side-by-side in a row, remove vertical spacing */
+#product-detail .pd-info .row .btn + .btn { margin-top: 0; }
 
 /* Modal detail (if used): same sizing */
 .product-detail-dialog .pd-info .stack-05 { justify-items: start; align-items: start; }
@@ -1532,6 +1545,8 @@ body.lscreens-subnav .card .body .color-dots{ margin-top:.4rem; }
   box-sizing: border-box;
 }
 .product-detail-dialog .pd-info .btn + .btn { margin-top: .5rem; }
+/* Remove vertical spacing for horizontal button rows in modal */
+.product-detail-dialog .pd-info .row .btn + .btn { margin-top: 0; }
 
 /* Replacement aggregator card */
 .collective-card .pd-info .stack-05 { justify-items: start; align-items: start; }
@@ -1543,6 +1558,8 @@ body.lscreens-subnav .card .body .color-dots{ margin-top:.4rem; }
   box-sizing: border-box;
 }
 .collective-card .pd-info .btn + .btn { margin-top: .5rem; }
+/* Remove vertical spacing for horizontal button rows in replacement aggregator */
+.collective-card .pd-info .row .btn + .btn { margin-top: 0; }
 
 /* Product detail page layout (gallery + info) */
 .product-page .product-detail { margin-top: 1rem; }
