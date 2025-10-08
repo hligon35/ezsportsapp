@@ -1198,6 +1198,30 @@ const Store = {
         try { this.ensureSEO(); } catch {}
         return;
       }
+      // Special-case: 5/16" Poly Twisted Rope grouped product page
+      if (pidKey === 'rope-516-poly') {
+        crumbs.push({ label: 'Accessories', href: 'accessories.html' });
+        crumbs.push({ label: '5/16" Poly Twisted Rope', href: null });
+        const nav = document.createElement('nav');
+        nav.className = 'breadcrumbs container wrap';
+        nav.setAttribute('aria-label', 'Breadcrumb');
+        const ol = document.createElement('ol');
+        ol.className = 'crumbs';
+        crumbs.forEach((c, idx) => {
+          const li = document.createElement('li');
+          if (c.href && idx < crumbs.length - 1) {
+            const a = document.createElement('a'); a.href = c.href; a.textContent = c.label; li.appendChild(a);
+          } else {
+            const span = document.createElement('span'); span.textContent = c.label; span.setAttribute('aria-current', 'page'); li.appendChild(span);
+          }
+          ol.appendChild(li);
+        });
+        nav.appendChild(ol);
+        nav.setAttribute('data-product-bc','');
+        main.parentNode.insertBefore(nav, main);
+        try { this.ensureSEO(); } catch {}
+        return;
+      }
       let prod = null;
       let foundCategoryName = '';
       // 1) Try unified catalog if present (product-loader)
@@ -1322,7 +1346,7 @@ const Store = {
       const base = (location.pathname.split('/').pop() || '').toLowerCase();
       // Define slide titles for each netting page. These are intentionally concise for dot aria-labels & captions.
       const DATA = {
-        'baseball-netting.html': [ 'Hitting Facility','Batting Cage','Foul Ball','Overhead','Backstop','L-Screen','Pitcher Pocket' ],
+        'baseball-netting.html': [ 'Hitting Facility','Batting Cage','Foul Ball','Overhead','Backstop' ],
         'golf-netting.html': [ 'Driving Range','Golf Course','Golf Cube','Residential' ],
         'commercial-netting.html': [ 'Auto-Drone','Drone Enclosure','Warehouse','Safety','Debris','Landfill' ],
         // Split the previous combined label 'Cricket Football' into two separate slides
@@ -1352,18 +1376,24 @@ const Store = {
       const track = section.querySelector('.carousel-track');
       const dotsWrap = section.querySelector('.carousel-dots');
       const slides = DATA[base];
-      // Image selection rule: Use image only if a file exists whose name equals the normalized slide title.
-      // Normalization: lower-case, remove non-alphanumeric. Then we look for `${key}.png` in assets/eznets/eznets.
+      // Image selection rule: Map normalized slide titles to real filenames in assets/img/eznets.
+      // Normalization: lower-case, remove non-alphanumeric. Example: "Foul Ball" -> key "foulball" -> "Foul_Ball.png"
   const IMG_BASE = 'assets/img/eznets/';
-      const KNOWN_FILENAMES = [
-        'baseball','basketball','cricket','football','golf','hockey','lacrosse','multisport','soccer','softball','tennis','volleyball',
-        'warehouse','safety','debris','drone','landfill'
-      ];
       const normalize = (str) => (str||'').toLowerCase().replace(/[^a-z0-9]+/g,'');
-      const imageFor = (title) => {
-        const k = normalize(title);
-        return KNOWN_FILENAMES.includes(k) ? (k + '.png') : null;
+      const FILES = {
+        // Sports (generic)
+        baseball: 'baseball.png', basketball: 'basketball.png', cricket: 'cricket.png', football: 'football.png',
+        golf: 'golf.png', hockey: 'hockey.png', lacrosse: 'lacrosse.png', multisport: 'multisport.png', soccer: 'soccer.png',
+        softball: 'softball.png', tennis: 'tennis.png', volleyball: 'volleyball.png',
+        // Commercial
+        autodrone: 'Auto_Drone.png', drone: 'drone.png', droneenclosure: 'Drone_Enclosure.png', warehouse: 'warehouse.png',
+        safety: 'safety.png', debris: 'debris.png', landfill: 'Ladndfill.png',
+        // Baseball subtypes
+        foulball: 'Foul_Ball.png', backstop: 'Back_Stop.png', overhead: 'Overhead_Netting.png',
+        // Golf subtypes
+        drivingrange: 'Driving_Range.png', golfcourse: 'Golf_Course.png', golfcube: 'Golf_Cube.png', residential: 'Residential.png'
       };
+      const imageFor = (title) => FILES[normalize(title)] || null;
       slides.forEach((title, idx) => {
         const imgFile = imageFor(title);
         const slide = document.createElement('div');
@@ -1669,7 +1699,7 @@ const Store = {
         const rangeHtml = prices.length ? (minP===maxP? `${currency.format(minP)}` : `${currency.format(minP)} - ${currency.format(maxP)}`) : '';
         const thumbs = modelData.map((m,i)=>`<button class="thumb" data-index="${i}" data-sku="${m.id}" aria-label="View ${m.title}"><img src="${m.img}" alt="${m.title}" loading="lazy"/></button>`).join('');
         const options = [`<option value="">Choose a Model…</option>`].concat(modelData.map(m=>`<option value="${m.id}" data-price="${m.price}">${m.title} — ${currency.format(m.price)}</option>`)).join('');
-  const firstImg = modelData[0]?.img || 'assets/img/EZSportslogo.png';
+        const firstImg = modelData[0]?.img || 'assets/img/EZSportslogo.png';
         grid.innerHTML = `
           <article class="collective-card replacement-aggregator">
             <div class="pd-grid">
@@ -1743,6 +1773,155 @@ const Store = {
           if (!m) { alert('Please choose a model.'); return; }
           const product = { id: sku, title: m.title, price: m.price || 0, img: m.img, category: 'replacement' };
           try { window.Store && window.Store.add(product, {}); } catch {}
+        });
+        return; // Skip normal grid rendering
+      }
+
+      // Special collective page: bullet-pad-kits (single aggregator card with model + color)
+      if (pageKey === 'bullet-pad-kits') {
+        // Collect source items from unified catalog when available; else fallback to prodList.json category
+        let all = [];
+        if (Array.isArray(window.CATALOG_BY_CATEGORY?.['bullet-pad-kits']) && window.CATALOG_BY_CATEGORY['bullet-pad-kits'].length) {
+          all = window.CATALOG_BY_CATEGORY['bullet-pad-kits'].map(r => r.raw || r);
+        }
+        if (!all.length && prodListData && prodListData.categories && Array.isArray(prodListData.categories['Bullet Pad Kits'])) {
+          all = prodListData.categories['Bullet Pad Kits'];
+        }
+        // As a resilient fallback, scan all categories for obvious pad kits (sku starts with PK- or name includes Pad Kit)
+        if (!all.length && prodListData && prodListData.categories && typeof prodListData.categories === 'object') {
+          for (const arr of Object.values(prodListData.categories)) {
+            if (!Array.isArray(arr)) continue;
+            arr.forEach(p => {
+              const sku = String(p?.sku || '').toUpperCase();
+              const name = String(p?.name || p?.title || '').toLowerCase();
+              if (sku.startsWith('PK-') || /\bpad\s*kit\b/.test(name)) all.push(p);
+            });
+          }
+        }
+        if (!all.length) { this.renderEmptyState(grid); return; }
+        // De-dupe by sku/id
+        const seen = new Set();
+        all = all.filter(p => { const key = String(p?.sku || p?.id || p?.name || ''); if (!key) return false; if (seen.has(key)) return false; seen.add(key); return true; });
+        // Sort predictable order: JR, L, Front Toss, Combo (w/ Overhead first), Fast Pitch, Overhead, then sized Protectives
+        const rank = (p) => {
+          const t = String(p?.name || p?.title || '').toLowerCase();
+          if (/\bjr\b/.test(t)) return 10;
+          if (/\bl\b/.test(t) && !/jr/.test(t)) return 20;
+          if (/front\s*toss/.test(t)) return 30;
+          if (/combo/.test(t) && /overhead/.test(t)) return 40;
+          if (/fast\s*pitch|\bfp\b/.test(t)) return 45;
+          if (/combo/.test(t)) return 50;
+          if (/overhead/.test(t)) return 60;
+          if (/7x7/.test(t)) return 70;
+          if (/8x8/.test(t)) return 80;
+          if (/10x10/.test(t)) return 90;
+          return 200;
+        };
+        all.sort((a,b)=> rank(a) - rank(b) || String(a?.name||'').localeCompare(String(b?.name||'')));
+
+        // Build model dataset
+        const modelData = all.map(p => {
+          const id = String(p?.sku || p?.id || p?.name || p?.title);
+          const title = String(p?.name || p?.title || id);
+          const price = Number(p?.map ?? p?.price ?? p?.wholesale ?? 0) || 0;
+          const norm = this.normalizeProdListItem(p);
+          const img = norm?.img || 'assets/prodImgs/Screens/L-Screen_Padding_Kit/images/l-screen-padding-kit-bulletpadkit_1.jpg';
+          const features = Array.isArray(p?.details?.features) ? p.details.features : (Array.isArray(p?.features) ? p.features : []);
+          return { id, title, price, img, features };
+        });
+        const prices = modelData.map(m=>m.price).filter(v=>isFinite(v) && v>0);
+        const minP = prices.length? Math.min(...prices):0;
+        const maxP = prices.length? Math.max(...prices):0;
+        const rangeHtml = prices.length ? (minP===maxP? `${currency.format(minP)}` : `${currency.format(minP)} - ${currency.format(maxP)}`) : '';
+  const options = [`<option value="">Choose a Model…</option>`].concat(modelData.map(m=>`<option value="${m.id}" data-price="${m.price}">${m.title} — ${currency.format(m.price)}</option>`)).join('');
+  const firstImg = 'assets/prodImgs/Bullet_Pad_Kit/bulletpadkit.avif';
+        // Standard 10 color palette used across team products
+        const COLORS = [
+          { value:'black', label:'Black' },
+          { value:'columbiablue', label:'Columbia Blue' },
+          { value:'darkgreen', label:'Dark Green' },
+          { value:'maroon', label:'Maroon' },
+          { value:'navy', label:'Navy' },
+          { value:'orange', label:'Orange' },
+          { value:'purple', label:'Purple' },
+          { value:'red', label:'Red' },
+          { value:'royal', label:'Royal' },
+          { value:'yellow', label:'Yellow' }
+        ];
+        const colorOptions = [`<option value="">Choose a Color…</option>`].concat(COLORS.map(c=>`<option value="${c.value}">${c.label}</option>`)).join('');
+
+        grid.classList.remove('grid','grid-3','product-grid');
+        grid.classList.add('collective-list');
+        grid.innerHTML = `
+          <article class="collective-card padkits-aggregator">
+            <div class="pd-grid">
+              <div class="pd-media">
+                <div class="pd-main"><img id="agg-main-img" src="${firstImg}" alt="Bullet Pad Kits" loading="eager" decoding="async"/></div>
+              </div>
+              <div class="pd-info">
+                <h1 class="pd-title">Bullet Pad Kits</h1>
+                <div class="price h3" id="agg-price">${rangeHtml}</div>
+                <div class="stack-05" style="margin-top:.5rem;">
+                  <label class="text-xs" for="agg-model-select" style="font-weight:700;letter-spacing:.4px;">Model</label>
+                  <select id="agg-model-select" class="pd-option-select" style="padding:.7rem .8rem;border:1px solid var(--border);border-radius:.6rem;font-weight:600;">${options}</select>
+                  <label class="text-xs" for="agg-color-select" style="font-weight:700;letter-spacing:.4px;">Color</label>
+                  <select id="agg-color-select" class="pd-option-select" style="padding:.7rem .8rem;border:1px solid var(--border);border-radius:.6rem;">${colorOptions}</select>
+                  <div id="agg-selected" class="text-sm text-muted"></div>
+                  <ul id="agg-features" class="feature-list" style="margin:.5rem 0 0 1rem; padding-left:1rem; list-style:disc;"></ul>
+                  <div class="row gap-06">
+                    <button class="btn btn-primary" id="agg-add">Add to Cart</button>
+                    <button class="btn btn-ghost" id="agg-back">Back</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </article>`;
+        // Wire interactions
+        const main = document.getElementById('agg-main-img');
+        const priceEl = document.getElementById('agg-price');
+        const selectEl = document.getElementById('agg-model-select');
+        const colorEl = document.getElementById('agg-color-select');
+        const selectedEl = document.getElementById('agg-selected');
+        const bySku = Object.fromEntries(modelData.map(m=>[m.id,m]));
+        const featuresEl = document.getElementById('agg-features');
+        const renderFeatures = (arr) => {
+          if (!featuresEl) return;
+          const list = Array.isArray(arr) ? arr.filter(x=>typeof x === 'string' && x.trim()) : [];
+          if (!list.length) { featuresEl.innerHTML = ''; return; }
+          const max = 10;
+          featuresEl.innerHTML = list.slice(0, max).map(f=>`<li>${f}</li>`).join('');
+        };
+        // Back button behavior
+        document.getElementById('agg-back')?.addEventListener('click', ()=>{
+          try {
+            if (history.length > 1) history.back();
+            else window.location.href = 'accessories.html';
+          } catch { window.location.href = 'accessories.html'; }
+        });
+        // Dropdown change updates main image + price + label
+        selectEl?.addEventListener('change', ()=>{
+          const sku = selectEl.value;
+          const m = bySku[sku];
+          if (m) {
+            // Keep hero static; only update price, label and features
+            priceEl.textContent = m.price>0 ? currency.format(m.price) : rangeHtml;
+            selectedEl.textContent = m.title;
+            renderFeatures(m.features);
+          } else {
+            priceEl.textContent = rangeHtml;
+            selectedEl.textContent = '';
+            renderFeatures([]);
+          }
+        });
+        // Add to cart requires a model and a color selection
+        document.getElementById('agg-add')?.addEventListener('click', ()=>{
+          const sku = selectEl?.value;
+          const m = sku ? bySku[sku] : null;
+          if (!m) { alert('Please choose a model.'); return; }
+          const color = (colorEl?.value || '').trim();
+          if (!color) { alert('Please choose a color.'); return; }
+          const product = { id: sku, title: m.title, price: m.price || 0, img: m.img, category: 'pad-kits' };
+          try { window.Store && window.Store.add(product, { color }); } catch {}
         });
         return; // Skip normal grid rendering
       }
@@ -1994,18 +2173,24 @@ const Store = {
         return;
       }
 
-      // Special aggregation on Accessories: group Twine Spool and Cable items into single cards with price ranges
+      // Special aggregation on Accessories: group Twine Spool, Cable, and 5/16" Poly Twisted Rope into single cards
       if (pageKey === 'accessories') {
         const isTwineSpool = (p) => /forever\s*black\s*twine\s*spool/i.test(String(p.name||p.title||''));
         const isCable = (p) => /^CABLE/i.test(String(p.sku||''));
+        const isRopeFt = (p) => String(p.sku||'').toUpperCase() === '5/16-TPLYSTER-xFT'.toUpperCase();
+        const isRopeSpool = (p) => String(p.sku||'').toUpperCase() === '5/16-TPLYSTER-1270'.toUpperCase();
+        const isRope = (p) => isRopeFt(p) || isRopeSpool(p);
+
         const twines = items.filter(isTwineSpool);
         const cables = items.filter(isCable);
-        const others = items.filter(p => !isTwineSpool(p) && !isCable(p));
-        if (twines.length || cables.length) {
+        const ropeFt = items.find(isRopeFt);
+        const ropeSpool = items.find(isRopeSpool);
+        const others = items.filter(p => !isTwineSpool(p) && !isCable(p) && !isRope(p));
+        if (twines.length || cables.length || ropeFt || ropeSpool) {
           grid.innerHTML = '';
           grid.classList.add('grid','grid-3','product-grid');
           const MAX_PAGE_ITEMS = 12;
-          const groupCount = (twines.length?1:0) + (cables.length?1:0);
+          const groupCount = (twines.length?1:0) + (cables.length?1:0) + ((ropeFt||ropeSpool)?1:0);
           const room = Math.max(0, MAX_PAGE_ITEMS - groupCount);
           // Render other accessories first
           others.slice(0, room).forEach(p => {
@@ -2013,12 +2198,14 @@ const Store = {
             if (card) grid.appendChild(card);
           });
           // Helper to build a group card
-          const buildGroupCard = ({title, items, href, alt}) => {
+          const buildGroupCard = ({title, items, href, alt, img}) => {
             const prices = items.map(p => Number(p.map ?? p.price ?? p.wholesale ?? 0) || 0).filter(v=>isFinite(v)&&v>0);
             const minP = prices.length ? Math.min(...prices) : 0;
             const maxP = prices.length ? Math.max(...prices) : 0;
             const range = prices.length ? (minP===maxP ? currency.format(minP) : `${currency.format(minP)} - ${currency.format(maxP)}`) : '';
-            const firstImg = this.normalizeProdListItem(items[0]).img || 'assets/img/EZSportslogo.png';
+            // Prefer curated image when provided
+            const curated = img && typeof img === 'string' ? img : '';
+            const firstImg = curated || this.normalizeProdListItem(items[0]).img || 'assets/img/EZSportslogo.png';
             const article = document.createElement('article');
             article.className = 'card';
             article.innerHTML = `
@@ -2032,12 +2219,41 @@ const Store = {
               </div>`;
             return article;
           };
+          // Helper to build the special grouped rope card that links to a dedicated product page
+          const buildRopeGroupCard = ({ ropeFt, ropeSpool }) => {
+            // Normalize an image from either record
+            const pickImg = (rec) => rec ? this.normalizeProdListItem(rec).img : '';
+            const curated = 'assets/prodImgs/Accessories/Twisted_rope/twisted_rope.jpeg';
+            const firstImg = curated || pickImg(ropeSpool) || pickImg(ropeFt) || 'assets/img/EZSportslogo.png';
+            const href = 'product.html?pid=rope-516-poly';
+            const article = document.createElement('article');
+            article.className = 'card';
+            article.innerHTML = `
+              <a class="media" href="${href}"><img src="${firstImg}" alt="5/16\" Poly Twisted Rope" loading="lazy" class="product-main-image"/></a>
+              <div class="body">
+                <h3 class="h3-tight"><a href="${href}">5/16\" Poly Twisted Rope</a></h3>
+                <div class="price-row">
+                  <span class="price">Price may vary</span>
+                  <a class="btn btn-ghost" href="${href}" aria-label="View 5/16\" Poly Twisted Rope">View</a>
+                </div>
+              </div>`;
+            return article;
+          };
           if (twines.length) {
-            grid.appendChild(buildGroupCard({ title:'Forever Black Twine Spool', items: twines, href:'product.html?pid=twine-forever-black', alt:'Forever Black Twine Spool' }));
+            grid.appendChild(buildGroupCard({ title:'Forever Black Twine Spool', items: twines, href:'product.html?pid=twine-forever-black', alt:'Forever Black Twine Spool', img: 'assets/prodImgs/Accessories/Forever/black_twine.jpeg' }));
           }
           if (cables.length) {
-            grid.appendChild(buildGroupCard({ title:'Cable', items: cables, href:'product.html?pid=cable-wire', alt:'Galvanized Cable' }));
+            grid.appendChild(buildGroupCard({ title:'Cable', items: cables, href:'product.html?pid=cable-wire', alt:'Galvanized Cable', img: 'assets/prodImgs/Accessories/Cable/cable.jpeg' }));
           }
+          if (ropeFt || ropeSpool) {
+            grid.appendChild(buildRopeGroupCard({ ropeFt, ropeSpool }));
+          }
+          // Curated Accessories navigation card: Bullet Pad Kits
+          try {
+            const padImg = 'assets/prodImgs/Bullet_Pad_Kit/bulletpadkit.avif';
+            const padCard = buildGroupCard({ title:'Bullet Pad Kits', items: [], href:'bullet-pad-kits.html', alt:'Bullet Pad Kits', img: padImg });
+            if (padCard) grid.appendChild(padCard);
+          } catch {}
           return; // done with custom rendering
         }
       }
@@ -2240,6 +2456,18 @@ const Store = {
         const extra = Array.isArray(imagesList) ? imagesList.filter(s => s !== hero) : [];
         imagesList.splice(0, imagesList.length, hero, ...extra);
       }
+      // Armor Baseball Cart (Accessories)
+      if (lowerId === 'armorbasket' || /armor\s*(baseball)?\s*cart|armor\s*basket/.test(lowerTitle)) {
+        const base = 'assets/prodImgs/Accessories/Armor_basket';
+        const curated = [
+          `${base}/armorwbasket.avif`,
+          `${base}/armorwbasket2.avif`,
+          `${base}/armorwbasket3.avif`
+        ];
+        img = curated[0];
+        const extra = Array.isArray(imagesList) ? imagesList.filter(s => !curated.includes(s)) : [];
+        imagesList.splice(0, imagesList.length, ...curated, ...extra);
+      }
       // Pro Batting Mat (Accessories)
       if (lowerId === 'battingmat' || /\bbatting\s*mat\b/.test(lowerTitle)) {
         const base = 'assets/prodImgs/Battingmat';
@@ -2305,6 +2533,8 @@ const Store = {
           const lt = title.toLowerCase();
           // Do not show dots for Screen Bulletz Leg Caps
           if (lid === 'screen bulletz' || /screen\s*bulletz/.test(lt)) return true;
+          // Do not show dots for Armor Baseball Cart / Armor Basket
+          if (lid === 'armorbasket' || /armor\s*(baseball)?\s*cart|armor\s*basket/.test(lt)) return true;
         } catch {}
         return false;
       })();
@@ -2535,6 +2765,20 @@ const Store = {
       if (Array.isArray(product.raw.images)) sources = product.raw.images.slice();
       else if (Array.isArray(product.raw.gallery)) sources = product.raw.gallery.slice();
     }
+    // Product-specific override: Wheeled Ball Basket should show standard team-color swatches even without per-color images
+    try {
+      const pidish = String(product.id || product.sku || '').toLowerCase();
+      const tish = String(product.title || '').toLowerCase();
+      const looksLikeWBasket = pidish === 'wbasket' || (/wheeled\s*ball\s*basket/.test(tish));
+      if (looksLikeWBasket) {
+        // Use first available image (or curated hero) for all swatches
+        const hero = (Array.isArray(sources) && sources[0]) || product.img || 'assets/prodImgs/Accessories/Wbasket/wbasket.avif';
+        // Standard 10-color palette (exclude plain green to keep to 10)
+        const fixed = ['black','columbiablue','darkgreen','maroon','navy','orange','purple','red','royal','yellow']
+          .map(c => ({ name: c, class: c, image: hero }));
+        return fixed;
+      }
+    } catch {}
     if (!sources.length) return [];
 
     // Special-case: Bullet JR images are numbered without color tokens.
@@ -2741,10 +2985,39 @@ const Store = {
       if ((page === 'index.html' || page==='') && FEATURED.length) return FEATURED;
       return PRODUCTS;
     })();
-    const list = baseList.filter(p =>
+    let list = baseList.filter(p =>
       (this.state.filter === 'all' || p.category === this.state.filter) &&
       p.title.toLowerCase().includes(query.toLowerCase())
     );
+
+    // Combine twisted rope SKUs into a single grouped card with variations
+    try {
+      const findById = (id) => list.find(p => p.id === id);
+      const ropeFt = findById('5/16-TPLYSTER-xFT');
+      const ropeSpool = findById('5/16-TPLYSTER-1270');
+      if (ropeFt || ropeSpool) {
+        // Remove individual entries from the list
+        list = list.filter(p => p.id !== '5/16-TPLYSTER-xFT' && p.id !== '5/16-TPLYSTER-1270');
+        // Build grouped product with desired MAP for FT ($1/ft) and Spool $230
+        const grouped = {
+          id: 'ROPE-516-POLY',
+          title: '5/16" Poly Twisted Rope',
+          category: (ropeFt?.category || ropeSpool?.category || 'accessories'),
+          img: ropeSpool?.img || ropeFt?.img || 'assets/img/EZSportslogo.png',
+          images: ropeSpool?.images?.length ? ropeSpool.images : (ropeFt?.images || []),
+          description: (ropeFt?.description || ropeSpool?.description || 'Durable 5/16\" poly twisted rope, available by the foot or as a full 1270\' spool.'),
+          features: Array.from(new Set([...(ropeFt?.features || []), ...(ropeSpool?.features || [])])).slice(0, 10),
+          // Set a nominal price to keep indexing; card will override display
+          price: 1,
+          isTwistedRope: true,
+          variations: [
+            { id: '5/16-TPLYSTER-1270', title: "1270' Spool", price: 230 },
+            { id: '5/16-TPLYSTER-xFT', title: 'By the Foot', map: 1.00, unit: '/ft' }
+          ]
+        };
+        list.unshift(grouped);
+      }
+    } catch {}
 
     const html = list.map(p => {
       const desc = p.description ? p.description.slice(0, 140) + (p.description.length > 140 ? '…' : '') : '';
@@ -2772,7 +3045,9 @@ const Store = {
       
       // Calculate price display (range if variations exist)
       let priceDisplay;
-      if (p.variations && p.variations.length > 1) {
+      if (p.isTwistedRope) {
+        priceDisplay = 'Price may vary';
+      } else if (p.variations && p.variations.length > 1) {
         const prices = p.variations.map(v => v.map || v.price || 0).filter(price => price > 0);
         if (prices.length > 1) {
           const minPrice = Math.min(...prices);
@@ -2789,11 +3064,11 @@ const Store = {
       
       return `
       <article class="card ${p.category === 'netting' ? '' : ''}" data-product-id="${p.id}" ${p.stripe?.defaultPriceId ? `data-stripe-price="${p.stripe.defaultPriceId}"` : ''}>
-        <div class="media no-link">
+        ${p.isTwistedRope ? `<a class="media" href="product.html?pid=rope-516-poly">` : `<div class="media no-link">`}
           <img src="${initialImg}" alt="${p.title}" loading="lazy" draggable="false" style="pointer-events:none;" onerror="this.onerror=null;this.src='https://placehold.co/600x400?text=Image+Unavailable';" class="product-main-image"/>
-        </div>
+        ${p.isTwistedRope ? `</a>` : `</div>`}
         <div class="body">
-          <h3 class="h3-tight">${p.title}</h3>
+          <h3 class="h3-tight">${p.isTwistedRope ? `<a href="product.html?pid=rope-516-poly">${p.title}</a>` : p.title}</h3>
           ${desc ? `<p class=\"desc text-sm\">${desc}</p>` : ''}
           ${featPreview ? `<ul class=\"text-xs features-preview\">${featPreview}</ul>` : ''}
           ${colorDotsHtml}
@@ -2801,8 +3076,10 @@ const Store = {
           <div class="price-row">
             <span class="price">${priceDisplay}</span>
             <div class="actions">
-              <button class="btn btn-ghost" data-add="${p.id}" ${p.stock === 0 ? 'disabled' : ''}>${p.stock === 0 ? 'Out of Stock' : 'Add'}</button>
-              <button class="btn btn-ghost" data-detail="${p.id}" aria-label="View details for ${p.title}">Details</button>
+              ${p.isTwistedRope
+                ? `<a class="btn btn-ghost" href="product.html?pid=rope-516-poly" aria-label="View ${p.title}">View</a>`
+                : `<button class="btn btn-ghost" data-add="${p.id}" ${p.stock === 0 ? 'disabled' : ''}>${p.stock === 0 ? 'Out of Stock' : 'Add'}</button>
+                   <button class="btn btn-ghost" data-detail="${p.id}" aria-label="View details for ${p.title}">Details</button>`}
             </div>
           </div>
         </div>
@@ -2978,6 +3255,23 @@ const Store = {
       featureList = `<h4>Features</h4><ul class="feature-list">${items}</ul>`;
     }
     const descHtml = `<h4>Description</h4>` + (product.description ? `<p class="full-desc">${product.description}</p>` : `<p class="full-desc muted">Description coming soon.</p>`);
+    // Twisted rope special handling: expose a simple dropdown for Spool vs By the Foot
+    const isRope = !!product.isTwistedRope || /5\/16\"\s*poly\s*twisted\s*rope/i.test(product.title||'');
+    let ropeControls = '';
+    if (isRope) {
+      const spool = { id: '5/16-TPLYSTER-1270', title: "1270' Spool", price: 230 };
+      const perFt = { id: '5/16-TPLYSTER-xFT', title: 'By the Foot', price: 1, unit: '/ft' };
+      ropeControls = `
+        <div class="stack-05">
+          <label for="rope-option" class="text-sm">Choose Option</label>
+          <select id="rope-option">
+            <option value="${spool.id}" data-price="${spool.price}">${spool.title} — ${currency.format(spool.price)}</option>
+            <option value="${perFt.id}" data-price="${perFt.price}">${perFt.title} — $${perFt.price}/${perFt.unit.replace('/','')}</option>
+          </select>
+          <div class="text-xs muted">For By the Foot, quantity equals feet.</div>
+        </div>`;
+    }
+
     dlg.innerHTML = `
       <form method="dialog" class="dlg-backdrop" onclick="this.closest('dialog').close()"></form>
       <section class="panel" role="document">
@@ -2991,14 +3285,17 @@ const Store = {
             ${images.length > 1 ? `<div class="thumbs" role="list">${thumbs}</div>` : ''}
           </div>
           <div class="info">
-            <p class="price-lg">${currency.format(product.price)}</p>
+            <p class="price-lg">${isRope ? 'Price may vary' : currency.format(product.price)}</p>
+            ${isRope ? ropeControls : ''}
             ${featureList}
             ${descHtml}
           </div>
         </div>
         <footer class="panel-foot">
-          <button class="btn btn-primary" data-add-detail="${product.id}">Add to Cart</button>
-          <button class="btn btn-ghost" value="close">Close</button>
+          <div class="row gap-06">
+            <button class="btn btn-primary" data-add-detail="${product.id}">${isRope ? 'Add Selected' : 'Add to Cart'}</button>
+            <button class="btn btn-ghost" value="close">Back</button>
+          </div>
         </footer>
       </section>`;
     dlg.showModal();
@@ -3014,8 +3311,37 @@ const Store = {
     // Add-to-cart inside dialog
     dlg.querySelector('[data-add-detail]')?.addEventListener('click', (e) => {
       e.preventDefault();
-      this.add(product, {});
-      try { window.trackEvent && window.trackEvent('add_to_cart', { id: product.id, price: product.price }); } catch {}
+      if (isRope) {
+        const sel = dlg.querySelector('#rope-option');
+        const chosenId = sel?.value || '5/16-TPLYSTER-1270';
+        const chosenPrice = Number(sel?.selectedOptions?.[0]?.getAttribute('data-price') || 0) || 0;
+        const chosenTitle = sel?.selectedOptions?.[0]?.textContent || product.title;
+        const line = {
+          id: chosenId,
+          qty: 1,
+          title: chosenTitle,
+          price: chosenPrice,
+          img: product.img,
+          category: product.category
+        };
+        // For per-foot option, we treat quantity as feet; default to 1 foot; user can edit qty in cart
+        if (chosenId === '5/16-TPLYSTER-xFT') {
+          line.title = '5/16" Poly Twisted Rope — By the Foot';
+          line.price = 1; // $1/ft
+        } else {
+          line.title = '5/16" Poly Twisted Rope — 1270\' Spool';
+          line.price = 230;
+        }
+        // Push directly into cart state to preserve exact price per selection
+        this.state.cart.push(line);
+        this.persist();
+        this.renderCart();
+        this.openCart();
+        try { window.trackEvent && window.trackEvent('add_to_cart', { id: line.id, price: line.price, qty: line.qty }); } catch {}
+      } else {
+        this.add(product, {});
+        try { window.trackEvent && window.trackEvent('add_to_cart', { id: product.id, price: product.price }); } catch {}
+      }
     }, { once: true });
     // Explicit close wiring (buttons with value="close" do not auto-close because they are outside the form element containing method="dialog")
     dlg.querySelectorAll('button[value="close"], [data-close-detail]').forEach(btn => {

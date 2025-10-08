@@ -51,7 +51,7 @@
     const priceMax = varPrices.length ? Math.max(...varPrices) : null;
     const price = varPrices.length ? priceMin : (Number(p.price ?? p.map ?? p.wholesale ?? 0) || 0);
     const isUsableSrc = (s) => typeof s === 'string' && /^(https?:|\/|assets\/)/i.test(s);
-    let primary = null;
+  let primary = null;
     // 1) explicit p.img
     if (isUsableSrc(p.img)) primary = p.img;
     // 2) images
@@ -85,7 +85,7 @@
       const cand = dl.find(isUsableSrc);
       if (cand) primary = cand;
     }
-    const gallery = [];
+  const gallery = [];
   // Collect gallery candidates from various shapes:
   // 1) images.all (object shape)
   if (p.images && Array.isArray(p.images.all)) gallery.push(...p.images.all.filter(isUsableSrc));
@@ -96,7 +96,16 @@
     if (primary && !gallery.length) gallery.push(primary);
     const features = Array.isArray(p.features) ? p.features : (p.details && Array.isArray(p.details.features) ? p.details.features : []);
     const description = p.description || (p.details && p.details.description) || '';
-  let unique = Array.from(new Set(gallery)).slice(0,20);
+  // Build unique list and filter placeholders/non-image tokens
+  const isValidImg = (src) => {
+    if (!src || typeof src !== 'string') return false;
+    const s = src.trim(); if (!s) return false;
+    const lower = s.toLowerCase();
+    if (['removed','placeholder','n/a','na','null'].includes(lower)) return false;
+    if (lower.includes('placeholder') || lower.includes('noimage') || lower.includes('coming-soon')) return false;
+    return /\.(png|jpe?g|webp|avif|gif|svg)(\?|$)/.test(lower);
+  };
+  let unique = Array.from(new Set(gallery)).filter(isValidImg).slice(0,20);
 
     // Curated Accessories imagery overrides
     try {
@@ -123,6 +132,18 @@
         primary = hero;
         const extras = unique.filter(u => u !== hero);
         unique = [hero, ...extras].slice(0, 20);
+      }
+      // Armor Baseball Cart (Accessories)
+      if (lowerId === 'armorbasket' || /armor\s*(baseball)?\s*cart|armor\s*basket/.test(lowerTitle)) {
+        const base = 'assets/prodImgs/Accessories/Armor_basket';
+        const curated = [
+          `${base}/armorwbasket.avif`,
+          `${base}/armorwbasket2.avif`,
+          `${base}/armorwbasket3.avif`
+        ];
+        primary = curated[0];
+        const extras = unique.filter(u => !curated.includes(u));
+        unique = [...curated, ...extras].slice(0, 20);
       }
       // Pro Batting Mat (Accessories)
       if (lowerId === 'battingmat' || /\bbatting\s*mat\b/.test(lowerTitle)) {
@@ -232,11 +253,11 @@
       el.innerHTML = '<div class="alert">Product not found.</div>';
       return;
     }
-    // Detect Pre-Made Cages grouped pages to disable color dropdown
+    // Detect grouped pages to disable color dropdown
     const isPreMadeCagesGroup = /^(cages-21nylon|cages-36nylon|cages-36poly)$/i.test(String(prod.id||''));
-  // Detect Twine Spool & Cable grouped pages to disable color dropdown
-  const isTwineSpoolGroup = /^twine-forever-black$/i.test(String(prod.id||''));
-  const isCableGroup = /^cable-wire$/i.test(String(prod.id||''));
+    const isTwineSpoolGroup = /^twine-forever-black$/i.test(String(prod.id||''));
+    const isCableGroup = /^cable-wire$/i.test(String(prod.id||''));
+    const isRopeGroup = /^rope-516-poly$/i.test(String(prod.id||'')) || /5\/16\"\s*poly\s*twisted\s*rope/i.test(String(prod.title||''));
     // Render price or price range; will update dynamically on option change
     const basePriceHtml = (() => {
       if (prod.priceMin && prod.priceMax && prod.priceMax !== prod.priceMin) {
@@ -249,9 +270,10 @@
     const thumbs = prod.displayPairs.map((g,i)=>`<button class="thumb" data-index="${i}" aria-label="Show image ${i+1}" data-large="${g.large}"><img src="${g.thumb}" alt="${prod.title} image ${i+1}" loading="lazy"/></button>`).join('');
 
     // Build color choices from product images using Store's color extraction
-    // Skip for Pre-Made Cages and Twine Spool grouped pages per request
+    // Skip for grouped pages and Armor Baseball Cart (no color dropdown requested)
     let colorOptions = [];
-  if (!isPreMadeCagesGroup && !isTwineSpoolGroup && !isCableGroup) {
+    const isArmorBasket = /armorbasket/i.test(String(prod.id||'')) || /armor\s*(baseball)?\s*cart|armor\s*basket/i.test(String(prod.title||''));
+  if (!isPreMadeCagesGroup && !isTwineSpoolGroup && !isCableGroup && !isRopeGroup && !isArmorBasket) {
       try {
         const imgs = Array.isArray(prod.displayPairs) ? prod.displayPairs.map(p => p.large) : (prod.primary ? [prod.primary] : []);
         if (window.Store && typeof window.Store.extractProductColors === 'function') {
@@ -298,8 +320,10 @@
               ` : ''}
               ${colorSelectHtml}
             </div>
-            <button class="btn btn-primary" id="pd-add">Add to Cart</button>
-            <a class="btn" href="javascript:history.back()">Back</a>
+            <div class="row gap-06">
+              <button class="btn btn-primary" id="pd-add">Add to Cart</button>
+              <button class="btn btn-ghost" type="button" id="pd-back">Back</button>
+            </div>
           </div>
           <h3>Features</h3>
           ${features || '<p class="muted">No features listed.</p>'}
@@ -475,6 +499,10 @@
         window.Store && window.Store.add(product, { size, color });
       } catch {}
     });
+    // Back button click handler for consistent sizing (button vs anchor)
+    document.getElementById('pd-back')?.addEventListener('click', ()=>{
+      try { history.back(); } catch {}
+    });
   }
 
   async function init(){
@@ -512,7 +540,9 @@
         });
         // Primary image & gallery: use first valid image
         const first = twines[0] || {};
-        const primary = variations.find(v=>v.img)?.img || first.img || '';
+  // Curated hero image for Twine Spool
+  const curatedHero = 'assets/prodImgs/Accessories/Forever/black_twine.jpeg';
+  const primary = curatedHero || variations.find(v=>v.img)?.img || first.img || '';
         const gallery = variations.map(v=>v.img).filter(Boolean);
         const galleryPairs = (gallery.length ? gallery : [primary]).filter(Boolean).slice(0,12).map(src=>({thumb:src, large:src}));
         const displayPairs = galleryPairs.slice(0, Math.min(8, galleryPairs.length));
@@ -557,7 +587,9 @@
           return { option, map: price, price, sku: m.sku || m.id, img };
         });
         const first = cables[0] || {};
-        const primary = variations.find(v=>v.img)?.img || first.img || '';
+  // Curated hero image for Cable
+  const curatedHero = 'assets/prodImgs/Accessories/Cable/cable.jpeg';
+  const primary = curatedHero || variations.find(v=>v.img)?.img || first.img || '';
         const gallery = variations.map(v=>v.img).filter(Boolean);
         const galleryPairs = (gallery.length ? gallery : [primary]).filter(Boolean).slice(0,12).map(src=>({thumb:src, large:src}));
         const displayPairs = galleryPairs.slice(0, Math.min(8, galleryPairs.length));
@@ -573,6 +605,43 @@
           priceMin: priceMin || 0,
           priceMax: priceMax || priceMin || 0,
           primary: primary || '',
+          displayPairs,
+          features,
+          description,
+          variations
+        };
+        render(synthetic);
+        return;
+      }
+      // Grouped detail: 5/16" Poly Twisted Rope — By the Foot and 1270' Spool
+      if (pidKey === 'rope-516-poly') {
+        const ropeFt = all.find(p => String(p.sku||'').toUpperCase() === '5/16-TPLYSTER-XFT');
+        const ropeSpool = all.find(p => String(p.sku||'').toUpperCase() === '5/16-TPLYSTER-1270');
+        if (!ropeFt && !ropeSpool) { render(null); return; }
+        const pickImg = (rec) => {
+          if (!rec) return '';
+          const img = rec.img || (rec.images && (rec.images.primary || (Array.isArray(rec.images) && rec.images[0]))) || (rec.details && rec.details.image_url) || '';
+          return img || '';
+        };
+  // Curated hero image for Twisted Rope
+  const primary = 'assets/prodImgs/Accessories/Twisted_rope/twisted_rope.jpeg' || pickImg(ropeSpool) || pickImg(ropeFt) || '';
+        const gallery = [primary].filter(Boolean);
+        const galleryPairs = (gallery.length ? gallery : [primary]).filter(Boolean).slice(0,12).map(src=>({thumb:src, large:src}));
+        const displayPairs = galleryPairs.slice(0, Math.min(8, galleryPairs.length));
+        const variations = [
+          { option: "1270' Spool", map: 230, price: 230, sku: '5/16-TPLYSTER-1270', img: primary },
+          { option: 'By the Foot', map: 1, price: 1, sku: '5/16-TPLYSTER-xFT', img: primary }
+        ];
+        const priceMin = 1; const priceMax = 230;
+        const features = Array.from(new Set([...(ropeFt?.details?.features||ropeFt?.features||[]), ...(ropeSpool?.details?.features||ropeSpool?.features||[])])).slice(0,10);
+        const description = (ropeFt?.details?.description || ropeFt?.description || ropeSpool?.details?.description || ropeSpool?.description || 'Durable 5/16" poly twisted rope. Choose a full 1270\' spool or buy by the foot.');
+        const synthetic = {
+          id: pidKey,
+          title: '5/16" Poly Twisted Rope',
+          price: priceMin,
+          priceMin,
+          priceMax,
+          primary: primary || 'assets/img/EZSportslogo.png',
           displayPairs,
           features,
           description,
