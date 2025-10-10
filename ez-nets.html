@@ -13,9 +13,21 @@
     .net-hero{background:linear-gradient(135deg,#000000 0%, var(--brand) 100%);color:#fff;padding:2.2rem 0;border-radius:1.25rem;margin-top:1rem}
     .net-hero h1{margin:0 0 .5rem;font-size:clamp(1.9rem,4.5vw,3.1rem);letter-spacing:.6px;text-transform:uppercase;font-weight:900}
     .net-hero p{margin:0 0 1rem;font-weight:600;max-width:780px}
-    .spec-grid{display:grid;gap:1rem;margin:1.5rem 0;grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
-    .spec-card{background:#fff;border:1px solid var(--border);border-radius:1rem;padding:1rem;box-shadow:0 4px 18px rgba(12,32,64,.06)}
-    .spec-card h3{margin:.15rem 0 .4rem;font-size:1rem}
+    /* Compact spec grid ~20% shorter */
+    .spec-grid{display:grid;gap:.8rem;margin:1.2rem 0;grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+    .spec-card{background:#fff;border:1px solid var(--border);border-radius:1rem;padding:.8rem;box-shadow:0 4px 18px rgba(12,32,64,.06)}
+    .spec-card h3{margin:.1rem 0 .3rem;font-size:.9rem}
+    /* Enforce uniform image sizing (same visual footprint for all spec images) */
+    .spec-card .spec-image{
+      display:block;
+      margin:0 auto .5rem;
+      width:100%;
+      max-width:260px;
+      aspect-ratio:4/3;
+      height:auto;
+      object-fit:contain;
+      border-radius:.5rem
+    }
   </style>
 </head>
 <body>
@@ -46,20 +58,24 @@
 
     <section class="spec-grid">
       <article class="spec-card">
+        <img class="spec-image" src="assets/img/eznets/premium_materials.png" alt="Premium Materials" loading="eager" decoding="async" />
         <h3>Premium Materials</h3>
-        <p>UV stabilized, weather‑resistant, pro‑grade twine options. (Placeholder copy).</p>
+        <p>UV stabilized, weather‑resistant, pro‑grade twine options.</p>
       </article>
       <article class="spec-card">
+        <img class="spec-image" src="assets/img/eznets/custom_sizing.png" alt="Custom Sizing" loading="lazy" decoding="async" />
         <h3>Custom Sizing</h3>
-        <p>Cut to exact dimensions with perimeter edging & hardware. (Placeholder).</p>
+        <p>Cut to exact dimensions with perimeter edging & hardware.</p>
       </article>
       <article class="spec-card">
+        <img class="spec-image" src="assets/img/eznets/safety_first.png" alt="Safety First" loading="lazy" decoding="async" />
         <h3>Safety First</h3>
-        <p>Engineered break strength and proper impact absorption. (Placeholder).</p>
+        <p>Engineered break strength and proper impact absorption.</p>
       </article>
       <article class="spec-card">
+        <img class="spec-image" src="assets/img/eznets/fast_turnaround.png" alt="Fast Turnaround" loading="lazy" decoding="async" />
         <h3>Fast Turnaround</h3>
-        <p>Streamlined quoting and fabrication workflow. (Placeholder).</p>
+        <p>Streamlined quoting and fabrication workflow.</p>
       </article>
     </section>
 

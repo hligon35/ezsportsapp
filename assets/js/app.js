@@ -401,6 +401,7 @@ const Store = {
   this.ensureNettingSubnav();
   this.ensureSubcategoryIntro();
   this.ensureNettingCarousel();
+  this.ensureEZNetsSpecImages();
   this.ensureHeroRotator();
   this.ensureRandomTypeTileImages();
   this.ensureUniformFooter();
@@ -589,8 +590,8 @@ const Store = {
             <strong>EZ Sports Netting</strong>
             <p>Better baseball through better gear.</p>
             <div class="socials" aria-label="social links">
-              <a href="https://www.facebook.com/Ezsportsnetting/" aria-label="Facebook" target="_blank" rel="noopener"><img src="assets/img/facebook.png" alt="Facebook"/></a>
-              <a href="#" aria-label="Instagram" target="_blank" rel="noopener"><img src="assets/img/instagram.png" alt="Instagram"/></a>
+              <a href="https://www.facebook.com/Ezsportsnetting/" aria-label="Facebook" target="_blank" rel="noopener"><img src="assets/img/facebook.png?v=20251009" alt="Facebook"/></a>
+              <a href="#" aria-label="Instagram" target="_blank" rel="noopener"><img src="assets/img/instagram.png?v=20251009" alt="Instagram"/></a>
             </div>
           </div>
           <div>
@@ -1463,6 +1464,39 @@ const Store = {
       // Initialize
       update();
     } catch(e) { /* silent */ }
+  },
+
+  // On the EZ Nets overview page, inject images into the spec cards based on their titles
+  ensureEZNetsSpecImages() {
+    try {
+      const base = (location.pathname.split('/').pop() || '').toLowerCase();
+      if (base !== 'ez-nets.html') return;
+      const wrap = document.querySelector('.spec-grid');
+      if (!wrap) return;
+      const FILES = {
+        'premium materials': 'premium_materials.png',
+        'custom sizing': 'custom_sizing.png',
+        'safety first': 'safety_first.png',
+        'fast turnaround': 'fast_turnaround.png'
+      };
+      const IMG_BASE = 'assets/img/eznets/';
+      wrap.querySelectorAll('.spec-card').forEach(card => {
+        const h = card.querySelector('h3');
+        if (!h) return;
+        const key = (h.textContent || '').trim().toLowerCase();
+        const file = FILES[key];
+        if (!file) return;
+        // Prevent duplicates
+        if (card.querySelector('img.spec-image')) return;
+        const img = document.createElement('img');
+  img.src = IMG_BASE + file;
+  img.alt = h.textContent || 'Illustration';
+  img.loading = 'lazy';
+        img.className = 'spec-image rounded-sm';
+        // Insert image at the top of the card
+        card.insertBefore(img, card.firstChild);
+      });
+    } catch {}
   },
 
   // Insert a brief category intro + product range chips on L-Screens subcategory pages.
@@ -2693,14 +2727,17 @@ const Store = {
   // Replace placeholder logo.svg with new brand image in header & footer
   ensureBrandLogos() {
     try {
-  const BRAND_SRC = 'assets/img/EZSportslogo.png';
-      const targets = [
-        ...document.querySelectorAll('.site-header .brand img, .footer-brand-block img')
-      ];
+      const BRAND_SRC = 'assets/img/EZSportslogo.png';
+      // Only target the brand logo in header and the non-social logo image in footer.
+      const headerImgs = Array.from(document.querySelectorAll('.site-header .brand img'));
+      const footerImgs = Array.from(document.querySelectorAll('.footer-brand-block img')).filter(img => !img.closest('.socials'));
+      const targets = [...headerImgs, ...footerImgs];
       targets.forEach(img => {
+        const alt = (img.getAttribute('alt') || '').toLowerCase();
+        const isSocial = img.closest('.socials') || /facebook|instagram|twitter|social/.test(alt);
+        if (isSocial) return; // never override social icons
         img.setAttribute('src', BRAND_SRC);
         img.setAttribute('alt', 'EZ Sports Netting logo');
-        // Standardize size if missing explicit height
         if (!img.getAttribute('height')) img.setAttribute('height', '40');
       });
     } catch {}
