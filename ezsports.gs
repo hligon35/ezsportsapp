@@ -29,7 +29,13 @@ const CONFIG = {
   FORCE_TEST_CC: false, // if true, always CC TEST_EMAIL
   BOT_MIN_MS: 1200, // minimum elapsed ms required before submit (timing heuristic)
   // Optional: add an API key and include it in requests via header 'X-API-Key' or query 'key'
-  API_KEY: ''
+  API_KEY: '',
+  // Optional: reCAPTCHA secret. If provided, requests must include recaptchaToken (v3/v2) to be verified.
+  RECAPTCHA_SECRET: '',
+  // Optional: Cloudflare Turnstile secret. If provided, requests must include cf-turnstile-response to be verified.
+  TURNSTILE_SECRET: '0x4AAAAAAB5rtUvINs4vdhP14ff-GcW7o_o',
+  // Optional: restrict accepted Referer/Origin domains
+  ALLOWED_ORIGINS: ['https://ezsportsnetting.com', 'https://www.ezsportsnetting.com']
 };
 
 const SHEETS = {
@@ -49,6 +55,33 @@ function doPost(e) {
     }
 
   const payload = _parseRequest(e) || {};
+    // Optional origin check
+    if (Array.isArray(CONFIG.ALLOWED_ORIGINS) && CONFIG.ALLOWED_ORIGINS.length) {
+      var ref = _header(e, 'referer') || e?.parameter?.referer || '';
+      var okOrigin = CONFIG.ALLOWED_ORIGINS.some(function(o){ return ref && (ref.indexOf(o) === 0); });
+      if (!okOrigin && ref) {
+        // If Referer is present but not allowed, silently accept but drop
+        return _json({ ok: true });
+      }
+    }
+
+    // Optional Cloudflare Turnstile verification (preferred)
+    if (CONFIG.TURNSTILE_SECRET) {
+      var tsToken = (payload['cf-turnstile-response'] || payload.turnstileToken || '').toString().trim();
+      var ipTs = (_header(e, 'x-forwarded-for') || '').split(',')[0].trim();
+      if (!tsToken || !_verifyTurnstile(CONFIG.TURNSTILE_SECRET, tsToken, ipTs)) {
+        return _json({ ok: true }); // pretend success
+      }
+    }
+
+    // Optional reCAPTCHA verification
+    if (CONFIG.RECAPTCHA_SECRET) {
+      var token = (payload.recaptchaToken || payload['g-recaptcha-response'] || '').toString().trim();
+      var ip = (_header(e, 'x-forwarded-for') || '').split(',')[0].trim();
+      if (!token || !_verifyRecaptcha(CONFIG.RECAPTCHA_SECRET, token, ip)) {
+        return _json({ ok: true }); // pretend success
+      }
+    }
     // Bot guard: honeypot/timing/rate limit. If flagged, return ok without processing.
     const botCheck = _isBot(e, payload);
     if (botCheck.flag) {
@@ -281,6 +314,22 @@ function _isBot(e, data) {
       if (count >= 30) return { flag: true, reason: 'rate_limit', count };
       cache.put(key, String(count + 1), 3600); // 1 hour window
     }
+
+    // 4) User-Agent heuristics (missing or obvious non-browser clients)
+    var ua = _header(e, 'user-agent') || '';
+    if (!ua) return { flag: true, reason: 'ua_missing' };
+    var uaBad = /(curl|wget|python-requests|httpclient|libwww|postman|insomnia|java|okhttp|apache-httpclient|bot|crawler)/i.test(ua);
+    if (uaBad) return { flag: true, reason: 'ua_blacklist', ua: ua };
+
+    // 5) Message phishing heuristics: excessive links or HTML markup
+    var msg = (data.message || data.msg || '').toString();
+    if (msg) {
+      var urlMatches = msg.match(/\bhttps?:\/\/|\bwww\./gi);
+      var linkCount = urlMatches ? urlMatches.length : 0;
+      if (linkCount >= 3) return { flag: true, reason: 'too_many_links', links: linkCount };
+      if (/<\s*a\s+href|<script|<iframe/i.test(msg)) return { flag: true, reason: 'html_in_message' };
+      if (msg.length > 5000) return { flag: true, reason: 'message_too_long' };
+    }
     return { flag: false };
   } catch (err) {
     // Fail-closed for safety
@@ -297,4 +346,39 @@ function _computeCc(e, data) {
   if (CONFIG.TEST_EMAIL && (CONFIG.FORCE_TEST_CC || testFlag)) list.push(CONFIG.TEST_EMAIL);
   // Dedupe and clean
   return Array.from(new Set(list.map(String).filter(Boolean)));
+}
+
+// --- Optional reCAPTCHA verify ---
+function _verifyRecaptcha(secret, token, remoteip) {
+  try {
+    var url = 'https://www.google.com/recaptcha/api/siteverify';
+    var payload = {
+      method: 'post',
+      payload: { secret: secret, response: token, remoteip: remoteip || '' },
+      muteHttpExceptions: true
+    };
+    var res = UrlFetchApp.fetch(url, payload);
+    var text = res && res.getContentText ? res.getContentText() : '';
+    var json = (text && text.charAt(0) === '{') ? JSON.parse(text) : {};
+    return !!json.success;
+  } catch (err) {
+    return false;
+  }
+}
+
+function _verifyTurnstile(secret, token, remoteip) {
+  try {
+    var url = 'https://challenges.cloudflare.com/turnstile/v0/siteverify';
+    var payload = {
+      method: 'post',
+      payload: { secret: secret, response: token, remoteip: remoteip || '' },
+      muteHttpExceptions: true
+    };
+    var res = UrlFetchApp.fetch(url, payload);
+    var text = res && res.getContentText ? res.getContentText() : '';
+    var json = (text && text.charAt(0) === '{') ? JSON.parse(text) : {};
+    return !!json.success;
+  } catch (err) {
+    return false;
+  }
 }
