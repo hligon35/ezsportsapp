@@ -26,6 +26,11 @@
     .btn { appearance:none; border: 1px solid #111; background:#111; color:#fff; padding:.65rem 1rem; border-radius: 10px; cursor:pointer; font-weight:600; }
     .btn.ghost { background:transparent; color:#111; }
     .cs-note { font-size:.875rem; color:#666; margin-top:.75rem; }
+    /* Mobile: center logo above card and make it match card width */
+    @media (max-width: 819.98px) {
+      .cs-hero { text-align: center; }
+      .cs-hero img { width: 100%; max-width: none; display:block; margin: 0 auto; }
+    }
   </style>
   <meta name="robots" content="noindex" />
   <link rel="manifest" href="manifest.webmanifest" />
