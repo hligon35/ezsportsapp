@@ -17,7 +17,22 @@ try {
 } catch {}
 
 // Lightweight client-side "Coming Soon" gate with hidden unlock
-// Toggle via localStorage.__COMING_SOON__ = 'on'|'off' (default 'off'),
+// (Removed obsolete minimal Store skeleton to prevent duplicate declaration; see full Store definition later in file.)
+
+// If forms.js is not loaded (older pages), provide a minimal noop Turnstile token helper
+async function getTurnstileToken(){
+  try {
+    if (window.turnstile && window.TURNSTILE_SITE_KEY) {
+      return new Promise(res=>{
+        let host=document.createElement('div'); host.style.cssText='position:fixed;left:-9999px;top:-9999px;'; document.body.appendChild(host);
+        let wid=null; let done=false; const cleanup=()=>{ if(done) return; done=true; try{window.turnstile.remove(wid);}catch{} try{host.remove();}catch{} };
+        try { wid = window.turnstile.render(host,{sitekey:window.TURNSTILE_SITE_KEY,size:'flexible',callback:t=>{res(t||'');cleanup();},'error-callback':()=>{res('');cleanup();},'timeout-callback':()=>{res('');cleanup();}}); window.turnstile.execute(wid); setTimeout(()=>{res('');cleanup();},7000); }
+        catch{ res(''); cleanup(); }
+      });
+    }
+  } catch {}
+  return '';
+}
 // or query params: ?gate=on to enable, ?gate=off to disable, ?unlock=1 to grant temporary access
 (function comingSoonGate(){
   try {
@@ -32,11 +47,9 @@ try {
     const defaultGate = isLocal ? 'off' : 'on';
     const enabled = (localStorage.getItem('__COMING_SOON__') || defaultGate) === 'on';
     if (!enabled) return;
+    if (isLocal) return; // allow local preview without gate
 
-    // Allow dev/local preview without gate
-    if (isLocal) return;
-
-    // Avoid redirect loop on the gate page itself and on API/asset routes
+    // Avoid redirect loop on gate page & API/asset routes
     if (/coming-soon\.html$/i.test(path)) return;
     if (/^\/(api|assets|server|database)\b/.test(path)) return;
 
@@ -46,82 +59,33 @@ try {
       const raw = localStorage.getItem('comingSoonUnlocked');
       if (raw) {
         const { at } = JSON.parse(raw);
-        if (at && (Date.now() - at) < (24*60*60*1000)) unlocked = true;
+        if (at && (Date.now() - at) < 24*60*60*1000) unlocked = true;
       }
     } catch {}
     if (unlocked) return;
-
-    // Redirect all other pages to the gate
     location.replace('coming-soon.html');
   } catch {}
 })();
 
 const currency = new Intl.NumberFormat(undefined, { style: 'currency', currency: 'USD' });
-
-// Featured products cache (homepage only): random until enough analytics, then popularity-based
 let FEATURED = [];
-
-// Dynamic products loaded from API (fallback to empty). Each product object expected shape:
-// { id, name, description, category, price, image, stripe? }
 let PRODUCTS = [];
 
-// Basic description sanitizer to remove scripting, styles, boilerplate clutter and collapse whitespace.
-function sanitizeDescription(raw) {
-  if (!raw || typeof raw !== 'string') return '';
-  let txt = raw;
-  // Remove script/style tags and their content
-  txt = txt.replace(/<script[\s\S]*?<\/script>/gi, ' ') // scripts
-           .replace(/<style[\s\S]*?<\/style>/gi, ' ');
-  // Strip HTML tags
-  txt = txt.replace(/<[^>]+>/g, ' ');
-  // Decode very common entities manually (avoid DOMParser dependency for robustness if blocked by CSP)
-  const entities = { '&nbsp;':' ', '&amp;':'&', '&lt;':'<', '&gt;':'>', '&quot;':'"', '&#39;':'\'' };
-  txt = txt.replace(/&(nbsp|amp|lt|gt|quot|#39);/g, (m)=> entities[m] || ' ');
-  // Split into lines, prune obvious boilerplate / navigation / marketing footer junk
-  const boilerplatePatterns = [
-    /©/i,
-    /all rights reserved/i,
-    /privacy policy/i,
-    /terms of (service|use)/i,
-    /subscribe/i,
-    /follow us/i,
-    /track your order/i,
-    /customer service/i,
-    /returns &? exchanges/i,
-    /shipping/i,
-    /warranty/i,
-    /newsletter/i,
-    /javascript required/i,
-    /var\s+\w+\s*=|function\s*\(/i,
-    /add to cart/i
-  ];
-  let lines = txt.split(/\r?\n|\u2028|\u2029/).map(l=>l.trim()).filter(l=>l);
-  lines = lines.filter(l => {
-    if (l.length < 2) return false;
-    if (l.length > 600) return false; // extremely long (likely concatenated junk)
-    return !boilerplatePatterns.some(re => re.test(l));
-  });
-  // Remove duplicate consecutive lines
-  const deduped = [];
-  for (const l of lines) {
-    if (deduped[deduped.length-1] === l) continue;
-    deduped.push(l);
-  }
-  lines = deduped;
-  // Attempt to extract feature-like bullet lines (retain for features array if not already present elsewhere)
-  const featureLike = [];
-  lines = lines.filter(l => {
-    if (/^[-*•]\s+/.test(l) || /^\d+\./.test(l)) { featureLike.push(l.replace(/^[-*•]\s+/, '').replace(/^\d+\.\s*/, '')); return false; }
-    return true;
-  });
-  // Merge back cleaned description
-  txt = lines.join(' ');
-  // Collapse multiple spaces
-  txt = txt.replace(/\s{2,}/g, ' ').trim();
-  // Truncate to reasonable length for dialog readability
-  const MAX_LEN = 800;
-  if (txt.length > MAX_LEN) txt = txt.slice(0, MAX_LEN) + '…';
-  return txt;
+function sanitizeDescription(html) {
+  try {
+    if (!html) return '';
+    const div = document.createElement('div');
+    div.innerHTML = String(html);
+    div.querySelectorAll('script,style,noscript').forEach(n=>n.remove());
+    div.querySelectorAll('*').forEach(el => {
+      [...el.attributes].forEach(a => { if (/^on/i.test(a.name)) el.removeAttribute(a.name); });
+    });
+    let txt = div.textContent || '';
+    txt = txt.replace(/\s{2,}/g, ' ').trim();
+    const MAX_LEN = 800;
+    if (txt.length > MAX_LEN) txt = txt.slice(0, MAX_LEN) + '…';
+    return txt;
+  } catch { return ''; }
 }
 async function fetchProducts() {
   try {
@@ -135,108 +99,21 @@ async function fetchProducts() {
     ];
     let data = [];
     let lastErr = null;
+    // Attempt to fetch from first responsive base
     for (const base of bases) {
+      const url = (base ? base.replace(/\/$/,'') : '') + '/api/products';
       try {
-        const url = base + '/api/products?limit=100';
-        const res = await fetch(url, { credentials: 'include' });
-        if (!res.ok) throw new Error(res.status + ' ' + res.statusText);
+        const res = await fetch(url, { cache: 'no-store' });
+        if (!res.ok) throw new Error('HTTP '+res.status);
         const json = await res.json();
-        if (Array.isArray(json) && json.length) {
-          data = json;
-          window.__API_BASE = base; // expose for other calls (logout, etc.)
-          break;
-        } else {
-          // keep iterating; remember empty as soft failure
-          lastErr = new Error('Empty dataset from ' + (base || 'current origin'));
-        }
-      } catch (e) { lastErr = e; }
+        if (Array.isArray(json) && json.length) { data = json; break; }
+      } catch (err) { lastErr = err; }
     }
-  if (!Array.isArray(data)) data = [];
-    if (!data.length && lastErr) throw lastErr;
-    // Normalize to UI shape
-    const mapCategory = (raw) => {
-      const c = String(raw || '').toLowerCase();
-      // Direct matches first
-      if (['bats','gloves','netting','helmets'].includes(c)) return c;
-      // Heuristic mapping
-      if (/bat/.test(c)) return 'bats';
-      if (/glove|mitt/.test(c)) return 'gloves';
-      if (/screen|net|cage|field|facility/.test(c)) return 'netting';
-      if (/helm|protect/.test(c)) return 'helmets';
-      return 'bats'; // fallback bucket for now
-    };
-  PRODUCTS = data.map(p => {
-      const normCat = mapCategory(p.category || p.department || p.type || '');
-      // Salvage bad name cases like literal 'div' by deriving from id slug
-      let rawName = p.name || p.title || p.id || '';
-      if (/^div$/i.test(rawName) && p.id) {
-        rawName = p.id
-          .replace(/[-_]+/g, ' ')
-          .replace(/\b([a-z])/g, m => m.toUpperCase())
-          .slice(0, 120);
-      }
-      const cleanedDesc = sanitizeDescription(p.description || '');
-  return {
-        id: p.id,
-        title: rawName,
-        price: typeof p.price === 'number' ? p.price : Number(p.price) || 0,
-        category: normCat,
-  img: p.image || 'assets/img/EZSportslogo.png',
-        images: Array.isArray(p.images) ? p.images.filter(x=>typeof x==='string' && x.trim()).slice(0,8) : (p.image ? [p.image] : []),
-        stripe: p.stripe || null,
-        stock: p.stock,
-        createdAt: p.createdAt || null,
-        description: cleanedDesc,
-        features: Array.isArray(p.features) ? p.features.slice(0, 25) : []
-      };
-    });
-    // Only filter zero-priced items now; salvaged names retained
-    const before = PRODUCTS.length;
-    PRODUCTS = PRODUCTS.filter(p => p.price > 0);
-    const removed = before - PRODUCTS.length;
-    // Expose quick debug counts in development
-    if (removed > 0 && !window.__catalogDebugShown) {
-      window.__catalogDebugShown = true;
-      const badge = document.createElement('div');
-      badge.style.cssText = 'position:fixed;bottom:8px;right:8px;background:#112;padding:6px 10px;font:12px/1.2 monospace;color:#8f8;border-radius:4px;z-index:9999;opacity:0.9';
-      badge.textContent = `Products loaded: ${PRODUCTS.length} (filtered out ${removed} zero-price)`;
-      document.body.appendChild(badge);
-      setTimeout(()=>badge.remove(), 8000);
-    }
-    // Optional: sort newest first if timestamps present; fallback to title
-    PRODUCTS.sort((a, b) => {
-      if (a.createdAt && b.createdAt) return (new Date(b.createdAt)) - (new Date(a.createdAt));
-      return a.title.localeCompare(b.title);
-    });
-    // Notify listeners that products are loaded
-    try { window.dispatchEvent(new CustomEvent('products:loaded', { detail: { count: PRODUCTS.length } })); } catch {}
+    PRODUCTS = Array.isArray(data) ? data : [];
+    if (!PRODUCTS.length && lastErr) console.warn('All product API attempts failed, will use fallbacks:', lastErr?.message||lastErr);
   } catch (e) {
-    console.warn('Product fetch failed, falling back to local adminProducts:', e.message);
-    PRODUCTS = [];
+    console.warn('fetchProducts() unrecoverable error:', e);
   }
-  // Fallback: merge locally-managed admin products (created in admin panel) when API is empty/unavailable
-  try {
-    if (!PRODUCTS.length) {
-      const raw = localStorage.getItem('shopProducts') || localStorage.getItem('adminProducts');
-      if (raw) {
-        const local = JSON.parse(raw);
-        if (Array.isArray(local) && local.length) {
-          const mapped = local.map(p => ({
-            id: p.id,
-            title: p.title || p.name || p.id,
-            price: typeof p.price === 'number' ? p.price : Number(p.price) || 0,
-            category: (p.category || '').toString().toLowerCase() || 'misc',
-            img: p.img || p.image || 'assets/img/EZSportslogo.png',
-            images: p.images || (p.image ? [p.image] : []),
-            description: sanitizeDescription(p.description || ''),
-            features: Array.isArray(p.features) ? p.features.slice(0,25) : [],
-            stock: p.stock
-          }));
-          PRODUCTS = mapped;
-        }
-      }
-    }
-  } catch {}
 }
   // Cloudflare Turnstile site key (public). Provided by user.
   window.TURNSTILE_SITE_KEY = window.TURNSTILE_SITE_KEY || '0x4AAAAAAB5rtUiQ1MiqGIxp';
@@ -261,21 +138,27 @@ async function fetchProducts() {
     try {
       const ok = await loadTurnstile();
       if (!ok || !window.TURNSTILE_SITE_KEY) return '';
-      return await new Promise((resolve) => {
+      if (getTurnstileToken._pending) return await getTurnstileToken._pending;
+      getTurnstileToken._pending = new Promise(resolve => {
         const host = document.createElement('div');
         host.style.cssText = 'position:fixed;left:-9999px;top:-9999px;';
         document.body.appendChild(host);
         let cleaned = false;
         const cleanup = (id) => { if (cleaned) return; cleaned = true; try { window.turnstile.remove(id); } catch {} try { host.remove(); } catch {} };
-        const id = window.turnstile.render(host, {
-          sitekey: window.TURNSTILE_SITE_KEY,
-          size: 'invisible',
-          callback: (token) => { resolve(token || ''); cleanup(id); }
-        });
-        try { window.turnstile.execute(id); } catch { resolve(''); cleanup(id); }
-        // Failsafe timeout
-        setTimeout(() => { resolve(''); cleanup(id); }, 5000);
-      });
+        let wid = null;
+        try {
+          wid = window.turnstile.render(host, {
+            sitekey: window.TURNSTILE_SITE_KEY,
+            size: 'flexible', // valid sizes: compact, normal, flexible
+            callback: (token) => { resolve(token||''); cleanup(wid); },
+            'error-callback': () => { resolve(''); cleanup(wid); },
+            'timeout-callback': () => { resolve(''); cleanup(wid); }
+          });
+        } catch(err) { resolve(''); cleanup(wid); return; }
+        try { window.turnstile.execute(wid); } catch { resolve(''); cleanup(wid); }
+        setTimeout(()=>{ resolve(''); cleanup(wid); }, 8000);
+      }).finally(()=>{ getTurnstileToken._pending = null; });
+      return await getTurnstileToken._pending;
     } catch { return ''; }
   }
 
@@ -296,55 +179,22 @@ async function fetchProducts() {
     const existingIds = new Set(PRODUCTS.map(p=>p.id));
     let added = 0;
     local.forEach(p => {
-      if (!existingIds.has(p.id)) { PRODUCTS.push({
-        id: p.id,
-        title: p.title || p.name,
-        price: p.price || 0,
-        category: 'l-screens',
-  img: p.image || p.img || 'assets/img/EZSportslogo.png',
-        images: Array.isArray(p.images) ? p.images : (p.image ? [p.image] : []),
-        description: sanitizeDescription(p.description || ''),
-        features: Array.isArray(p.features) ? p.features.slice(0,25) : []
-      }); added++; }
-    });
-    if (added) {
-      PRODUCTS.sort((a,b)=> a.title.localeCompare(b.title));
-      try { window.dispatchEvent(new CustomEvent('products:loaded', { detail: { count: PRODUCTS.length, addedScreens: added } })); } catch {}
-    }
-  } catch(e) { /* silent */ }
-})();
-
-// Augment PRODUCTS with locally built Gloves catalog (gloves-catalog.json) if present.
-(async function mergeLocalGloves(){
-  try {
-    // Avoid 404s in dev: only fetch local catalogs when explicitly enabled
-    if (!(window.ENABLE_LOCAL_CATALOG || /[?&]local-catalog=1\b/.test(location.search))) return;
-    await new Promise(r=>setTimeout(r,400)); // slight delay after screens merge
-    const res = await fetch('assets/info/prodInfo/gloves-catalog.json', { cache: 'no-cache' });
-    if (!res.ok) return;
-    const local = await res.json();
-    if (!Array.isArray(local) || !local.length) return;
-    const existingIds = new Set(PRODUCTS.map(p=>p.id));
-    let added = 0;
-    local.forEach(p => {
       if (!existingIds.has(p.id)) {
         PRODUCTS.push({
           id: p.id,
-          title: p.title || p.name,
-          price: p.price || 0,
-          category: 'gloves',
-          img: p.image || p.img || 'assets/img/EZSportslogo.png',
-          images: Array.isArray(p.images) ? p.images : (p.image ? [p.image] : []),
-          description: sanitizeDescription(p.description || ''),
-          features: Array.isArray(p.features) ? p.features.slice(0,25) : []
+          title: p.title || p.name || p.id,
+          price: typeof p.price === 'number' ? p.price : Number(p.price) || 0,
+          category: (p.category||'').toLowerCase() || 'misc',
+          img: p.img || p.image || 'assets/img/EZSportslogo.png',
+          images: Array.isArray(p.images) ? p.images.slice(0,8) : (p.image?[p.image]:[]),
+          description: sanitizeDescription(p.description||''),
+          features: Array.isArray(p.features) ? p.features.slice(0,25) : [],
+          stock: p.stock
         });
         added++;
       }
     });
-    if (added) {
-      PRODUCTS.sort((a,b)=> a.title.localeCompare(b.title));
-      try { window.dispatchEvent(new CustomEvent('products:loaded', { detail: { count: PRODUCTS.length, addedGloves: added } })); } catch {}
-    }
+    if (added) { try { window.dispatchEvent(new CustomEvent('products:merged',{ detail:{ added } })); } catch {} }
   } catch(e) { /* silent */ }
 })();
 
@@ -476,220 +326,37 @@ const Store = {
     };
 
     // Ensure layout and nav
-  this.ensureHeaderLayout();
-  this.ensureCoreNav();
-  // Defensive: ensure Home link is present & first (in case of legacy markup or race conditions)
-  this.ensureHomeFirst();
-    this.ensureBreadcrumbs();
-    this.updateNavigation();
-  this.ensureNettingSubnav();
-  this.ensureSubcategoryIntro();
-  this.ensureNettingCarousel();
-  this.ensureEZNetsSpecImages();
-  this.ensureHeroRotator();
-  this.ensureRandomTypeTileImages();
-  this.ensureUniformFooter();
-  this.ensureExpertCTA();
-  this.ensureQuoteButtons();
-  this.ensureBrandLogos();
-  this.ensureFooterNettingLink();
-  this.ensureSkipLink();
-  this.ensureSEO();
-  this.ensurePerformanceOptimizations();
-  this.ensureServiceWorkerRegistered();
-  // Render page-specific product grids from external prodList.json if present
-  this.ensurePageProductGrid();
-
-    // Runtime responsive enforcement (in case stale CSS served from cache briefly)
-    this.enforceResponsiveBehaviors();
-
-    // Load products from API then render
-    fetchProducts().then(() => {
-      // Homepage: build FEATURED set and hide category chips if present
-      const page = (location.pathname.split('/').pop()||'').toLowerCase();
-      if (page === 'index.html' || page === '' ) {
-        FEATURED = computeFeatured(PRODUCTS);
-        const chipBar = document.querySelector('.catalog .filters');
-        if (chipBar) chipBar.style.display = 'none';
-      }
-      if (this.ui.grid) this.renderProducts();
-      if (this.ui.grid && PRODUCTS.length === 0) {
-        const msg = document.createElement('div');
-        msg.className = 'alert alert-warn';
-        msg.style.cssText = 'background:#331;padding:12px 16px;border:1px solid #663;color:#ffc;border-radius:6px;margin:12px 0;font:14px/1.4 system-ui, sans-serif;';
-        msg.innerHTML = `
-        // Enforce maximum display count (cap at 12 for page grids)
-        const MAX_PAGE_ITEMS = 12;
-        items.slice(0, MAX_PAGE_ITEMS).forEach(p => {
-          const card = this.buildProductCard(this.normalizeProdListItem(p));
-          if (card) grid.appendChild(card);
+    try {
+      const toggle = document.querySelector('.menu-toggle');
+      const nav = document.getElementById('primary-nav');
+      if (toggle && nav) {
+        toggle.addEventListener('click', () => {
+          const open = nav.classList.toggle('is-open');
+          document.body.classList.toggle('nav-open', open);
+          toggle.setAttribute('aria-expanded', String(open));
         });
-            <li>Start the server (e.g. <code>npm run start</code> or <code>node server/index.js</code>).</li>
-            <li>Run the product sync script if needed (e.g. <code>node server/scripts/sync-products.js</code>).</li>
-            <li>Click Retry below once the server is up.</li>
-          </ol>
-          <button type="button" style="margin-top:8px" class="btn btn-primary" id="retry-products">Retry Load</button>
-        `;
-        this.ui.grid.parentNode.insertBefore(msg, this.ui.grid);
-        const retry = msg.querySelector('#retry-products');
-        retry?.addEventListener('click', async () => {
-          retry.disabled = true; retry.textContent = 'Retrying…';
-          await fetchProducts();
-          this.renderProducts();
-          if (PRODUCTS.length) msg.remove(); else { retry.disabled = false; retry.textContent = 'Retry Load'; }
-        });
-      }
-    });
-
-    // Mobile nav toggle
-        // (Admin local append removed to keep strict prodList source and honor max cap)
-    const toggle = document.querySelector('.menu-toggle');
-    const nav = document.getElementById('primary-nav') || document.querySelector('nav.quick-links');
-    if (toggle && nav) {
-      toggle.addEventListener('click', () => {
-        const open = nav.classList.toggle('is-open');
-        document.body.classList.toggle('nav-open', open);
-        toggle.setAttribute('aria-expanded', String(open));
-      });
-      // Close nav when a link is chosen
-      nav.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
-        if (nav.classList.contains('is-open')) {
+        // Close nav when a link is chosen
+        nav.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+          if (nav.classList.contains('is-open')) {
+            nav.classList.remove('is-open');
+            document.body.classList.remove('nav-open');
+            toggle.setAttribute('aria-expanded', 'false');
+          }
+        }));
+        // Close when clicking outside (mobile overlay)
+        document.addEventListener('click', (e) => {
+          if (!nav.classList.contains('is-open')) return;
+          if (e.target === nav || nav.contains(e.target) || e.target === toggle || toggle.contains(e.target)) return;
           nav.classList.remove('is-open');
           document.body.classList.remove('nav-open');
-          toggle.setAttribute('aria-expanded', 'false');
-        }
-      }));
-      // Close when clicking outside (mobile overlay)
-      document.addEventListener('click', (e) => {
-        if (!nav.classList.contains('is-open')) return;
-        if (e.target === nav || nav.contains(e.target) || e.target === toggle || toggle.contains(e.target)) return;
-        nav.classList.remove('is-open');
-        document.body.classList.remove('nav-open');
-        toggle.setAttribute('aria-expanded','false');
-      });
-    }
-
-    // Render initial views
-    // initial render will happen after fetch; if fetch stalls, show spinner
-    if (this.ui.grid) this.ui.grid.innerHTML = '<p class="text-muted">Loading products…</p>';
-    this.renderCart();
-
-    // Ensure the Continue Shopping button in the mini-cart just closes the panel
-    try {
-      const dlg = this.ui.dialog;
-      if (dlg && !dlg.dataset.wiredContinue) {
-        const footer = dlg.querySelector('.mini-cart__footer');
-        if (footer) {
-          footer.addEventListener('click', (e) => {
-            const a = e.target && e.target.closest ? e.target.closest('a') : null;
-            if (!a) return;
-            const label = (a.textContent || '').trim().toLowerCase();
-            // Only intercept the Continue Shopping link within the mini-cart footer
-            if (label.startsWith('continue shopping')) {
-              e.preventDefault();
-              try { dlg.close(); } catch {}
-            }
-          });
-        }
-        dlg.dataset.wiredContinue = '1';
+          toggle.setAttribute('aria-expanded','false');
+        });
       }
-    } catch {}
-
-    // Chips
-    document.querySelectorAll('.chip').forEach(ch => ch.addEventListener('click', () => {
-      document.querySelectorAll('.chip').forEach(x => x.classList.remove('is-active'));
-      ch.classList.add('is-active');
-      this.state.filter = ch.dataset.chip;
-      this.renderProducts();
-    }));
-
-    // Category tiles
-    document.querySelectorAll('.tile').forEach(tile => tile.addEventListener('click', () => {
-      const c = tile.dataset.filter; if (!c) return;
-      this.filter(c);
-    }));
-
-    // Footer year
-    const y = document.getElementById('year');
-    if (y) y.textContent = new Date().getFullYear();
-
-    // Reveal header/nav only after everything is standardized
-    document.body.classList.add('nav-ready');
-
-    // Defensive: remove any lingering hero CTA link to baseball-l-screens on l-screens hub page (cache / SW stale HTML)
-    try {
-      const basePage = (location.pathname.split('/').pop()||'').toLowerCase();
-      if (basePage === 'l-screens.html' || basePage === 'l-screens') {
-        const heroCtas = document.querySelector('.hero-ctas');
-        if (heroCtas) {
-          heroCtas.querySelectorAll('a[href*="baseball-l-screens"]').forEach(a=>a.remove());
-        }
-      }
-    } catch {}
-
-    // Wire newsletter subscribe forms (public)
-    try {
-      document.querySelectorAll('form.subscribe').forEach(form => {
-        // Ensure honeypot fields exist
-        if (!form.querySelector('input[name="hp"]')) {
-          const hp = document.createElement('input'); hp.type = 'text'; hp.name = 'hp'; hp.autocomplete = 'off'; hp.style.display = 'none'; form.appendChild(hp);
-        }
-        if (!form.querySelector('input[name="started"]')) {
-          const st = document.createElement('input'); st.type = 'hidden'; st.name = 'started'; st.value = String(window.__formStarted || Date.now()); form.appendChild(st);
-        }
-        if (!form.querySelector('input[name="finger"]')) {
-          const fg = document.createElement('input'); fg.type = 'hidden'; fg.name = 'finger'; fg.value = 'ok'; form.appendChild(fg);
-        }
-        form.addEventListener('submit', async (e) => {
-          e.preventDefault();
-          const emailInput = form.querySelector('input[type="email"]');
-          const email = (emailInput?.value || '').trim();
-          if (!email) { alert('Please enter your email.'); return; }
-          let statusEl = form.querySelector('.subscribe-status');
-          if (!statusEl) {
-            statusEl = document.createElement('div');
-            statusEl.className = 'subscribe-status muted';
-            statusEl.style.marginTop = '.5rem';
-            form.appendChild(statusEl);
-          }
-          statusEl.textContent = 'Subscribing…';
-          try {
-            // Get Turnstile token (invisible)
-            const tsToken = await getTurnstileToken();
-            // Build payload with anti-bot hints
-            const payload = {
-              email,
-              finger: 'ok',
-              started: Number(form.querySelector('input[name="started"]').value || Date.now()),
-              source: (location.pathname || '').replace(/^\\/,'/'),
-              referer: document.referrer || '',
-              'cf-turnstile-response': tsToken
-            };
-            const res = await fetch('/api/marketing/subscribe', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ email }) });
-            // Prefer to send the full payload; fallback to legacy body if server expects only { email }
-            let ok = res.ok; let data = null;
-            try {
-              if (!ok) {
-                // Retry with extended payload (in case backend accepts extra fields)
-                const res2 = await fetch('/api/marketing/subscribe', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
-                ok = res2.ok; data = await res2.json().catch(()=>null);
-              } else {
-                data = await res.json().catch(()=>null);
-              }
-            } catch {}
-            if (!res.ok) throw new Error(data.message||'Failed to subscribe');
-            statusEl.textContent = 'Subscribed! Check your inbox for future deals.';
-            emailInput.value = '';
-          } catch (err) {
-            statusEl.textContent = 'Could not subscribe right now.';
-          }
-        }, { once: true });
-      });
     } catch {}
   },
 
-  // Build or normalize a canonical footer structure across all pages
-  ensureUniformFooter() {
+// Build or normalize a canonical footer structure across all pages (Store method)
+ensureUniformFooter() {
     try {
       let footer = document.querySelector('footer.site-footer');
       if (!footer) {
@@ -741,10 +408,10 @@ const Store = {
       const y = footer.querySelector('#year');
       if (y) y.textContent = new Date().getFullYear();
     } catch {}
-  },
+},
 
-  // Accessibility: ensure a skip link exists for keyboard users
-  ensureSkipLink() {
+// Accessibility: ensure a skip link exists for keyboard users (Store method)
+ensureSkipLink() {
     try {
       if (document.querySelector('a.skip')) return;
       const a = document.createElement('a');
@@ -754,10 +421,10 @@ const Store = {
       // Insert as the first child of body
       document.body.insertAdjacentElement('afterbegin', a);
     } catch {}
-  },
+},
 
-  // SEO: canonical/robots/OG/Twitter and JSON-LD (Organization + Breadcrumbs)
-  ensureSEO() {
+// SEO: canonical/robots/OG/Twitter and JSON-LD (Organization + Breadcrumbs) (Store method)
+ensureSEO() {
     try {
       const head = document.head;
       // Canonical
@@ -874,10 +541,10 @@ const Store = {
         head.appendChild(m);
       }
     } catch {}
-  },
+},
 
-  // Performance: fonts/stripe preconnect, stylesheet preload, image lazy loading with LCP protection
-  ensurePerformanceOptimizations() {
+// Performance: fonts/stripe preconnect, stylesheet preload, image lazy loading with LCP protection
+function ensurePerformanceOptimizations() {
     try {
       const head = document.head;
       const ensureLink = (attrs) => {
@@ -927,10 +594,10 @@ const Store = {
         }
       });
     } catch {}
-  },
+}
 
-  // PWA: register Service Worker for production only
-  ensureServiceWorkerRegistered() {
+// PWA: register Service Worker for production only
+function ensureServiceWorkerRegistered() {
     try {
       const isProd = (location.protocol === 'https:') && !/^(localhost|127\.0\.0\.1)$/i.test(location.hostname);
       if (!('serviceWorker' in navigator) || !isProd) return;
@@ -938,9 +605,9 @@ const Store = {
         if (!reg) navigator.serviceWorker.register('/service-worker.js').catch(()=>{});
       }).catch(()=>{});
     } catch {}
-  },
+}
 
-  ensureHeaderLayout() {
+function ensureHeaderLayout() {
     const header = document.querySelector('.site-header .header-bar');
     if (!header) return;
 
@@ -1014,9 +681,9 @@ const Store = {
     if (menuToggle && !menuToggle.getAttribute('aria-label')) {
       menuToggle.setAttribute('aria-label','Toggle navigation');
     }
-  },
+}
 
-  ensureCoreNav() {
+function ensureCoreNav() {
   const nav = document.getElementById('primary-nav') || document.querySelector('nav.quick-links');
     if (!nav) return;
 
@@ -1071,11 +738,10 @@ const Store = {
         if (calc) calc.remove();
       }
     } catch {}
-  },
+}
 
-  // Guarantee the Home link exists and is first in the primary nav even if
-  // pre-existing static markup or another script injected links earlier.
-  ensureHomeFirst() {
+// Guarantee the Home link exists and is first in the primary nav
+function ensureHomeFirst() {
     try {
       const nav = document.getElementById('primary-nav') || document.querySelector('nav.quick-links');
       if (!nav) return;

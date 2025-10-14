@@ -88,7 +88,7 @@
             <img src="assets/img/facebook.png" alt="Facebook" />
           </a>
           <a href="#" aria-label="Instagram"><img src="assets/img/instagram.png" alt="Instagram" /></a>
-          <a href="#" aria-label="X"><img src="assets/img/xwhite.png" alt="X" /></a>
+          <!-- <a href="#" aria-label="X"><img src="assets/img/xwhite.png" alt="X" /></a> -->
         </div>
       </div>
       <nav aria-label="Footer">
@@ -144,18 +144,6 @@
 
   <script type="module" src="assets/js/analytics.js"></script>
   <script type="module" src="assets/js/app.js"></script>
-  <script>
-    // Lightweight client-side handler for demo
-    (function(){
-      const f = document.getElementById('contact-form');
-      if (!f) return;
-      f.addEventListener('submit', function(e){
-        e.preventDefault();
-        const msg = f.querySelector('.form-msg');
-        if (msg) { msg.textContent = 'Message sent (demo). We\'ll be in touch soon!'; msg.style.color = 'green'; }
-        f.reset();
-      });
-    })();
-  </script>
+  <script src="assets/js/forms.js"></script>
 </body>
 </html>

@@ -33,9 +33,19 @@ const CONFIG = {
   // Optional: reCAPTCHA secret. If provided, requests must include recaptchaToken (v3/v2) to be verified.
   RECAPTCHA_SECRET: '',
   // Optional: Cloudflare Turnstile secret. If provided, requests must include cf-turnstile-response to be verified.
-  TURNSTILE_SECRET: '0x4AAAAAAB5rtUvINs4vdhP14ff-GcW7o_o',
+  TURNSTILE_SECRET: '',
   // Optional: restrict accepted Referer/Origin domains
-  ALLOWED_ORIGINS: ['https://ezsportsnetting.com', 'https://www.ezsportsnetting.com']
+  ALLOWED_ORIGINS: ['https://ezsportsnetting.com', 'https://www.ezsportsnetting.com', 'http://localhost:5500', 'http://127.0.0.1:5500'],
+  // Optional end‑user autoresponder controls
+  AUTOREPLY: {
+    ENABLE_SUBSCRIBE: true,
+    ENABLE_CONTACT: true,
+    FROM: 'EZ Sports Netting <no-reply@ezsportsnetting.com>',
+    SUBJECT_SUBSCRIBE: 'Thanks for subscribing to EZ Sports Netting',
+    SUBJECT_CONTACT: 'We received your message',
+    // If you want a BCC of every autoresponse for audit, set value below; else leave blank
+    BCC: ''
+  }
 };
 
 const SHEETS = {
@@ -66,10 +76,13 @@ function doPost(e) {
     }
 
     // Optional Cloudflare Turnstile verification (preferred)
-    if (CONFIG.TURNSTILE_SECRET) {
+    // Prefer Script Properties value over in-source secret so secret isn't kept in version control.
+    var scriptProps = null; try { scriptProps = PropertiesService.getScriptProperties(); } catch (e2) {}
+    var TURNSTILE_SECRET = (scriptProps && scriptProps.getProperty('TURNSTILE_SECRET')) || CONFIG.TURNSTILE_SECRET;
+    if (TURNSTILE_SECRET) {
       var tsToken = (payload['cf-turnstile-response'] || payload.turnstileToken || '').toString().trim();
       var ipTs = (_header(e, 'x-forwarded-for') || '').split(',')[0].trim();
-      if (!tsToken || !_verifyTurnstile(CONFIG.TURNSTILE_SECRET, tsToken, ipTs)) {
+      if (!tsToken || !_verifyTurnstile(TURNSTILE_SECRET, tsToken, ipTs)) {
         return _json({ ok: true }); // pretend success
       }
     }
@@ -130,6 +143,14 @@ function _handleSubscribe(data, e) {
   }
 
   const resp1 = { ok: true, type: 'subscribe' };
+  // Optional autoresponder
+  try {
+    if (CONFIG.AUTOREPLY && CONFIG.AUTOREPLY.ENABLE_SUBSCRIBE && email && _isValidEmail(email)) {
+      _sendAutoReply('subscribe', { email: email });
+      resp1.autoreply = true;
+    }
+  } catch (er) { resp1.autoreplyError = String(er); }
+  resp1.message = 'Subscription received';
   if (e && e.parameter && (e.parameter.test === '1' || e.parameter.debug === '1')) resp1.debug = { kind: 'subscribe' };
   return _json(resp1);
 }
@@ -177,6 +198,14 @@ function _handleContact(data, e) {
   }
 
   const resp2 = { ok: true, type: 'contact' };
+  // Optional autoresponder
+  try {
+    if (CONFIG.AUTOREPLY && CONFIG.AUTOREPLY.ENABLE_CONTACT && email && _isValidEmail(email)) {
+      _sendAutoReply('contact', { email: email, name: name, message: message, subject: subjectIn });
+      resp2.autoreply = true;
+    }
+  } catch (er2) { resp2.autoreplyError = String(er2); }
+  resp2.message = 'Message received';
   if (e && e.parameter && (e.parameter.test === '1' || e.parameter.debug === '1')) resp2.debug = { kind: 'contact' };
   return _json(resp2);
 }
@@ -346,6 +375,29 @@ function _computeCc(e, data) {
   if (CONFIG.TEST_EMAIL && (CONFIG.FORCE_TEST_CC || testFlag)) list.push(CONFIG.TEST_EMAIL);
   // Dedupe and clean
   return Array.from(new Set(list.map(String).filter(Boolean)));
+}
+
+// --- Autoresponder ---
+function _sendAutoReply(kind, ctx) {
+  try {
+    if (!CONFIG.AUTOREPLY) return;
+    var email = (ctx && ctx.email) || '';
+    if (!email || !_isValidEmail(email)) return;
+    var from = CONFIG.AUTOREPLY.FROM || CONFIG.EMAIL_TO;
+    var bcc = CONFIG.AUTOREPLY.BCC || '';
+    if (kind === 'subscribe' && CONFIG.AUTOREPLY.ENABLE_SUBSCRIBE) {
+      var subjS = CONFIG.AUTOREPLY.SUBJECT_SUBSCRIBE || 'Thanks for subscribing';
+      var bodyS = _html('<p>Thanks for subscribing to EZ Sports Netting! You\'re now on the list for product updates, facility build tips, and launch announcements.</p><p>- The EZ Sports Team</p>');
+      MailApp.sendEmail({ to: email, subject: subjS, htmlBody: bodyS, name: from, bcc: bcc });
+    } else if (kind === 'contact' && CONFIG.AUTOREPLY.ENABLE_CONTACT) {
+      var subjC = CONFIG.AUTOREPLY.SUBJECT_CONTACT || 'We received your message';
+      var preview = (ctx && ctx.message) ? (String(ctx.message).slice(0,160)) : '';
+      var bodyC = _html('<p>We\'ve received your message' + (ctx && ctx.name ? (', ' + _esc(ctx.name)) : '') + '.</p>' + (preview ? ('<blockquote style="border-left:3px solid #ddd;margin:1em 0;padding:.5em 1em;font-style:italic">' + _esc(preview) + (ctx.message.length>160?'…':'') + '</blockquote>') : '') + '<p>A member of the team will get back to you shortly. If this is urgent, you can reply directly to this email.</p><p>- The EZ Sports Team</p>');
+      MailApp.sendEmail({ to: email, subject: subjC, htmlBody: bodyC, name: from, bcc: bcc });
+    }
+  } catch(err) {
+    // Silent fail; autoresponder should not block core flow
+  }
 }
 
 // --- Optional reCAPTCHA verify ---
