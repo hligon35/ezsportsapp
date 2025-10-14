@@ -3,6 +3,7 @@ const CORE_CACHE = 'core-v7';
 const ASSET_CACHE = 'assets-v5';
 const CORE = [
   '/index.html',
+  '/coming-soon.html',
   '/assets/css/styles.css',
   '/assets/js/app.js'
 ];

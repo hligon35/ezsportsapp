@@ -16,6 +16,46 @@ try {
   }
 } catch {}
 
+// Lightweight client-side "Coming Soon" gate with hidden unlock
+// Toggle via localStorage.__COMING_SOON__ = 'on'|'off' (default 'off'),
+// or query params: ?gate=on to enable, ?gate=off to disable, ?unlock=1 to grant temporary access
+(function comingSoonGate(){
+  try {
+    const sp = new URLSearchParams(location.search);
+    const path = location.pathname.replace(/^\\/,'/');
+    if (sp.get('gate') === 'on') localStorage.setItem('__COMING_SOON__','on');
+    if (sp.get('gate') === 'off') localStorage.setItem('__COMING_SOON__','off');
+    if (sp.has('unlock')) localStorage.setItem('comingSoonUnlocked', JSON.stringify({ at: Date.now() }));
+
+    // Default: gate ON for non-local hosts, OFF locally
+    const isLocal = /^(localhost|127\.0\.0\.1)$/i.test(location.hostname);
+    const defaultGate = isLocal ? 'off' : 'on';
+    const enabled = (localStorage.getItem('__COMING_SOON__') || defaultGate) === 'on';
+    if (!enabled) return;
+
+    // Allow dev/local preview without gate
+    if (isLocal) return;
+
+    // Avoid redirect loop on the gate page itself and on API/asset routes
+    if (/coming-soon\.html$/i.test(path)) return;
+    if (/^\/(api|assets|server|database)\b/.test(path)) return;
+
+    // Check 24h unlock token
+    let unlocked = false;
+    try {
+      const raw = localStorage.getItem('comingSoonUnlocked');
+      if (raw) {
+        const { at } = JSON.parse(raw);
+        if (at && (Date.now() - at) < (24*60*60*1000)) unlocked = true;
+      }
+    } catch {}
+    if (unlocked) return;
+
+    // Redirect all other pages to the gate
+    location.replace('coming-soon.html');
+  } catch {}
+})();
+
 const currency = new Intl.NumberFormat(undefined, { style: 'currency', currency: 'USD' });
 
 // Featured products cache (homepage only): random until enough analytics, then popularity-based
@@ -198,6 +238,50 @@ async function fetchProducts() {
     }
   } catch {}
 }
+  // Cloudflare Turnstile site key (public). Provided by user.
+  window.TURNSTILE_SITE_KEY = window.TURNSTILE_SITE_KEY || '0x4AAAAAAB5rtUiQ1MiqGIxp';
+
+  // Lightweight Turnstile script loader and token fetcher (invisible)
+  async function loadTurnstile() {
+    if (window.turnstile) return true;
+    await new Promise((resolve) => {
+      const s = document.createElement('script');
+      s.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js';
+      s.async = true; s.defer = true;
+      s.onload = () => resolve(true);
+      s.onerror = () => resolve(false);
+      document.head.appendChild(s);
+    });
+    // small wait for global to attach
+    await new Promise(r=>setTimeout(r,50));
+    return !!window.turnstile;
+  }
+
+  async function getTurnstileToken() {
+    try {
+      const ok = await loadTurnstile();
+      if (!ok || !window.TURNSTILE_SITE_KEY) return '';
+      return await new Promise((resolve) => {
+        const host = document.createElement('div');
+        host.style.cssText = 'position:fixed;left:-9999px;top:-9999px;';
+        document.body.appendChild(host);
+        let cleaned = false;
+        const cleanup = (id) => { if (cleaned) return; cleaned = true; try { window.turnstile.remove(id); } catch {} try { host.remove(); } catch {} };
+        const id = window.turnstile.render(host, {
+          sitekey: window.TURNSTILE_SITE_KEY,
+          size: 'invisible',
+          callback: (token) => { resolve(token || ''); cleanup(id); }
+        });
+        try { window.turnstile.execute(id); } catch { resolve(''); cleanup(id); }
+        // Failsafe timeout
+        setTimeout(() => { resolve(''); cleanup(id); }, 5000);
+      });
+    } catch { return ''; }
+  }
+
+  // Timestamp for bot timing check (added to form submissions)
+  try { window.__formStarted = Date.now(); } catch {}
+
 // Augment PRODUCTS with locally built L-Screens catalog (screens-catalog.json) if present.
 (async function mergeLocalScreens(){
   try {
@@ -546,6 +630,16 @@ const Store = {
     // Wire newsletter subscribe forms (public)
     try {
       document.querySelectorAll('form.subscribe').forEach(form => {
+        // Ensure honeypot fields exist
+        if (!form.querySelector('input[name="hp"]')) {
+          const hp = document.createElement('input'); hp.type = 'text'; hp.name = 'hp'; hp.autocomplete = 'off'; hp.style.display = 'none'; form.appendChild(hp);
+        }
+        if (!form.querySelector('input[name="started"]')) {
+          const st = document.createElement('input'); st.type = 'hidden'; st.name = 'started'; st.value = String(window.__formStarted || Date.now()); form.appendChild(st);
+        }
+        if (!form.querySelector('input[name="finger"]')) {
+          const fg = document.createElement('input'); fg.type = 'hidden'; fg.name = 'finger'; fg.value = 'ok'; form.appendChild(fg);
+        }
         form.addEventListener('submit', async (e) => {
           e.preventDefault();
           const emailInput = form.querySelector('input[type="email"]');
@@ -560,8 +654,29 @@ const Store = {
           }
           statusEl.textContent = 'Subscribing…';
           try {
+            // Get Turnstile token (invisible)
+            const tsToken = await getTurnstileToken();
+            // Build payload with anti-bot hints
+            const payload = {
+              email,
+              finger: 'ok',
+              started: Number(form.querySelector('input[name="started"]').value || Date.now()),
+              source: (location.pathname || '').replace(/^\\/,'/'),
+              referer: document.referrer || '',
+              'cf-turnstile-response': tsToken
+            };
             const res = await fetch('/api/marketing/subscribe', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ email }) });
-            const data = await res.json();
+            // Prefer to send the full payload; fallback to legacy body if server expects only { email }
+            let ok = res.ok; let data = null;
+            try {
+              if (!ok) {
+                // Retry with extended payload (in case backend accepts extra fields)
+                const res2 = await fetch('/api/marketing/subscribe', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+                ok = res2.ok; data = await res2.json().catch(()=>null);
+              } else {
+                data = await res.json().catch(()=>null);
+              }
+            } catch {}
             if (!res.ok) throw new Error(data.message||'Failed to subscribe');
             statusEl.textContent = 'Subscribed! Check your inbox for future deals.';
             emailInput.value = '';
@@ -606,13 +721,16 @@ const Store = {
             <a href="about.html">About</a><br/>
             <a href="contactus.html">Contact Us</a>
           </div>
-          <div class="subscribe">
+          <form class="subscribe" method="post" action="#" autocomplete="off" novalidate>
             <h4>Get deals in your inbox</h4>
+            <input type="text" name="hp" style="display:none" tabindex="-1" aria-hidden="true" autocomplete="off" />
+            <input type="hidden" name="started" value="" />
+            <input type="hidden" name="finger" value="ok" />
             <div class="row">
-              <input type="email" placeholder="you@email.com" aria-label="Email address"/>
-              <button class="btn btn-primary" type="button">Subscribe</button>
+              <input type="email" placeholder="you@email.com" aria-label="Email address" required/>
+              <button class="btn btn-primary" type="submit">Subscribe</button>
             </div>
-          </div>
+          </form>
         </div>
         <div class="subfooter container">&copy; <span id="year"></span> EZ Sports Netting. All rights reserved.</div>`;
       // Replace footer content only if different to avoid layout thrash
