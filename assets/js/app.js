@@ -1507,8 +1507,11 @@ const Store = {
         // Commercial
         autodrone: 'Auto_Drone.png', drone: 'drone.png', droneenclosure: 'Drone_Enclosure.png', warehouse: 'warehouse.png',
         safety: 'safety.png', debris: 'debris.png', landfill: 'Ladndfill.png',
+        // Training facility
+        lanedividersystems: '../ezproj/facility3.jpg',
         // Baseball subtypes
         foulball: 'Foul_Ball.png', backstop: 'Back_Stop.png', overhead: 'Overhead_Netting.png',
+        hittingfacility: '../ezproj/facility2.jpg', battingcage: '../ezproj/battcage1.jpg',
         // Golf subtypes
         drivingrange: 'Driving_Range.png', golfcourse: 'Golf_Course.png', golfcube: 'Golf_Cube.png', residential: 'Residential.png'
       };
@@ -1528,6 +1531,14 @@ const Store = {
               <figcaption class="visually-hidden">${title}</figcaption>
             </figure>
             <h3 class="slide-title">${title}</h3>`;
+          // Graceful fallback if image fails to load
+          const imgEl = slide.querySelector('img');
+          if (imgEl) {
+            imgEl.addEventListener('error', () => {
+              const fig = slide.querySelector('.slide-media');
+              if (fig) fig.innerHTML = `<span>${title}</span><figcaption class="visually-hidden">${title}</figcaption>`;
+            }, { once: true });
+          }
         } else {
           slide.innerHTML = `
             <figure class="slide-media">

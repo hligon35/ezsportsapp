@@ -744,7 +744,8 @@ img[src*="/logo.svg"]{
   .site-header .header-bar{display:grid;grid-template-rows:auto auto;row-gap:.4rem;align-items:center;justify-items:stretch;grid-template-columns:100%;column-gap:.25rem;padding:0 .55rem .5rem}
   .site-header .brand{grid-column:1 / -1;grid-row:1;justify-self:center;margin-inline:auto;margin-bottom:.4rem}
   /* Second row defined with fractional distribution including gap fallback */
-  .site-header .header-bar{grid-template-columns:60% 20% 20%}
+  /* Adaptive columns: search grows, actions/menu size to content */
+  .site-header .header-bar{grid-template-columns:minmax(0,1fr) auto auto}
   .site-header .search{grid-row:2;grid-column:1;order:unset;width:100%;min-width:0;margin:0;display:flex}
   .site-header .search input{width:100%;min-width:0;padding:.6rem .65rem .6rem 2.4rem;font-size:.85rem}
   .site-header .header-actions{grid-row:2;grid-column:2;order:unset;display:flex;justify-content:center;align-items:center;width:100%;margin:0;gap:.25rem}
@@ -829,6 +830,21 @@ img[src*="/logo.svg"]{
   .site-header .header-bar .quick-links .has-submenu.submenu-left > .nav-submenu{
     right:calc(100% + .35rem);
     width:min(75vw, 320px);
+  }
+}
+
+/* Small phones/tablets: make the menu panel full-width and left-aligned for consistency */
+@media (max-width:640px){
+  .site-header .header-bar .quick-links{left:0; right:0; width:100%;}
+  /* When nav has the nav-centered utility, keep items left-aligned in mobile stacked panel */
+  .site-header .header-bar .quick-links.nav-centered{justify-content:flex-start !important}
+  /* Submenu stacks inline to avoid off-screen clipping on narrow devices */
+  .site-header .header-bar .quick-links .has-submenu.submenu-left > .nav-submenu{
+    position:static;
+    right:auto; left:auto; top:auto;
+    width:100%; max-height:none; overflow:visible;
+    padding:.25rem; margin-top:.25rem;
+    background:#0a0a0a; border:none; border-radius:.5rem; box-shadow:none;
   }
 }
 
