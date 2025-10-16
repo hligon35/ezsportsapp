@@ -38,10 +38,15 @@ const path = require('path');
 const args = process.argv.slice(2);
 const DRY_RUN = args.includes('--dry');
 const NO_STRIPE = args.includes('--no-stripe');
+const DEACTIVATE_REMOVED = args.includes('--deactivate-removed');
 
 // Root resolution: this file is server/scripts/sync-products.js
 const SERVER_DIR = path.resolve(__dirname, '..');
 const REPO_ROOT = path.resolve(SERVER_DIR, '..');
+
+// Load env from both repo root and server/.env (second call is a no-op if file missing)
+try { require('dotenv').config({ path: path.join(REPO_ROOT, '.env') }); } catch {}
+try { require('dotenv').config({ path: path.join(SERVER_DIR, '.env') }); } catch {}
 const PRODINFO_DIR = path.join(REPO_ROOT, 'assets', 'info', 'prodInfo');
 const DB_DIR = path.join(SERVER_DIR, 'database');
 const PRODUCTS_FILE = path.join(DB_DIR, 'products.json');
@@ -296,11 +301,13 @@ async function main() {
   }
 
   // Merge with any existing products that were not present in current scan (mark inactive)
+  const removed = [];
   const newIds = new Set(results.map(r => r.id));
   existing.forEach(p => {
     if (!newIds.has(p.id)) {
       // preserve but mark inactive (soft retire) unless already inactive
       results.push({ ...p, isActive: false, updatedAt: new Date().toISOString() });
+      removed.push(p);
     }
   });
 
@@ -315,6 +322,30 @@ async function main() {
     await fs.writeFile(tmp, JSON.stringify(results, null, 2));
     await fs.rename(tmp, PRODUCTS_FILE);
     console.log(`Wrote ${results.length} products to products.json`);
+  }
+
+  // Optionally deactivate removed products in Stripe for parity (safe opt-in)
+  if (!DRY_RUN && stripe && DEACTIVATE_REMOVED && removed.length) {
+    console.log(`\nStripe: deactivating ${removed.length} removed product(s)...`);
+    let ok = 0, fail = 0;
+    for (const p of removed) {
+      try {
+        let stripeProductId = p?.stripe?.productId || null;
+        if (!stripeProductId) {
+          // Try to locate by metadata.local_id
+          try {
+            const found = await stripe.products.search({ query: `metadata['local_id']:'${p.id}'` });
+            stripeProductId = found?.data?.[0]?.id || null;
+          } catch {}
+        }
+        if (!stripeProductId) { fail++; continue; }
+        await stripe.products.update(stripeProductId, { active: false });
+        ok++;
+      } catch (e) {
+        fail++;
+      }
+    }
+    console.log(`Stripe deactivated: ${ok} succeeded, ${fail} skipped/failed.`);
   }
 
   if (warnings.length) {

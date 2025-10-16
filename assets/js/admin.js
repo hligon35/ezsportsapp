@@ -143,6 +143,8 @@ function showSection(section, btn) {
   if (section === 'users') renderUsers();
   if (section === 'marketing') renderMarketing();
   if (section === 'invoices') renderInvoices();
+  if (section === 'finance') renderFinance();
+  if (section === 'traffic') renderTraffic();
 }
 
 async function renderProducts() {
@@ -438,6 +440,16 @@ document.addEventListener('DOMContentLoaded', () => {
   const invRefreshBtn = document.getElementById('invoices-refresh-btn');
   if (invStatusFilter) invStatusFilter.addEventListener('change', renderInvoices);
   if (invRefreshBtn) invRefreshBtn.addEventListener('click', renderInvoices);
+  // Finance
+  const finTf = document.getElementById('finance-timeframe');
+  const finRefresh = document.getElementById('finance-refresh-btn');
+  if (finTf) finTf.addEventListener('change', renderFinance);
+  if (finRefresh) finRefresh.addEventListener('click', renderFinance);
+  // Traffic
+  const trTf = document.getElementById('traffic-timeframe');
+  const trRefresh = document.getElementById('traffic-refresh-btn');
+  if (trTf) trTf.addEventListener('change', renderTraffic);
+  if (trRefresh) trRefresh.addEventListener('click', renderTraffic);
 });
 
 // Make functions global for onclick handlers
@@ -702,4 +714,121 @@ function printInvoice(invoiceId) {
       w.document.close();
     })
     .catch(()=> alert('Failed to load invoice'));
+}
+
+// Finance (Stripe)
+async function renderFinance(){
+  const tf = document.getElementById('finance-timeframe');
+  const timeframe = tf ? tf.value : 'week';
+  try {
+    const base = window.__API_BASE || API_BASES[0] || '';
+    const res = await fetch(`${base}/api/admin/stripe/summary?timeframe=${encodeURIComponent(timeframe)}`, { credentials:'include', headers: authHeaders() });
+    if (!res.ok) throw new Error(await res.text().catch(()=> 'Failed'));
+    const data = await res.json();
+    const fmt = (n)=> `$${Number(n||0).toFixed(2)}`;
+    const g = document.getElementById('fin-gross'); if (g) g.textContent = fmt(data.summary?.gross);
+    const r = document.getElementById('fin-refunds'); if (r) r.textContent = fmt(data.summary?.refunds);
+    const f = document.getElementById('fin-fees'); if (f) f.textContent = fmt(data.summary?.fees);
+    const n = document.getElementById('fin-net'); if (n) n.textContent = fmt(data.summary?.net);
+    const bal = document.getElementById('fin-balance');
+    if (bal) {
+      const avail = (data.balance?.available||[]).map(b=>`${b.currency.toUpperCase()}: ${fmt(b.amount)}`).join(', ') || '–';
+      const pend = (data.balance?.pending||[]).map(b=>`${b.currency.toUpperCase()}: ${fmt(b.amount)}`).join(', ') || '–';
+      bal.textContent = `Available: ${avail} | Pending: ${pend}`;
+    }
+    const payouts = document.getElementById('fin-payouts');
+    if (payouts) {
+      const list = (data.payouts||[]).map(p=>`<div class="product-item"><div><strong>${p.id}</strong><br><small>${new Date(p.created*1000).toLocaleString()}</small></div><div><strong>${fmt(p.amount)}</strong> <small>${p.status}</small></div></div>`).join('');
+      payouts.innerHTML = list || '<p class="muted">No payouts</p>';
+    }
+    // Chart: cash flow daily
+    try {
+      const el = document.getElementById('fin-chart');
+      if (el && window.Chart) {
+        const labels = (data.series||[]).map(p=>p.date);
+        const gross = (data.series||[]).map(p=>p.gross||0);
+        const net = (data.series||[]).map(p=>p.net||0);
+        const refunds = (data.series||[]).map(p=>p.refunds||0);
+        const fees = (data.series||[]).map(p=>p.fees||0);
+        if (el.__chart) { el.__chart.destroy(); }
+        el.__chart = new window.Chart(el.getContext('2d'), {
+          type: 'line',
+          data: { labels, datasets: [
+            { label:'Gross', data:gross, borderColor:'#2a6ef4', backgroundColor:'rgba(42,110,244,0.15)', tension:.25 },
+            { label:'Net', data:net, borderColor:'#0aa06e', backgroundColor:'rgba(10,160,110,0.15)', tension:.25 },
+            { label:'Refunds', data:refunds, borderColor:'#cc3344', backgroundColor:'rgba(204,51,68,0.15)', tension:.25 },
+            { label:'Fees', data:fees, borderColor:'#888', backgroundColor:'rgba(136,136,136,0.15)', tension:.25 }
+          ] },
+          options: { responsive:true, scales:{ y:{ beginAtZero:true, ticks:{ callback:(v)=>`$${Number(v).toFixed(0)}` } } }, plugins:{ legend:{ position:'bottom' } } }
+        });
+      }
+    } catch {}
+  } catch (e) {
+    const g = document.getElementById('fin-gross'); if (g) g.textContent = '—';
+    const r = document.getElementById('fin-refunds'); if (r) r.textContent = '—';
+    const f = document.getElementById('fin-fees'); if (f) f.textContent = '—';
+    const n = document.getElementById('fin-net'); if (n) n.textContent = '—';
+    const bal = document.getElementById('fin-balance'); if (bal) bal.textContent = 'Unavailable';
+    const payouts = document.getElementById('fin-payouts'); if (payouts) payouts.innerHTML = '<p class="muted">Unavailable</p>';
+  }
+  // Also attempt to list invoices
+  try {
+    const base = window.__API_BASE || API_BASES[0] || '';
+    const tf = document.getElementById('finance-timeframe');
+    const timeframe = tf ? tf.value : 'week';
+    const res = await fetch(`${base}/api/admin/stripe/invoices?timeframe=${encodeURIComponent(timeframe)}&limit=10`, { credentials:'include', headers: authHeaders() });
+    const wrap = document.getElementById('fin-invoices');
+    if (!wrap) return;
+    if (!res.ok) { wrap.innerHTML = '<p class="muted">No Stripe invoices.</p>'; return; }
+    const data = await res.json();
+    const list = (data.items||[]).map(inv=>`<div class="product-item"><div><strong>${inv.number||inv.id}</strong> <small>${inv.status}</small><br><small>${new Date(inv.created*1000).toLocaleString()}</small><br>${inv.customer_email||''}</div><div><strong>$${Number(inv.total/100).toFixed(2)}</strong></div></div>`).join('');
+    wrap.innerHTML = list || '<p class="muted">No Stripe invoices.</p>';
+  } catch (e) {
+    const wrap = document.getElementById('fin-invoices'); if (wrap) wrap.innerHTML = '<p class="muted">Unavailable</p>';
+  }
+}
+
+// Traffic (Cloudflare)
+async function renderTraffic(){
+  const tf = document.getElementById('traffic-timeframe');
+  const timeframe = tf ? tf.value : 'week';
+  try {
+    const base = window.__API_BASE || API_BASES[0] || '';
+    const res = await fetch(`${base}/api/admin/cloudflare/summary?timeframe=${encodeURIComponent(timeframe)}`, { credentials:'include', headers: authHeaders() });
+    if (!res.ok) throw new Error(await res.text().catch(()=> 'Failed'));
+    const data = await res.json();
+    const reqs = document.getElementById('cf-reqs'); if (reqs) reqs.textContent = String(data.totals?.requests||0);
+    const cache = document.getElementById('cf-cache'); if (cache) cache.textContent = `${Math.round((data.cacheRatio||0)*100)}%`;
+    const band = document.getElementById('cf-band'); if (band) band.textContent = `${Number(data.bandwidthMB||0).toFixed(1)} MB`;
+    const thr = document.getElementById('cf-threats'); if (thr) thr.textContent = String(data.totals?.threats||0);
+    const top = document.getElementById('cf-top-paths'); if (top) top.innerHTML = (data.topPaths||[]).map(p=>`<li><code>${p.path}</code> — <strong>${p.requests}</strong></li>`).join('') || '<li class="muted">No data</li>';
+    const byc = document.getElementById('cf-by-country'); if (byc) byc.innerHTML = (data.byCountry||[]).map(c=>`<li>${c.country} — <strong>${c.requests}</strong></li>`).join('') || '<li class="muted">No data</li>';
+    // Chart: daily requests
+    try {
+      const el = document.getElementById('cf-chart');
+      if (el && window.Chart) {
+        const labels = (data.series||[]).map(p=>p.date);
+        const reqs = (data.series||[]).map(p=>p.requests||0);
+        const cached = (data.series||[]).map(p=>p.cachedRequests||0);
+        const threats = (data.series||[]).map(p=>p.threats||0);
+        if (el.__chart) { el.__chart.destroy(); }
+        el.__chart = new window.Chart(el.getContext('2d'), {
+          type: 'line',
+          data: { labels, datasets: [
+            { label:'Requests', data:reqs, borderColor:'#2a6ef4', backgroundColor:'rgba(42,110,244,0.15)', tension:.25 },
+            { label:'Cached', data:cached, borderColor:'#0aa06e', backgroundColor:'rgba(10,160,110,0.15)', tension:.25 },
+            { label:'Threats', data:threats, borderColor:'#cc3344', backgroundColor:'rgba(204,51,68,0.15)', tension:.25 }
+          ] },
+          options: { responsive:true, scales:{ y:{ beginAtZero:true } }, plugins:{ legend:{ position:'bottom' } } }
+        });
+      }
+    } catch {}
+  } catch (e) {
+    const reqs = document.getElementById('cf-reqs'); if (reqs) reqs.textContent = '—';
+    const cache = document.getElementById('cf-cache'); if (cache) cache.textContent = '—';
+    const band = document.getElementById('cf-band'); if (band) band.textContent = '—';
+    const thr = document.getElementById('cf-threats'); if (thr) thr.textContent = '—';
+    const top = document.getElementById('cf-top-paths'); if (top) top.innerHTML = '<li class="muted">Unavailable</li>';
+    const byc = document.getElementById('cf-by-country'); if (byc) byc.innerHTML = '<li class="muted">Unavailable</li>';
+  }
 }

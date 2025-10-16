@@ -39,17 +39,55 @@
     return out;
   }
 
+  function toSlug(s) {
+    if (!s) return '';
+    return String(s)
+      .toLowerCase()
+      .trim()
+      .replace(/&/g, ' and ')
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '');
+  }
+
+  // Heuristic shipping fallback (dsr) when product-level/variation dsr is missing
+  function guessDsr(prod) {
+    try {
+      const t = String(prod?.title || prod?.name || '').toLowerCase();
+      const id = String(prod?.id || prod?.sku || '').toLowerCase();
+      // Pre‑Made / cages tend to ship higher
+      if (/cages-|\bpre[-\s]?made\b|batting\s*cage|\bcage\b/.test(t) || /cages-/.test(id)) return 125;
+      // L-Screens, Protective Screens, Pitcher's Pocket, Replacement Nets cluster
+      if (/l[- ]?screen|\bbullet\b/.test(t)) return 75;
+      if (/protective\s+screen/.test(t)) return 75;
+      if (/replacement|\brn-/.test(t)) return 75;
+      if (/pitcher'?s\s*pocket/.test(t)) return 75;
+      // Accessories cluster
+      if (/cable|twine|rope|pad\s*kit|basket|mat|screen\s*bulletz|armor/.test(t)) return 100;
+      // Default
+      return 100;
+    } catch { return 100; }
+  }
+
   function toDisplayItem(p){
     const id = String(p.sku || p.id || p.name || p.title || Math.random().toString(36).slice(2));
     const title = String(p.name || p.title || id);
     const variations = Array.isArray(p.variations) ? p.variations.slice() : [];
+    const parseNumberLikePrice = (val) => {
+      if (val == null) return 0;
+      if (typeof val === 'number' && Number.isFinite(val)) return val;
+      if (typeof val === 'string') {
+        const m = val.match(/([0-9]+(?:\.[0-9]+)?)/);
+        if (m) return parseFloat(m[1]);
+      }
+      return 0;
+    };
     // Compute price and price range from variations first (map preferred), else fallback
     const varPrices = variations
       .map(v => Number(v.map ?? v.price ?? 0))
       .filter(n => Number.isFinite(n) && n > 0);
     const priceMin = varPrices.length ? Math.min(...varPrices) : null;
     const priceMax = varPrices.length ? Math.max(...varPrices) : null;
-    const price = varPrices.length ? priceMin : (Number(p.price ?? p.map ?? p.wholesale ?? 0) || 0);
+    const price = varPrices.length ? priceMin : (parseNumberLikePrice(p.price ?? p.map ?? p.wholesale ?? 0) || 0);
     const isUsableSrc = (s) => typeof s === 'string' && /^(https?:|\/|assets\/)/i.test(s);
   let primary = null;
     // 1) explicit p.img
@@ -197,53 +235,31 @@
 
     // Build structured gallery entries
     const galleryPairs = unique.map(src => ({ thumb: src, large: deriveLarge(src) }));
-    // Large/hero variants to keep in visible gallery: filenames containing (1) OR 1a before extension OR _a variant suffix
-  // Include hero variants: (1), 1a, _a, or plain trailing 'a' before extension
-  const largePattern = /(\(1\)\.|1a\.|_a\.|[^\w]a\.)/i;
-    let displayPairs = galleryPairs.filter(g => {
-      const name = g.large.split('/').pop().toLowerCase();
-      return largePattern.test(name);
-    });
-    // If filtering nuked everything (edge case), fallback to originals
+    // Deduplicate by resolved large URL so we keep one per unique color/image
+    const seenLarge = new Set();
+    let displayPairs = [];
+    for (const p of galleryPairs) {
+      const key = (p.large || '').toLowerCase();
+      if (!key) continue;
+      if (seenLarge.has(key)) continue;
+      seenLarge.add(key);
+      displayPairs.push(p);
+    }
     if (!displayPairs.length) displayPairs = galleryPairs.slice();
-
-    // Deduplicate by base color/slug keeping highest quality variant order: (1) > _a > 1a > a > plain
-    const orderScore = (name) => {
-      if (/\(1\)\./.test(name)) return 500;
-      if (/_a\./.test(name)) return 400;
-      if (/1a\./.test(name)) return 300;
-      if (/[^\w]a\./.test(name)) return 200;
-      return 100; // plain fallback
-    };
-    const baseKey = (name) => {
-      // Remove (1), remove _a, 1a, trailing 'a' (non-word) before extension, collapse color suffix groups
-      let base = name
-        .replace(/\(1\)/,'')
-        .replace(/_a\./,'.')
-        .replace(/1a\./,'1.')
-        .replace(/([^\w])a\./,'$1.')
-        .replace(/\s+/g,'');
-      return base;
-    };
-    const bestByBase = new Map();
-    displayPairs.forEach(p => {
-      const filename = p.large.split('/').pop().toLowerCase();
-      const key = baseKey(filename);
-      const score = orderScore(filename);
-      const existing = bestByBase.get(key);
-      if (!existing || score > existing.score) {
-        bestByBase.set(key, { pair: p, score });
-      }
-    });
-    displayPairs = Array.from(bestByBase.values()).sort((a,b)=> b.score - a.score).map(v=>v.pair);
-    // Ensure primary is one of the LARGE versions; if not, pick first large
+    // Ensure primary is one of the LARGE versions; if not, pick first
     const largeSet = new Set(galleryPairs.map(g=>g.large));
     if (!primary || !largeSet.has(primary)) {
-      // Prefer a hero containing (1) or lacking color suffix
-      const hero = galleryPairs.find(g=>/\(1\)\.avif$/i.test(g.large)) || galleryPairs[0];
+      const hero = galleryPairs[0];
       primary = hero ? hero.large : (primary || galleryPairs[0]?.large);
     }
-    return { id, title, price, priceMin, priceMax, primary, galleryPairs, displayPairs, features, description, variations };
+    // Move primary to the front
+    try {
+      const idx = displayPairs.findIndex(p => p.large === primary);
+      if (idx > 0) { const [picked] = displayPairs.splice(idx,1); displayPairs.unshift(picked); }
+    } catch {}
+    // Include product-level dsr (shipping dollar) if present
+    const dsr = Number(p.dsr ?? 0) || 0;
+    return { id, title, price, priceMin, priceMax, primary, galleryPairs, displayPairs, features, description, variations, dsr };
   }
 
   function render(prod){
@@ -267,58 +283,101 @@
       }
       return `<div class="price h3" id="pd-price"></div>`;
     })();
-    const thumbs = prod.displayPairs.map((g,i)=>`<button class="thumb" data-index="${i}" aria-label="Show image ${i+1}" data-large="${g.large}"><img src="${g.thumb}" alt="${prod.title} image ${i+1}" loading="lazy"/></button>`).join('');
+  const thumbs = prod.displayPairs.map((g,i)=>`<button class="thumb" data-index="${i}" aria-label="Show image ${i+1}" data-large="${g.large}"><img src="${g.thumb}" alt="${prod.title} image ${i+1}" loading="lazy" onerror="this.closest('button') && this.closest('button').remove()"/></button>`).join('');
+    const thumbsSection = (Array.isArray(prod.displayPairs) && prod.displayPairs.length > 1)
+      ? `<div class="pd-thumbs" role="tablist">${thumbs}</div>`
+      : '';
+
+    // Compute initial shipping (dsr) display before option selection
+    const variationDsrs = Array.isArray(prod.variations) ? prod.variations
+      .map(v => Number(v.dsr ?? 0))
+      .filter(n => Number.isFinite(n) && n > 0) : [];
+    const initialShippingText = (() => {
+      if (variationDsrs.length) {
+        const min = Math.min(...variationDsrs);
+        const max = Math.max(...variationDsrs);
+        if (min === max) return `Shipping: $${min.toFixed(2)}`;
+        return `Shipping: $${min.toFixed(2)} - $${max.toFixed(2)}`;
+      }
+      const pDsr = Number(prod.dsr ?? 0) || 0;
+      if (pDsr > 0) return `Shipping: $${pDsr.toFixed(2)}`;
+      // Fallback to heuristic to ensure shipping is always visible
+      const g = guessDsr(prod);
+      return g > 0 ? `Shipping: $${g.toFixed(2)}` : '';
+    })();
 
     // Build color choices from product images using Store's color extraction
-    // Skip for grouped pages and Armor Baseball Cart (no color dropdown requested)
-    let colorOptions = [];
+    // Skip for grouped pages, Screen Bulletz, and Armor Baseball Cart (no color dropdown requested)
+  let colorOptions = [];
     const isArmorBasket = /armorbasket/i.test(String(prod.id||'')) || /armor\s*(baseball)?\s*cart|armor\s*basket/i.test(String(prod.title||''));
-  if (!isPreMadeCagesGroup && !isTwineSpoolGroup && !isCableGroup && !isRopeGroup && !isArmorBasket) {
+    const isScreenBulletz = /screen\s*bulletz/i.test(String(prod.id||'')) || /screen\s*bulletz/i.test(String(prod.title||''));
+  if (!isPreMadeCagesGroup && !isTwineSpoolGroup && !isCableGroup && !isRopeGroup && !isArmorBasket && !isScreenBulletz) {
       try {
         const imgs = Array.isArray(prod.displayPairs) ? prod.displayPairs.map(p => p.large) : (prod.primary ? [prod.primary] : []);
         if (window.Store && typeof window.Store.extractProductColors === 'function') {
           colorOptions = window.Store.extractProductColors({ images: imgs, id: (new URLSearchParams(location.search)).get('pid') || prod.id, sku: (new URLSearchParams(location.search)).get('pid') || prod.id, title: prod.title });
         }
-        // De-duplicate by color name keeping first image
-        const seen = new Set();
-        colorOptions = colorOptions.filter(c => { if (seen.has(c.name)) return false; seen.add(c.name); return true; });
+        // De-duplicate by image URL so all distinct color images are kept
+        const seenImages = new Set();
+        colorOptions = colorOptions.filter(c => {
+          const key = String(c.image || '').toLowerCase();
+          if (!key) return false;
+          if (seenImages.has(key)) return false;
+          seenImages.add(key);
+          return true;
+        });
       } catch {}
     }
-    const colorSelectHtml = (colorOptions && colorOptions.length) ? `
+    const colorSelectHtml = (colorOptions && colorOptions.length > 1) ? `
       <select id="pd-color-select" class="pd-option-select" aria-label="Color" style="padding:.7rem .8rem;border:1px solid var(--border);border-radius:.6rem;font-weight:600;">
         <option value="">Choose a Color...</option>
-        ${colorOptions.map(c => {
-          const label = (c.label ? `Color ${c.label}` : (c.class && c.class !== 'neutral' ? (c.class.charAt(0).toUpperCase()+c.class.slice(1)) : (c.name.charAt(0).toUpperCase()+c.name.slice(1))));
-          return `<option value="${(c.name||'').replace(/"/g,'&quot;')}" data-image="${c.image}" data-color-class="${c.class||''}">${label}</option>`;
-        }).join('')}
+        ${(() => {
+          let neutralIndex = 1;
+          return colorOptions.map(c => {
+            const isNeutral = (c.class || '') === 'neutral';
+            const label = isNeutral
+              ? `Image ${neutralIndex++}`
+              : (c.class ? (c.class.charAt(0).toUpperCase() + c.class.slice(1)) : (c.name ? (c.name.charAt(0).toUpperCase() + c.name.slice(1)) : 'Image'));
+            return `<option value="${(c.name||'').replace(/"/g,'&quot;')}" data-image="${c.image}" data-color-class="${c.class||''}">${label}</option>`;
+          }).join('');
+        })()}
       </select>
     ` : '';
     const features = Array.isArray(prod.features) && prod.features.length ? `<ul class="features">${prod.features.map(f=>`<li>${f}</li>`).join('')}</ul>` : '';
     el.innerHTML = `
       <div class="pd-grid">
         <div class="pd-media">
-          <div class="pd-main"><img id="pd-main-img" src="${prod.primary}" alt="${prod.title}" loading="eager" fetchpriority="high" decoding="async"/></div>
-          <div class="pd-thumbs" role="tablist">${thumbs}</div>
+          <div class="pd-main"><img id="pd-main-img" src="${prod.primary}" alt="${prod.title}" loading="eager" fetchpriority="high" decoding="async" onerror="this.onerror=null; this.src='assets/EZSportslogo.png';"/></div>
+          ${thumbsSection}
         </div>
         <div class="pd-info">
           <h1 class="pd-title">${prod.title}</h1>
           ${basePriceHtml}
+          <div class="text-sm text-muted" id="pd-shipping">${initialShippingText}</div>
           <div class="stack-05" id="pd-option-block" style="margin-top:.5rem;">
             <div class="row gap-06" id="pd-select-row">
-              ${prod.variations && prod.variations.length ? `
+              ${(prod.variations && prod.variations.length > 1) ? `
                 <select id="pd-option-select" class="pd-option-select" aria-label="Options" style="padding:.7rem .8rem;border:1px solid var(--border);border-radius:.6rem;font-weight:600;">
                   <option value="">Choose an Option...</option>
                   ${prod.variations.map((v,i)=>{
                     const vPrice = Number(v.map ?? v.price ?? 0) || 0;
+                    const vDsr = Number(v.dsr ?? prod.dsr ?? 0) || 0;
                     const label = v.option || `Option ${i+1}`;
                     const priceText = vPrice > 0 ? ` - $${vPrice.toFixed(2)}` : '';
                     const dataImg = v.img ? ` data-img="${(v.img||'').replace(/"/g,'&quot;')}"` : '';
                     const dataSku = v.sku ? ` data-sku="${String(v.sku).replace(/"/g,'&quot;')}"` : '';
-                    return `<option value="${label.replace(/"/g,'&quot;')}" data-price="${vPrice}"${dataImg}${dataSku}>${label}${priceText}</option>`;
+                    const dataDsr = vDsr > 0 ? ` data-dsr="${vDsr}"` : '';
+                    const dataByFoot = (v.byfoot || /\bby\s*the\s*foot\b/i.test(label)) ? ' data-byfoot="1"' : '';
+                    return `<option value="${label.replace(/\"/g,'&quot;')}" data-price="${vPrice}"${dataImg}${dataSku}${dataDsr}${dataByFoot}>${label}${priceText}</option>`;
                   }).join('')}
                 </select>
               ` : ''}
               ${colorSelectHtml}
+            </div>
+            <div id="pd-footage-block" class="stack-02" style="display:none;margin-top:.5rem;">
+              <label for="pd-feet" class="text-sm" style="font-weight:600;">Length (feet)</label>
+              <input id="pd-feet" type="number" min="1" step="1" value="1" inputmode="numeric" style="padding:.6rem .7rem;border:1px solid var(--border);border-radius:.5rem;width:9rem;" />
+              <div class="text-xs text-muted">Sold by the foot (1' increments).</div>
             </div>
             <div class="row gap-06">
               <button class="btn btn-primary" id="pd-add">Add to Cart</button>
@@ -345,17 +404,37 @@
         }
       });
     });
+    // If fewer than two thumbnails remain (e.g., some removed on error), hide the strip
+    try {
+      const thumbsWrap = document.querySelector('.pd-thumbs');
+      if (thumbsWrap && thumbsWrap.querySelectorAll('.thumb').length < 2) {
+        thumbsWrap.style.display = 'none';
+      }
+    } catch {}
     // Wire option select to update price dynamically
     try {
       const priceEl = document.getElementById('pd-price');
+      const shipEl = document.getElementById('pd-shipping');
       const optSel = document.getElementById('pd-option-select');
+      const feetBlock = document.getElementById('pd-footage-block');
+      const feetInput = document.getElementById('pd-feet');
       if (optSel && priceEl) {
-        const updatePrice = () => {
+        const calcFeet = () => {
+          if (!feetInput) return 1;
+          let n = Number(feetInput.value);
+          if (!Number.isFinite(n) || n < 1) n = 1;
+          return Math.floor(n);
+        };
+        const updateDisplays = () => {
           const opt = optSel.options[optSel.selectedIndex];
           const p = Number(opt?.dataset?.price||0) || 0;
           const imgSrc = opt?.dataset?.img;
+          const byFoot = (opt?.dataset?.byfoot === '1') || /\bby\s*the\s*foot\b/i.test(String(optSel.value||''));
+          // Toggle feet UI
+          if (feetBlock) feetBlock.style.display = byFoot ? '' : 'none';
           if (p > 0) {
-            priceEl.textContent = `$${p.toFixed(2)}`;
+            const multiplier = byFoot ? calcFeet() : 1;
+            priceEl.textContent = `$${(p * multiplier).toFixed(2)}`;
           } else if (prod.priceMin && prod.priceMax && prod.priceMax !== prod.priceMin) {
             priceEl.textContent = `$${prod.priceMin.toFixed(2)} - $${prod.priceMax.toFixed(2)}`;
           } else if (prod.price > 0) {
@@ -363,18 +442,75 @@
           } else {
             priceEl.textContent = '';
           }
+          // Shipping (dsr): prefer selected variation's dsr, else product-level, else keep initial/range
+          if (shipEl) {
+            const dsr = Number(opt?.dataset?.dsr||0) || 0;
+            if (dsr > 0) {
+              shipEl.textContent = `Shipping: $${dsr.toFixed(2)}`;
+            } else {
+              // Recompute from variations or product-level
+              const vDsrs = Array.isArray(prod.variations) ? prod.variations
+                .map(v => Number(v.dsr ?? 0))
+                .filter(n => Number.isFinite(n) && n > 0) : [];
+              if (vDsrs.length) {
+                const min = Math.min(...vDsrs); const max = Math.max(...vDsrs);
+                shipEl.textContent = (min===max) ? `Shipping: $${min.toFixed(2)}` : `Shipping: $${min.toFixed(2)} - $${max.toFixed(2)}`;
+              } else if (Number(prod.dsr||0) > 0) {
+                shipEl.textContent = `Shipping: $${Number(prod.dsr).toFixed(2)}`;
+              } else {
+                // Heuristic fallback
+                const g = guessDsr(prod);
+                shipEl.textContent = `Shipping: $${g.toFixed(2)}`;
+              }
+            }
+          }
           // Update image when option carries an image
           if (imgSrc) {
             const main = document.getElementById('pd-main-img');
             if (main) main.src = imgSrc;
           }
         };
-        optSel.addEventListener('change', updatePrice);
-        // If there's exactly one option, preselect it and update price
+        optSel.addEventListener('change', updateDisplays);
+        // When feet changes, recompute price if by-foot selected
+        if (feetInput) feetInput.addEventListener('input', () => {
+          // sanitize to integer >=1
+          const n = Number(feetInput.value);
+          if (!Number.isFinite(n) || n < 1) feetInput.value = '1';
+          updateDisplays();
+        });
+        // If there's exactly one option, preselect it and update price/shipping
         if (optSel.options.length === 2) { // includes the "Choose" placeholder
           optSel.selectedIndex = 1;
-          updatePrice();
+          updateDisplays();
         }
+      }
+    } catch {}
+
+    // If this is a single by-the-foot product (no option dropdown), expose feet input and multiply price
+    try {
+      const priceEl = document.getElementById('pd-price');
+      const feetBlock = document.getElementById('pd-footage-block');
+      const feetInput = document.getElementById('pd-feet');
+      const hasOptions = !!document.getElementById('pd-option-select');
+      const isByFootTitle = /by\s*the\s*f(?:oot|t)\b/i.test(String(prod.title||''));
+      const isByFootId = /xft$/i.test(String(prod.id||'')) || /-xft-/i.test(String(prod.id||'')) || /xft/i.test(String(prod.id||''));
+      if (!hasOptions && (isByFootTitle || isByFootId)) {
+        if (feetBlock) feetBlock.style.display = '';
+        const perFoot = Number(prod.price || prod.priceMin || 0) || 0;
+        const calcFeet = () => {
+          if (!feetInput) return 1; let n = Number(feetInput.value); if (!Number.isFinite(n) || n < 1) n = 1; return Math.floor(n);
+        };
+        const updateFeetPrice = () => {
+          if (!priceEl) return;
+          if (perFoot > 0) {
+            priceEl.textContent = `$${(perFoot * calcFeet()).toFixed(2)}`;
+          }
+        };
+        if (feetInput) feetInput.addEventListener('input', () => {
+          const n = Number(feetInput.value); if (!Number.isFinite(n) || n < 1) feetInput.value = '1';
+          updateFeetPrice();
+        });
+        updateFeetPrice();
       }
     } catch {}
 
@@ -482,21 +618,82 @@
         let chosenLabel = prod.title;
         let chosenPrice = prod.price || 0;
         let chosenImg = (document.getElementById('pd-main-img')?.getAttribute('src')) || prod.primary;
+  let chosenShipRaw = (typeof prod.dsr !== 'undefined') ? prod.dsr : undefined;
+        const singleVar = (prod.variations && prod.variations.length === 1) ? prod.variations[0] : null;
         if (optSel && optSel.value) {
           chosenLabel = `${prod.title} — ${optSel.value}`;
           const optEl = optSel.options[optSel.selectedIndex];
           const p = Number(optEl?.dataset?.price||0) || 0;
-          if (p > 0) chosenPrice = p;
+          if (p > 0) {
+            const byFoot = (optEl?.dataset?.byfoot === '1') || /\bby\s*the\s*foot\b/i.test(String(optSel.value||''));
+            if (byFoot) {
+              const feetInput = document.getElementById('pd-feet');
+              let feet = Number(feetInput?.value || 1);
+              if (!Number.isFinite(feet) || feet < 1) feet = 1;
+              feet = Math.floor(feet);
+              chosenPrice = p * feet;
+              chosenLabel = `${chosenLabel} (${feet}')`;
+            } else {
+              chosenPrice = p;
+            }
+          }
           if (optEl?.dataset?.img) chosenImg = optEl.dataset.img;
-        } else if (prod.variations && prod.variations.length) {
+          if (typeof optEl?.dataset?.dsr !== 'undefined') {
+            const dsrNum = Number(optEl.dataset.dsr);
+            chosenShipRaw = Number.isFinite(dsrNum) && dsrNum > 0 ? dsrNum : (optEl.dataset.dsr || chosenShipRaw);
+          }
+        } else if (singleVar) {
+          // Single-variation product: no dropdown; use that variation's values implicitly
+          const p = Number(singleVar.map ?? singleVar.price ?? 0) || 0;
+          if (p > 0) chosenPrice = p;
+          if (singleVar.img) chosenImg = singleVar.img;
+          if (typeof singleVar.dsr !== 'undefined') chosenShipRaw = singleVar.dsr;
+          // include option label as size for cart uniqueness/context
+          if (singleVar.option) chosenLabel = `${prod.title} — ${singleVar.option}`;
+        } else if (prod.variations && prod.variations.length > 1) {
           alert('Please choose an option.');
           return;
+        } else {
+          // No variations: support single by-the-foot items (e.g., Vinyl Top by the FT, Screen Padding by the FT)
+          const isByFootTitle = /by\s*the\s*f(?:oot|t)\b/i.test(String(prod.title||''));
+          const isByFootId = /xft$/i.test(String(prod.id||'')) || /-xft-/i.test(String(prod.id||'')) || /xft/i.test(String(prod.id||''));
+          if (isByFootTitle || isByFootId) {
+            const feetInput = document.getElementById('pd-feet');
+            let feet = Number(feetInput?.value || 1); if (!Number.isFinite(feet) || feet < 1) feet = 1; feet = Math.floor(feet);
+            const perFoot = Number(prod.price || prod.priceMin || 0) || 0;
+            if (perFoot > 0) {
+              chosenPrice = perFoot * feet;
+              chosenLabel = `${chosenLabel} (${feet}')`;
+            }
+          }
         }
         // Pass option as size to preserve cart key uniqueness
-        const size = (optSel && optSel.value) ? optSel.value : undefined;
+        const size = (optSel && optSel.value)
+          ? (() => {
+              const optEl = optSel.options[optSel.selectedIndex];
+              const byFoot = (optEl?.dataset?.byfoot === '1') || /\bby\s*the\s*foot\b/i.test(String(optSel.value||''));
+              if (!byFoot) return optSel.value;
+              let feet = Number(document.getElementById('pd-feet')?.value || 1);
+              if (!Number.isFinite(feet) || feet < 1) feet = 1;
+              feet = Math.floor(feet);
+              return `${optSel.value}: ${feet}'`;
+            })()
+          : (() => {
+              // For single by-foot products, include feet in size for clarity
+              const isByFootTitle = /by\s*the\s*f(?:oot|t)\b/i.test(String(prod.title||''));
+              const isByFootId = /xft$/i.test(String(prod.id||'')) || /-xft-/i.test(String(prod.id||'')) || /xft/i.test(String(prod.id||''));
+              if (isByFootTitle || isByFootId) {
+                let feet = Number(document.getElementById('pd-feet')?.value || 1); if (!Number.isFinite(feet) || feet < 1) feet = 1; feet = Math.floor(feet);
+                return `By the Foot: ${feet}'`;
+              }
+              return (singleVar && singleVar.option ? singleVar.option : undefined);
+            })();
         const color = (colorSel && colorSel.value) ? colorSel.value : undefined;
+        // Ensure shipping is populated for cart line
+        let finalShip = chosenShipRaw;
+        if (!(Number(finalShip) > 0)) finalShip = guessDsr(prod);
         const product = { id: prod.id, title: chosenLabel, price: chosenPrice, img: chosenImg, category: 'netting' };
-        window.Store && window.Store.add(product, { size, color });
+        window.Store && window.Store.add(product, { size, color, ship: finalShip });
       } catch {}
     });
     // Back button click handler for consistent sizing (button vs anchor)
@@ -536,7 +733,8 @@
           const price = Number(m.map ?? m.price ?? m.wholesale ?? 0) || 0;
           const opt = `#${gauge}`;
           const img = (m.img || (m.images && (m.images.primary || (Array.isArray(m.images) && m.images[0])))) || '';
-          return { option: opt, map: price, price, sku: m.sku || m.id, img };
+          const dsr = Number(m.dsr ?? m.details?.dsr ?? 0) || 0;
+          return { option: opt, map: price, price, sku: m.sku || m.id, img, dsr };
         });
         // Primary image & gallery: use first valid image
         const first = twines[0] || {};
@@ -547,7 +745,8 @@
         const galleryPairs = (gallery.length ? gallery : [primary]).filter(Boolean).slice(0,12).map(src=>({thumb:src, large:src}));
         const displayPairs = galleryPairs.slice(0, Math.min(8, galleryPairs.length));
         // Price range
-        const prices = variations.map(v=>v.price).filter(n=>Number.isFinite(n) && n>0);
+  const prices = variations.map(v=>v.price).filter(n=>Number.isFinite(n) && n>0);
+  const dsrs = variations.map(v=>Number(v.dsr||0)).filter(n=>Number.isFinite(n) && n>0);
         const priceMin = prices.length ? Math.min(...prices) : 0;
         const priceMax = prices.length ? Math.max(...prices) : 0;
         const features = (first.details && Array.isArray(first.details.features) ? first.details.features : (Array.isArray(first.features) ? first.features : []));
@@ -562,7 +761,8 @@
           displayPairs,
           features,
           description,
-          variations
+          variations,
+          dsr: (dsrs.length ? Math.min(...dsrs) : 0)
         };
         render(synthetic);
         return;
@@ -584,7 +784,8 @@
           const price = Number(m.map ?? m.price ?? m.wholesale ?? 0) || 0;
           const option = parseLabel(m.name||m.title);
           const img = (m.img || (m.images && (m.images.primary || (Array.isArray(m.images) && m.images[0])))) || '';
-          return { option, map: price, price, sku: m.sku || m.id, img };
+          const dsr = Number(m.dsr ?? m.details?.dsr ?? 0) || 0;
+          return { option, map: price, price, sku: m.sku || m.id, img, dsr };
         });
         const first = cables[0] || {};
   // Curated hero image for Cable
@@ -593,7 +794,8 @@
         const gallery = variations.map(v=>v.img).filter(Boolean);
         const galleryPairs = (gallery.length ? gallery : [primary]).filter(Boolean).slice(0,12).map(src=>({thumb:src, large:src}));
         const displayPairs = galleryPairs.slice(0, Math.min(8, galleryPairs.length));
-        const prices = variations.map(v=>v.price).filter(n=>Number.isFinite(n) && n>0);
+  const prices = variations.map(v=>v.price).filter(n=>Number.isFinite(n) && n>0);
+  const dsrs = variations.map(v=>Number(v.dsr||0)).filter(n=>Number.isFinite(n) && n>0);
         const priceMin = prices.length ? Math.min(...prices) : 0;
         const priceMax = prices.length ? Math.max(...prices) : 0;
         const features = (first.details && Array.isArray(first.details.features) ? first.details.features : (Array.isArray(first.features) ? first.features : []));
@@ -608,7 +810,8 @@
           displayPairs,
           features,
           description,
-          variations
+          variations,
+          dsr: (dsrs.length ? Math.min(...dsrs) : 0)
         };
         render(synthetic);
         return;
@@ -628,11 +831,14 @@
         const gallery = [primary].filter(Boolean);
         const galleryPairs = (gallery.length ? gallery : [primary]).filter(Boolean).slice(0,12).map(src=>({thumb:src, large:src}));
         const displayPairs = galleryPairs.slice(0, Math.min(8, galleryPairs.length));
+        const vDsrSpool = Number(ropeSpool?.dsr ?? ropeSpool?.details?.dsr ?? 0) || 0;
+        const vDsrFt = Number(ropeFt?.dsr ?? ropeFt?.details?.dsr ?? 0) || 0;
         const variations = [
-          { option: "1270' Spool", map: 230, price: 230, sku: '5/16-TPLYSTER-1270', img: primary },
-          { option: 'By the Foot', map: 1, price: 1, sku: '5/16-TPLYSTER-xFT', img: primary }
+          { option: "1270' Spool", map: 230, price: 230, sku: '5/16-TPLYSTER-1270', img: primary, dsr: vDsrSpool },
+          { option: 'By the Foot', map: 1, price: 1, sku: '5/16-TPLYSTER-xFT', img: primary, dsr: vDsrFt }
         ];
         const priceMin = 1; const priceMax = 230;
+        const dsrs = [vDsrSpool, vDsrFt].filter(n=>Number.isFinite(n) && n>0);
         const features = Array.from(new Set([...(ropeFt?.details?.features||ropeFt?.features||[]), ...(ropeSpool?.details?.features||ropeSpool?.features||[])])).slice(0,10);
         const description = (ropeFt?.details?.description || ropeFt?.description || ropeSpool?.details?.description || ropeSpool?.description || 'Durable 5/16" poly twisted rope. Choose a full 1270\' spool or buy by the foot.');
         const synthetic = {
@@ -645,7 +851,8 @@
           displayPairs,
           features,
           description,
-          variations
+          variations,
+          dsr: (dsrs.length ? Math.min(...dsrs) : 0)
         };
         render(synthetic);
         return;
@@ -661,7 +868,8 @@
           map: Number(m.map ?? m.price ?? m.wholesale ?? 0) || 0,
           price: Number(m.map ?? m.price ?? m.wholesale ?? 0) || 0,
           sku: m.sku || m.id,
-          img: (m.img || (m.images && (m.images.primary || (Array.isArray(m.images) && m.images[0])))) || ''
+          img: (m.img || (m.images && (m.images.primary || (Array.isArray(m.images) && m.images[0])))) || '',
+          dsr: Number(m.dsr ?? m.details?.dsr ?? 0) || 0
         }));
         // Override imagery with curated group images
         const GROUP_IMAGES = {
@@ -679,7 +887,8 @@
         const gallery = groupImgs.length ? groupImgs.slice(0, 10) : variations.map(v => v.img).filter(Boolean);
         const galleryPairs = (gallery.length ? gallery : [primary]).filter(Boolean).slice(0,20).map(src => ({ thumb: src, large: src }));
         const displayPairs = galleryPairs.slice(0, Math.min(8, galleryPairs.length));
-        const prices = variations.map(v => v.price).filter(n=>Number.isFinite(n) && n>0);
+  const prices = variations.map(v => v.price).filter(n=>Number.isFinite(n) && n>0);
+  const dsrs = variations.map(v=>Number(v.dsr||0)).filter(n=>Number.isFinite(n) && n>0);
         const priceMin = prices.length ? Math.min(...prices) : 0;
         const priceMax = prices.length ? Math.max(...prices) : 0;
         const first = models[0] || {};
@@ -695,14 +904,32 @@
           displayPairs,
           features,
           description,
-          variations
+          variations,
+          dsr: (dsrs.length ? Math.min(...dsrs) : 0)
         };
         render(synthetic);
         return;
       }
 
       // Normal single-product detail
-      const raw = all.find(p => String(p.sku||p.id) === pid);
+      // Resolve by multiple keys to avoid collisions on generic SKUs (e.g., "Screen Component")
+      const pidNorm = String(pid||'');
+      const pidLower = pidNorm.toLowerCase();
+      const raw = all.find(p => {
+        const id = String(p.id||'');
+        const sku = String(p.sku||'');
+        const name = String(p.name||p.title||'');
+        const title = String(p.title||p.name||'');
+        if (id === pidNorm || sku === pidNorm || name === pidNorm || title === pidNorm) return true;
+        // also match lowercase forms
+        if (id.toLowerCase() === pidLower || sku.toLowerCase() === pidLower) return true;
+        // support slug-based linking by name/title
+        const nameSlug = toSlug(name);
+        const titleSlug = toSlug(title);
+        if (nameSlug && nameSlug === pidLower) return true;
+        if (titleSlug && titleSlug === pidLower) return true;
+        return false;
+      });
       render(raw ? toDisplayItem(raw) : null);
     } catch (e) {
       render(null);

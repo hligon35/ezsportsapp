@@ -55,6 +55,8 @@
     <button onclick="showSection('orders', this)">Orders</button>
     <button onclick="showSection('users', this)">Users</button>
     <button onclick="showSection('marketing', this)">Marketing</button>
+    <button onclick="showSection('finance', this)">Finance</button>
+    <button onclick="showSection('traffic', this)">Traffic</button>
   <a class="btn btn-ghost ml-auto" href="analytics.html">Analytics →</a>
       </div>
 
@@ -196,6 +198,80 @@
           </section>
         </div>
       </div>
+
+      <!-- Finance Section (Stripe) -->
+      <div id="finance-section" class="admin-section hidden">
+        <h3>Finance</h3>
+        <div class="toolbar">
+          <label>
+            <span>Timeframe:</span>
+            <select id="finance-timeframe" class="filter-select">
+              <option value="today">Today</option>
+              <option value="week" selected>Last 7 days</option>
+              <option value="month">This month</option>
+              <option value="all">All time</option>
+            </select>
+          </label>
+          <button class="btn btn-secondary" id="finance-refresh-btn">Refresh</button>
+        </div>
+        <section class="cards mt-4" id="finance-kpis" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:1rem;">
+          <div class="card-sm"><div class="muted">Gross</div><div class="kpi" id="fin-gross">$0.00</div></div>
+          <div class="card-sm"><div class="muted">Refunds</div><div class="kpi" id="fin-refunds">$0.00</div></div>
+          <div class="card-sm"><div class="muted">Fees</div><div class="kpi" id="fin-fees">$0.00</div></div>
+          <div class="card-sm"><div class="muted">Net</div><div class="kpi" id="fin-net">$0.00</div></div>
+        </section>
+        <section class="mt-4">
+          <h4>Balance</h4>
+          <div id="fin-balance" class="muted">–</div>
+        </section>
+        <section class="mt-4">
+          <h4>Cash Flow (Daily)</h4>
+          <canvas id="fin-chart" height="120"></canvas>
+        </section>
+        <section class="mt-4">
+          <div class="flex-row space-between items-center"><h4>Recent Payouts</h4></div>
+          <div id="fin-payouts" class="product-list"><p class="muted">No payouts.</p></div>
+        </section>
+        <section class="mt-4">
+          <div class="flex-row space-between items-center"><h4>Stripe Invoices</h4></div>
+          <div id="fin-invoices" class="product-list"><p class="muted">Loading…</p></div>
+        </section>
+      </div>
+
+      <!-- Traffic Section (Cloudflare) -->
+      <div id="traffic-section" class="admin-section hidden">
+        <h3>Traffic</h3>
+        <div class="toolbar">
+          <label>
+            <span>Timeframe:</span>
+            <select id="traffic-timeframe" class="filter-select">
+              <option value="today">Today</option>
+              <option value="week" selected>Last 7 days</option>
+              <option value="month">This month</option>
+              <option value="all">All time</option>
+            </select>
+          </label>
+          <button class="btn btn-secondary" id="traffic-refresh-btn">Refresh</button>
+        </div>
+        <section class="cards mt-4" id="traffic-kpis" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:1rem;">
+          <div class="card-sm"><div class="muted">Requests</div><div class="kpi" id="cf-reqs">0</div></div>
+          <div class="card-sm"><div class="muted">Cache Hit %</div><div class="kpi" id="cf-cache">0%</div></div>
+          <div class="card-sm"><div class="muted">Bandwidth</div><div class="kpi" id="cf-band">0 MB</div></div>
+          <div class="card-sm"><div class="muted">Threats</div><div class="kpi" id="cf-threats">0</div></div>
+        </section>
+        <section class="mt-4">
+          <h4>Top Paths</h4>
+          <ul id="cf-top-paths" class="product-list"></ul>
+        </section>
+        <section class="mt-4">
+          <h4>Requests (Daily)</h4>
+          <canvas id="cf-chart" height="120"></canvas>
+        </section>
+        <section class="mt-4">
+          <h4>By Country</h4>
+          <ul id="cf-by-country" class="product-list"></ul>
+        </section>
+      </div>
     </div>
   </main>
   <footer class="site-footer">
@@ -268,6 +344,8 @@
   <!-- Inventory-related modals removed for dropship model -->
 
   <script type="module" src="assets/js/analytics.js"></script>
+  <!-- Optional chart library for admin dashboards -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js" integrity="sha384-6VYa3u7J4YON5D3hV8mH7KGLzsdSsJcX+8YbqG+zI5wV1Gq4r7S1rGkVZq6x9GxP" crossorigin="anonymous"></script>
   <script type="module" src="assets/js/admin.js"></script>
   <script type="module" src="assets/js/app.js"></script>
 </body>

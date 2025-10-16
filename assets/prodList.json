@@ -955,6 +955,8 @@
         "sku": "CABLE516-500",
         "name": "500' of 5/16\" Cable",
         "wholesale": 305.95,
+        "dsr": 100,
+        "map": 405.95,
         "img": "assets/img/products/2026-victus-vibe-pro-crayon-tatis-pink-drop-10-usssa-baseball-bat-vsbvib10c-ft.jpg",
         "details": {
           "features": [
@@ -966,6 +968,8 @@
         "sku": "CABLE516-1000",
         "name": "1000' of 5/16\" Cable",
         "wholesale": 557.1,
+        "dsr": 100,
+        "map": 657.1,
         "img": "assets/img/products/2025-louisville-slugger-atlas-drop-5-usssa-baseball-bat.jpeg",
         "details": {
           "features": [
@@ -977,6 +981,8 @@
         "sku": "CABLE14-500",
         "name": "500' of 1/4\" Cable",
         "wholesale": 179.95,
+        "dsr": 100,
+        "map": 279.95,
         "img": "assets/img/products/oakley-encoder-matte-carbon-prizm-24k-sunglasses.jpg",
         "details": {
           "features": [
@@ -988,6 +994,8 @@
         "sku": "CABLE14-1000",
         "name": "1000' of 1/4\" Cable",
         "wholesale": 341.95,
+        "dsr": 100,
+        "map": 441.95,
         "img": "assets/img/products/2024-louisville-slugger-select-pwr-used-drop-10-usa-baseball-bat-wbl2818010.jpg",
         "details": {
           "features": [
@@ -999,6 +1007,7 @@
         "sku": "5/16-TPLYSTER-xFT",
         "name": "5/16\" Poly Twisted Rope by the FT",
         "wholesale": "0.25/ft",
+        "dsr": 100,
         "img": "assets/img/products/nike-alpha-elite-batting-gloves-n-100-4380.jpg",
         "details": {
           "features": [
@@ -1010,6 +1019,7 @@
         "sku": "5/16-TPLYSTER-1270",
         "name": "5/16\" 1270' Spool Poly Twisted Rope",
         "wholesale": 230,
+        "dsr": 100,
         "img": "assets/img/products/2026-warstic-bonesaber-hybrid-usa-limited-edition-bbcor-baseball-bat-mbbsrhb25us.jpg",
         "details": {
           "features": [
@@ -1021,6 +1031,8 @@
         "sku": "FT-TNHL-01801",
         "name": "#21 Forever Black Twine Spool",
         "wholesale": 10.88,
+        "dsr": 100,
+        "map": 30.88,
         "img": "assets/img/products/2025-soldier-tank-bbcor-baseball-bat-ssbb25tank-bb-1-25-chg.jpg",
         "details": {
           "features": [
@@ -1032,6 +1044,8 @@
         "sku": "FT-TNHL-02101",
         "name": "#30 Forever Black Twine Spool",
         "wholesale": 10.88,
+        "dsr": 100,
+        "map": 30.88,
         "img": "assets/img/products/nike-pro-dri-fit-adult-compression-arm-sleeve-n-101-2740.jpg",
         "details": {
           "features": [
@@ -1043,6 +1057,8 @@
         "sku": "FT-TNHL-03601",
         "name": "#36 Forever Black Twine Spool",
         "wholesale": 10.88,
+        "dsr": 100,
+        "map": 30.88,
         "img": "assets/img/products/2025-rawlings-icon-8-usssa-baseball-bat.jpg",
         "details": {
           "features": [
@@ -1054,6 +1070,8 @@
         "sku": "FT-TNHL-04201",
         "name": "#42 Forever Black Twine Spool",
         "wholesale": 10.88,
+        "dsr": 100,
+        "map": 30.88,
         "img": "assets/img/products/2026-easton-ghost-advanced-drop-10-fastpitch-softball-bat-efp6ghad10.jpg",
         "details": {
           "features": [
@@ -1065,6 +1083,8 @@
         "sku": "FT-TNHL-06001",
         "name": "#60 Forever Black Twine Spool",
         "wholesale": 10.88,
+        "dsr": 100,
+        "map": 30.88,
         "img": "assets/img/products/2026-louisville-slugger-select-pwr-drop-10-usa-baseball-bat-wbl4126010.jpg",
         "details": {
           "features": [
@@ -1076,6 +1096,8 @@
         "sku": "FT-TNHL-9601",
         "name": "#92 Forever Black Twine Spool",
         "wholesale": 10.88,
+        "dsr": 100,
+        "map": 30.88,
         "img": "assets/img/products/bruce-bolt-performance-headband-bb-hb.jpg",
         "details": {
           "features": [
@@ -1087,6 +1109,8 @@
         "sku": "Screen Bulletz",
         "name": "Screen Bulletz Leg Caps (4-Pack)",
         "wholesale": 32,
+        "dsr": 100,
+        "map": 52,
         "details": {
           "features": [
             "Fast and Reliable Shipping",
@@ -1108,6 +1132,7 @@
         "sku": "BWK",
         "name": "Bullet Wheel Kit",
         "wholesale": 75,
+        "dsr": 100,
         "img": "assets/img/products/33-gloves-lp-pro-long-cuff-youth-batting-gloves-yll-109214.jpg",
         "details": {
           "features": [
@@ -1119,6 +1144,7 @@
         "sku": "Screen Component",
         "name": "Bullet Fixed Leg Kit",
         "wholesale": 35,
+        "dsr": 100,
         "img": "assets/img/products/2026-louisville-slugger-kryo-drop-10-fastpitch-softball-bat-wbl4135010.jpg",
         "details": {
           "features": [
@@ -1130,6 +1156,7 @@
         "sku": "Screen Wheel",
         "name": "Bullet Replacement Wheels (2-Pack)",
         "wholesale": 30,
+        "dsr": 100,
         "img": "assets/img/products/victus-vibe-pencil-drop-5-usssa-baseball-bat.jpg",
         "details": {
           "features": [
@@ -1141,6 +1168,7 @@
         "sku": "VINYL-12inchxFt",
         "name": "12\" Vinyl Top by the FT",
         "wholesale": "2/ft",
+        "dsr": 100,
         "img": "assets/img/products/velo-changeup-gen-2-phantom-candy-rush-pink-sunglasses-velo-change-candypnk.jpg",
         "details": {
           "features": [
@@ -1152,6 +1180,7 @@
         "sku": "Screen Component",
         "name": "Screen Padding by the FT",
         "wholesale": "1/ft",
+        "dsr": 100,
         "img": "assets/img/products/lizard-skins-dsp-ultra-bat-grip.jpg",
         "details": {
           "features": [
@@ -1163,6 +1192,7 @@
         "sku": "Battingmat",
         "name": "Pro Batting Mat",
         "wholesale": 475,
+        "dsr": 100,
         "notes": "Free Shipping",
         "img": "assets/img/products/tanner-original-replacement-standard-batting-tee-stem-only-ttstem1.jpg",
         "details": {
@@ -1175,6 +1205,7 @@
         "sku": "Armorbasket",
         "name": "Armor Baseball Cart",
         "wholesale": 200,
+        "dsr": 100,
         "notes": "Free Shipping",
         "img": "assets/img/products/victus-v243-powderpuff-pro-reserve-maple-wood-baseball-bat-cstmv243pp.jpg",
         "details": {
@@ -1187,6 +1218,7 @@
         "sku": "Wbasket",
         "name": "Bullet Wheeled Ball Basket",
         "wholesale": 350,
+        "dsr": 100,
         "notes": "LTL Freight Only",
         "img": "assets/img/products/100-limited-edition-speedcraft-xs-fernando-tatis-jr-blue-topaz-mirror-lens-sungl.jpg",
         "details": {
@@ -1203,7 +1235,7 @@
         "map": 299.95,
         "wholesale": 195,
         "dsr": 50,
-        "shipping": "44\" x 36\" x 4\", 36lbs",
+        "dimensions": "44\" x 36\" x 4\", 36lbs",
         "details": {
           "description": "Nine targets. Real accountability. This 9‑pocket pitching trainer builds strike‑zone command without a catcher. The industrial‑grade steel frame and #60 UV‑treated netting handle daily bullpens indoors or out, and each pocket gives instant feedback you can count, track, and improve. Adjustable, detachable legs make storage simple and height easy to dial in. Ships fully assembled so you can train right away.\n\nWARNING: Use reduces risk but can’t eliminate it. Thrown or batted balls may ricochet and cause injury. Always wear appropriate protective gear and follow best‑practice training protocols.",
           "warranty": "Netting Warranty: Full One (1) Year Warranty",
@@ -1253,7 +1285,7 @@
         "map": 249.95,
         "wholesale": 164,
         "dsr": 50,
-        "shipping": "36\" x 36\" x 4\", 30lbs",
+        "dimensions": "36\" x 36\" x 4\", 30lbs",
         "details": {
           "description": "True strike‑zone training for elite arms. This pro‑spec 9‑pocket target mirrors the game‑size zone for precision bullpens and measurable command work. Overbuilt with galvanized steel and #60 UV‑treated netting for years of cage or field use. Lightweight, portable, and height‑adjustable with detachable legs. Ships fully assembled so you can get to work fast.\n\nWARNING: Use reduces risk but can’t eliminate it. Thrown or batted balls may ricochet and cause injury. Always wear appropriate protective gear and follow best‑practice training protocols.",
           "warranty": "Netting Warranty: Full One (1) Year Warranty",
@@ -1308,7 +1340,7 @@
             "map": 399.95,
             "wholesale": 295,
             "dsr": 75,
-            "shipping": "82\" x 16\" x 4\", 45lbs & 48\" x 12\" x 12\", 15lbs",
+            "dimensions": "82\" x 16\" x 4\", 45lbs & 48\" x 12\" x 12\", 15lbs",
             "price": 474.95
           },
           {
@@ -1316,21 +1348,21 @@
             "map": 499.95,
             "wholesale": 358,
             "dsr": 75,
-            "shipping": "82\" x 16\" x 4\", 45lbs & 48\" x 12\" x 12\", 20lbs"
+            "dimensions": "82\" x 16\" x 4\", 45lbs & 48\" x 12\" x 12\", 20lbs"
           },
           {
             "option": "Wheeled",
             "map": 499.95,
             "wholesale": 358,
             "dsr": 75,
-            "shipping": "82\" x 16\" x 4\", 45lbs & 48\" x 12\" x 12\", 20lbs"
+            "dimensions": "82\" x 16\" x 4\", 45lbs & 48\" x 12\" x 12\", 20lbs"
           },
           {
             "option": "Padded w/wheels",
             "map": 549.95,
             "wholesale": 390,
             "dsr": 75,
-            "shipping": "82\" x 16\" x 4\", 45lbs & 48\" x 12\" x 12\", 25lbs"
+            "dimensions": "82\" x 16\" x 4\", 45lbs & 48\" x 12\" x 12\", 25lbs"
           }
         ],
         "details": {
@@ -1380,28 +1412,28 @@
             "map": 349.95,
             "wholesale": 258,
             "dsr": 75,
-            "shipping": "82\" x 16\" x 4\", 45lbs & 48\" x 12\" x 12\", 15lbs"
+            "dimensions": "82\" x 16\" x 4\", 45lbs & 48\" x 12\" x 12\", 15lbs"
           },
           {
             "option": "Padded",
             "map": 449.95,
             "wholesale": 321,
             "dsr": 75,
-            "shipping": "82\" x 16\" x 4\", 45lbs & 48\" x 12\" x 12\", 20lbs"
+            "dimensions": "82\" x 16\" x 4\", 45lbs & 48\" x 12\" x 12\", 20lbs"
           },
           {
             "option": "Wheeled",
             "map": 449.95,
             "wholesale": 321,
             "dsr": 75,
-            "shipping": "82\" x 16\" x 4\", 45lbs & 48\" x 12\" x 12\", 20lbs"
+            "dimensions": "82\" x 16\" x 4\", 45lbs & 48\" x 12\" x 12\", 20lbs"
           },
           {
             "option": "Padded w/wheels",
             "map": 499.95,
             "wholesale": 358,
             "dsr": 75,
-            "shipping": "82\" x 16\" x 4\", 45lbs & 48\" x 12\" x 12\", 25lbs"
+            "dimensions": "82\" x 16\" x 4\", 45lbs & 48\" x 12\" x 12\", 25lbs"
           }
         ],
         "details": {
@@ -1451,28 +1483,28 @@
             "map": 399.95,
             "wholesale": 295,
             "dsr": 75,
-            "shipping": "82\" x 16\" x 4\", 45lbs & 48\" x 12\" x 12\", 20lbs"
+            "dimensions": "82\" x 16\" x 4\", 45lbs & 48\" x 12\" x 12\", 20lbs"
           },
           {
             "option": "Padded",
             "map": 499.95,
             "wholesale": 358,
             "dsr": 75,
-            "shipping": "82\" x 16\" x 4\", 45lbs & 48\" x 12\" x 12\", 20lbs"
+            "dimensions": "82\" x 16\" x 4\", 45lbs & 48\" x 12\" x 12\", 20lbs"
           },
           {
             "option": "Wheeled",
             "map": 499.95,
             "wholesale": 358,
             "dsr": 75,
-            "shipping": "82\" x 16\" x 4\", 45lbs & 48\" x 12\" x 12\", 20lbs"
+            "dimensions": "82\" x 16\" x 4\", 45lbs & 48\" x 12\" x 12\", 20lbs"
           },
           {
             "option": "Padded w/wheels",
             "map": 549.95,
             "wholesale": 390,
             "dsr": 75,
-            "shipping": "82\" x 16\" x 4\", 45lbs & 48\" x 12\" x 12\", 25lbs"
+            "dimensions": "82\" x 16\" x 4\", 45lbs & 48\" x 12\" x 12\", 25lbs"
           }
         ],
         "details": {
@@ -1522,28 +1554,28 @@
             "map": 449.95,
             "wholesale": 327,
             "dsr": 75,
-            "shipping": "82\" x 16\" x 4\", 45lbs & 48\" x 12\" x 12\", 20lbs"
+            "dimensions": "82\" x 16\" x 4\", 45lbs & 48\" x 12\" x 12\", 20lbs"
           },
           {
             "option": "Padded",
             "map": 549.95,
             "wholesale": 390,
             "dsr": 75,
-            "shipping": "82\" x 16\" x 4\", 45lbs & 48\" x 12\" x 12\", 20lbs"
+            "dimensions": "82\" x 16\" x 4\", 45lbs & 48\" x 12\" x 12\", 20lbs"
           },
           {
             "option": "Wheeled",
             "map": 549.95,
             "wholesale": 390,
             "dsr": 75,
-            "shipping": "82\" x 16\" x 4\", 45lbs & 48\" x 12\" x 12\", 20lbs"
+            "dimensions": "82\" x 16\" x 4\", 45lbs & 48\" x 12\" x 12\", 20lbs"
           },
           {
             "option": "Padded w/wheels",
             "map": 599.95,
             "wholesale": 422,
             "dsr": 75,
-            "shipping": "82\" x 16\" x 4\", 45lbs & 48\" x 12\" x 12\", 25lbs"
+            "dimensions": "82\" x 16\" x 4\", 45lbs & 48\" x 12\" x 12\", 25lbs"
           }
         ],
         "details": {
@@ -1592,21 +1624,21 @@
             "map": 799.95,
             "wholesale": 532,
             "dsr": 125,
-            "shipping": "79\" x 15\" x 9\", 90lbs & 48\" x 12\" x 12\", 15lbs"
+            "dimensions": "79\" x 15\" x 9\", 90lbs & 48\" x 12\" x 12\", 15lbs"
           },
           {
             "option": "Wheeled",
             "map": 799.95,
             "wholesale": 532,
             "dsr": 125,
-            "shipping": "79\" x 15\" x 9\", 90lbs & 48\" x 12\" x 12\", 20lbs"
+            "dimensions": "79\" x 15\" x 9\", 90lbs & 48\" x 12\" x 12\", 20lbs"
           },
           {
             "option": "Padded w/wheels",
             "map": 849.95,
             "wholesale": 574,
             "dsr": 125,
-            "shipping": "79\" x 15\" x 9\", 90lbs & 48\" x 12\" x 12\", 30lbs"
+            "dimensions": "79\" x 15\" x 9\", 90lbs & 48\" x 12\" x 12\", 30lbs"
           }
         ],
         "details": {
@@ -1658,28 +1690,28 @@
             "map": 599.95,
             "wholesale": 432,
             "dsr": 125,
-            "shipping": "79\" x 15\" x 9\", 90lbs"
+            "dimensions": "79\" x 15\" x 9\", 90lbs"
           },
           {
             "option": "Padded",
             "map": 699.95,
             "wholesale": 474,
             "dsr": 125,
-            "shipping": "79\" x 15\" x 9\", 90lbs & 48\" x 12\" x 12\", 15lbs"
+            "dimensions": "79\" x 15\" x 9\", 90lbs & 48\" x 12\" x 12\", 15lbs"
           },
           {
             "option": "Wheeled",
             "map": 699.95,
             "wholesale": 474,
             "dsr": 125,
-            "shipping": "79\" x 15\" x 9\", 90lbs & 48\" x 12\" x 12\", 20lbs"
+            "dimensions": "79\" x 15\" x 9\", 90lbs & 48\" x 12\" x 12\", 20lbs"
           },
           {
             "option": "Padded w/wheels",
             "map": 749.95,
             "wholesale": 532,
             "dsr": 125,
-            "shipping": "79\" x 15\" x 9\", 90lbs & 48\" x 12\" x 12\", 30lbs"
+            "dimensions": "79\" x 15\" x 9\", 90lbs & 48\" x 12\" x 12\", 30lbs"
           }
         ],
         "details": {
@@ -1730,28 +1762,28 @@
             "map": 449.95,
             "wholesale": 353,
             "dsr": 75,
-            "shipping": "82\" x 16\" x 4\", 45lbs & 48\" x 12\" x 12\", 15lbs"
+            "dimensions": "82\" x 16\" x 4\", 45lbs & 48\" x 12\" x 12\", 15lbs"
           },
           {
             "option": "Padded",
             "map": 499.95,
             "wholesale": 400,
             "dsr": 75,
-            "shipping": "82\" x 16\" x 4\", 45lbs & 48\" x 12\" x 12\", 20lbs"
+            "dimensions": "82\" x 16\" x 4\", 45lbs & 48\" x 12\" x 12\", 20lbs"
           },
           {
             "option": "Wheeled",
             "map": 499.95,
             "wholesale": 400,
             "dsr": 75,
-            "shipping": "82\" x 16\" x 4\", 45lbs & 48\" x 12\" x 12\", 20lbs"
+            "dimensions": "82\" x 16\" x 4\", 45lbs & 48\" x 12\" x 12\", 20lbs"
           },
           {
             "option": "Padded w/wheels",
             "map": 599.95,
             "wholesale": 490,
             "dsr": 75,
-            "shipping": "82\" x 16\" x 4\", 45lbs & 48\" x 12\" x 12\", 25lbs"
+            "dimensions": "82\" x 16\" x 4\", 45lbs & 48\" x 12\" x 12\", 25lbs"
           }
         ],
         "details": {
@@ -1800,28 +1832,28 @@
             "map": 349.95,
             "wholesale": 258,
             "dsr": 75,
-            "shipping": "82\" x 16\" x 4\", 45lbs & 48\" x 12\" x 12\", 15lbs"
+            "dimensions": "82\" x 16\" x 4\", 45lbs & 48\" x 12\" x 12\", 15lbs"
           },
           {
             "option": "Padded",
             "map": 449.95,
             "wholesale": 321,
             "dsr": 75,
-            "shipping": "82\" x 16\" x 4\", 45lbs & 48\" x 12\" x 12\", 20lbs"
+            "dimensions": "82\" x 16\" x 4\", 45lbs & 48\" x 12\" x 12\", 20lbs"
           },
           {
             "option": "Wheeled",
             "map": 449.95,
             "wholesale": 321,
             "dsr": 75,
-            "shipping": "82\" x 16\" x 4\", 45lbs & 48\" x 12\" x 12\", 20lbs"
+            "dimensions": "82\" x 16\" x 4\", 45lbs & 48\" x 12\" x 12\", 20lbs"
           },
           {
             "option": "Padded w/wheels",
             "map": 499.95,
             "wholesale": 358,
             "dsr": 75,
-            "shipping": "82\" x 16\" x 4\", 45lbs & 48\" x 12\" x 12\", 25lbs"
+            "dimensions": "82\" x 16\" x 4\", 45lbs & 48\" x 12\" x 12\", 25lbs"
           }
         ],
         "details": {
@@ -1871,28 +1903,28 @@
             "map": 349.95,
             "wholesale": 258,
             "dsr": 75,
-            "shipping": "82\" x 16\" x 4\", 45lbs & 48\" x 12\" x 12\", 15lbs"
+            "dimensions": "82\" x 16\" x 4\", 45lbs & 48\" x 12\" x 12\", 15lbs"
           },
           {
             "option": "Padded",
             "map": 449.95,
             "wholesale": 321,
             "dsr": 75,
-            "shipping": "82\" x 16\" x 4\", 45lbs & 48\" x 12\" x 12\", 20lbs"
+            "dimensions": "82\" x 16\" x 4\", 45lbs & 48\" x 12\" x 12\", 20lbs"
           },
           {
             "option": "Wheeled",
             "map": 449.95,
             "wholesale": 321,
             "dsr": 75,
-            "shipping": "82\" x 16\" x 4\", 45lbs & 48\" x 12\" x 12\", 20lbs"
+            "dimensions": "82\" x 16\" x 4\", 45lbs & 48\" x 12\" x 12\", 20lbs"
           },
           {
             "option": "Padded w/wheels",
             "map": 499.95,
             "wholesale": 358,
             "dsr": 75,
-            "shipping": "82\" x 16\" x 4\", 45lbs & 48\" x 12\" x 12\", 25lbs"
+            "dimensions": "82\" x 16\" x 4\", 45lbs & 48\" x 12\" x 12\", 25lbs"
           }
         ],
         "details": {
@@ -1942,28 +1974,28 @@
             "map": 399.95,
             "wholesale": 311,
             "dsr": 75,
-            "shipping": "82\" x 16\" x 4\", 45lbs & 48\" x 12\" x 12\", 15lbs"
+            "dimensions": "82\" x 16\" x 4\", 45lbs & 48\" x 12\" x 12\", 15lbs"
           },
           {
             "option": "Padded",
             "map": 499.95,
             "wholesale": 369,
             "dsr": 75,
-            "shipping": "82\" x 16\" x 4\", 45lbs & 48\" x 12\" x 12\", 20lbs"
+            "dimensions": "82\" x 16\" x 4\", 45lbs & 48\" x 12\" x 12\", 20lbs"
           },
           {
             "option": "Wheeled",
             "map": 499.95,
             "wholesale": 369,
             "dsr": 75,
-            "shipping": "82\" x 16\" x 4\", 45lbs & 48\" x 12\" x 12\", 20lbs"
+            "dimensions": "82\" x 16\" x 4\", 45lbs & 48\" x 12\" x 12\", 20lbs"
           },
           {
             "option": "Padded w/wheels",
             "map": 549.95,
             "wholesale": 406,
             "dsr": 75,
-            "shipping": "82\" x 16\" x 4\", 45lbs & 48\" x 12\" x 12\", 25lbs"
+            "dimensions": "82\" x 16\" x 4\", 45lbs & 48\" x 12\" x 12\", 25lbs"
           }
         ],
         "details": {
@@ -2012,28 +2044,28 @@
             "map": 449.95,
             "wholesale": 367,
             "dsr": 100,
-            "shipping": "79\" x 15\" x 9\", 90lbs"
+            "dimensions": "79\" x 15\" x 9\", 90lbs"
           },
           {
             "option": "Padded",
             "map": 549.95,
             "wholesale": 421,
             "dsr": 100,
-            "shipping": "79\" x 15\" x 9\", 90lbs & 48\" x 12\" x 12\", 15lbs"
+            "dimensions": "79\" x 15\" x 9\", 90lbs & 48\" x 12\" x 12\", 15lbs"
           },
           {
             "option": "Wheeled",
             "map": 549.95,
             "wholesale": 421,
             "dsr": 100,
-            "shipping": "79\" x 15\" x 9\", 90lbs & 48\" x 12\" x 12\", 20lbs"
+            "dimensions": "79\" x 15\" x 9\", 90lbs & 48\" x 12\" x 12\", 20lbs"
           },
           {
             "option": "Padded w/wheels",
             "map": 599.95,
             "wholesale": 456,
             "dsr": 100,
-            "shipping": "79\" x 15\" x 9\", 90lbs & 48\" x 12\" x 12\", 30lbs"
+            "dimensions": "79\" x 15\" x 9\", 90lbs & 48\" x 12\" x 12\", 30lbs"
           }
         ],
         "details": {
@@ -2083,28 +2115,28 @@
             "map": 549.95,
             "wholesale": 500,
             "dsr": 100,
-            "shipping": "79\" x 15\" x 9\", 90lbs"
+            "dimensions": "79\" x 15\" x 9\", 90lbs"
           },
           {
             "option": "Padded",
             "map": 649.95,
             "wholesale": 548,
             "dsr": 100,
-            "shipping": "79\" x 15\" x 9\", 90lbs & 48\" x 12\" x 12\", 15lbs"
+            "dimensions": "79\" x 15\" x 9\", 90lbs & 48\" x 12\" x 12\", 15lbs"
           },
           {
             "option": "Wheeled",
             "map": 649.95,
             "wholesale": 548,
             "dsr": 100,
-            "shipping": "79\" x 15\" x 9\", 90lbs & 48\" x 12\" x 12\", 20lbs"
+            "dimensions": "79\" x 15\" x 9\", 90lbs & 48\" x 12\" x 12\", 20lbs"
           },
           {
             "option": "Padded w/wheels",
             "map": 699.95,
             "wholesale": 590,
             "dsr": 100,
-            "shipping": "79\" x 15\" x 9\", 90lbs & 48\" x 12\" x 12\", 30lbs"
+            "dimensions": "79\" x 15\" x 9\", 90lbs & 48\" x 12\" x 12\", 30lbs"
           }
         ],
         "details": {
