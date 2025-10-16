@@ -301,9 +301,8 @@
       }
       const pDsr = Number(prod.dsr ?? 0) || 0;
       if (pDsr > 0) return `Shipping: $${pDsr.toFixed(2)}`;
-      // Fallback to heuristic to ensure shipping is always visible
-      const g = guessDsr(prod);
-      return g > 0 ? `Shipping: $${g.toFixed(2)}` : '';
+      // New policy fallback: show $100 flat when no dsr present
+      return `Shipping: $${(100).toFixed(2)}`;
     })();
 
     // Build color choices from product images using Store's color extraction
@@ -458,9 +457,8 @@
               } else if (Number(prod.dsr||0) > 0) {
                 shipEl.textContent = `Shipping: $${Number(prod.dsr).toFixed(2)}`;
               } else {
-                // Heuristic fallback
-                const g = guessDsr(prod);
-                shipEl.textContent = `Shipping: $${g.toFixed(2)}`;
+                // New policy fallback: show $100 flat when no dsr present
+                shipEl.textContent = `Shipping: $${(100).toFixed(2)}`;
               }
             }
           }
@@ -697,11 +695,11 @@
               return (singleVar && singleVar.option ? singleVar.option : undefined);
             })();
         const color = (colorSel && colorSel.value) ? colorSel.value : undefined;
-        // Ensure shipping is populated for cart line
-        let finalShip = chosenShipRaw;
-        if (!(Number(finalShip) > 0)) finalShip = guessDsr(prod);
+        // Include per-product shipping only when an explicit dsr is defined (>0). Otherwise omit and default $100 applies at checkout.
         const product = { id: prod.id, title: chosenLabel, price: chosenPrice, img: chosenImg, category: 'netting' };
-        window.Store && window.Store.add(product, { size, color, ship: finalShip });
+        const opts = { size, color };
+        if (Number(chosenShipRaw) > 0) opts.ship = Number(chosenShipRaw);
+        window.Store && window.Store.add(product, opts);
       } catch {}
     });
     // Back button click handler for consistent sizing (button vs anchor)

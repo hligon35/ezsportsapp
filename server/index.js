@@ -435,8 +435,8 @@ async function calcSubtotalCents(items = []) {
   }, 0);
 }
 
-async function calcShippingCents(items = [], subtotalCents, method = 'standard'){
-  // If we have per-item dsr values in the product catalog, prefer summing those
+async function calcShippingCents(items = [], _subtotalCents, _method = 'standard'){
+  // New policy: if any items have a per-product dsr, sum dsr * qty; otherwise flat $100 per order
   try {
     const priceMap = await loadPriceMap();
     let dsrTotal = 0;
@@ -450,21 +450,19 @@ async function calcShippingCents(items = [], subtotalCents, method = 'standard')
     }
     if (dsrTotal > 0) return dsrTotal;
   } catch {}
-  // Fallback: flat shipping
-  if (subtotalCents >= 7500) return 0; // free over $75
-  if (method === 'express') return 2500;
-  return 1000; // standard
+  // Default when no dsr present on any items
+  return 10000; // $100 flat
 }
 
 // Create payment intent with server-side calculation
 app.post('/api/create-payment-intent', async (req, res) => {
-  const { items = [], customer = {}, shipping = {}, shippingMethod = 'standard', currency = 'usd', couponCode = '', existingOrderId = null } = req.body;
+  const { items = [], customer = {}, shipping = {}, currency = 'usd', couponCode = '', existingOrderId = null } = req.body;
   try {
     if (!stripe) {
       return res.status(503).json({ error: 'Stripe is not configured on the server.' });
     }
   const subtotal = await calcSubtotalCents(items);
-  const shippingCents = await calcShippingCents(items, subtotal, shippingMethod);
+  const shippingCents = await calcShippingCents(items, subtotal);
   let amount = subtotal + shippingCents; // taxes omitted in demo
 
     // Optional: apply coupon
@@ -513,7 +511,6 @@ app.post('/api/create-payment-intent', async (req, res) => {
       metadata: {
         email: customer.email || '',
         name: customer.name || '',
-        shipping_method: shippingMethod,
         items: items.map(i => `${i.id}:${i.qty}`).join('|'),
         order_id: newOrder?.id ? String(newOrder.id) : '',
         coupon_code: appliedCoupon ? String(appliedCoupon.code) : ''

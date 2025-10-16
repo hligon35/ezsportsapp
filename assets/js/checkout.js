@@ -29,14 +29,24 @@ function fromCents(c){ return Math.max(0, Math.round(Number(c||0))); }
 function calcSubtotalCents(cart){
   return cart.reduce((sum,i)=> sum + (toCents(i.price||0) * (i.qty||0)), 0);
 }
-function calcShippingCents(subtotalCents, method){
-  if (subtotalCents >= 7500) return 0; // free over $75
-  if (method === 'express') return 2500;
-  return 1000; // standard
+function calcShippingCentsForCart(cart){
+  // New policy: if any cart items carry a per-product dsr (ship), sum ship * qty; else flat $100 per order
+  let dsrTotal = 0;
+  let hasAnyDsr = false;
+  for (const i of cart) {
+    const dsr = Number(i.ship || 0);
+    if (dsr > 0) {
+      hasAnyDsr = true;
+      const qty = Math.max(1, Number(i.qty) || 1);
+      dsrTotal += Math.round(dsr * 100) * qty;
+    }
+  }
+  if (hasAnyDsr) return dsrTotal;
+  return 10000; // $100 default when no dsr present
 }
-function updateSummary(cart, shippingMethod, applied){
+function updateSummary(cart, applied){
   const sub = calcSubtotalCents(cart);
-  const ship = calcShippingCents(sub, shippingMethod);
+  const ship = calcShippingCentsForCart(cart);
   let discount = 0;
   if (applied && applied.type && applied.value) {
     if (applied.type === 'percent') {
@@ -110,10 +120,9 @@ async function initialize() {
     const fd = new FormData(form);
     const customer = { name: fd.get('name'), email: fd.get('email') };
     const shipping = { address1: fd.get('address1'), address2: fd.get('address2'), city: fd.get('city'), state: fd.get('state'), postal: fd.get('postal'), country: fd.get('country') };
-    const shippingMethod = fd.get('shippingMethod');
     // Send minimal items shape to backend
     const items = cart.map(i=>({ id: i.id, qty: i.qty }));
-    return { items, customer, shipping, shippingMethod, couponCode: appliedCoupon?.code || '', existingOrderId: orderId };
+    return { items, customer, shipping, couponCode: appliedCoupon?.code || '', existingOrderId: orderId };
   };
 
   async function createOrUpdatePaymentIntent() {
@@ -167,9 +176,7 @@ async function initialize() {
   await createOrUpdatePaymentIntent();
 
   // Always show a computed summary (even in test mode). Server breakdown overrides this during PI creation.
-  const fd0 = new FormData(form);
-  const shipMethod0 = fd0.get('shippingMethod') || 'standard';
-  const { total: computedTotal } = updateSummary(cart, shipMethod0, appliedCoupon);
+  const { total: computedTotal } = updateSummary(cart, appliedCoupon);
   if (amount > 0) {
     document.getElementById('sum-total').textContent = currencyFmt(amount);
   } else {
@@ -183,16 +190,7 @@ async function initialize() {
     if (submit) submit.textContent = 'Place Order';
   }
 
-  // Recompute totals on shipping method change
-  const shipSelect = form.querySelector('#shippingMethod');
-  if (shipSelect) shipSelect.addEventListener('change', async () => {
-    const fd = new FormData(form);
-    const method = fd.get('shippingMethod') || 'standard';
-    updateSummary(cart, method, appliedCoupon);
-    // Refresh PI to reflect shipping (and coupon) changes
-    await createOrUpdatePaymentIntent();
-    if (amount > 0) document.getElementById('sum-total').textContent = currencyFmt(amount);
-  });
+  // Shipping method selection removed; totals depend only on cart contents and coupon
 
   // Promo code apply handler
   const applyBtn = document.getElementById('apply-code');
@@ -207,13 +205,13 @@ async function initialize() {
       if (data.valid) {
         appliedCoupon = data.coupon ? { code: data.coupon.code, type: data.coupon.type, value: data.coupon.value } : { code, type:'percent', value:0 };
         document.getElementById('discount-code-label').textContent = `(${appliedCoupon.code})`;
-        updateSummary(cart, (new FormData(form)).get('shippingMethod')||'standard', appliedCoupon);
+        updateSummary(cart, appliedCoupon);
         await createOrUpdatePaymentIntent();
         if (amount > 0) document.getElementById('sum-total').textContent = currencyFmt(amount);
         msg.textContent = 'Code applied.';
       } else {
         appliedCoupon = null;
-        updateSummary(cart, (new FormData(form)).get('shippingMethod')||'standard', appliedCoupon);
+        updateSummary(cart, appliedCoupon);
         msg.textContent = 'Invalid or expired code.';
       }
     } catch (e) {
@@ -232,10 +230,8 @@ async function initialize() {
         // Try to create order via backend (unauthenticated endpoint)
         const resp = await fetch('/api/order', { method:'POST', headers:{'Content-Type':'application/json'}, credentials:'include', body: JSON.stringify(payload) });
         // Compute totals locally for confirmation
-        const fd = new FormData(form);
-        const shipMethod = fd.get('shippingMethod') || 'standard';
         const sub = calcSubtotalCents(cart);
-        const ship = calcShippingCents(sub, shipMethod);
+        const ship = calcShippingCentsForCart(cart);
         const discount = computeDiscountCents(sub, ship, appliedCoupon);
         const total = sub + ship - discount;
         let orderId = Date.now();
@@ -270,10 +266,8 @@ async function initialize() {
     // Save a lightweight snapshot for confirmation page UI
     try {
       const items = cart.map(i=>({ productName: i.title || i.id, id: i.id, quantity: i.qty, price: Number(i.price)||0, subtotal: (Number(i.price)||0) * (i.qty||0) }));
-      const fd = new FormData(form);
-      const shipMethod = fd.get('shippingMethod') || 'standard';
       const sub = calcSubtotalCents(cart);
-      const ship = calcShippingCents(sub, shipMethod);
+      const ship = calcShippingCentsForCart(cart);
       const fallbackTotal = sub + ship;
       const totalCents = typeof amount === 'number' && amount > 0 ? amount : fallbackTotal;
       const discount = Math.max(0, fallbackTotal - totalCents);
