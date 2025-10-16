@@ -116,21 +116,114 @@ app.post('/webhook/stripe', express.raw({ type: 'application/json' }), async (re
 
   try {
     // For dropship model, do not mutate stock on payment events
-    // Optionally, mark related order as paid via metadata in the future
-    if (event.type === 'payment_intent.succeeded') {
-      try {
-        const pi = event.data.object;
-        const orderId = pi?.metadata?.order_id;
-        const couponCode = pi?.metadata?.coupon_code;
-        if (orderId) {
-          await orderService.updateOrderStatus(orderId, 'paid');
+    // Update orders and finance metadata by event types
+    switch (event.type) {
+      case 'payment_intent.succeeded': {
+        try {
+          const pi = event.data.object;
+          const orderId = pi?.metadata?.order_id;
+          const couponCode = pi?.metadata?.coupon_code;
+          if (orderId) {
+            await orderService.updateOrderStatus(orderId, 'paid');
+            const latestChargeId = Array.isArray(pi.charges?.data) && pi.charges.data[0]?.id ? pi.charges.data[0].id : undefined;
+            let fees, net;
+            if (latestChargeId && stripe) {
+              try {
+                const ch = await stripe.charges.retrieve(latestChargeId, { expand: ['balance_transaction'] });
+                const bt = ch.balance_transaction;
+                if (bt) { fees = (bt.fee || 0) / 100; net = (bt.net || 0) / 100; }
+              } catch (e) { /* ignore fee fetch errors */ }
+            }
+            await orderService.updatePaymentInfo(orderId, {
+              intentId: pi.id,
+              latestChargeId,
+              amount: (pi.amount || 0) / 100,
+              currency: pi.currency,
+              fees,
+              net,
+              method: 'stripe',
+              paidAt: new Date().toISOString()
+            });
+          }
+          if (couponCode) {
+            try { await couponService.consume(String(couponCode)); } catch (e) { console.warn('Coupon consume failed:', e.message); }
+          }
+          // Queue order confirmation email (simple DB queue for now)
+          try {
+            const EmailService = require('./services/EmailService');
+            const emailSvc = new EmailService();
+            let orderSummary = '';
+            try { const order = orderId ? await orderService.getOrderById(orderId) : null; if (order) {
+              const lines = (order.items||[]).map(i=>`${i.quantity}x ${i.productName} — $${Number(i.subtotal||0).toFixed(2)}`).join('<br/>');
+              orderSummary = `<p><strong>Order #${order.id}</strong></p><p>${lines}</p><p>Total: $${Number(order.total||0).toFixed(2)}</p>`;
+            }} catch {}
+            await emailSvc.queue({ to: pi?.receipt_email || pi?.metadata?.email || '', subject: 'Order confirmed', html: orderSummary || '<p>Thank you for your purchase.</p>' });
+          } catch (e) { console.warn('Email queue failed:', e.message); }
+        } catch (e) {
+          console.warn('payment_intent.succeeded handling failed:', e.message);
         }
-        if (couponCode) {
-          try { await couponService.consume(String(couponCode)); } catch (e) { console.warn('Coupon consume failed:', e.message); }
-        }
-      } catch (e) {
-        console.warn('Order status update on webhook failed:', e.message);
+        break;
       }
+      case 'payment_intent.payment_failed': {
+        try {
+          const pi = event.data.object;
+          const orderId = pi?.metadata?.order_id;
+          if (orderId) {
+            await orderService.updateOrderStatus(orderId, 'cancelled');
+            await orderService.updatePaymentInfo(orderId, { intentId: pi.id, failureCode: pi.last_payment_error?.code, failureMessage: pi.last_payment_error?.message });
+          }
+        } catch (e) { console.warn('payment_failed handling failed:', e.message); }
+        break;
+      }
+      case 'charge.refunded':
+      case 'refund.created': {
+        try {
+          const obj = event.data.object;
+          const charge = event.type === 'charge.refunded' ? obj : obj.charge;
+          // We don’t always have order_id here; if you set it in PI metadata, you can look it up via the PaymentIntent on the charge
+          if (charge && stripe) {
+            try {
+              const ch = typeof charge === 'string' ? await stripe.charges.retrieve(charge) : charge;
+              const intentId = ch.payment_intent;
+              if (intentId) {
+                const pi = await stripe.paymentIntents.retrieve(intentId);
+                const orderId = pi?.metadata?.order_id;
+                if (orderId) {
+                  await orderService.patchOrder(orderId, { status: 'cancelled', refundedAt: new Date().toISOString() });
+                  await orderService.updatePaymentInfo(orderId, { refunded: true, refundId: event.type === 'refund.created' ? obj.id : undefined });
+                }
+              }
+            } catch (e) { console.warn('Refund reconciliation failed:', e.message); }
+          }
+        } catch (e) { console.warn('refund handling failed:', e.message); }
+        break;
+      }
+      case 'charge.dispute.created': {
+        try {
+          const charge = event.data.object.charge;
+          if (charge && stripe) {
+            try {
+              const ch = typeof charge === 'string' ? await stripe.charges.retrieve(charge) : charge;
+              const pi = ch.payment_intent ? await stripe.paymentIntents.retrieve(ch.payment_intent) : null;
+              const orderId = pi?.metadata?.order_id;
+              if (orderId) {
+                await orderService.patchOrder(orderId, { dispute: { id: event.data.object.id, status: event.data.object.status, created: new Date().toISOString() } });
+              }
+            } catch (e) { console.warn('Dispute reconciliation failed:', e.message); }
+          }
+        } catch (e) { console.warn('dispute handling failed:', e.message); }
+        break;
+      }
+      case 'payout.paid':
+      case 'payout.failed': {
+        try {
+          const PayoutService = require('./services/PayoutService');
+          const svc = new PayoutService();
+          await svc.recordPayout(event.data.object);
+        } catch (e) { console.warn('Payout record failed:', e.message); }
+        break;
+      }
+      default: break;
     }
     res.json({ received: true });
   } catch (e) {
@@ -274,26 +367,80 @@ app.use((err, req, res, next) => {
 
 // Dynamic pricing sourced from products DB (cached briefly in-memory)
 let priceCache = { ts: 0, map: new Map() };
+async function loadFallbackPriceMap() {
+  try {
+    const file = path.join(__dirname, '..', 'assets', 'prodList.json');
+    const raw = await fs.readFile(file, 'utf8');
+    const json = JSON.parse(raw);
+    const out = new Map();
+    if (json && json.categories && typeof json.categories === 'object') {
+      for (const arr of Object.values(json.categories)) {
+        if (!Array.isArray(arr)) continue;
+        arr.forEach(p => {
+          const id = String(p.sku || p.id || p.name || '').trim();
+          if (!id) return;
+          const price = Number(p.map ?? p.price ?? p.wholesale ?? 0) || 0;
+          const cents = Math.round(price * 100);
+          // dsr may exist on some records; if absent, 0 (fallback logic will apply flat shipping)
+          const dsr = Number(p.dsr || (p.details && p.details.dsr) || 0) || 0;
+          out.set(id, { cents, dsr });
+        });
+      }
+    }
+    return out;
+  } catch {
+    return new Map();
+  }
+}
 async function loadPriceMap() {
   const now = Date.now();
   if (now - priceCache.ts < 60_000 && priceCache.map.size) return priceCache.map;
   const all = await productService.getAllProducts(false);
   const map = new Map();
-  all.forEach(p => { if (p.isActive !== false && typeof p.price === 'number') map.set(p.id, Math.round(p.price * 100)); });
+  all.forEach(p => {
+    if (p.isActive === false) return;
+    const cents = (typeof p.price === 'number' && isFinite(p.price)) ? Math.round(p.price * 100) : 0;
+    map.set(p.id, { cents, dsr: Number(p.dsr || 0) || 0 });
+  });
+  // Merge fallback prodList prices for SKUs not present in DB
+  try {
+    const fb = await loadFallbackPriceMap();
+    if (fb && fb.size) {
+      for (const [id, rec] of fb.entries()) {
+        if (!map.has(id)) map.set(id, rec);
+      }
+    }
+  } catch {}
   priceCache = { ts: now, map };
   return map;
 }
 async function calcSubtotalCents(items = []) {
   const priceMap = await loadPriceMap();
   return items.reduce((sum, it) => {
-    const cents = priceMap.get(it.id);
+    const rec = priceMap.get(it.id);
+    const cents = rec?.cents;
     if (!cents) return sum;
     const qty = Math.max(1, Number(it.qty) || 1);
     return sum + cents * qty;
   }, 0);
 }
 
-function calcShippingCents(subtotalCents, method = 'standard'){
+async function calcShippingCents(items = [], subtotalCents, method = 'standard'){
+  // If we have per-item dsr values in the product catalog, prefer summing those
+  try {
+    const priceMap = await loadPriceMap();
+    let dsrTotal = 0;
+    for (const it of items) {
+      const rec = priceMap.get(it.id);
+      const dsr = Number(rec?.dsr || 0);
+      if (dsr > 0) {
+        const qty = Math.max(1, Number(it.qty) || 1);
+        dsrTotal += Math.round(dsr * 100) * qty;
+      }
+    }
+    if (dsrTotal > 0) return dsrTotal;
+  } catch {}
+  // Fallback: flat shipping
   if (subtotalCents >= 7500) return 0; // free over $75
   if (method === 'express') return 2500;
   return 1000; // standard
@@ -306,18 +453,21 @@ app.post('/api/create-payment-intent', async (req, res) => {
     if (!stripe) {
       return res.status(503).json({ error: 'Stripe is not configured on the server.' });
     }
-    const subtotal = await calcSubtotalCents(items);
-    const shippingCents = calcShippingCents(subtotal, shippingMethod);
-    let amount = subtotal + shippingCents; // taxes omitted in demo
+  const subtotal = await calcSubtotalCents(items);
+  const shippingCents = await calcShippingCents(items, subtotal, shippingMethod);
+  let amount = subtotal + shippingCents; // taxes omitted in demo
 
     // Optional: apply coupon
     let appliedCoupon = null;
+    let discountCents = 0;
     if (couponCode) {
       try {
         const v = await couponService.validate(couponCode, customer.email || '');
         if (v.valid) {
           appliedCoupon = v.coupon;
+          const before = amount;
           amount = couponService.applyDiscount(amount, appliedCoupon);
+          discountCents = Math.max(0, before - amount);
         }
       } catch (e) {
         // ignore invalid coupon; frontend can call validate endpoint for messaging
@@ -373,7 +523,18 @@ app.post('/api/create-payment-intent', async (req, res) => {
       }
     });
     // Return client secret and linked order id so the frontend can keep them in sync
-    res.json({ clientSecret: paymentIntent.client_secret, amount, orderId: newOrder?.id || null, couponApplied: appliedCoupon ? { code: appliedCoupon.code, type: appliedCoupon.type, value: appliedCoupon.value } : null });
+    res.json({
+      clientSecret: paymentIntent.client_secret,
+      amount,
+      orderId: newOrder?.id || null,
+      couponApplied: appliedCoupon ? { code: appliedCoupon.code, type: appliedCoupon.type, value: appliedCoupon.value } : null,
+      breakdown: {
+        subtotal: subtotal,
+        shipping: shippingCents,
+        discount: discountCents,
+        total: amount
+      }
+    });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: err.message });
@@ -388,6 +549,11 @@ app.get('/health', (req, res) => {
 // Create order endpoint (save order details)
 app.post('/api/order', async (req, res) => {
   try{
+    // Block in production unless explicitly allowed (test checkout path)
+    const allowTest = String(process.env.ALLOW_TEST_CHECKOUT || '').toLowerCase() === 'true';
+    if (process.env.NODE_ENV === 'production' && !allowTest) {
+      return res.status(403).json({ error: 'Disabled in production' });
+    }
     const orderData = req.body;
     
     // Save to database using OrderService
@@ -403,7 +569,7 @@ app.post('/api/order', async (req, res) => {
       res.json({ status: 'ok', orderId: order.id });
     } else {
       // Fallback to file logging for incomplete orders
-      const order = { ...orderData, ts: new Date().toISOString() };
+      const order = { ...orderData, ts: new Date().toISOString(), test: true };
       await fs.appendFile('orders.ndjson', JSON.stringify(order) + "\n");
       res.json({ status: 'ok' });
     }

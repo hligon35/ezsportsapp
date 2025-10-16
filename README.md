@@ -35,23 +35,24 @@ Raw product specs live under `assets/info/prodInfo/<Category>/*.json`. Each file
 
 ```json
 {
-	"id": "...",
-	"name": "...",
-	"description": "...",
-	"category": "bats",
-	"price": 349.99,
-	"currency": "usd",
-	"image": "https://.../primary.jpg",
-	"features": ["..."],
-	"meta": { "sourceUrl": "https://..." },
-	"isActive": true,
-	"featured": false,
-	"stock": 12,
-	"stripe": { "productId": "prod_XXX", "defaultPriceId": "price_YYY", "currency": "usd" },
-	"createdAt": "2025-09-01T00:00:00.000Z",
-	"updatedAt": "2025-09-01T00:00:00.000Z"
+  "id": "...",
+  "name": "...",
+  "description": "...",
+  "category": "bats",
+  "price": 349.99,
+  "currency": "usd",
+  "image": "https://.../primary.jpg",
+  "features": ["..."],
+  "meta": { "sourceUrl": "https://..." },
+  "isActive": true,
+  "featured": false,
+  "stock": 12,
+  "stripe": { "productId": "prod_XXX", "defaultPriceId": "price_YYY", "currency": "usd" },
+  "createdAt": "2025-09-01T00:00:00.000Z",
+  "updatedAt": "2025-09-01T00:00:00.000Z"
 }
 ```
+ 
 Missing or removed source files cause previously imported products to be soft‑retired (`isActive:false`).
 
 ### Run Sync
@@ -72,19 +73,23 @@ npm run products:sync
 Auto sync on server start: set `AUTOSYNC_PRODUCTS=1` (and `AUTOSYNC_STRIPE=1` if you want Stripe product/price creation each boot).
 
 ### Category Normalization
+ 
 Folder names are slugified; frontend then maps heuristically to UI filter chips: `bats`, `gloves`, `netting`, `helmets`. Adjust mapping in `fetchProducts()` if you add new verticals.
 
 ### Zero‑Price Handling
+ 
 Products with `price <= 0` are filtered out client-side (assumed incomplete). Update their JSON source with a numeric price and re‑sync to surface them.
 
 ## Run Locally
 
 Backend server (serves API + static files):
+
 ```bash
 npm install
 npm run dev        # starts Express on default port 4242
 ```
-Visit: http://localhost:4242/
+
+Visit: <http://localhost:4242/>
 
 (You can still open HTML directly for a purely static preview, but dynamic products & checkout require the server.)
 
@@ -96,10 +101,11 @@ Visit: http://localhost:4242/
 Environment variables (configure in Render dashboard or a local `.env` for dev):
 
 - STRIPE_PUBLISHABLE_KEY: your Stripe test publishable key (starts with `pk_test_...`).
-- STRIPE_SECRET_KEY: your Stripe test secret key (starts with `sk_test_...`).
+- STRIPE_SECRET_KEY: your Stripe test secret key (store in .env; do not commit; format similar to `sk_test_...`).
 - STRIPE_WEBHOOK_SECRET: the signing secret from the Stripe CLI or Dashboard for your webhook endpoint.
 
 Endpoints:
+
 - `GET /api/config` → `{ pk, enabled }`
 - `POST /api/create-payment-intent` → `{ clientSecret, amount }` (amount computed from current product DB; includes shipping logic)
 - `POST /webhook/stripe` (raw body) for `payment_intent.succeeded` (placeholder logic)
@@ -115,41 +121,51 @@ This project includes a simple marketing system backed by the JSON DB:
 - Coupons/Promo codes: Admins can create/list/deactivate codes and optionally restrict them to specific emails. Checkout validates/applies codes and Stripe metadata records the code; successful payment consumes the coupon.
 
 Admin UI
+
 - Open `admin.html` → Marketing tab
-	- Send Newsletter: Enter Subject + HTML/Text content and click “Queue Newsletter” (emails go to outbox in `server/database/emails.json`).
-	- Create Coupon: Choose Type (percent/fixed), Value, optional expiration & max uses, optional restricted emails (comma separated), then Create.
-	- Coupons: Lists all, with a Deactivate action.
-	- Subscribers: Lists active subscribers.
+  - Send Newsletter: Enter Subject + HTML/Text content and click “Queue Newsletter” (emails go to outbox in `server/database/emails.json`).
+  - Create Coupon: Choose Type (percent/fixed), Value, optional expiration & max uses, optional restricted emails (comma separated), then Create.
+  - Coupons: Lists all, with a Deactivate action.
+  - Subscribers: Lists active subscribers.
 
 API Endpoints
+
 - Public
-	- `POST /api/marketing/subscribe` → `{ email, name? }` → adds/updates subscriber
-	- `POST /api/marketing/unsubscribe` → `{ email }` → marks subscriber inactive
-	- `POST /api/marketing/validate-coupon` → `{ code, email? }` → `{ valid, reason?, coupon? }`
+  - `POST /api/marketing/subscribe` → `{ email, name? }` → adds/updates subscriber
+  - `POST /api/marketing/unsubscribe` → `{ email }` → marks subscriber inactive
+  - `POST /api/marketing/validate-coupon` → `{ code, email? }` → `{ valid, reason?, coupon? }`
 - Admin (require admin auth)
-	- `GET /api/marketing/admin/subscribers?activeOnly=true`
-	- `GET /api/marketing/admin/coupons`
-	- `POST /api/marketing/admin/coupons` → `{ code, type: 'percent'|'fixed', value, expiresAt?, maxUses?, userEmails?[] }`
-	- `POST /api/marketing/admin/coupons/:code/deactivate`
-	- `POST /api/marketing/admin/newsletter` → `{ subject, html, text? }` queues emails for all active subscribers
+  - `GET /api/marketing/admin/subscribers?activeOnly=true`
+  - `GET /api/marketing/admin/coupons`
+  - `POST /api/marketing/admin/coupons` → `{ code, type: 'percent'|'fixed', value, expiresAt?, maxUses?, userEmails?[] }`
+  - `POST /api/marketing/admin/coupons/:code/deactivate`
+  - `POST /api/marketing/admin/newsletter` → `{ subject, html, text? }` queues emails for all active subscribers
 
 Checkout + Coupons
+
 - Checkout page has a Promo Code input. Clicking Apply validates via `/api/marketing/validate-coupon`.
 - The server’s `POST /api/create-payment-intent` accepts `couponCode` and applies discount server-side to the PaymentIntent `amount`; it also sets metadata `coupon_code`.
 - Stripe webhook (`/webhook/stripe`) consumes the coupon on `payment_intent.succeeded`.
 
 Quick test
+
 1) Add a product to the cart and go to Checkout.
 2) Admin → Marketing → Create Coupon (e.g., code `SAVE10`, type `percent`, value `10`).
 3) Back in Checkout, enter `SAVE10` and Apply. You should see a Discount row and reduced Total.
 4) With Stripe keys configured, complete a test payment; the coupon will be marked as used on success (webhook).
 
 ## Analytics Events
+
 Client emits (console by default via `window.trackEvent`):
+ 
 - `view_item_list`, `view_item`, `add_to_cart`, `view_cart`, `begin_checkout`, `purchase`
 Extend by wiring `trackEvent` to POST `/api/analytics/event` (already scaffolded). Server has placeholder services for future persistence.
 
 ## Checkout Flow (Simplified)
+
+ 
+ 
+ 
 1. User adds items → cart persisted in localStorage.
 2. On checkout page you POST items to `/api/create-payment-intent`.
 3. Stripe Elements (future) confirms the PaymentIntent.
@@ -157,19 +173,24 @@ Extend by wiring `trackEvent` to POST `/api/analytics/event` (already scaffolded
 
 ## Admin Products + Storefront Coordination
 
-- Admin Panel (`admin.html`)
-	- Products are managed via `/api/products` (requires admin login). The UI falls back to localStorage if the API is offline, so you can still draft items.
-	- On load, the admin fetches the live list and saves a lightweight copy in `localStorage.adminProducts` for storefront fallback.
-	- Add/Update/Delete first try the API, then gracefully fall back to local storage if the network fails.
+Admin Panel (`admin.html`)
 
-- Storefront behavior (`assets/js/app.js`)
-	- Catalog fetch tries `/api/products` first.
-	- If the API is empty/unavailable, it falls back to `localStorage.shopProducts` or `localStorage.adminProducts` so products still render.
-	- Category pages that use `assets/prodList.json` continue to render curated items, then append any admin‑managed products that match the page category.
+- Products are managed via `/api/products` (requires admin login). The UI falls back to localStorage if the API is offline, so you can still draft items.
+- On load, the admin fetches the live list and saves a lightweight copy in `localStorage.adminProducts` for storefront fallback.
+- Add/Update/Delete first try the API, then gracefully fall back to local storage if the network fails.
 
-- Stripe‑linked Orders
-	- On `/api/create-payment-intent`, the server creates a local order first and returns `orderId` alongside `clientSecret`.
-	- Stripe webhook marks that order as `paid` on `payment_intent.succeeded`, keeping sales data and analytics in sync automatically.
+ 
+Storefront behavior (`assets/js/app.js`)
+
+- Catalog fetch tries `/api/products` first.
+- If the API is empty/unavailable, it falls back to `localStorage.shopProducts` or `localStorage.adminProducts` so products still render.
+- Category pages that use `assets/prodList.json` continue to render curated items, then append any admin‑managed products that match the page category.
+
+ 
+Stripe‑linked Orders
+
+- On `/api/create-payment-intent`, the server creates a local order first and returns `orderId` alongside `clientSecret`.
+- Stripe webhook marks that order as `paid` on `payment_intent.succeeded`, keeping sales data and analytics in sync automatically.
 
 ### Quick Test (Dev)
 
@@ -177,14 +198,15 @@ Extend by wiring `trackEvent` to POST `/api/analytics/event` (already scaffolded
 2) Go to Admin → add a product (Bats or Netting). Confirm it appears in the list.
 3) Open the homepage and category pages; you should see products. Kill the server and refresh — admin products still render via local fallback.
 4) Checkout:
-	 - Without Stripe keys → test mode: order is still recorded via `/api/order` and confirmation page loads.
-	 - With Stripe keys and webhook secret set → complete a test card payment; webhook should mark the order `paid`.
+ Without Stripe keys → test mode: order is still recorded via `/api/order` and confirmation page loads.
+ With Stripe keys and webhook secret set → complete a test card payment; webhook should mark the order `paid`.
 
 ## Environment Variables Summary
+
 ```env
 PORT=4242
 STRIPE_PUBLISHABLE_KEY=pk_test_xxx
-STRIPE_SECRET_KEY=sk_test_xxx
+STRIPE_SECRET_KEY=<your-test-secret-key>
 STRIPE_WEBHOOK_SECRET=whsec_xxx   # optional
 AUTOSYNC_PRODUCTS=1               # optional auto product ingestion
 AUTOSYNC_STRIPE=1                 # also create/update Stripe products/prices
@@ -192,12 +214,14 @@ CORS_ORIGINS=http://localhost:4242,http://127.0.0.1:4242  # optional allowlist
 ```
 
 ## Quality / Edge Cases
+
 - Price cache TTL: 60s (server) – immediate heavy change requires waiting or code invalidation.
 - Zero priced items hidden client-side.
 - Missing image fallback: logo placeholder; consider adding better placeholders & width/height for CLS.
 - Sync soft‑retires removed products (kept for historical references / potential orders).
 
 ## Roadmap Ideas
+
 - Persist analytics events server-side & expose dashboard
 - Product detail page for richer SEO (Product JSON-LD)
 - Inventory management & low-stock alerts
@@ -205,8 +229,107 @@ CORS_ORIGINS=http://localhost:4242,http://127.0.0.1:4242  # optional allowlist
 - Tax calculation & shipping zones (currently flat/free threshold)
 
 ## Contributing
+
 Open a PR or file an issue. Keep changes minimal & focused; run the product sync script if you add or restructure product JSON sources.
 
 ## License
 
 MIT — use freely for your projects.
+
+## Production Runbook
+
+This section captures the exact steps to take this app to production on Render with Stripe webhooks and Cloudflare traffic metrics.
+
+### 1) Configure environment variables (Render dashboard)
+
+Required
+
+- NODE_ENV=production
+- TRUST_PROXY=1
+- STRIPE_PUBLISHABLE_KEY=pk_live_xxx
+- STRIPE_SECRET_KEY=\<your-live-secret-key\>
+- STRIPE_WEBHOOK_SECRET=whsec_xxx (from Stripe Dashboard webhook endpoint for your Render URL)
+- JWT_SECRET=long-random-secret
+- COOKIE_SECURE=true
+- COOKIE_SAMESITE=None
+- COOKIE_DOMAIN=.your-domain.com
+
+Recommended
+
+- CORS_ORIGINS=`https://your-domain.com`,`https://admin.your-domain.com`
+- CLOUDFLARE_API_TOKEN=… (Analytics Read for your zone)
+- CLOUDFLARE_ZONE_ID=…
+- AUTOSYNC_PRODUCTS=1 (optional) and AUTOSYNC_STRIPE=1 (optional)
+
+Tip: copy `server/.env.example` to `server/.env` for local dev and fill the values; Do NOT commit real secrets (`server/.env` is gitignored).
+
+### 2) Webhook setup options
+
+Pick one:
+
+- Production (recommended): In Stripe Dashboard → Developers → Webhooks, create an endpoint pointing to `https://<your-render-domain>/webhook/stripe`. Copy the Signing secret (whsec_…) into Render `STRIPE_WEBHOOK_SECRET`.
+- Local dev (Stripe CLI): Forward cloud events to your local server.
+
+PowerShell (Windows) — local dev flow
+
+
+```powershell
+# In one terminal: start the server
+npm --prefix server install
+npm --prefix server run dev
+
+# In another terminal: login (once)
+stripe login
+
+# Start listener and print signing secret (copy whsec_xxx)
+stripe listen --forward-to http://127.0.0.1:4242/webhook/stripe --print-secret
+
+```
+
+Paste the printed `whsec_…` into `server/.env` as `STRIPE_WEBHOOK_SECRET`, then restart the server.
+
+Troubleshooting (Windows)
+
+- If the fully-qualified path fails with exit code 1, try the `stripe` shim (as above) or run with a device label:
+
+```powershell
+stripe listen --forward-to http://127.0.0.1:4242/webhook/stripe --print-secret --device-name "Harold-PC"
+```
+
+- Use 127.0.0.1 instead of localhost to avoid IPv6 binding quirks.
+- Add debug logging to see why it exits:
+
+```powershell
+stripe listen --forward-to http://127.0.0.1:4242/webhook/stripe --print-secret --log-level debug
+```
+
+- Firewalls/antivirus can block the local port the CLI uses internally; temporarily allowlist Stripe CLI.
+- As a production alternative, skip CLI entirely and use the Dashboard endpoint (recommended in prod).
+
+### 3) Smoke tests
+
+With the server running and keys configured:
+
+1. Add an item to cart and open `checkout.html`.
+2. Create PaymentIntent by filling the form (it happens automatically on change). Totals should match the server’s breakdown.
+3. Pay with a test card (4242 4242 4242 4242) and valid future expiry.
+4. On success:
+
+- Order is created locally and marked `paid` via webhook (`/webhook/stripe`).
+- Admin → Finance shows recent totals; Orders show Stripe `fees` / `net` when retrievable.
+
+Optional webhook triggers (dev):
+
+```powershell
+stripe trigger payment_intent.succeeded
+stripe trigger charge.refunded
+stripe trigger charge.dispute.created
+stripe trigger payout.paid
+```
+
+### 4) Operational notes
+
+- Webhook robustness: the server verifies signatures when `STRIPE_WEBHOOK_SECRET` is set and handles idempotent updates.
+- Shipping calculation: sums per-line DSR when available from catalog; flat/free fallback otherwise.
+- Security: helmet headers, rate-limiters on sensitive routes, CORS allowlist, `trust proxy` enabled for proper IP/cookies behind Render.
+- Backups: JSON DB can be backed up with `npm --prefix server run db:backup`.

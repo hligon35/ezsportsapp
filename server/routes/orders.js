@@ -149,3 +149,25 @@ router.get('/admin/recent', requireAdmin, async (req, res) => {
 });
 
 module.exports = router;
+// Public minimal summary endpoint (no PII). Safe to expose on confirmation page.
+router.get('/summary/:id', async (req, res) => {
+  try {
+    const order = await orderService.getOrderById(req.params.id);
+    if (!order) return res.status(404).json({ message: 'Order not found' });
+    const items = Array.isArray(order.items) ? order.items.map(i => ({
+      id: i.productId || i.id,
+      productName: i.productName,
+      quantity: i.quantity,
+      subtotal: i.subtotal
+    })) : [];
+    const out = {
+      id: order.id,
+      status: order.status,
+      total: order.total,
+      items
+    };
+    res.json(out);
+  } catch (e) {
+    res.status(500).json({ message: e.message });
+  }
+});

@@ -202,6 +202,7 @@ function renderOrders() {
             <strong>Order #${order.id}</strong> — <small>${order.status||'pending'}</small>
             <br><small>${new Date(order.createdAt||order.date).toLocaleString()}</small>
             <br>Items: ${order.items.map(i => `${(i.quantity||i.qty)}x ${i.productId||i.id}`).join(', ')}
+            ${order.paymentInfo && (order.paymentInfo.fees!=null || order.paymentInfo.net!=null) ? `<br><small>Fees: $${Number(order.paymentInfo.fees||0).toFixed(2)} • Net: $${Number(order.paymentInfo.net||0).toFixed(2)}</small>` : ''}
           </div>
           <div class="flex-row gap-05 items-center">
             <strong>$${(order.total||0).toFixed(2)}</strong>
@@ -445,6 +446,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const finRefresh = document.getElementById('finance-refresh-btn');
   if (finTf) finTf.addEventListener('change', renderFinance);
   if (finRefresh) finRefresh.addEventListener('click', renderFinance);
+  const finPayoutsLocalRefresh = document.getElementById('fin-payouts-local-refresh');
+  if (finPayoutsLocalRefresh) finPayoutsLocalRefresh.addEventListener('click', renderFinance);
   // Traffic
   const trTf = document.getElementById('traffic-timeframe');
   const trRefresh = document.getElementById('traffic-refresh-btn');
@@ -770,6 +773,22 @@ async function renderFinance(){
     const n = document.getElementById('fin-net'); if (n) n.textContent = '—';
     const bal = document.getElementById('fin-balance'); if (bal) bal.textContent = 'Unavailable';
     const payouts = document.getElementById('fin-payouts'); if (payouts) payouts.innerHTML = '<p class="muted">Unavailable</p>';
+  }
+  // Load local payout history
+  try {
+    const base = window.__API_BASE || API_BASES[0] || '';
+    const res = await fetch(`${base}/api/admin/stripe/payouts-local`, { credentials:'include', headers: authHeaders() });
+    const wrap = document.getElementById('fin-payouts-local');
+    if (wrap) {
+      if (!res.ok) { wrap.innerHTML = '<p class="muted">No local payouts.</p>'; }
+      else {
+        const data = await res.json();
+        const list = (data.items||[]).map(p=>`<div class="product-item"><div><strong>${p.id}</strong><br><small>${new Date(p.createdAt).toLocaleString()}</small>${p.arrivalDate?`<br><small>Arrived: ${new Date(p.arrivalDate).toLocaleDateString()}</small>`:''}</div><div><strong>$${Number(p.amount||0).toFixed(2)}</strong> <small>${p.status||''}</small></div></div>`).join('');
+        wrap.innerHTML = list || '<p class="muted">No local payouts.</p>';
+      }
+    }
+  } catch (e) {
+    const wrap = document.getElementById('fin-payouts-local'); if (wrap) wrap.innerHTML = '<p class="muted">Unavailable</p>';
   }
   // Also attempt to list invoices
   try {
