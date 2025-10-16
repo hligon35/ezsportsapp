@@ -21,30 +21,18 @@ async function initializeDatabase() {
     console.log(`Found ${existingProducts.length} products and ${existingUsers.length} users`);
     
     // Create admin user if it doesn't exist
-  const adminExists = existingUsers.find(u => u.email === 'admin@ezsports.com' || u.username === 'admin');
-    if (!adminExists) {
-      console.log('Creating admin user...');
-      await userService.register({
-    email: 'admin@ezsports.com',
-    username: 'admin',
-        password: 'admin123',
-        name: 'Admin User'
-      });
-      console.log('Admin user created: admin@ezsports.com / admin123');
-    } else {
-      console.log('Admin user already exists');
-    }
+    // Primary admin is the owner account (email-based)
     
   // Demo user no longer seeded
 
     // Create owner admin user if it doesn't exist
-    const ownerExists = existingUsers.find(u => u.email === 'amercedes@ezsportsnetting.com' || u.username === 'amercedes');
+  const ownerExists = existingUsers.find(u => (u.email||'').toLowerCase() === 'amercedes@ezsportsnetting.com' || (u.username||'').toLowerCase() === 'amercedes');
     if (!ownerExists) {
       console.log('Creating owner admin user...');
       await userService.register({
         email: 'amercedes@ezsportsnetting.com',
         username: 'amercedes',
-        password: '#EZSports2025',
+        password: '#EZSports25',
         name: 'EZ Sports Owner',
         isAdmin: true
       });
@@ -54,11 +42,11 @@ async function initializeDatabase() {
     }
 
     // Create requested test customer if it doesn't exist (username-based login)
-    const customerExists = existingUsers.find(u => u.username === 'customer' || u.email === 'customer@ezsports.com');
+  const customerExists = existingUsers.find(u => (u.username||'').toLowerCase() === 'customer' || (u.email||'').toLowerCase() === 'customer@ezsportsnetting.com');
     if (!customerExists) {
       console.log('Creating test customer user...');
       await userService.register({
-        email: 'customer@ezsports.com',
+        email: 'customer@ezsportsnetting.com',
         username: 'customer',
         password: 'custom123',
         name: 'Test Customer'
@@ -70,8 +58,7 @@ async function initializeDatabase() {
     
     console.log('Database initialization complete!');
     console.log('\nLogin credentials:');
-  console.log('Admin (username login): admin / admin123');
-  console.log('Admin (email login): admin@ezsports.com / admin123');
+  // Admin user (username) no longer seeded by default
   console.log('Owner (email login): amercedes@ezsportsnetting.com / #EZSports2025');
   console.log('Customer (username login): customer / custom123');
     

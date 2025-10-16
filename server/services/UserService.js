@@ -41,8 +41,7 @@ class UserService {
         isAdmin: Boolean(
           userData.isAdmin === true ||
           userData.role === 'admin' ||
-          userData.email === 'admin@ezsports.com' ||
-          userData.email === 'amercedes@ezsportsnetting.com'
+          (userData.email && userData.email.toLowerCase() === 'amercedes@ezsportsnetting.com')
         ),
         lastLogin: null
       };
@@ -90,8 +89,7 @@ class UserService {
   const computedName = user.name || [user.firstName, user.lastName].filter(Boolean).join(' ').trim() || 'User';
   const computedIsAdmin = Boolean(
     user.isAdmin || user.role === 'admin' ||
-    user.email === 'admin@ezsports.com' ||
-    user.email === 'amercedes@ezsportsnetting.com'
+    ((user.email||'').toLowerCase() === 'amercedes@ezsportsnetting.com')
   );
   return { ...userWithoutPassword, name: computedName, isAdmin: computedIsAdmin };
     } catch (error) {

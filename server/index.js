@@ -242,6 +242,16 @@ app.use('/api/orders', orderRoutes);
 app.use('/api/inventory', inventoryRoutes);
 app.use('/api/invoices', invoiceRoutes);
 app.use('/api/analytics', analyticsRoutes);
+// Accept text/plain payloads (JSON string) for marketing endpoints to support legacy/form fallbacks
+app.use('/api/marketing', express.text({ type: ['text/plain', 'text/*'], limit: '100kb' }), (req, _res, next) => {
+  if (typeof req.body === 'string') {
+    const s = req.body.trim();
+    if (s.startsWith('{') && s.endsWith('}')) {
+      try { req.body = JSON.parse(s); } catch { /* leave as string */ }
+    }
+  }
+  next();
+});
 app.use('/api/marketing', marketingRoutes);
 app.use('/api/admin', adminRoutes);
 

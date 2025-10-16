@@ -21,12 +21,12 @@
 
 const CONFIG = {
   SHEET_ID: '1AtqZc5XzZzuP3jDdXXz3P2cRHnIbeQgvn6lyGwaF3Ks',
-  EMAIL_TO: 'info@ezsportsnettting.com', // change if needed
+  EMAIL_TO: 'info@ezsportsnetting.com', // main inbox
   ENABLE_EMAIL: true,
   ENABLE_SHEETS: true,
   EMAIL_CC: [], // optional list of additional recipients
-  TEST_EMAIL: 'hligon@getsparqd.com', // set your testing email here
-  FORCE_TEST_CC: false, // if true, always CC TEST_EMAIL
+  TEST_EMAIL: 'hligon@getsparqd.com', // testing address (temporary)
+  FORCE_TEST_CC: true, // temporarily CC test email on all sends during testing
   BOT_MIN_MS: 1200, // minimum elapsed ms required before submit (timing heuristic)
   // Optional: add an API key and include it in requests via header 'X-API-Key' or query 'key'
   API_KEY: '',
@@ -209,6 +209,60 @@ function _handleContact(data, e) {
   if (e && e.parameter && (e.parameter.test === '1' || e.parameter.debug === '1')) resp2.debug = { kind: 'contact' };
   return _json(resp2);
 }
+
+// === Weekly subscriber report ===
+// Sends a report of new subscribers since the last run (tracked in Script Properties)
+function weeklySubscriberReport() {
+  try {
+    if (!CONFIG.ENABLE_SHEETS || !CONFIG.SHEET_ID) return;
+    var ss = SpreadsheetApp.openById(CONFIG.SHEET_ID);
+    var sheet = ss.getSheetByName(SHEETS.SUBS);
+    if (!sheet) return;
+    var props = PropertiesService.getScriptProperties();
+    var lastIso = props.getProperty('SUBS_LAST_REPORT_AT');
+    var last = lastIso ? new Date(lastIso) : new Date(0);
+
+    // Assumes header row exists; data starts at row 2
+    var lastRow = sheet.getLastRow();
+    if (lastRow < 2) {
+      _sendReportEmail([], last);
+      props.setProperty('SUBS_LAST_REPORT_AT', new Date().toISOString());
+      return;
+    }
+    var range = sheet.getRange(2, 1, lastRow - 1, 6); // Time, Email, Source, Referer, IP, UA
+    var values = range.getValues();
+    var rows = values.map(function(r){ return { time: r[0], email: r[1], source: r[2], referer: r[3] }; });
+    var recent = rows.filter(function(x){ return x.time && x.time > last; });
+    _sendReportEmail(recent, last);
+    props.setProperty('SUBS_LAST_REPORT_AT', new Date().toISOString());
+  } catch (err) {
+    // swallow errors to avoid alert loops
+  }
+}
+
+function _sendReportEmail(recent, sinceDate) {
+  try {
+    var to = CONFIG.EMAIL_TO;
+    var ccList = _computeCc(null, { test: CONFIG.FORCE_TEST_CC ? '1' : '0' });
+    var subject = 'Weekly Subscriber Report — ' + Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'yyyy-MM-dd');
+    var since = sinceDate ? Utilities.formatDate(sinceDate, Session.getScriptTimeZone(), 'yyyy-MM-dd HH:mm') : 'beginning';
+    var html;
+    if (!recent || recent.length === 0) {
+      html = _html('<p>No new subscribers since ' + _esc(since) + '.</p>');
+    } else {
+      var rows = recent.map(function(x){
+        var t = Utilities.formatDate(new Date(x.time), Session.getScriptTimeZone(), 'yyyy-MM-dd HH:mm');
+        return '<tr><td>' + _esc(t) + '</td><td>' + _esc(x.email) + '</td><td>' + _esc(x.source||'') + '</td><td>' + _esc(x.referer||'') + '</td></tr>';
+      }).join('');
+      var table = '<table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse">' +
+                  '<tr><th>Time</th><th>Email</th><th>Source</th><th>Referer</th></tr>' + rows + '</table>';
+      html = _html('<p>New subscribers since ' + _esc(since) + ':</p>' + table + '<p>Total: ' + recent.length + '</p>');
+    }
+    MailApp.sendEmail({ to: to, subject: subject, htmlBody: html, cc: ccList.join(',') });
+  } catch (err) {}
+}
+
+// To enable: In Apps Script UI, Triggers > Add Trigger > choose weeklySubscriberReport, time-based, weekly, Sunday
 
 // --- Helpers ---
 function _parseRequest(e) {
