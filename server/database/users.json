@@ -1,7 +1,7 @@
 [
   {
     "id": "user_mpd5k67y9",
-    "email": "admin@ezsports.com",
+  "email": "admin@ezsportsnetting.com",
     "username": "admin",
     "password": "$2b$10$oTfY/cJ4d20i0USVn9jpKe8QUZdRb5MKwLJTxhs0CDmjuOqIDcGu2",
     "firstName": "Admin",
@@ -13,7 +13,7 @@
   },
   {
     "username": "customer",
-    "email": "customer@ezsports.com",
+  "email": "customer@ezsportsnetting.com",
     "password": "$2b$10$1rUKDbLUuF.QVWV5HnahLeA3VPvJgwPf2TU1OtPoEKfjqiq5eRwCa",
     "name": "Test Customer",
     "isAdmin": false,

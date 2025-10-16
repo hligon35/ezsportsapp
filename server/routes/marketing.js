@@ -12,11 +12,74 @@ const mail = new EmailService();
 // Public subscribe endpoint
 router.post('/subscribe', async (req, res) => {
   try {
-    const { email, name } = req.body || {};
+    const { email, name, source, referer } = req.body || {};
     const s = await subs.addOrUpdate(email, name);
+
+    // Optionally forward to Google Apps Script to log to Google Sheet
+    try {
+      const url = (process.env.MARKETING_APPS_SCRIPT_URL || '').trim();
+      if (url) {
+        const payload = { type: 'subscribe', email, name, source: source || '', referer: referer || '' };
+        const body = JSON.stringify(payload);
+        // Use global fetch if available (Node 18+); ignore errors
+        const doFetch = (typeof fetch === 'function')
+          ? fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body })
+          : Promise.resolve(null);
+        await Promise.race([
+          doFetch.catch(()=>null),
+          new Promise(r=>setTimeout(()=>r(null), 1500)) // don't block response
+        ]);
+      }
+    } catch {/* ignore forwarding errors */}
+
     res.json({ ok:true, subscriber: s });
   } catch (e) {
     res.status(400).json({ message: e.message });
+  }
+});
+
+// Public: contact form intake -> queues an email to the internal inbox
+router.post('/contact', async (req, res) => {
+  try {
+    const body = req.body || {};
+    const name = (body.name || '').toString().trim() || 'Website Visitor';
+    const email = (body.email || '').toString().trim();
+    const phone = (body.phone || '').toString().trim();
+    const message = (body.message || '').toString().trim();
+    const subject = (body.subject || '').toString().trim() || 'New Contact Form Submission';
+    const turnstile = body['cf-turnstile-response'] || body.cfTurnstileToken || '';
+    const honeypot = body.hp || body._honeypot || '';
+
+    // Basic anti-spam: honeypot should be empty
+    if (honeypot) return res.json({ ok: true, queued: false, spam: true });
+
+    if (!email || !message) return res.status(400).json({ ok: false, error: 'Missing email or message' });
+
+    const html = `
+      <h2>Contact Form Submission</h2>
+      <p><strong>Name:</strong> ${name}</p>
+      <p><strong>Email:</strong> ${email}</p>
+      ${phone ? `<p><strong>Phone:</strong> ${phone}</p>` : ''}
+      <p><strong>Subject:</strong> ${subject}</p>
+      <p><strong>Message:</strong></p>
+      <pre style="white-space:pre-wrap">${message}</pre>
+    `;
+
+    const inbox = (process.env.CONTACT_INBOX || '').trim();
+    if (!inbox) {
+      return res.status(503).json({ ok: false, error: 'CONTACT_INBOX is not configured on the server' });
+    }
+    await mail.queue({
+      to: inbox,
+      subject: `[Contact] ${subject}`,
+      html,
+      text: `From: ${name} <${email}>\n${phone ? `Phone: ${phone}\n` : ''}\nSubject: ${subject}\n\n${message}`,
+      tags: ['contact']
+    });
+
+    res.json({ ok: true, queued: true });
+  } catch (e) {
+    res.status(500).json({ ok: false, error: e.message });
   }
 });
 

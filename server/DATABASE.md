@@ -30,7 +30,7 @@ server/
 - **Secure Authentication**: bcrypt password hashing
 - **Role-based Access**: Admin and customer roles
 - **Profile Management**: Update profiles, change passwords
-- **Auto-admin**: admin@ezsports.com automatically gets admin privileges
+- **Auto-admin**: amercedes@ezsportsnetting.com automatically gets admin privileges
 
 ### 📦 Product Management
 - **Full CRUD Operations**: Create, read, update, delete products

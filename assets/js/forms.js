@@ -1,7 +1,7 @@
 // Minimal isolated forms wiring (subscribe + contact)
 // Safe to load while main app.js is in repair. Preserves existing endpoint & Turnstile usage.
 (function(){
-  const FORM_ENDPOINT = 'https://script.google.com/macros/s/AKfycbxwazi-lSQ1DSbMJo9o47meEqoPGEHLHWSewgYpr7Fe0Tzu8vMdrt42gxB_z692i3B7/exec';
+  const FORM_ENDPOINT = 'https://script.google.com/macros/s/AKfycbw1npuTQiIpGQqlB6LPh4AoihC9bVW8XngIq270ZYaQfZ7msW1zz5cOjmWwATkrqtmr/exec';
   // Decide endpoint strategy:
   // 1. If running on production domain, use relative /api proxies (hide upstream URL & enable easier header control).
   // 2. If running on localhost AND the user created the marketing proxy functions, also use /api.

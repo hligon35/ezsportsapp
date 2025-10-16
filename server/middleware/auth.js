@@ -36,11 +36,11 @@ function requireAdmin(req, res, next) {
       // Fast-path: token says admin
       if (req.user?.isAdmin) return next();
       // Fallback: known admin email
-      if ((req.user?.email || '').toLowerCase() === 'admin@ezsports.com') return next();
+  if ((req.user?.email || '').toLowerCase() === 'amercedes@ezsportsnetting.com') return next();
       // Fallback: lookup user in DB and infer admin from stored flags/role
       if (req.user?.id) {
         const user = await db.findOne('users', { id: req.user.id });
-        if (user && (user.isAdmin || user.role === 'admin' || (user.email||'').toLowerCase()==='admin@ezsports.com')) {
+        if (user && (user.isAdmin || user.role === 'admin' || (user.email||'').toLowerCase()==='amercedes@ezsportsnetting.com')) {
           req.user.isAdmin = true;
           return next();
         }
@@ -53,7 +53,7 @@ function requireAdmin(req, res, next) {
 }
 
 function signToken(user) {
-  const computedIsAdmin = Boolean(user.isAdmin || user.role === 'admin' || user.email === 'admin@ezsports.com');
+  const computedIsAdmin = Boolean(user.isAdmin || user.role === 'admin' || (user.email||'').toLowerCase() === 'amercedes@ezsportsnetting.com');
   const payload = { id: user.id, email: user.email, isAdmin: computedIsAdmin };
   return jwt.sign(payload, JWT_SECRET, { expiresIn: '7d', issuer: JWT_ISS, audience: JWT_AUD });
 }
