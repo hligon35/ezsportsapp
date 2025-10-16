@@ -14,7 +14,8 @@ class DatabaseManager {
   analytics: 'analytics.json',
   subscribers: 'subscribers.json',
   coupons: 'coupons.json',
-  emails: 'emails.json'
+  emails: 'emails.json',
+  payouts: 'payouts.json'
     };
   }
 

@@ -149,6 +149,29 @@ class OrderService {
     }
   }
 
+  // Attach/merge payment info to an order
+  async updatePaymentInfo(id, paymentInfoPatch = {}) {
+    try {
+      const orderId = parseInt(id);
+      const order = await this.getOrderById(orderId);
+      if (!order) throw new Error('Order not found');
+      const merged = { ...order.paymentInfo, ...paymentInfoPatch };
+      const updated = await this.db.update('orders', { id: orderId }, { paymentInfo: merged });
+      if (!updated) throw new Error('Failed to update payment info');
+      return await this.getOrderById(orderId);
+    } catch (e) { throw e; }
+  }
+
+  // Generic partial update for arbitrary fields (e.g., paidAt, refundedAt, flags)
+  async patchOrder(id, fields = {}) {
+    try {
+      const orderId = parseInt(id);
+      const updated = await this.db.update('orders', { id: orderId }, { ...fields });
+      if (!updated) throw new Error('Order not found');
+      return await this.getOrderById(orderId);
+    } catch (e) { throw e; }
+  }
+
   // Get order statistics
   async getOrderStats(timeframe = 'all') {
     try {

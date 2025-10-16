@@ -132,15 +132,33 @@ async function initialize() {
           document.getElementById('discount-row').style.display = '';
           document.getElementById('discount-code-label').textContent = `(${appliedCoupon.code})`;
         }
+        // If server provides a pricing breakdown, render it exactly
+        try {
+          const bd = intentResp.breakdown || null;
+          const set = (id, cents) => { const el = document.getElementById(id); if (el && Number.isFinite(cents)) el.textContent = currencyFmt(fromCents(cents)); };
+          if (bd) {
+            set('sum-subtotal', bd.subtotal);
+            set('sum-shipping', bd.shipping);
+            if (bd.discount && bd.discount > 0) {
+              const row = document.getElementById('discount-row');
+              if (row) row.style.display = '';
+              const dEl = document.getElementById('sum-discount');
+              if (dEl) dEl.textContent = '-' + currencyFmt(fromCents(bd.discount));
+            }
+            const totalEl = document.getElementById('sum-total');
+            if (totalEl) totalEl.textContent = currencyFmt(fromCents(bd.total));
+          }
+        } catch {}
         const _stripe = await getStripe();
-        if (!elements) {
+        // Always recreate Elements for a new clientSecret to ensure correct PI binding
+        try {
+          if (elements) {
+            try { const host = document.getElementById('payment-element'); host && (host.innerHTML = ''); } catch {}
+          }
           elements = _stripe.elements({ clientSecret, appearance: { theme: 'stripe' } });
           const paymentElement = elements.create('payment', { layout: 'tabs' });
           paymentElement.mount('#payment-element');
-        } else {
-          // Elements auto-updates with new clientSecret when recreating? Safer to re-create.
-          try { elements.update({ clientSecret }); } catch {}
-        }
+        } catch {}
       }
     } catch (_) { /* ignore */ }
   }
@@ -148,7 +166,7 @@ async function initialize() {
   // Initialize Stripe and create PaymentIntent on backend if Stripe is enabled
   await createOrUpdatePaymentIntent();
 
-  // Always show a computed summary (even in test mode)
+  // Always show a computed summary (even in test mode). Server breakdown overrides this during PI creation.
   const fd0 = new FormData(form);
   const shipMethod0 = fd0.get('shippingMethod') || 'standard';
   const { total: computedTotal } = updateSummary(cart, shipMethod0, appliedCoupon);

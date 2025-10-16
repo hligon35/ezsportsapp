@@ -129,6 +129,18 @@ router.get('/stripe/invoices', requireAdmin, async (req, res) => {
 });
 
 // --- Cloudflare Analytics (GraphQL) ---
+router.get('/stripe/payouts-local', requireAdmin, async (req, res) => {
+  try {
+    const PayoutService = require('../services/PayoutService');
+    const svc = new PayoutService();
+    const list = await svc.list(50);
+    res.json({ items: list });
+  } catch (e) {
+    res.status(500).json({ message: e.message || 'Failed to load local payouts' });
+  }
+});
+
+// --- Cloudflare Analytics (GraphQL) ---
 router.get('/cloudflare/summary', requireAdmin, async (req, res) => {
   try {
     const token = process.env.CLOUDFLARE_API_TOKEN;

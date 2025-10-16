@@ -610,7 +610,7 @@
       } catch {}
     })();
 
-    document.getElementById('pd-add')?.addEventListener('click', ()=>{
+  document.getElementById('pd-add')?.addEventListener('click', ()=>{
       try {
         // Determine selected variation (if any)
         const optSel = document.getElementById('pd-option-select');
@@ -642,6 +642,10 @@
             const dsrNum = Number(optEl.dataset.dsr);
             chosenShipRaw = Number.isFinite(dsrNum) && dsrNum > 0 ? dsrNum : (optEl.dataset.dsr || chosenShipRaw);
           }
+          // Prefer a concrete SKU for the cart item ID when available
+          if (optEl?.dataset?.sku) {
+            try { prod = { ...prod, id: String(optEl.dataset.sku) }; } catch {}
+          }
         } else if (singleVar) {
           // Single-variation product: no dropdown; use that variation's values implicitly
           const p = Number(singleVar.map ?? singleVar.price ?? 0) || 0;
@@ -650,6 +654,10 @@
           if (typeof singleVar.dsr !== 'undefined') chosenShipRaw = singleVar.dsr;
           // include option label as size for cart uniqueness/context
           if (singleVar.option) chosenLabel = `${prod.title} — ${singleVar.option}`;
+          // Prefer concrete SKU for cart id
+          if (singleVar.sku) {
+            try { prod = { ...prod, id: String(singleVar.sku) }; } catch {}
+          }
         } else if (prod.variations && prod.variations.length > 1) {
           alert('Please choose an option.');
           return;
