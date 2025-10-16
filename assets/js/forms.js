@@ -86,9 +86,23 @@
             referer: document.referrer||'',
             'cf-turnstile-response': token
           };
-          // Use text/plain to avoid triggering a CORS preflight against Apps Script (simpler dev experience)
-          const res = await fetch(endpointFor('subscribe'), {method:'POST', headers:{'Content-Type':'text/plain'}, body: JSON.stringify(payload)});
-          const data = await res.json().catch(()=>({}));
+          // Send with fallback: try local /api first, if 404/405/network error, retry direct Apps Script
+          let data = {};
+          const primaryUrl = endpointFor('subscribe');
+          try {
+            const res = await fetch(primaryUrl, { method:'POST', headers:{'Content-Type':'text/plain'}, body: JSON.stringify(payload) });
+            if (res.ok) {
+              data = await res.json().catch(()=>({}));
+            } else if (res.status === 404 || res.status === 405) {
+              throw new Error('proxy-unavailable');
+            } else {
+              data = await res.json().catch(()=>({}));
+            }
+          } catch {
+            // Fallback to Apps Script
+            const res2 = await fetch(FORM_ENDPOINT, { method:'POST', headers:{'Content-Type':'text/plain'}, body: JSON.stringify(payload) });
+            data = await res2.json().catch(()=>({}));
+          }
           if (!data.ok) throw 0;
           statusEl.textContent='Subscribed! Check your inbox for future deals.';
           if (emailInput) emailInput.value='';
@@ -122,8 +136,22 @@
           referer: document.referrer||'',
           'cf-turnstile-response': token
         };
-  const res = await fetch(endpointFor('contact'), {method:'POST', headers:{'Content-Type':'text/plain'}, body: JSON.stringify(payload)});
-        const data = await res.json().catch(()=>({}));
+        // Send with fallback similar to subscribe
+        let data = {};
+        const primaryUrl = endpointFor('contact');
+        try {
+          const res = await fetch(primaryUrl, { method:'POST', headers:{'Content-Type':'text/plain'}, body: JSON.stringify(payload) });
+          if (res.ok) {
+            data = await res.json().catch(()=>({}));
+          } else if (res.status === 404 || res.status === 405) {
+            throw new Error('proxy-unavailable');
+          } else {
+            data = await res.json().catch(()=>({}));
+          }
+        } catch {
+          const res2 = await fetch(FORM_ENDPOINT, { method:'POST', headers:{'Content-Type':'text/plain'}, body: JSON.stringify(payload) });
+          data = await res2.json().catch(()=>({}));
+        }
         if (!data.ok) throw 0;
         msgEl.textContent='Message sent!'; msgEl.style.color='green';
         form.reset();

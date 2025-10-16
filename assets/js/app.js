@@ -19,20 +19,6 @@ try {
 // Lightweight client-side "Coming Soon" gate with hidden unlock
 // (Removed obsolete minimal Store skeleton to prevent duplicate declaration; see full Store definition later in file.)
 
-// If forms.js is not loaded (older pages), provide a minimal noop Turnstile token helper
-async function getTurnstileToken(){
-  try {
-    if (window.turnstile && window.TURNSTILE_SITE_KEY) {
-      return new Promise(res=>{
-        let host=document.createElement('div'); host.style.cssText='position:fixed;left:-9999px;top:-9999px;'; document.body.appendChild(host);
-        let wid=null; let done=false; const cleanup=()=>{ if(done) return; done=true; try{window.turnstile.remove(wid);}catch{} try{host.remove();}catch{} };
-        try { wid = window.turnstile.render(host,{sitekey:window.TURNSTILE_SITE_KEY,size:'flexible',callback:t=>{res(t||'');cleanup();},'error-callback':()=>{res('');cleanup();},'timeout-callback':()=>{res('');cleanup();}}); window.turnstile.execute(wid); setTimeout(()=>{res('');cleanup();},7000); }
-        catch{ res(''); cleanup(); }
-      });
-    }
-  } catch {}
-  return '';
-}
 // or query params: ?gate=on to enable, ?gate=off to disable, ?unlock=1 to grant temporary access
 (function comingSoonGate(){
   try {
@@ -327,6 +313,37 @@ const Store = {
 
     // Ensure layout and nav
     try {
+      // Global head/perf tweaks first
+      try { this.ensurePerformanceOptimizations(); } catch {}
+      try { this.ensureServiceWorkerRegistered(); } catch {}
+
+      // Header and primary navigation
+      try { this.ensureHeaderLayout(); } catch {}
+      try { this.ensureCoreNav(); } catch {}
+      try { this.ensureHomeFirst(); } catch {}
+
+      // Account/login presence in header
+      try { this.updateNavigation(); } catch {}
+
+      // Page-level product grids (Accessories, Pre-Made Cages, etc.)
+      try { this.ensurePageProductGrid(); } catch {}
+
+      // Signal that navigation is ready so CSS can reveal the header bar
+      try {
+        document.documentElement.classList.add('nav-ready');
+        document.body.classList.add('nav-ready');
+      } catch {}
+
+      // Accessibility, SEO, breadcrumbs, and footer
+      try { this.ensureSkipLink(); } catch {}
+      try { this.ensureBreadcrumbs(); } catch {}
+      try { this.ensureSEO(); } catch {}
+      try { this.ensureUniformFooter(); } catch {}
+
+      // Page-specific enhancements (safe to call when not applicable)
+      try { this.ensureNettingSubnav(); } catch {}
+      try { this.ensureNettingCarousel(); } catch {}
+
       const toggle = document.querySelector('.menu-toggle');
       const nav = document.getElementById('primary-nav');
       if (toggle && nav) {
@@ -544,7 +561,7 @@ ensureSEO() {
 },
 
 // Performance: fonts/stripe preconnect, stylesheet preload, image lazy loading with LCP protection
-function ensurePerformanceOptimizations() {
+ensurePerformanceOptimizations() {
     try {
       const head = document.head;
       const ensureLink = (attrs) => {
@@ -593,21 +610,21 @@ function ensurePerformanceOptimizations() {
           img.setAttribute('decoding', 'async');
         }
       });
-    } catch {}
-}
+  } catch {}
+},
 
 // PWA: register Service Worker for production only
-function ensureServiceWorkerRegistered() {
+ensureServiceWorkerRegistered() {
     try {
       const isProd = (location.protocol === 'https:') && !/^(localhost|127\.0\.0\.1)$/i.test(location.hostname);
       if (!('serviceWorker' in navigator) || !isProd) return;
       navigator.serviceWorker.getRegistration().then(reg => {
         if (!reg) navigator.serviceWorker.register('/service-worker.js').catch(()=>{});
       }).catch(()=>{});
-    } catch {}
-}
+  } catch {}
+},
 
-function ensureHeaderLayout() {
+ensureHeaderLayout() {
     const header = document.querySelector('.site-header .header-bar');
     if (!header) return;
 
@@ -681,11 +698,20 @@ function ensureHeaderLayout() {
     if (menuToggle && !menuToggle.getAttribute('aria-label')) {
       menuToggle.setAttribute('aria-label','Toggle navigation');
     }
-}
+},
 
-function ensureCoreNav() {
-  const nav = document.getElementById('primary-nav') || document.querySelector('nav.quick-links');
-    if (!nav) return;
+ensureCoreNav() {
+  let nav = document.getElementById('primary-nav') || document.querySelector('nav.quick-links');
+    // If no nav exists, synthesize one inside the header bar so layout stays consistent
+    if (!nav) {
+      const headerBar = document.querySelector('.site-header .header-bar');
+      if (!headerBar) return;
+      nav = document.createElement('nav');
+      nav.id = 'primary-nav';
+      nav.className = 'quick-links';
+      nav.setAttribute('aria-label','Primary');
+      headerBar.appendChild(nav);
+    }
 
     // Deactivate legacy nav (kept for later reference):
     // const legacy = [ 'Deals','Bats','Gloves','Batting Gloves','Drip','Gear','Apparel','Facility & Field','Turf' ];
@@ -737,11 +763,11 @@ function ensureCoreNav() {
         const calc = Array.from(nav.querySelectorAll('a')).find(a => /netting-calculator\.html$/i.test(a.getAttribute('href')||''));
         if (calc) calc.remove();
       }
-    } catch {}
-}
+  } catch {}
+},
 
 // Guarantee the Home link exists and is first in the primary nav
-function ensureHomeFirst() {
+ensureHomeFirst() {
     try {
       const nav = document.getElementById('primary-nav') || document.querySelector('nav.quick-links');
       if (!nav) return;
@@ -1136,7 +1162,7 @@ function ensureHomeFirst() {
         'commercial-netting.html': [ 'Auto-Drone','Drone Enclosure','Warehouse','Safety','Debris','Landfill' ],
         // Split the previous combined label 'Cricket Football' into two separate slides
         'sports-netting.html': [ 'Baseball','Basketball','Cricket','Football','Golf','Hockey','Lacrosse','Multi-Sport','Soccer','Softball','Tennis','Volleyball' ],
-        'training-facility.html': [ 'Lane Divider Systems','Ceiling Track','Retractable Shell','Impact Panels' ]
+        'training-facility.html': [ 'Lane Divider Systems','Impact Panels' ]
       };
       // Provide a broad showcase carousel on overview page if present using a curated subset
       if (base === 'ez-nets.html') {
@@ -1539,6 +1565,7 @@ function ensureHomeFirst() {
               <div class="pd-info">
                 <h1 class="pd-title">Replacement Nets</h1>
                 <div class="price h3" id="agg-price">${rangeHtml}</div>
+                <div class="text-sm text-muted" id="agg-ship"></div>
                 <div class="stack-05" style="margin-top:.5rem;">
                   <label class="text-xs" for="agg-model-select" style="font-weight:700;letter-spacing:.4px;">Model</label>
                   <select id="agg-model-select" class="pd-option-select" style="padding:.7rem .8rem;border:1px solid var(--border);border-radius:.6rem;font-weight:600;">${options}</select>
@@ -1555,6 +1582,16 @@ function ensureHomeFirst() {
         const selectEl = document.getElementById('agg-model-select');
         const selectedEl = document.getElementById('agg-selected');
         const bySku = Object.fromEntries(modelData.map(m=>[m.id,m]));
+        const shipEl = document.getElementById('agg-ship');
+        const shipFor = (m) => {
+          const raw = (typeof m?.dsr !== 'undefined') ? m.dsr : (typeof m?.raw?.dsr !== 'undefined' ? m.raw.dsr : undefined);
+          const num = Number(raw);
+          if (Number.isFinite(num) && num > 0) return num;
+          // Heuristic similar to product page
+          const t = String(m?.title||'').toLowerCase();
+          if (/replacement/.test(t)) return 75;
+          return 100;
+        };
         const featuresEl = document.getElementById('agg-features');
         const renderFeatures = (arr) => {
           if (!featuresEl) return;
@@ -1563,6 +1600,16 @@ function ensureHomeFirst() {
           const max = 10; // cap to avoid overly long lists
           featuresEl.innerHTML = list.slice(0, max).map(f=>`<li>${f}</li>`).join('');
         };
+        // Initialize shipping text as range across models
+        try {
+          if (shipEl) {
+            const ships = modelData.map(m=>shipFor(m)).filter(n=>Number.isFinite(n) && n>0);
+            if (ships.length) {
+              const min = Math.min(...ships), max = Math.max(...ships);
+              shipEl.textContent = (min===max) ? `Shipping: $${min.toFixed(2)}` : `Shipping: $${min.toFixed(2)} - $${max.toFixed(2)}`;
+            }
+          }
+        } catch {}
         // Thumb click selects corresponding model
         grid.querySelectorAll('.pd-thumbs .thumb').forEach(btn=>{
           btn.addEventListener('click',()=>{
@@ -1576,6 +1623,7 @@ function ensureHomeFirst() {
               priceEl.textContent = price>0 ? currency.format(price) : rangeHtml;
               selectedEl.textContent = `${bySku[sku]?.title || ''}`;
               renderFeatures(bySku[sku]?.features);
+              if (shipEl) { const ship = shipFor(bySku[sku]); shipEl.textContent = ship ? `Shipping: $${ship.toFixed(2)}` : ''; }
             }
             grid.querySelectorAll('.pd-thumbs .thumb').forEach(b=>b.classList.toggle('is-active', b===btn));
           });
@@ -1589,10 +1637,12 @@ function ensureHomeFirst() {
             priceEl.textContent = m.price>0 ? currency.format(m.price) : rangeHtml;
             selectedEl.textContent = m.title;
             renderFeatures(m.features);
+            if (shipEl) { const ship = shipFor(m); shipEl.textContent = ship ? `Shipping: $${ship.toFixed(2)}` : ''; }
           } else {
             priceEl.textContent = rangeHtml;
             selectedEl.textContent = '';
             renderFeatures([]);
+            if (shipEl) shipEl.textContent = '';
           }
         });
         // Add to cart requires a selection
@@ -1601,7 +1651,10 @@ function ensureHomeFirst() {
           const m = sku ? bySku[sku] : null;
           if (!m) { alert('Please choose a model.'); return; }
           const product = { id: sku, title: m.title, price: m.price || 0, img: m.img, category: 'replacement' };
-          try { window.Store && window.Store.add(product, {}); } catch {}
+          // Shipping from dsr if present on model or raw, else fallback
+          let ship = (typeof m.dsr !== 'undefined') ? m.dsr : (typeof m.raw?.dsr !== 'undefined' ? m.raw.dsr : undefined);
+          if (!(Number(ship)>0)) ship = shipFor(m);
+          try { window.Store && window.Store.add(product, { ship }); } catch {}
         });
         return; // Skip normal grid rendering
       }
@@ -1690,6 +1743,7 @@ function ensureHomeFirst() {
               <div class="pd-info">
                 <h1 class="pd-title">Bullet Pad Kits</h1>
                 <div class="price h3" id="agg-price">${rangeHtml}</div>
+                <div class="text-sm text-muted" id="agg-ship"></div>
                 <div class="stack-05" style="margin-top:.5rem;">
                   <label class="text-xs" for="agg-model-select" style="font-weight:700;letter-spacing:.4px;">Model</label>
                   <select id="agg-model-select" class="pd-option-select" style="padding:.7rem .8rem;border:1px solid var(--border);border-radius:.6rem;font-weight:600;">${options}</select>
@@ -1712,6 +1766,14 @@ function ensureHomeFirst() {
         const colorEl = document.getElementById('agg-color-select');
         const selectedEl = document.getElementById('agg-selected');
         const bySku = Object.fromEntries(modelData.map(m=>[m.id,m]));
+        const shipEl = document.getElementById('agg-ship');
+        const shipFor = (m) => {
+          const raw = (typeof m?.dsr !== 'undefined') ? m.dsr : (typeof m?.raw?.dsr !== 'undefined' ? m.raw.dsr : undefined);
+          const num = Number(raw);
+          if (Number.isFinite(num) && num > 0) return num;
+          // Bullet pad kits roughly in L-Screen class
+          return 75;
+        };
         const featuresEl = document.getElementById('agg-features');
         const renderFeatures = (arr) => {
           if (!featuresEl) return;
@@ -1720,6 +1782,16 @@ function ensureHomeFirst() {
           const max = 10;
           featuresEl.innerHTML = list.slice(0, max).map(f=>`<li>${f}</li>`).join('');
         };
+        // Initialize shipping text as range across models
+        try {
+          if (shipEl) {
+            const ships = modelData.map(m=>shipFor(m)).filter(n=>Number.isFinite(n) && n>0);
+            if (ships.length) {
+              const min = Math.min(...ships), max = Math.max(...ships);
+              shipEl.textContent = (min===max) ? `Shipping: $${min.toFixed(2)}` : `Shipping: $${min.toFixed(2)} - $${max.toFixed(2)}`;
+            }
+          }
+        } catch {}
         // Back button behavior
         document.getElementById('agg-back')?.addEventListener('click', ()=>{
           try {
@@ -1736,10 +1808,12 @@ function ensureHomeFirst() {
             priceEl.textContent = m.price>0 ? currency.format(m.price) : rangeHtml;
             selectedEl.textContent = m.title;
             renderFeatures(m.features);
+            if (shipEl) { const ship = shipFor(m); shipEl.textContent = ship ? `Shipping: $${ship.toFixed(2)}` : ''; }
           } else {
             priceEl.textContent = rangeHtml;
             selectedEl.textContent = '';
             renderFeatures([]);
+            if (shipEl) shipEl.textContent = '';
           }
         });
         // Add to cart requires a model and a color selection
@@ -1750,7 +1824,9 @@ function ensureHomeFirst() {
           const color = (colorEl?.value || '').trim();
           if (!color) { alert('Please choose a color.'); return; }
           const product = { id: sku, title: m.title, price: m.price || 0, img: m.img, category: 'pad-kits' };
-          try { window.Store && window.Store.add(product, { color }); } catch {}
+          let ship = (typeof m.dsr !== 'undefined') ? m.dsr : (typeof m.raw?.dsr !== 'undefined' ? m.raw.dsr : undefined);
+          if (!(Number(ship)>0)) ship = shipFor(m);
+          try { window.Store && window.Store.add(product, { color, ship }); } catch {}
         });
         return; // Skip normal grid rendering
       }
@@ -2010,11 +2086,22 @@ function ensureHomeFirst() {
         const isRopeSpool = (p) => String(p.sku||'').toUpperCase() === '5/16-TPLYSTER-1270'.toUpperCase();
         const isRope = (p) => isRopeFt(p) || isRopeSpool(p);
 
-        const twines = items.filter(isTwineSpool);
-        const cables = items.filter(isCable);
-        const ropeFt = items.find(isRopeFt);
-        const ropeSpool = items.find(isRopeSpool);
-        const others = items.filter(p => !isTwineSpool(p) && !isCable(p) && !isRope(p));
+        // Exclude specific accessories from Accessories page
+        const shouldExclude = (p) => {
+          const name = String(p.name || p.title || '').toLowerCase();
+          // Remove Bullet Wheel Kit, Bullet Fixed Leg, Bullet Replacement Wheels
+          if (/bullet\s*wheel\s*kit/i.test(name)) return true;
+          if (/bullet\s*fixed\s*leg/i.test(name)) return true;
+          if (/bullet\s*replacement\s*wheels?/i.test(name)) return true;
+          return false;
+        };
+        // Apply grouping and exclusions
+        const base = items.filter(p => !shouldExclude(p));
+        const twines = base.filter(isTwineSpool);
+        const cables = base.filter(isCable);
+        const ropeFt = base.find(isRopeFt);
+        const ropeSpool = base.find(isRopeSpool);
+        const others = base.filter(p => !isTwineSpool(p) && !isCable(p) && !isRope(p));
         if (twines.length || cables.length || ropeFt || ropeSpool) {
           grid.innerHTML = '';
           grid.classList.add('grid','grid-3','product-grid');
@@ -2136,7 +2223,8 @@ function ensureHomeFirst() {
   // Normalize raw entries from prodList.json categories into the minimal shape our UI expects
   normalizeProdListItem(p) {
     if (!p || typeof p !== 'object') return p;
-    const id = String(p.sku || p.id || p.name || p.title || Math.random().toString(36).slice(2));
+    // Prefer stable, human-unique identifiers over generic SKUs that can collide (e.g., "Screen Component")
+    const id = String(p.id || p.name || p.title || p.sku || Math.random().toString(36).slice(2));
     const title = String(p.name || p.title || id);
     // Prefer explicit price fields; fall back to details.price, map, then wholesale, or derive from variations
     let price = Number(p.price ?? p.map ?? p.wholesale ?? 0) || 0;
@@ -3196,6 +3284,13 @@ function ensureHomeFirst() {
       // Store a snapshot for items that may not exist in PRODUCTS (e.g., dynamic pages like gloves)
       let imgSrc = product.img;
       try { if (imgSrc) imgSrc = new URL(imgSrc, location.href).href; } catch {}
+      // Determine shipping (dsr) for this line: prefer explicit opts.ship; else product.dsr; else none.
+      const rawShip = (opts && Object.prototype.hasOwnProperty.call(opts, 'ship')) ? opts.ship
+        : (Object.prototype.hasOwnProperty.call(product, 'dsr') ? product.dsr : undefined);
+      const shipAmount = (() => {
+        const n = Number(rawShip);
+        return (Number.isFinite(n) && n > 0) ? n : 0;
+      })();
       this.state.cart.push({
         id: product.id,
         qty: 1,
@@ -3204,7 +3299,9 @@ function ensureHomeFirst() {
         title: product.title || product.name,
         price: typeof product.price === 'number' ? product.price : Number(product.price) || 0,
         img: imgSrc || 'assets/img/EZSportslogo.png',
-        category: product.category
+        category: product.category,
+        ship: rawShip, // preserve original value (could be string)
+        shipAmount // numeric amount used in totals
       });
     }
     this.persist();
@@ -3250,6 +3347,18 @@ function ensureHomeFirst() {
     return this.cartDetailed.reduce((sum, i) => sum + ((i.product?.price || 0) * i.qty), 0);
   },
 
+  // Total shipping from per-line shipAmount values (dsr) × qty
+  get shippingTotal() {
+    try {
+      return this.state.cart.reduce((sum, i) => sum + ((Number(i.shipAmount)||0) * (i.qty||0)), 0);
+    } catch { return 0; }
+  },
+
+  // Combined total: items + shipping (dsr)
+  get total() {
+    return (this.subtotal || 0) + (this.shippingTotal || 0);
+  },
+
   renderCart() {
     const rows = this.cartDetailed.map(i => {
       const key = this.keyFor(i);
@@ -3275,7 +3384,8 @@ function ensureHomeFirst() {
 
     if (this.ui.items) this.ui.items.innerHTML = rows || '<p>Your cart is empty.</p>';
     if (this.ui.count) this.ui.count.textContent = String(this.state.cart.reduce((s, i) => s + i.qty, 0));
-    if (this.ui.subtotal) this.ui.subtotal.textContent = currency.format(this.subtotal);
+  // Display combined total (items + shipping) in mini-cart summary
+  if (this.ui.subtotal) this.ui.subtotal.textContent = currency.format(this.total);
     if (this.state.cart.length) {
       try { window.trackEvent && window.trackEvent('view_cart', { items: this.state.cart.map(i => ({ id: i.id, price: i.price, qty: i.qty })) }); } catch {}
     }
