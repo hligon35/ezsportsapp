@@ -1,6 +1,8 @@
 // Order Service - Handle order operations
 const DatabaseManager = require('../database/DatabaseManager');
 const ProductService = require('./ProductService');
+const path = require('path');
+const fs = require('fs').promises;
 
 class OrderService {
   constructor() {
@@ -8,29 +10,74 @@ class OrderService {
     this.productService = new ProductService();
   }
 
+  // Load fallback catalog (assets/prodList.json) and build a quick lookup by SKU/id
+  async _loadFallbackCatalogMap() {
+    try {
+      const file = path.join(__dirname, '..', '..', 'assets', 'prodList.json');
+      const raw = await fs.readFile(file, 'utf8');
+      const json = JSON.parse(raw);
+      const out = new Map();
+      if (json && json.categories && typeof json.categories === 'object') {
+        for (const arr of Object.values(json.categories)) {
+          if (!Array.isArray(arr)) continue;
+          arr.forEach(p => {
+            const id = String(p.sku || p.id || p.name || '').trim();
+            if (!id) return;
+            const name = String(p.name || p.title || id);
+            const price = Number(p.map ?? p.price ?? p.wholesale ?? 0) || 0;
+            out.set(id, { name, price });
+          });
+        }
+      }
+      return out;
+    } catch {
+      return new Map();
+    }
+  }
+
   // Create a new order
   async createOrder(orderData) {
     try {
-  // Dropship model: skip stock availability validation
+      // Dropship model: skip stock availability validation
+
+      // Preload fallback map once in case some SKUs aren't seeded in DB yet
+      const fbMap = await this._loadFallbackCatalogMap();
 
       // Calculate total
       let total = 0;
       const enrichedItems = [];
-      
+
       for (const item of orderData.items) {
-        const product = await this.productService.getProductById(item.id);
-        if (!product) {
-          throw new Error(`Product not found: ${item.id}`);
+        const qty = Math.max(1, Number(item.qty) || 1);
+        let product = null;
+        try { product = await this.productService.getProductById(item.id); } catch {}
+
+        // Fallback lookup when product is not found in DB
+        let price = 0;
+        let productName = '';
+        if (product) {
+          price = Number(product.price || 0) || 0;
+          productName = product.name || String(item.id);
+        } else {
+          const fb = fbMap.get(String(item.id));
+          if (fb) {
+            price = Number(fb.price || 0) || 0;
+            productName = fb.name || String(item.id);
+          } else {
+            // Last resort: allow unknown product with zero price to still create an order record
+            price = 0;
+            productName = String(item.id);
+          }
         }
-        
-        const itemTotal = product.price * item.qty;
+
+        const itemTotal = price * qty;
         total += itemTotal;
-        
+
         enrichedItems.push({
           productId: item.id,
-          productName: product.name,
-          price: product.price,
-          quantity: item.qty,
+          productName,
+          price,
+          quantity: qty,
           subtotal: itemTotal
         });
       }
@@ -225,10 +272,9 @@ class OrderService {
   // Get recent orders
   async getRecentOrders(limit = 10) {
     try {
-      const orders = await this.getAllOrders();
-      return orders
-        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-        .slice(0, limit);
+      const res = await this.getAllOrders(null, { page: 1, pageSize: 100000, sortBy: 'createdAt', sortDir: 'desc' });
+      const items = Array.isArray(res?.items) ? res.items : (Array.isArray(res) ? res : []);
+      return items.slice(0, limit);
     } catch (error) {
       throw error;
     }

@@ -366,6 +366,10 @@
         "name": "Bullet L Pad Kit (23')",
         "wholesale": 89.95,
         "dsr": 20,
+        "img": "assets/prodImgs/Accessories/Vinyl/vinyl.png",
+        "images": [
+          "assets/prodImgs/Accessories/Vinyl/vinyl.png"
+        ],
         "details": {
           "features": [
             "Fast and Reliable Shipping",
@@ -379,14 +383,16 @@
             "Built Tough for Training Facilities, Schools, & Organizations"
           ],
           "description": "Give your screen a clean, pro finish and cut down ricochets. This padding kit wraps the frame in 18 oz vinyl over 1½” impact foam to protect the net border and the people around it. Built to handle daily reps indoors or out. Fits 1 5/8”–2” steel frames and includes twine for a tight, no‑slip install.\n\nSafety Notice: Padding reduces risk but cannot eliminate it. Batted balls may still ricochet and cause injury. Always use appropriate protective gear and follow best‑practice training protocols."
-        },
-        "img": ""
+        }
       },
       {
         "sku": "PK-BULLETJR",
         "name": "Bullet JR L Pad Kit (20')",
-        "wholesale": 89.95,
         "dsr": 20,
+        "img": "assets/prodImgs/Accessories/Padding/padding.png",
+        "images": [
+          "assets/prodImgs/Accessories/Padding/padding.png"
+        ],
         "details": {
           "features": [
             "Fast and Reliable Shipping",
@@ -400,8 +406,7 @@
             "Built Tough for Training Facilities, Schools, & Organizations"
           ],
           "description": "Give your screen a clean, pro finish and cut down ricochets. This padding kit wraps the frame in 18 oz vinyl over 1½” impact foam to protect the net border and the people around it. Built to handle daily reps indoors or out. Fits 1 5/8”–2” steel frames and includes twine for a tight, no‑slip install.\n\nSafety Notice: Padding reduces risk but cannot eliminate it. Batted balls may still ricochet and cause injury. Always use appropriate protective gear and follow best‑practice training protocols."
-        },
-        "img": ""
+        }
       },
       {
         "sku": "PK-BULLETFT",
@@ -1169,7 +1174,10 @@
         "name": "12\" Vinyl Top by the FT",
         "wholesale": "2/ft",
         "dsr": 100,
-        "img": "assets/img/products/velo-changeup-gen-2-phantom-candy-rush-pink-sunglasses-velo-change-candypnk.jpg",
+        "img": "assets/prodImgs/Accessories/Vinyl/vinyl.png",
+        "images": [
+          "assets/prodImgs/Accessories/Vinyl/vinyl.png"
+        ],
         "details": {
           "features": [
             "Fast and Reliable Shipping"
@@ -1181,7 +1189,10 @@
         "name": "Screen Padding by the FT",
         "wholesale": "1/ft",
         "dsr": 100,
-        "img": "assets/img/products/lizard-skins-dsp-ultra-bat-grip.jpg",
+        "img": "assets/prodImgs/Accessories/Padding/padding.png",
+        "images": [
+          "assets/prodImgs/Accessories/Padding/padding.png"
+        ],
         "details": {
           "features": [
             "Fast and Reliable Shipping"

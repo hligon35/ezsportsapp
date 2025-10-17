@@ -39,6 +39,7 @@ const args = process.argv.slice(2);
 const DRY_RUN = args.includes('--dry');
 const NO_STRIPE = args.includes('--no-stripe');
 const DEACTIVATE_REMOVED = args.includes('--deactivate-removed');
+const FROM_DB = args.includes('--from-db');
 
 // Root resolution: this file is server/scripts/sync-products.js
 const SERVER_DIR = path.resolve(__dirname, '..');
@@ -177,6 +178,43 @@ async function main() {
 
   const existing = await loadExistingProducts();
   const existingMap = new Map(existing.map(p => [p.id, p]));
+
+  // If operating from DB, bypass filesystem scan and just refresh Stripe linkage on existing products
+  if (FROM_DB) {
+    const existing = await loadExistingProducts();
+    console.log(`FROM_DB mode: found ${existing.length} existing products in DB.`);
+    let updated = [];
+    let warnings = [];
+    for (const prev of existing) {
+      const nowIso = new Date().toISOString();
+      const product = { ...prev };
+      product.updatedAt = nowIso;
+      if (stripe && !DRY_RUN) {
+        try {
+          const sp = await ensureStripeProduct(product.id, product.name || product.id, product.description || '', product.stripe);
+          const priceObj = await ensureStripePrice(sp.id, product.price, product.currency || 'usd');
+          product.stripe = { productId: sp.id, defaultPriceId: priceObj.id, currency: (product.currency || 'usd') };
+        } catch (e) {
+          warnings.push(`Stripe sync failed for ${product.id}: ${e.message}`);
+        }
+      }
+      updated.push(product);
+    }
+    if (DRY_RUN) {
+      console.log(`DRY RUN: Would update ${updated.length} products in products.json`);
+    } else {
+      const tmp = PRODUCTS_FILE + '.tmp';
+      await fs.writeFile(tmp, JSON.stringify(updated, null, 2));
+      await fs.rename(tmp, PRODUCTS_FILE);
+      console.log(`Wrote ${updated.length} products to products.json`);
+    }
+    if (warnings.length) {
+      console.log('\nWarnings:');
+      warnings.forEach(w => console.log(' - ' + w));
+    }
+    console.log('\n=== Product Sync Complete ===');
+    return;
+  }
 
   const files = await walkJsonFiles(PRODINFO_DIR);
   console.log(`Discovered ${files.length} product JSON files under prodInfo.`);
