@@ -12,14 +12,44 @@ const mail = new EmailService();
 // Public subscribe endpoint
 router.post('/subscribe', async (req, res) => {
   try {
-    const { email, name, source, referer } = req.body || {};
-    const s = await subs.addOrUpdate(email, name);
+    const { email, name, source, referer, hp } = req.body || {};
+    // Basic anti-spam: honeypot should be empty
+    if (hp) return res.json({ ok: true, queued: false, spam: true });
+    const addr = (email || '').toString().trim();
+    if (!addr) return res.status(400).json({ message: 'Email is required' });
+
+    const s = await subs.addOrUpdate(addr, name);
+
+    // Fire-and-forget: notify internal inbox and send thank-you to subscriber
+    (async () => {
+      try {
+        const inbox = (process.env.CONTACT_INBOX || 'info@ezsportsnetting.com').trim();
+        if (inbox) {
+          const html = `
+            <h2>New Newsletter Subscriber</h2>
+            <p><strong>Email:</strong> ${addr}</p>
+            ${name ? `<p><strong>Name:</strong> ${name}</p>` : ''}
+            ${source ? `<p><strong>Source:</strong> ${source}</p>` : ''}
+            ${referer ? `<p><strong>Referrer:</strong> ${referer}</p>` : ''}
+          `;
+          await mail.queue({ to: inbox, subject: 'New subscriber', html, text: `Email: ${addr}\nName: ${name||''}\nSource: ${source||''}\nReferrer: ${referer||''}`, tags: ['subscribe','internal'] });
+        }
+      } catch (e) { /* ignore internal notify errors */ }
+
+      try {
+        const html = `
+          <p>Thanks for subscribing to EZ Sports Netting!</p>
+          <p>We’ll send occasional deals and product updates. You can unsubscribe anytime.</p>
+        `;
+        await mail.queue({ to: addr, subject: 'Thanks for subscribing to EZ Sports Netting', html, text: 'Thanks for subscribing to EZ Sports Netting! We’ll send occasional deals and product updates.', tags: ['subscribe','welcome'] });
+      } catch (e) { /* ignore welcome email errors */ }
+    })();
 
     // Optionally forward to Google Apps Script to log to Google Sheet
     try {
       const url = (process.env.MARKETING_APPS_SCRIPT_URL || '').trim();
       if (url) {
-        const payload = { type: 'subscribe', email, name, source: source || '', referer: referer || '' };
+        const payload = { type: 'subscribe', email: addr, name, source: source || '', referer: referer || '' };
         const body = JSON.stringify(payload);
         // Use global fetch if available (Node 18+); ignore errors
         const doFetch = (typeof fetch === 'function')
@@ -65,10 +95,7 @@ router.post('/contact', async (req, res) => {
       <pre style="white-space:pre-wrap">${message}</pre>
     `;
 
-    const inbox = (process.env.CONTACT_INBOX || '').trim();
-    if (!inbox) {
-      return res.status(503).json({ ok: false, error: 'CONTACT_INBOX is not configured on the server' });
-    }
+    const inbox = (process.env.CONTACT_INBOX || 'info@ezsportsnetting.com').trim();
     await mail.queue({
       to: inbox,
       subject: `[Contact] ${subject}`,
@@ -76,6 +103,24 @@ router.post('/contact', async (req, res) => {
       text: `From: ${name} <${email}>\n${phone ? `Phone: ${phone}\n` : ''}\nSubject: ${subject}\n\n${message}`,
       tags: ['contact']
     });
+
+    // Send an acknowledgement email to the sender (non-blocking)
+    try {
+      const ackHtml = `
+        <p>Hi ${name.replace(/</g,'&lt;')},</p>
+        <p>Thanks for contacting EZ Sports Netting! We received your message and will get back to you soon.</p>
+        <hr/>
+        <p><strong>Your message:</strong></p>
+        <pre style="white-space:pre-wrap">${message.replace(/</g,'&lt;')}</pre>
+      `;
+      await mail.queue({
+        to: email,
+        subject: 'We received your message',
+        html: ackHtml,
+        text: `Hi ${name},\n\nThanks for contacting EZ Sports Netting! We received your message and will get back to you soon.\n\n---\nYour message:\n${message}`,
+        tags: ['contact','ack']
+      });
+    } catch (_) { /* ignore ack errors */ }
 
     res.json({ ok: true, queued: true });
   } catch (e) {

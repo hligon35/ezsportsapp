@@ -338,7 +338,8 @@ const Store = {
       try { this.ensureSkipLink(); } catch {}
       try { this.ensureBreadcrumbs(); } catch {}
       try { this.ensureSEO(); } catch {}
-      try { this.ensureUniformFooter(); } catch {}
+  try { this.ensureUniformFooter(); } catch {}
+  try { this.attachSubscribeHandlers(); } catch {}
 
       // Page-specific enhancements (safe to call when not applicable)
       try { this.ensureNettingSubnav(); } catch {}
@@ -448,6 +449,49 @@ ensureUniformFooter() {
       // Ensure current year
       const y = footer.querySelector('#year');
       if (y) y.textContent = new Date().getFullYear();
+    } catch {}
+},
+
+// Subscribe form: AJAX submit to /api/marketing/subscribe with basic UX
+attachSubscribeHandlers() {
+    try {
+      const forms = document.querySelectorAll('form.subscribe');
+      forms.forEach((form) => {
+        if (form.__wired) return; // avoid duplicate bindings
+        form.__wired = true;
+        // Remove any inline onsubmit attributes added by legacy markup
+        try { form.removeAttribute('onsubmit'); } catch {}
+        form.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const btn = form.querySelector('button[type="submit"]');
+          const emailInput = form.querySelector('input[type="email"]');
+          const hp = (form.querySelector('input[name="hp"]')?.value || '').trim();
+          const email = (emailInput?.value || '').trim();
+          if (!email) {
+            emailInput?.focus();
+            return;
+          }
+          if (btn) { btn.disabled = true; btn.textContent = 'Subscribing…'; }
+          try {
+            const payload = { email, source: 'footer', referer: location.href, hp };
+            const res = await fetch('/api/marketing/subscribe', {
+              method: 'POST',
+              headers: { 'Content-Type': 'text/plain' },
+              body: JSON.stringify(payload),
+            });
+            if (res.ok) {
+              form.innerHTML = '<h4>Thanks for subscribing!</h4><p>Check your inbox for a confirmation.</p>';
+            } else {
+              const msg = await res.text().catch(()=>'');
+              alert('Subscription failed. Please try again later.' + (msg ? `\n${msg}` : ''));
+              if (btn) { btn.disabled = false; btn.textContent = 'Subscribe'; }
+            }
+          } catch (err) {
+            alert('Network error. Please try again.');
+            if (btn) { btn.disabled = false; btn.textContent = 'Subscribe'; }
+          }
+        }, { passive: false });
+      });
     } catch {}
 },
 
