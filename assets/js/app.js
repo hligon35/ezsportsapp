@@ -2493,6 +2493,8 @@ ensureHomeFirst() {
       const title = String(prod.title || 'Untitled');
       const price = Number(prod.price || 0);
       const img = String(prod.img || 'assets/img/netting.jpg');
+      const lid = id.toLowerCase();
+      const lt = title.toLowerCase();
       // Prefer showing a range when min/max are available; fall back to single price
       let displayPrice = '';
       const minP = Number(prod.minPrice ?? price ?? 0);
@@ -2514,15 +2516,19 @@ ensureHomeFirst() {
       const colors = this.extractProductColors(prod);
       const suppressDots = (() => {
         try {
-          const lid = String(id).toLowerCase();
-          const lt = title.toLowerCase();
           // Do not show dots for Screen Bulletz Leg Caps
           if (lid === 'screen bulletz' || /screen\s*bulletz/.test(lt)) return true;
           // Do not show dots for Armor Baseball Cart / Armor Basket
           if (lid === 'armorbasket' || /armor\s*(baseball)?\s*cart|armor\s*basket/.test(lt)) return true;
+          // Do not show dots for Vinyl Top by the FT (VINYL* SKUs)
+          if (/^vinyl/.test(lid) || /vinyl\s*top/.test(lt)) return true;
+          // Do not show dots for Screen Padding by the FT (Screen Component SKU)
+          if (/screen\s*padding/.test(lt)) return true;
         } catch {}
         return false;
       })();
+      // Right-align Add button for Vinyl Top and Screen Padding cards when price is not displayed
+      const moveAddRight = (/^vinyl/.test(lid) || /vinyl\s*top/.test(lt) || /screen\s*padding/.test(lt));
       const initialColorIndex = colors.length > 0 ? Math.floor(Math.random() * colors.length) : -1;
       const initialImg = (initialColorIndex >= 0 && colors[initialColorIndex]?.image) ? colors[initialColorIndex].image : img;
       const colorDotsHtml = (!suppressDots && colors.length > 0) ? `
@@ -2560,7 +2566,7 @@ ensureHomeFirst() {
           <div class="body">
             <h3 class="h3-tight"><a href="${href}">${title}</a></h3>
             ${colorDotsHtml}
-            <div class="price-row">
+            <div class="price-row${(!displayPrice && moveAddRight) ? ' right' : ''}">
               ${displayPrice ? `<span class="price">${displayPrice}</span>` : ''}
               <button class="btn btn-ghost js-add" data-id="${id}" data-title="${title.replace(/"/g,'&quot;')}" data-price="${price}" data-category="${prod.category || ''}" data-img="${img}">Add</button>
             </div>
