@@ -63,6 +63,16 @@
       <!-- Products Section -->
   <div id="products-section" class="admin-section">
         <h3>Product Management</h3>
+        <div class="toolbar" style="margin-bottom:1rem;">
+          <button type="button" id="btn-sync-products" class="btn btn-secondary">Run Product Sync</button>
+          <label class="muted" style="display:flex;align-items:center;gap:.25rem;">
+            <input type="checkbox" id="sync-dryrun" /> Dry run
+          </label>
+          <label class="muted" style="display:flex;align-items:center;gap:.25rem;">
+            <input type="checkbox" id="sync-deactivate" /> Deactivate removed (Stripe)
+          </label>
+          <span id="sync-status" class="muted" style="margin-left:.5rem;"></span>
+        </div>
         <form id="product-form" class="product-form">
           <input type="text" id="product-name" placeholder="Product Name" required />
           <input type="number" id="product-price" placeholder="Price" step="0.01" required />

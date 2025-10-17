@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const { requireAdmin } = require('../middleware/auth');
+const path = require('path');
+const { spawn } = require('child_process');
 
 // Stripe Billing Portal for admins to open on behalf of customer
 let stripe = null;
@@ -215,3 +217,61 @@ router.get('/cloudflare/summary', requireAdmin, async (req, res) => {
 });
 
 module.exports = router;
+
+// --- Admin Product Sync (local DB + optional Stripe) ---
+// Triggers server/scripts/sync-products.js. Protected with requireAdmin.
+router.post('/products/sync', requireAdmin, async (req, res) => {
+  try {
+    // Query flags: stripe=1 to enable Stripe, dry=1 for dry run, deactivateRemoved=1 to deactivate in Stripe
+    const stripeFlag = String(req.query.stripe || '1');
+    const dryFlag = String(req.query.dry || '0');
+    const deactFlag = String(req.query.deactivateRemoved || '0');
+
+    const args = ['scripts/sync-products.js'];
+    if (!(stripeFlag === '1' || /true/i.test(stripeFlag))) args.push('--no-stripe');
+    if (dryFlag === '1' || /true/i.test(dryFlag)) args.push('--dry');
+    if (deactFlag === '1' || /true/i.test(deactFlag)) args.push('--deactivate-removed');
+
+    const cwd = path.join(__dirname, '..');
+    const child = spawn('node', args, { cwd, env: process.env });
+    let stdout = '';
+    let stderr = '';
+    let responded = false;
+    child.stdout.on('data', (d) => { stdout += d.toString(); });
+    child.stderr.on('data', (d) => { stderr += d.toString(); });
+    child.on('error', (err) => {
+      if (responded) return;
+      responded = true;
+      res.status(500).json({ ok: false, message: err.message });
+    });
+    child.on('exit', (code) => {
+      if (responded) return;
+      responded = true;
+      const wroteMatch = stdout.match(/Wrote\s+(\d+)\s+products/i);
+      const discoveredMatch = stdout.match(/Discovered\s+(\d+)\s+product JSON files/i);
+      const warnings = [];
+      try {
+        const lines = stdout.split(/\r?\n/);
+        let warnIdx = lines.findIndex(l => /^Warnings:/i.test(l));
+        if (warnIdx >= 0) {
+          for (let i = warnIdx + 1; i < lines.length; i++) {
+            const line = lines[i];
+            if (!line.trim()) continue;
+            warnings.push(line.replace(/^\s*-\s*/, ''));
+          }
+        }
+      } catch {}
+      res.json({
+        ok: code === 0,
+        code,
+        discovered: discoveredMatch ? Number(discoveredMatch[1]) : null,
+        wrote: wroteMatch ? Number(wroteMatch[1]) : null,
+        stdout,
+        stderr,
+        warnings
+      });
+    });
+  } catch (e) {
+    res.status(500).json({ ok: false, message: e.message });
+  }
+});

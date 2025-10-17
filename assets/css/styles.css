@@ -608,14 +608,15 @@ body{
 /* Auth form layout */
 .auth-container{ max-width: 480px; margin: 2rem auto; background:#fff; border-radius:1.2rem; box-shadow:0 4px 24px rgba(12,32,64,.10); padding: 1.5rem; }
 .auth-form{ display:grid; grid-auto-rows:min-content; gap:.9rem; }
-.auth-form input{ padding:.85rem 1rem; border:1px solid var(--border); border-radius:.7rem; }
+.auth-form input{ padding:.85rem 1rem; border:1px solid var(--border); border-radius:.7rem; width:100%; max-width:100%; box-sizing:border-box; }
 .auth-form .auth-field{ position:relative; display:block; }
-.auth-form .auth-field input[type="password"]{ padding-right:4.5rem; }
+.auth-form .auth-field input[type="password"],
+.auth-form .auth-field input.has-peek{ padding-right:2.4rem; }
 .auth-form .auth-peek{
   position:absolute;
   right:.5rem;
   top:50%;
-  transform: translateY(-52%);
+  transform: translateY(-50%);
   display:flex;
   align-items:center;
   gap:.35rem;
@@ -626,9 +627,28 @@ body{
   border-radius:.4rem;
   cursor:pointer;
 }
+
+/* Eye button variant for show/hide */
+.auth-peek-btn{
+  position:absolute;
+  right:.5rem;
+  top:50%;
+  transform:translateY(-50%);
+  width:32px; height:32px;
+  display:inline-grid; place-items:center;
+  border:none; background:transparent; color:#6b7280; /* gray-500 */
+  cursor:pointer; padding:0; border-radius:.4rem;
+}
+.auth-peek-btn:hover, .auth-peek-btn:focus-visible{ color:#374151; outline:none; box-shadow:var(--ring); }
+.auth-peek-btn .eye-closed{ display:none; }
+.auth-peek-btn[aria-pressed="true"] .eye-open{ display:none; }
+.auth-peek-btn[aria-pressed="true"] .eye-closed{ display:block; }
 .auth-form .auth-peek input{ width:auto; margin:0; vertical-align:middle; position:relative; top:-1px; }
 .auth-form .auth-peek .peek-label{ font-size:.8rem; opacity:.75; line-height:1; }
-.auth-form .grid-2{ display:grid; grid-template-columns:1fr 1fr; gap:.6rem; }
+.auth-form .grid-2{ display:grid; grid-template-columns:1fr; gap:.6rem; }
+@media(min-width:520px){
+  .auth-form .grid-2{ grid-template-columns:1fr 1fr; }
+}
 .auth-form .btn{ height: 44px; }
 img{max-width:100%;display:block}
 .container{max-width:1200px;width:100%;margin-inline:auto;padding-inline:clamp(.9rem,4vw,2rem)}

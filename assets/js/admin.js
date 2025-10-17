@@ -413,6 +413,38 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
+  // Wire Product Sync button
+  const syncBtn = document.getElementById('btn-sync-products');
+  const syncDry = document.getElementById('sync-dryrun');
+  const syncDeact = document.getElementById('sync-deactivate');
+  const syncStatus = document.getElementById('sync-status');
+  if (syncBtn && !syncBtn.__wired) {
+    syncBtn.__wired = true;
+    syncBtn.addEventListener('click', async () => {
+      try {
+        if (syncStatus) syncStatus.textContent = 'Running…';
+        syncBtn.disabled = true;
+        const params = new URLSearchParams();
+        params.set('stripe', '1');
+        if (syncDry && syncDry.checked) params.set('dry', '1');
+        if (syncDeact && syncDeact.checked) params.set('deactivateRemoved', '1');
+        const res = await fetchAdmin(`/api/admin/products/sync?${params.toString()}`, { method: 'POST' });
+        const data = await res.json().catch(()=>({}));
+        if (!res.ok || data.ok === false) throw new Error(data.message || 'Sync failed');
+        const wrote = (data.wrote!=null) ? `${data.wrote}` : '—';
+        const disc = (data.discovered!=null) ? `${data.discovered}` : '—';
+        const warns = Array.isArray(data.warnings) ? data.warnings.length : 0;
+        if (syncStatus) syncStatus.textContent = `Done. Wrote ${wrote}, discovered ${disc}${warns?`, warnings ${warns}`:''}.`;
+        // For visibility, also log stdout to console
+        try { console.info('[Product Sync] stdout:\n' + (data.stdout||'')); if (data.stderr) console.warn('[Product Sync] stderr:\n' + data.stderr); } catch {}
+      } catch (e) {
+        if (syncStatus) syncStatus.textContent = e.message || 'Sync failed';
+      } finally {
+        syncBtn.disabled = false;
+      }
+    });
+  }
+
   // Logout functionality
   const logoutBtn = document.getElementById('logout-btn');
   if (logoutBtn) {
