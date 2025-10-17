@@ -19691,5 +19691,74 @@
     "createdAt": "2025-10-17T20:07:21.975Z",
     "updatedAt": "2025-10-17T20:07:21.975Z",
     "id": 1789
+  },
+  {
+    "type": "pageview",
+    "path": "/index.html",
+    "referrer": "",
+    "visitorId": "v_fqldtxsgxo7mgvatnyk",
+    "userId": null,
+    "timestamp": "2025-10-17T20:25:59.205Z",
+    "createdAt": "2025-10-17T20:25:59.247Z",
+    "updatedAt": "2025-10-17T20:25:59.247Z",
+    "id": 1790
+  },
+  {
+    "type": "pageview",
+    "path": "/checkout.html",
+    "referrer": "",
+    "visitorId": "v_fqldtxsgxo7mgvatnyk",
+    "userId": null,
+    "timestamp": "2025-10-17T20:26:00.344Z",
+    "createdAt": "2025-10-17T20:26:00.350Z",
+    "updatedAt": "2025-10-17T20:26:00.350Z",
+    "id": 1791
+  },
+  {
+    "type": "view_cart",
+    "productId": {
+      "items": [
+        {
+          "id": "PITCHERSPOCKET9",
+          "price": 349.95,
+          "qty": 1
+        }
+      ]
+    },
+    "visitorId": "v_fqldtxsgxo7mgvatnyk",
+    "userId": null,
+    "timestamp": "2025-10-17T20:26:00.382Z",
+    "createdAt": "2025-10-17T20:26:00.394Z",
+    "updatedAt": "2025-10-17T20:26:00.394Z",
+    "id": 1792
+  },
+  {
+    "type": "pageview",
+    "path": "/index.html",
+    "referrer": "",
+    "visitorId": "v_i25cgvaaxm8mgvawz05",
+    "userId": null,
+    "timestamp": "2025-10-17T20:28:33.488Z",
+    "createdAt": "2025-10-17T20:28:33.499Z",
+    "updatedAt": "2025-10-17T20:28:33.499Z",
+    "id": 1793
+  },
+  {
+    "type": "view_cart",
+    "productId": {
+      "items": [
+        {
+          "id": "PITCHERSPOCKET9",
+          "price": 349.95,
+          "qty": 1
+        }
+      ]
+    },
+    "visitorId": "v_i25cgvaaxm8mgvawz05",
+    "userId": null,
+    "timestamp": "2025-10-17T20:28:34.005Z",
+    "createdAt": "2025-10-17T20:28:34.017Z",
+    "updatedAt": "2025-10-17T20:28:34.017Z",
+    "id": 1795
   }
 ]
