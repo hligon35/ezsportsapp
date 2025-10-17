@@ -19534,5 +19534,16 @@
     "createdAt": "2025-09-17T21:22:50.110Z",
     "updatedAt": "2025-09-17T21:22:50.110Z",
     "id": 1776
+  },
+  {
+    "type": "pageview",
+    "path": "/checkout.html",
+    "referrer": "",
+    "visitorId": "v_eq6xwovj37umgv216gv",
+    "userId": null,
+    "timestamp": "2025-10-17T16:19:53.267Z",
+    "createdAt": "2025-10-17T16:19:53.357Z",
+    "updatedAt": "2025-10-17T16:19:53.357Z",
+    "id": 1777
   }
 ]

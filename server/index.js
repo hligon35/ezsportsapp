@@ -50,6 +50,12 @@ const analyticsRoutes = require('./routes/analytics');
 const marketingRoutes = require('./routes/marketing');
 const adminRoutes = require('./routes/admin');
 const app = express();
+// Optional: Google Maps Places API key exposure for client autocomplete
+app.get('/api/maps-config', (_req, res) => {
+  const key = process.env.GOOGLE_MAPS_API_KEY || process.env.MAPS_API_KEY || process.env.GMAPS_KEY || null;
+  res.json({ googleMapsApiKey: key });
+});
+
 // Respect reverse proxy (needed for secure cookies and correct IPs when behind nginx/Heroku)
 if (process.env.TRUST_PROXY) {
   app.set('trust proxy', Number(process.env.TRUST_PROXY));
@@ -441,6 +447,21 @@ async function calcShippingCents(items = [], _subtotalCents, _method = 'standard
     const priceMap = await loadPriceMap();
     let total = 0;
     for (const it of items) {
+      const lid = String(it.id || '').toLowerCase();
+      // Free shipping override for specific products
+      const isFreeShip = (() => {
+        if (!lid) return false;
+        if (lid === 'battingmat' || lid === 'armorbasket') return true;
+        if (lid.includes('batting') && lid.includes('mat')) return true;
+        if (lid.includes('armor') && (lid.includes('basket') || lid.includes('baseball') && lid.includes('cart'))) return true;
+        return false;
+      })();
+      if (isFreeShip) {
+        // Free shipping per item
+        const qty = Math.max(1, Number(it.qty) || 1);
+        total += 0 * qty;
+        continue;
+      }
       const rec = priceMap.get(it.id);
       const dsr = Number(rec?.dsr || 0);
       const per = (Number.isFinite(dsr) && dsr > 0) ? dsr : 100;
@@ -454,6 +475,62 @@ async function calcShippingCents(items = [], _subtotalCents, _method = 'standard
   }
 }
 
+// --- Basic tax calculation ---
+// Efficient, local fallback: apply a simple state-based rate. Supports overrides via env.
+// Env formats supported:
+//  - TAX_RATES_JSON: JSON string like { "US": { "GA": 0.07, "FL": 0.06 } }
+//  - TAX_RATES: CSV like "GA:0.07,FL:0.06" (assumes US)
+function loadTaxRates() {
+  // Defaults: collect in GA at 7% unless overridden
+  const defaults = { US: { GA: 0.07 } };
+  try {
+    if (process.env.TAX_RATES_JSON) {
+      const parsed = JSON.parse(process.env.TAX_RATES_JSON);
+      if (parsed && typeof parsed === 'object') return parsed;
+    }
+  } catch {}
+  try {
+    if (process.env.TAX_RATES) {
+      const parts = String(process.env.TAX_RATES).split(',').map(s=>s.trim()).filter(Boolean);
+      const out = { US: {} };
+      for (const p of parts) {
+        const [st, rate] = p.split(':');
+        const key = String(st||'').trim().toUpperCase();
+        const r = Number(rate);
+        if (key && Number.isFinite(r) && r >= 0) out.US[key] = r;
+      }
+      if (Object.keys(out.US).length) return out;
+    }
+  } catch {}
+  return defaults;
+}
+const TAX_RATES = loadTaxRates();
+
+function getTaxRateForAddress(addr = {}) {
+  const country = String(addr.country || 'US').toUpperCase();
+  // Normalize state (handle full names like "Georgia" to GA)
+  const RAW_STATE = String(addr.state || '').trim();
+  const STATE_MAP = {
+    'ALABAMA':'AL','ALASKA':'AK','ARIZONA':'AZ','ARKANSAS':'AR','CALIFORNIA':'CA','COLORADO':'CO','CONNECTICUT':'CT','DELAWARE':'DE','FLORIDA':'FL','GEORGIA':'GA','HAWAII':'HI','IDAHO':'ID','ILLINOIS':'IL','INDIANA':'IN','IOWA':'IA','KANSAS':'KS','KENTUCKY':'KY','LOUISIANA':'LA','MAINE':'ME','MARYLAND':'MD','MASSACHUSETTS':'MA','MICHIGAN':'MI','MINNESOTA':'MN','MISSISSIPPI':'MS','MISSOURI':'MO','MONTANA':'MT','NEBRASKA':'NE','NEVADA':'NV','NEW HAMPSHIRE':'NH','NEW JERSEY':'NJ','NEW MEXICO':'NM','NEW YORK':'NY','NORTH CAROLINA':'NC','NORTH DAKOTA':'ND','OHIO':'OH','OKLAHOMA':'OK','OREGON':'OR','PENNSYLVANIA':'PA','RHODE ISLAND':'RI','SOUTH CAROLINA':'SC','SOUTH DAKOTA':'SD','TENNESSEE':'TN','TEXAS':'TX','UTAH':'UT','VERMONT':'VT','VIRGINIA':'VA','WASHINGTON':'WA','WEST VIRGINIA':'WV','WISCONSIN':'WI','WYOMING':'WY','DISTRICT OF COLUMBIA':'DC'
+  };
+  let state = RAW_STATE.toUpperCase();
+  if (state.length > 2) {
+    const key = state.replace(/\./g, '').replace(/\s+/g, ' ').trim();
+    state = STATE_MAP[key] || state;
+  }
+  const byCountry = TAX_RATES[country];
+  if (!byCountry) return 0;
+  const rate = byCountry[state];
+  return Number.isFinite(rate) ? rate : 0;
+}
+
+function calcTaxCents(subtotalCents = 0, shippingCents = 0, discountCents = 0, shippingAddr = {}) {
+  const rate = getTaxRateForAddress(shippingAddr);
+  if (!Number.isFinite(rate) || rate <= 0) return 0;
+  const taxableBase = Math.max(0, Math.round(Number(subtotalCents||0)) + Math.round(Number(shippingCents||0)) - Math.round(Number(discountCents||0)));
+  return Math.round(taxableBase * rate);
+}
+
 // Create payment intent with server-side calculation
 app.post('/api/create-payment-intent', async (req, res) => {
   const { items = [], customer = {}, shipping = {}, currency = 'usd', couponCode = '', existingOrderId = null } = req.body;
@@ -463,7 +540,7 @@ app.post('/api/create-payment-intent', async (req, res) => {
     }
   const subtotal = await calcSubtotalCents(items);
   const shippingCents = await calcShippingCents(items, subtotal);
-  let amount = subtotal + shippingCents; // taxes omitted in demo
+  let amount = subtotal + shippingCents; // initial base before discounts/tax
 
     // Optional: apply coupon
     let appliedCoupon = null;
@@ -481,6 +558,10 @@ app.post('/api/create-payment-intent', async (req, res) => {
         // ignore invalid coupon; frontend can call validate endpoint for messaging
       }
     }
+
+    // Compute taxes based on shipping address and post-discount amount
+    const taxCents = calcTaxCents(subtotal, shippingCents, discountCents, shipping);
+    amount = Math.max(0, subtotal + shippingCents - discountCents + taxCents);
 
     const description = `EZ Sports order — ${items.map(i => `${i.id}x${i.qty}`).join(', ')}`;
     // Create a local order first for analytics/visibility
@@ -539,6 +620,7 @@ app.post('/api/create-payment-intent', async (req, res) => {
         subtotal: subtotal,
         shipping: shippingCents,
         discount: discountCents,
+        tax: taxCents,
         total: amount
       }
     });

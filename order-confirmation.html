@@ -36,7 +36,14 @@
           if (extras) {
             const bits = [];
             if (typeof order.subtotal === 'number') bits.push(`<div>Subtotal: <strong>${currency(Number(order.subtotal))}</strong></div>`);
-            if (typeof order.shipping === 'number') bits.push(`<div>Shipping: <strong>${currency(Number(order.shipping))}</strong></div>`);
+            if (typeof order.shipping === 'number') {
+              const s = Number(order.shipping);
+              const shipStr = s === 0 ? 'Free' : currency(s);
+              bits.push(`<div>Shipping: <strong>${shipStr}</strong></div>`);
+            }
+            if (typeof order.tax === 'number' && Number(order.tax) > 0) {
+              bits.push(`<div>Tax: <strong>${currency(Number(order.tax))}</strong></div>`);
+            }
             if (typeof order.discount === 'number' && order.discount>0) bits.push(`<div>Discount${order.couponCode?` (${order.couponCode})`:''}: <strong>-${currency(Number(order.discount))}</strong></div>`);
             extras.innerHTML = bits.join('');
           }

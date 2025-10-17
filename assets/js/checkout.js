@@ -33,14 +33,28 @@ function calcShippingCentsForCart(cart){
   // New policy: each item has its own shipping: if item has dsr (ship), use it; otherwise default $100 per item
   let total = 0;
   for (const i of cart) {
-    const dsr = Number(i.ship || 0);
-    const per = (Number.isFinite(dsr) && dsr > 0) ? dsr : 100; // $100 default
+    const raw = (typeof i.ship !== 'undefined') ? i.ship : i.shipAmount;
+    const dsr = Number(raw);
+    // Respect explicit zero as free shipping
+    const per = Number.isFinite(dsr) ? (dsr === 0 ? 0 : (dsr > 0 ? dsr : 100)) : 100; // $100 default
     const qty = Math.max(1, Number(i.qty) || 1);
     total += Math.round(per * 100) * qty;
   }
   return total;
 }
-function updateSummary(cart, applied){
+function taxRateForAddress(addr){
+  // Mirror server defaults: GA 7%, else 0 unless overridden in future
+  const country = String(addr?.country || 'US').toUpperCase();
+  // Normalize common full state names to 2-letter codes for client-side fallback
+  const RAW = String(addr?.state || '').trim();
+  const MAP = { 'ALABAMA':'AL','ALASKA':'AK','ARIZONA':'AZ','ARKANSAS':'AR','CALIFORNIA':'CA','COLORADO':'CO','CONNECTICUT':'CT','DELAWARE':'DE','FLORIDA':'FL','GEORGIA':'GA','HAWAII':'HI','IDAHO':'ID','ILLINOIS':'IL','INDIANA':'IN','IOWA':'IA','KANSAS':'KS','KENTUCKY':'KY','LOUISIANA':'LA','MAINE':'ME','MARYLAND':'MD','MASSACHUSETTS':'MA','MICHIGAN':'MI','MINNESOTA':'MN','MISSISSIPPI':'MS','MISSOURI':'MO','MONTANA':'MT','NEBRASKA':'NE','NEVADA':'NV','NEW HAMPSHIRE':'NH','NEW JERSEY':'NJ','NEW MEXICO':'NM','NEW YORK':'NY','NORTH CAROLINA':'NC','NORTH DAKOTA':'ND','OHIO':'OH','OKLAHOMA':'OK','OREGON':'OR','PENNSYLVANIA':'PA','RHODE ISLAND':'RI','SOUTH CAROLINA':'SC','SOUTH DAKOTA':'SD','TENNESSEE':'TN','TEXAS':'TX','UTAH':'UT','VERMONT':'VT','VIRGINIA':'VA','WASHINGTON':'WA','WEST VIRGINIA':'WV','WISCONSIN':'WI','WYOMING':'WY','DISTRICT OF COLUMBIA':'DC' };
+  let state = RAW.toUpperCase();
+  if (state.length > 2) state = MAP[state] || state;
+  if (country === 'US' && state === 'GA') return 0.07;
+  return 0;
+}
+
+function updateSummary(cart, applied, shippingAddr){
   const sub = calcSubtotalCents(cart);
   const ship = calcShippingCentsForCart(cart);
   let discount = 0;
@@ -52,10 +66,18 @@ function updateSummary(cart, applied){
     }
     if (discount > (sub + ship)) discount = (sub + ship);
   }
-  const total = sub + ship - discount;
+  // Tax is calculated on (sub + ship - discount)
+  const taxBase = Math.max(0, sub + ship - discount);
+  const rate = taxRateForAddress(shippingAddr||{});
+  const tax = Math.round(taxBase * rate);
+  const total = sub + ship - discount + tax;
   const el = (id) => document.getElementById(id);
   if (el('sum-subtotal')) el('sum-subtotal').textContent = currencyFmt(fromCents(sub));
-  if (el('sum-shipping')) el('sum-shipping').textContent = currencyFmt(fromCents(ship));
+  if (el('sum-shipping')) el('sum-shipping').textContent = ship === 0 ? 'Free' : currencyFmt(fromCents(ship));
+  const taxRow = document.getElementById('tax-row');
+  if (taxRow) taxRow.style.display = tax > 0 ? '' : 'none';
+  const taxEl = document.getElementById('sum-tax');
+  if (taxEl) taxEl.textContent = currencyFmt(fromCents(tax));
   if (discount > 0) {
     const row = document.getElementById('discount-row');
     if (row) row.style.display = '';
@@ -66,7 +88,7 @@ function updateSummary(cart, applied){
     if (row) row.style.display = 'none';
   }
   if (el('sum-total')) el('sum-total').textContent = currencyFmt(fromCents(total));
-  return { sub, ship, discount, total };
+  return { sub, ship, discount, tax, total };
 }
 
 function computeDiscountCents(sub, ship, applied) {
@@ -90,6 +112,7 @@ async function initialize() {
   let amount = 0;
   let elements = null;
   let orderId = null;
+  let serverBreakdown = null; // latest server-provided breakdown
 
   // Render order lines with price and quantity
   const lines = cart.map(i => {
@@ -98,8 +121,9 @@ async function initialize() {
     const qty = i.qty || 0;
     const unitCents = toCents(unit);
     const lineCents = unitCents * qty;
-    const shipPer = Number(i.ship || 0);
-    const shipEach = (Number.isFinite(shipPer) && shipPer > 0) ? shipPer : 100;
+    const raw = (typeof i.ship !== 'undefined') ? i.ship : i.shipAmount;
+    const shipPer = Number(raw);
+    const shipEach = Number.isFinite(shipPer) ? (shipPer === 0 ? 0 : (shipPer > 0 ? shipPer : 100)) : 100;
     const shipCents = toCents(shipEach) * qty;
     const variant = variantText(i);
     return `
@@ -108,7 +132,7 @@ async function initialize() {
           <strong>${title}</strong>
           ${variant ? `<div class="muted">${variant}</div>` : ''}
           <div class="muted">${currencyFmt(unitCents)} × ${qty}</div>
-          <div class="muted">Shipping: ${currencyFmt(toCents(shipEach))} × ${qty}</div>
+          <div class="muted">Shipping: ${shipEach===0 ? 'Free' : currencyFmt(toCents(shipEach))} × ${qty}</div>
         </div>
         <div class="text-right">
           <strong>${currencyFmt(lineCents)}</strong>
@@ -126,6 +150,16 @@ async function initialize() {
     const items = cart.map(i=>({ id: i.id, qty: i.qty }));
     return { items, customer, shipping, couponCode: appliedCoupon?.code || '', existingOrderId: orderId };
   };
+
+  function getShippingAddress(){
+    const fd = new FormData(form);
+    // Normalize state to uppercase (and ideally to 2-letter if user typed code)
+    let state = (fd.get('state')||'').toString().trim();
+    if (state.length === 2) state = state.toUpperCase();
+    return { address1: fd.get('address1'), address2: fd.get('address2'), city: fd.get('city'), state, postal: fd.get('postal'), country: fd.get('country') };
+  }
+
+  function debounce(fn, wait){ let t; return (...args)=>{ clearTimeout(t); t = setTimeout(()=>fn(...args), wait); }; }
 
   async function createOrUpdatePaymentIntent() {
     await getStripe();
@@ -146,10 +180,16 @@ async function initialize() {
         // If server provides a pricing breakdown, render it exactly
         try {
           const bd = intentResp.breakdown || null;
+          serverBreakdown = bd || null;
           const set = (id, cents) => { const el = document.getElementById(id); if (el && Number.isFinite(cents)) el.textContent = currencyFmt(fromCents(cents)); };
           if (bd) {
             set('sum-subtotal', bd.subtotal);
-            set('sum-shipping', bd.shipping);
+            // Shipping: show Free when zero for consistency
+            const shipEl = document.getElementById('sum-shipping');
+            if (shipEl) shipEl.textContent = (bd.shipping === 0) ? 'Free' : currencyFmt(fromCents(bd.shipping));
+            const taxRow = document.getElementById('tax-row');
+            if (taxRow) taxRow.style.display = bd.tax && bd.tax > 0 ? '' : 'none';
+            if (Number.isFinite(bd.tax)) set('sum-tax', bd.tax);
             if (bd.discount && bd.discount > 0) {
               const row = document.getElementById('discount-row');
               if (row) row.style.display = '';
@@ -178,7 +218,7 @@ async function initialize() {
   await createOrUpdatePaymentIntent();
 
   // Always show a computed summary (even in test mode). Server breakdown overrides this during PI creation.
-  const { total: computedTotal } = updateSummary(cart, appliedCoupon);
+  const { total: computedTotal } = updateSummary(cart, appliedCoupon, getShippingAddress());
   if (amount > 0) {
     document.getElementById('sum-total').textContent = currencyFmt(amount);
   } else {
@@ -207,18 +247,32 @@ async function initialize() {
       if (data.valid) {
         appliedCoupon = data.coupon ? { code: data.coupon.code, type: data.coupon.type, value: data.coupon.value } : { code, type:'percent', value:0 };
         document.getElementById('discount-code-label').textContent = `(${appliedCoupon.code})`;
-        updateSummary(cart, appliedCoupon);
+        updateSummary(cart, appliedCoupon, getShippingAddress());
         await createOrUpdatePaymentIntent();
         if (amount > 0) document.getElementById('sum-total').textContent = currencyFmt(amount);
         msg.textContent = 'Code applied.';
       } else {
         appliedCoupon = null;
-        updateSummary(cart, appliedCoupon);
+        updateSummary(cart, appliedCoupon, getShippingAddress());
         msg.textContent = 'Invalid or expired code.';
       }
     } catch (e) {
       msg.textContent = 'Could not validate code.';
     }
+  });
+
+  // Recalculate when address changes (debounced)
+  const onAddrChange = debounce(async () => {
+    // Update local summary immediately for test mode and UX
+    updateSummary(cart, appliedCoupon, getShippingAddress());
+    await createOrUpdatePaymentIntent();
+    if (amount > 0) document.getElementById('sum-total').textContent = currencyFmt(amount);
+  }, 350);
+  ['address1','address2','city','state','postal','country'].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.addEventListener('input', onAddrChange);
+    el.addEventListener('change', onAddrChange);
   });
 
   form.addEventListener('submit', async (e) => {
@@ -235,7 +289,8 @@ async function initialize() {
         const sub = calcSubtotalCents(cart);
         const ship = calcShippingCentsForCart(cart);
         const discount = computeDiscountCents(sub, ship, appliedCoupon);
-        const total = sub + ship - discount;
+        const tax = Math.round(Math.max(0, sub + ship - discount) * taxRateForAddress(getShippingAddress()));
+        const total = sub + ship - discount + tax;
         let orderId = Date.now();
         if (resp.ok) {
           const data = await resp.json();
@@ -250,6 +305,7 @@ async function initialize() {
           subtotal: Math.round(sub)/100,
           shipping: Math.round(ship)/100,
           discount: Math.round(discount)/100,
+          tax: Math.round(tax)/100,
           couponCode: appliedCoupon?.code || null
         };
         // Save for confirmation page
@@ -273,6 +329,8 @@ async function initialize() {
       const fallbackTotal = sub + ship;
       const totalCents = typeof amount === 'number' && amount > 0 ? amount : fallbackTotal;
       const discount = Math.max(0, fallbackTotal - totalCents);
+      // Prefer server-provided tax if available
+      const taxCents = serverBreakdown && Number.isFinite(serverBreakdown.tax) ? serverBreakdown.tax : Math.max(0, totalCents - (sub + ship - discount));
       const order = {
         id: orderId,
         items,
@@ -280,6 +338,7 @@ async function initialize() {
         subtotal: Math.round(sub)/100,
         shipping: Math.round(ship)/100,
         discount: Math.round(discount)/100,
+        tax: Math.round(taxCents)/100,
         couponCode: appliedCoupon?.code || null
       };
       sessionStorage.setItem('lastOrder', JSON.stringify(order));

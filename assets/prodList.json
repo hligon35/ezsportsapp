@@ -992,6 +992,8 @@
           "features": [
             "Fast and Reliable Shipping"
           ]
+        ,
+          "description": "Commercial‑grade 5/16\" galvanized steel cable for batting cage top lines and support runs. Corrosion‑resistant for indoor/outdoor use; ideal with turnbuckles, thimbles, and cable clamps for a secure, long‑lasting install."
         }
       },
       {
@@ -1005,6 +1007,8 @@
           "features": [
             "Fast and Reliable Shipping"
           ]
+        ,
+          "description": "Bulk 1000' spool of 5/16\" galvanized steel cable for overhead netting, cage installs, and long support runs. Durable, weather‑resistant wire rope pairs with standard turnbuckles and clamps for professional rigging."
         }
       },
       {
@@ -1018,6 +1022,8 @@
           "features": [
             "Fast and Reliable Shipping"
           ]
+        ,
+          "description": "Versatile 1/4\" galvanized steel cable for light‑to‑medium netting applications and tie‑backs. Weather‑resistant and reliable for training facilities, parks, and backyard cages."
         }
       },
       {
@@ -1031,6 +1037,8 @@
           "features": [
             "Fast and Reliable Shipping"
           ]
+        ,
+          "description": "Economical 1000' spool of 1/4\" galvanized steel cable for extended cage runs and perimeter supports. Built for outdoor exposure and everyday use."
         }
       },
       {
@@ -1044,6 +1052,8 @@
           "features": [
             "Fast and Reliable Shipping"
           ]
+        ,
+          "description": "UV‑treated 5/16\" twisted poly rope sold by the foot for net borders, lacing, and tie‑downs. Lightweight, strong, and weather‑resistant for indoor/outdoor setups."
         }
       },
       {
@@ -1057,6 +1067,8 @@
           "features": [
             "Fast and Reliable Shipping"
           ]
+        ,
+          "description": "Full 1,270' spool of 5/16\" UV‑treated twisted poly rope for long net runs and facility installs. Ideal for edging, lacing, and general cage rigging."
         }
       },
       {
@@ -1070,6 +1082,8 @@
           "features": [
             "Fast and Reliable Shipping"
           ]
+        ,
+          "description": "Black UV‑treated repair/lacing twine in #21 gauge for net patches, tie‑offs, and light duty installs. A staple for quick field or cage fixes."
         }
       },
       {
@@ -1083,6 +1097,8 @@
           "features": [
             "Fast and Reliable Shipping"
           ]
+        ,
+          "description": "#30 black UV‑treated twine for durable net lacing and general maintenance. Great balance of strength and ease of handling."
         }
       },
       {
@@ -1096,6 +1112,8 @@
           "features": [
             "Fast and Reliable Shipping"
           ]
+        ,
+          "description": "Heavy‑duty #36 black UV‑treated twine for net repairs, seams, and tie‑downs that see more load and wear."
         }
       },
       {
@@ -1109,6 +1127,8 @@
           "features": [
             "Fast and Reliable Shipping"
           ]
+        ,
+          "description": "Extra‑strong #42 black UV‑treated twine for high‑stress lacing and long‑term net maintenance in cages or outdoor installs."
         }
       },
       {
@@ -1122,6 +1142,8 @@
           "features": [
             "Fast and Reliable Shipping"
           ]
+        ,
+          "description": "Ultra‑durable #60 black UV‑treated twine for commercial‑grade repairs, edge binding, and heavy lacing work."
         }
       },
       {
@@ -1135,6 +1157,8 @@
           "features": [
             "Fast and Reliable Shipping"
           ]
+        ,
+          "description": "Maximum‑strength #92 black UV‑treated twine for the toughest net lacing and reinforcement jobs. Built for facility abuse."
         }
       },
       {
@@ -1165,11 +1189,14 @@
         "name": "Bullet Wheel Kit",
         "wholesale": 75,
         "dsr": 100,
+        "active": false,
         "img": "assets/img/products/33-gloves-lp-pro-long-cuff-youth-batting-gloves-yll-109214.jpg",
         "details": {
           "features": [
             "Fast and Reliable Shipping"
           ]
+        ,
+          "description": "Add easy rolling mobility to your screen. Heavy‑duty wheel kit mounts to Bullet and Armor frames to move between stations and in/out of cages with less effort."
         }
       },
       {
@@ -1177,11 +1204,14 @@
         "name": "Bullet Fixed Leg Kit",
         "wholesale": 35,
         "dsr": 100,
+        "active": false,
         "img": "assets/img/products/2026-louisville-slugger-kryo-drop-10-fastpitch-softball-bat-wbl4135010.jpg",
         "details": {
           "features": [
             "Fast and Reliable Shipping"
           ]
+        ,
+          "description": "Replacement fixed leg components for Bullet screens. Simple bolt‑on stability for facilities that prefer stationary setups."
         }
       },
       {
@@ -1189,11 +1219,14 @@
         "name": "Bullet Replacement Wheels (2-Pack)",
         "wholesale": 30,
         "dsr": 100,
+        "active": false,
         "img": "assets/img/products/victus-vibe-pencil-drop-5-usssa-baseball-bat.jpg",
         "details": {
           "features": [
             "Fast and Reliable Shipping"
           ]
+        ,
+          "description": "Direct‑fit replacement wheels for Bullet screen wheel kits. Keep your screen rolling smoothly with a quick swap."
         }
       },
       {
@@ -1209,12 +1242,15 @@
           "features": [
             "Fast and Reliable Shipping"
           ]
+        ,
+          "description": "Heavy‑duty 12\" wide vinyl sold by the foot for edge wraps, protective toppers, and custom padding covers. UV‑resistant material cleans easily and handles daily facility use."
         }
       },
       {
         "sku": "Screen Component",
         "name": "Screen Padding by the FT",
         "wholesale": "1/ft",
+        "map": "1.5/ft",
         "dsr": 100,
         "img": "assets/prodImgs/Accessories/Padding/padding.png",
         "images": [
@@ -1224,45 +1260,53 @@
           "features": [
             "Fast and Reliable Shipping"
           ]
+        ,
+          "description": "Impact foam padding with vinyl cover sold by the foot to wrap screen frames and high‑contact areas. Reduces ricochet and protects net borders."
         }
       },
       {
         "sku": "Battingmat",
         "name": "Pro Batting Mat",
         "wholesale": 475,
-        "dsr": 100,
+        "map": 575,
+        "dsr": 0,
         "notes": "Free Shipping",
         "img": "assets/img/products/tanner-original-replacement-standard-batting-tee-stem-only-ttstem1.jpg",
         "details": {
           "features": [
             "Fast and Reliable Shipping"
-          ]
+          ],
+          "description": "Professional‑grade turf mat to protect the batter’s box in cages or on field. Spike‑resistant surface with non‑slip backing rolls out flat for quick, portable setup."
         }
       },
       {
         "sku": "Armorbasket",
         "name": "Armor Baseball Cart",
         "wholesale": 200,
-        "dsr": 100,
+        "map": 300,
+        "dsr": 0,
         "notes": "Free Shipping",
         "img": "assets/img/products/victus-v243-powderpuff-pro-reserve-maple-wood-baseball-bat-cstmv243pp.jpg",
         "details": {
           "features": [
             "Fast and Reliable Shipping"
-          ]
+          ],
+          "description": "Heavy‑duty rolling ball cart for the cage or field. Welded frame and large wheels make transport easy; deep basket keeps baseballs secure between stations."
         }
       },
       {
         "sku": "Wbasket",
         "name": "Bullet Wheeled Ball Basket",
         "wholesale": 350,
+        "map": 450,
         "dsr": 100,
         "notes": "LTL Freight Only",
         "img": "assets/img/products/100-limited-edition-speedcraft-xs-fernando-tatis-jr-blue-topaz-mirror-lens-sungl.jpg",
         "details": {
           "features": [
             "Fast and Reliable Shipping"
-          ]
+          ],
+          "description": "High‑capacity, wheeled ball basket designed for heavy facility use. Sturdy frame and large casters roll smoothly on turf or concrete to keep batting practice moving."
         }
       }
     ],
