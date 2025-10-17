@@ -25,15 +25,25 @@
   function flattenItems(data){
     const out = [];
     if (!data) return out;
+    const isVisible = (p) => {
+      try {
+        if (!p || typeof p !== 'object') return false;
+        if (p.hidden === true) return false;
+        if (p.draft === true) return false;
+        if (p.active === false) return false;
+        if (p.exclude === true || p.excluded === true) return false;
+      } catch {}
+      return true;
+    };
     // Legacy shape: pageKey arrays directly on root
     for (const [k,v] of Object.entries(data)) {
       if (k === 'schemaVersion' || k === 'updatedAt' || k === 'categories') continue;
-      if (Array.isArray(v)) out.push(...v);
+      if (Array.isArray(v)) out.push(...v.filter(isVisible));
     }
     // New shape: categories map
     if (data.categories && typeof data.categories === 'object') {
       for (const arr of Object.values(data.categories)) {
-        if (Array.isArray(arr)) out.push(...arr);
+        if (Array.isArray(arr)) out.push(...arr.filter(isVisible));
       }
     }
     return out;
@@ -936,6 +946,11 @@
         if (titleSlug && titleSlug === pidLower) return true;
         return false;
       });
+      // Guard: if an item was explicitly hidden but somehow slipped through, suppress rendering
+      if (raw && (raw.hidden === true || raw.draft === true || raw.active === false || raw.exclude === true || raw.excluded === true)) {
+        render(null);
+        return;
+      }
       render(raw ? toDisplayItem(raw) : null);
     } catch (e) {
       render(null);
