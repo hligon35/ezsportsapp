@@ -85,6 +85,23 @@ router.post('/contact', async (req, res) => {
 
     if (!email || !message) return res.status(400).json({ ok: false, error: 'Missing email or message' });
 
+    // Optional Cloudflare Turnstile verification (enable by setting CF_TURNSTILE_SECRET)
+    try {
+      const tsSecret = (process.env.CF_TURNSTILE_SECRET || '').trim();
+      if (tsSecret) {
+        const doFetch = (typeof fetch === 'function') ? fetch : (require('undici').fetch);
+        const resp = await doFetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: new URLSearchParams({ secret: tsSecret, response: turnstile || '' }).toString()
+        }).catch(() => null);
+        const data = resp ? await resp.json().catch(()=>({})) : {};
+        if (!data || data.success !== true) {
+          return res.status(400).json({ ok:false, error: 'Captcha verification failed' });
+        }
+      }
+    } catch { /* treat as no captcha when network fails */ }
+
     const html = `
       <h2>Contact Form Submission</h2>
       <p><strong>Name:</strong> ${name}</p>
