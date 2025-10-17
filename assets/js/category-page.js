@@ -74,8 +74,7 @@
               <div class="price-row">
                 <span class="price">${(new Intl.NumberFormat(undefined,{style:'currency',currency:'USD'})).format(p.price)}</span>
                 <div class="actions">
-                  <button class="btn btn-ghost" data-add="${p.id}">Add</button>
-                  <button class="btn btn-ghost" data-detail="${p.id}" aria-label="Details for ${p.title}">Details</button>
+                  <a class="btn btn-ghost" href="product.html?pid=${encodeURIComponent(p.id)}" aria-label="View ${p.title}">View</a>
                 </div>
               </div>
             </div>
@@ -90,16 +89,7 @@
         pager.innerHTML = h;
         pager.querySelectorAll('[data-page]').forEach(b => b.addEventListener('click', ()=> render(Number(b.getAttribute('data-page')), filtered)));
       }
-      // Bind add & detail
-      grid.querySelectorAll('[data-add]').forEach(btn => btn.addEventListener('click', ()=>{
-        const id = btn.getAttribute('data-add');
-        const prod = filtered.find(p=>p.id===id); if (prod && window.Store) window.Store.add(prod,{});
-        try { window.trackEvent && window.trackEvent('add_to_cart', { id }); } catch {}
-      }));
-      grid.querySelectorAll('[data-detail]').forEach(btn => btn.addEventListener('click', ()=>{
-        const id = btn.getAttribute('data-detail');
-        const prod = filtered.find(p=>p.id===id); if (prod && window.Store) window.Store.openProductDetail(prod);
-      }));
+      // No add/detail bindings needed; View links navigate to product detail
     }
   }
 

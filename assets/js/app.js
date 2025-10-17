@@ -2315,17 +2315,43 @@ ensureHomeFirst() {
     // Prefer stable, human-unique identifiers over generic SKUs that can collide (e.g., "Screen Component")
     const id = String(p.id || p.name || p.title || p.sku || Math.random().toString(36).slice(2));
     const title = String(p.name || p.title || id);
+    // Helper to parse values like "1.5/ft", "$0.50/ft", or plain numbers
+    const parseAmountAndUnit = (val) => {
+      if (val == null) return { amount: 0, unit: '' };
+      if (typeof val === 'number') return { amount: Number(val) || 0, unit: '' };
+      if (typeof val === 'string') {
+        const s = val.trim();
+        // Capture leading number (with optional $) and optional /unit suffix
+        const m = s.match(/^\$?\s*([0-9]+(?:\.[0-9]+)?)\s*(?:\/\s*([a-zA-Z]+))?/);
+        if (m) {
+          const amount = Number(m[1]) || 0;
+          const unit = m[2] ? ('/' + m[2].toLowerCase()) : (s.includes('/ft') ? '/ft' : '');
+          return { amount, unit };
+        }
+      }
+      return { amount: Number(val) || 0, unit: '' };
+    };
     // Prefer explicit price fields; fall back to details.price, map, then wholesale, or derive from variations
-    let price = Number(p.price ?? p.map ?? p.wholesale ?? 0) || 0;
+    let unitSuffix = '';
+    let parsed = parseAmountAndUnit(p.price ?? p.map ?? p.wholesale ?? 0);
+    let price = parsed.amount || 0;
+    if (!unitSuffix && parsed.unit) unitSuffix = parsed.unit;
     if ((!isFinite(price) || price <= 0) && p.details && (p.details.price != null)) {
-      const dp = Number(p.details.price);
-      if (isFinite(dp) && dp > 0) price = dp;
+      const dp = parseAmountAndUnit(p.details.price);
+      if (isFinite(dp.amount) && dp.amount > 0) {
+        price = dp.amount;
+        if (!unitSuffix && dp.unit) unitSuffix = dp.unit;
+      }
     }
     // Collect variation prices (if any) for min/max display and as a fallback
     let varMin = null, varMax = null;
     if (Array.isArray(p.variations) && p.variations.length) {
       const prices = p.variations
-        .map(v => Number(v.map ?? v.price ?? 0))
+        .map(v => {
+          const pv = parseAmountAndUnit(v.map ?? v.price ?? 0);
+          if (!unitSuffix && pv.unit) unitSuffix = pv.unit;
+          return pv.amount;
+        })
         .filter(v => isFinite(v) && v > 0);
       if (prices.length) {
         varMin = Math.min(...prices);
@@ -2504,7 +2530,7 @@ ensureHomeFirst() {
       if (varMin != null) candidates.push(varMin);
       return candidates.length ? Math.max(...candidates) : price || 0;
     })();
-    return { id, title, price, minPrice, maxPrice, img, images: imagesList, category: (p.category || '').toString().toLowerCase() };
+    return { id, title, price, minPrice, maxPrice, img, images: imagesList, category: (p.category || '').toString().toLowerCase(), priceUnit: unitSuffix };
   },
 
   buildProductCard(prod) {
@@ -2520,12 +2546,12 @@ ensureHomeFirst() {
       let displayPrice = '';
       const minP = Number(prod.minPrice ?? price ?? 0);
       const maxP = Number(prod.maxPrice ?? minP);
+      const unit = (prod.priceUnit || '').trim();
       if (isFinite(minP) && minP > 0) {
-        if (isFinite(maxP) && maxP > minP) {
-          displayPrice = `${currency.format(minP)} - ${currency.format(maxP)}`;
-        } else {
-          displayPrice = currency.format(minP);
-        }
+        const isRange = (isFinite(maxP) && maxP > minP);
+        displayPrice = isRange
+          ? `${currency.format(minP)} - ${currency.format(maxP)}${unit ? unit : ''}`
+          : `${currency.format(minP)}${unit ? unit : ''}`;
       }
       const href = `product.html?pid=${encodeURIComponent(id)}`;
 
@@ -2589,7 +2615,7 @@ ensureHomeFirst() {
             ${colorDotsHtml}
             <div class="price-row${(!displayPrice && moveAddRight) ? ' right' : ''}">
               ${displayPrice ? `<span class="price">${displayPrice}</span>` : ''}
-              <button class="btn btn-ghost js-add" data-id="${id}" data-title="${title.replace(/"/g,'&quot;')}" data-price="${price}" data-category="${prod.category || ''}" data-img="${img}">Add</button>
+              <a class="btn btn-ghost" href="${href}" aria-label="View ${title}">View</a>
             </div>
           </div>`;
       }
@@ -3093,8 +3119,7 @@ ensureHomeFirst() {
             <div class="actions">
               ${p.isTwistedRope
                 ? `<a class="btn btn-ghost" href="product.html?pid=rope-516-poly" aria-label="View ${p.title}">View</a>`
-                : `<button class="btn btn-ghost" data-add="${p.id}" ${p.stock === 0 ? 'disabled' : ''}>${p.stock === 0 ? 'Out of Stock' : 'Add'}</button>
-                   <button class="btn btn-ghost" data-detail="${p.id}" aria-label="View details for ${p.title}">Details</button>`}
+                : `<a class="btn btn-ghost" href="product.html?pid=${encodeURIComponent(p.id)}" aria-label="View ${p.title}">View</a>`}
             </div>
           </div>
         </div>
