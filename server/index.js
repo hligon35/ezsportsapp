@@ -436,22 +436,22 @@ async function calcSubtotalCents(items = []) {
 }
 
 async function calcShippingCents(items = [], _subtotalCents, _method = 'standard'){
-  // New policy: if any items have a per-product dsr, sum dsr * qty; otherwise flat $100 per order
+  // New policy: per-item shipping: use dsr when available; default $100 per item otherwise
   try {
     const priceMap = await loadPriceMap();
-    let dsrTotal = 0;
+    let total = 0;
     for (const it of items) {
       const rec = priceMap.get(it.id);
       const dsr = Number(rec?.dsr || 0);
-      if (dsr > 0) {
-        const qty = Math.max(1, Number(it.qty) || 1);
-        dsrTotal += Math.round(dsr * 100) * qty;
-      }
+      const per = (Number.isFinite(dsr) && dsr > 0) ? dsr : 100;
+      const qty = Math.max(1, Number(it.qty) || 1);
+      total += Math.round(per * 100) * qty;
     }
-    if (dsrTotal > 0) return dsrTotal;
-  } catch {}
-  // Default when no dsr present on any items
-  return 10000; // $100 flat
+    return total;
+  } catch {
+    // Fallback: treat as $100 per item
+    return (items || []).reduce((s, it) => s + (10000 * Math.max(1, Number(it.qty)||1)), 0);
+  }
 }
 
 // Create payment intent with server-side calculation

@@ -30,19 +30,15 @@ function calcSubtotalCents(cart){
   return cart.reduce((sum,i)=> sum + (toCents(i.price||0) * (i.qty||0)), 0);
 }
 function calcShippingCentsForCart(cart){
-  // New policy: if any cart items carry a per-product dsr (ship), sum ship * qty; else flat $100 per order
-  let dsrTotal = 0;
-  let hasAnyDsr = false;
+  // New policy: each item has its own shipping: if item has dsr (ship), use it; otherwise default $100 per item
+  let total = 0;
   for (const i of cart) {
     const dsr = Number(i.ship || 0);
-    if (dsr > 0) {
-      hasAnyDsr = true;
-      const qty = Math.max(1, Number(i.qty) || 1);
-      dsrTotal += Math.round(dsr * 100) * qty;
-    }
+    const per = (Number.isFinite(dsr) && dsr > 0) ? dsr : 100; // $100 default
+    const qty = Math.max(1, Number(i.qty) || 1);
+    total += Math.round(per * 100) * qty;
   }
-  if (hasAnyDsr) return dsrTotal;
-  return 10000; // $100 default when no dsr present
+  return total;
 }
 function updateSummary(cart, applied){
   const sub = calcSubtotalCents(cart);
@@ -102,6 +98,9 @@ async function initialize() {
     const qty = i.qty || 0;
     const unitCents = toCents(unit);
     const lineCents = unitCents * qty;
+    const shipPer = Number(i.ship || 0);
+    const shipEach = (Number.isFinite(shipPer) && shipPer > 0) ? shipPer : 100;
+    const shipCents = toCents(shipEach) * qty;
     const variant = variantText(i);
     return `
       <div class="flex-row items-start gap-075 space-between">
@@ -109,8 +108,11 @@ async function initialize() {
           <strong>${title}</strong>
           ${variant ? `<div class="muted">${variant}</div>` : ''}
           <div class="muted">${currencyFmt(unitCents)} × ${qty}</div>
+          <div class="muted">Shipping: ${currencyFmt(toCents(shipEach))} × ${qty}</div>
         </div>
-        <div class="text-right"><strong>${currencyFmt(lineCents)}</strong></div>
+        <div class="text-right">
+          <strong>${currencyFmt(lineCents)}</strong>
+        </div>
       </div>
     `;
   }).join('');
