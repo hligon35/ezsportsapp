@@ -10,6 +10,7 @@ const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
 const cookieParser = require('cookie-parser');
 const fsSync = require('fs');
+const crypto = require('crypto');
 // Initialize Stripe client only if a secret key is provided (set in Render env)
 let stripe = null;
 try {
@@ -51,14 +52,33 @@ const marketingRoutes = require('./routes/marketing');
 const adminRoutes = require('./routes/admin');
 const app = express();
 // Optional: Google Maps Places API key exposure for client autocomplete
-app.get('/api/maps-config', (_req, res) => {
+app.get('/api/maps-config', (req, res) => {
+  // Only expose key for known origins; otherwise return null
   const key = process.env.GOOGLE_MAPS_API_KEY || process.env.MAPS_API_KEY || process.env.GMAPS_KEY || null;
-  res.json({ googleMapsApiKey: key });
+  const origin = req.headers.origin || '';
+  const envOrigins = (process.env.CORS_ORIGINS || '').split(',').map(s => s.trim()).filter(Boolean);
+  const devOrigins = ['http://127.0.0.1:5500', 'http://localhost:5500'];
+  const allowList = envOrigins.length ? envOrigins : devOrigins;
+  const allowed = !origin || allowList.includes(origin);
+  res.json({ googleMapsApiKey: allowed ? key : null });
 });
 
 // Respect reverse proxy (needed for secure cookies and correct IPs when behind nginx/Heroku)
 if (process.env.TRUST_PROXY) {
   app.set('trust proxy', Number(process.env.TRUST_PROXY));
+}
+
+// Optional HTTPS redirect behind proxies (ENABLE with FORCE_HTTPS=true)
+if (String(process.env.FORCE_HTTPS || '').toLowerCase() === 'true') {
+  app.use((req, res, next) => {
+    const proto = (req.headers['x-forwarded-proto'] || '').toString();
+    if (proto && proto !== 'https') {
+      const host = req.headers.host;
+      const url = `https://${host}${req.originalUrl}`;
+      return res.redirect(301, url);
+    }
+    next();
+  });
 }
 
 // CORS with optional allowlist and credentials for cookie-based auth
@@ -82,6 +102,10 @@ app.options('*', cors(corsOptions));
 app.use(helmet({
   contentSecurityPolicy: false // Keep disabled for now to avoid breaking inline scripts/styles; tighten later
 }));
+// Add HSTS explicitly (works when behind proxy with trust proxy enabled)
+try {
+  app.use((req, res, next) => { res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains'); next(); });
+} catch {}
 app.use(compression());
 app.use(cookieParser());
 // Basic request logging
@@ -97,6 +121,9 @@ if (isProd) {
   app.use('/api/inventory', generalLimiter);
   // Admin analytics endpoints can be limited too
   app.use('/api/analytics/admin', generalLimiter);
+  // Tighter limits for auth and public marketing endpoints to reduce abuse
+  const tightLimiter = rateLimit({ windowMs: 60 * 1000, max: 20 });
+  app.use(['/api/users/login', '/api/users/register', '/api/marketing/subscribe', '/api/marketing/contact'], tightLimiter);
 } else {
   // No limiter in development to simplify testing
 }
@@ -346,6 +373,15 @@ app.use((req, res, next) => {
   next();
 });
 
+// Block access to sensitive repo directories from being served statically
+app.use((req, res, next) => {
+  const p = req.path || '';
+  if (/^\/(?:server|database)\b/.test(p)) {
+    return res.status(404).send('Not Found');
+  }
+  next();
+});
+
 app.use(express.static(path.join(__dirname, '..')));
 
 // Static assets caching (1 year for immutable, 1 hour for html)
@@ -538,9 +574,13 @@ app.post('/api/create-payment-intent', async (req, res) => {
     if (!stripe) {
       return res.status(503).json({ error: 'Stripe is not configured on the server.' });
     }
-  const subtotal = await calcSubtotalCents(items);
-  const shippingCents = await calcShippingCents(items, subtotal);
-  let amount = subtotal + shippingCents; // initial base before discounts/tax
+    // Basic input validation and normalization
+    if (!Array.isArray(items) || items.length === 0) return res.status(400).json({ error: 'Items are required' });
+    const normItems = items.map(i => ({ id: String(i.id || '').trim(), qty: Math.max(1, Math.min(20, parseInt(i.qty || 1))) }));
+    const safeCurrency = (String(currency || 'usd').toLowerCase() === 'usd') ? 'usd' : 'usd';
+    const subtotal = await calcSubtotalCents(normItems);
+    const shippingCents = await calcShippingCents(normItems, subtotal);
+    let amount = subtotal + shippingCents; // initial base before discounts/tax
 
     // Optional: apply coupon
     let appliedCoupon = null;
@@ -560,8 +600,8 @@ app.post('/api/create-payment-intent', async (req, res) => {
     }
 
     // Compute taxes based on shipping address and post-discount amount
-    const taxCents = calcTaxCents(subtotal, shippingCents, discountCents, shipping);
-    amount = Math.max(0, subtotal + shippingCents - discountCents + taxCents);
+  const taxCents = calcTaxCents(subtotal, shippingCents, discountCents, shipping);
+  amount = Math.max(0, subtotal + shippingCents - discountCents + taxCents);
 
     const description = `EZ Sports order — ${items.map(i => `${i.id}x${i.qty}`).join(', ')}`;
     // Create a local order first for analytics/visibility
@@ -570,7 +610,7 @@ app.post('/api/create-payment-intent', async (req, res) => {
       const orderPayload = {
         userId: null,
         userEmail: customer.email || undefined,
-        items: items.map(i => ({ id: i.id, qty: i.qty })),
+        items: normItems.map(i => ({ id: i.id, qty: i.qty })),
         shippingAddress: shipping,
         customerInfo: customer,
         paymentInfo: { method: 'stripe' }
@@ -585,14 +625,21 @@ app.post('/api/create-payment-intent', async (req, res) => {
       newOrder = null;
     }
 
+    // Provide an idempotency key to prevent duplicate PI creation on retries
+    const idemKey = crypto
+      .createHash('sha256')
+      .update(JSON.stringify({ normItems, email: customer.email || '', existingOrderId: newOrder?.id || existingOrderId || null }))
+      .digest('hex')
+      .slice(0, 64);
+
     const paymentIntent = await stripe.paymentIntents.create({
       amount,
-      currency,
+      currency: safeCurrency,
       description,
       metadata: {
         email: customer.email || '',
         name: customer.name || '',
-        items: items.map(i => `${i.id}:${i.qty}`).join('|'),
+        items: normItems.map(i => `${i.id}:${i.qty}`).join('|'),
         order_id: newOrder?.id ? String(newOrder.id) : '',
         coupon_code: appliedCoupon ? String(appliedCoupon.code) : ''
       },
@@ -609,7 +656,7 @@ app.post('/api/create-payment-intent', async (req, res) => {
           country: shipping.country || 'US',
         }
       }
-    });
+    }, { idempotencyKey: idemKey });
     // Return client secret and linked order id so the frontend can keep them in sync
     res.json({
       clientSecret: paymentIntent.client_secret,
