@@ -6,6 +6,7 @@ async function getStripe() {
   if (stripe) return stripe;
   try {
     const cfg = await fetch('/api/config').then(r=>r.ok?r.json():{ pk: 'pk_test_your_publishable_key', enabled: false });
+    try { window.__stripeCfg = cfg; } catch {}
     stripeEnabled = !!cfg.enabled;
     stripe = Stripe(cfg.pk || 'pk_test_your_publishable_key');
   } catch {
@@ -211,6 +212,10 @@ async function initialize() {
           paymentElement.mount('#payment-element');
         } catch {}
       }
+      if (intentResp && intentResp.error) {
+        const msg = document.getElementById('payment-message');
+        if (msg) msg.textContent = intentResp.error || 'Could not initialize payment.';
+      }
     } catch (_) { /* ignore */ }
   }
 
@@ -230,6 +235,14 @@ async function initialize() {
     if (pe) pe.innerHTML = '<p class="muted">Test checkout active (no card required)</p>';
     const submit = document.getElementById('submit');
     if (submit) submit.textContent = 'Place Order';
+    // If Stripe is disabled due to server config, surface a helpful note
+    try {
+      const cfg = window.__stripeCfg;
+      if (cfg && cfg.missing && (cfg.missing.secret || cfg.missing.publishable)) {
+        const msg = document.getElementById('payment-message');
+        if (msg) msg.textContent = 'Card payments are temporarily unavailable. You can still place your order and we will follow up to complete payment.';
+      }
+    } catch {}
   }
 
   // Shipping method selection removed; totals depend only on cart contents and coupon

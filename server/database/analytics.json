@@ -19760,5 +19760,16 @@
     "createdAt": "2025-10-17T20:28:34.017Z",
     "updatedAt": "2025-10-17T20:28:34.017Z",
     "id": 1795
+  },
+  {
+    "type": "pageview",
+    "path": "/",
+    "referrer": "",
+    "visitorId": null,
+    "userId": null,
+    "timestamp": "2025-10-17T20:39:59.391Z",
+    "createdAt": "2025-10-17T20:39:59.415Z",
+    "updatedAt": "2025-10-17T20:39:59.415Z",
+    "id": 1796
   }
 ]
