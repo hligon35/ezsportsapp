@@ -1,9 +1,11 @@
 const express = require('express');
 const router = express.Router();
 const UserService = require('../services/UserService');
+const EmailService = require('../services/EmailService');
 const { signToken, requireAdmin, requireAuth, setAuthCookie, clearAuthCookie, getUserFromRequest } = require('../middleware/auth');
 
 const userService = new UserService();
+const emailService = new EmailService();
 
 // Register new user (requires firstName, lastName, email, password; optional password2 for confirmation)
 router.post('/register', async (req, res) => {
@@ -147,3 +149,40 @@ router.delete('/admin/:id', requireAdmin, async (req, res) => {
 });
 
 module.exports = router;
+
+// Forgot password: request reset link
+router.post('/forgot-password', async (req, res) => {
+  try {
+    const { email } = req.body;
+    const { token, email: userEmail } = await userService.createResetToken(email);
+    // Build reset URL
+  const base = process.env.APP_BASE_URL || `${req.protocol}://${req.get('host')}`;
+    const url = new URL('/reset-password.html', base);
+    url.searchParams.set('token', token);
+    // Queue email (replace with real provider later)
+    await emailService.queue({
+      to: userEmail,
+      subject: 'Reset your EZ Sports Netting password',
+      text: `Click the link to reset your password: ${url.toString()} (valid for 1 hour)`,
+      html: `<p>Click the link to reset your password:</p><p><a href="${url.toString()}">${url.toString()}</a></p><p>This link is valid for 1 hour.</p>`,
+      tags: ['password-reset']
+    });
+    res.json({ message: 'If an account exists for this email, you will receive a reset link.' });
+  } catch (err) {
+    // Respond generically to avoid email enumeration
+    res.json({ message: 'If an account exists for this email, you will receive a reset link.' });
+  }
+});
+
+// Reset password: confirm with token
+router.post('/reset-password', async (req, res) => {
+  try {
+    const { token, password, password2 } = req.body;
+    if (!token || !password) return res.status(400).json({ message: 'Token and new password are required' });
+    if (typeof password2 === 'string' && password2 !== password) return res.status(400).json({ message: 'Passwords do not match' });
+    await userService.resetPasswordWithToken(token, password);
+    res.json({ message: 'Password has been reset successfully' });
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+});

@@ -369,6 +369,30 @@ const Store = {
           toggle.setAttribute('aria-expanded','false');
         });
       }
+
+      // Immediately sync cart UI on load so the header count reflects existing items
+      try { this.renderCart(); } catch {}
+
+      // Keep cart UI in sync across browser events and tabs
+      try {
+        // BFCache restore (back/forward, some refresh behaviors)
+        window.addEventListener('pageshow', () => { try { this.rehydrateCart(); this.renderCart(); } catch {} });
+        // Cross-tab/localStorage updates
+        window.addEventListener('storage', (e) => {
+          if (e && e.key === 'cart') {
+            try { this.rehydrateCart(); this.renderCart(); } catch {}
+          }
+        });
+      } catch {}
+    } catch {}
+  },
+
+  // Re-read cart from localStorage and discard invalid shapes
+  rehydrateCart() {
+    try {
+      const raw = localStorage.getItem('cart');
+      const arr = raw ? JSON.parse(raw) : [];
+      if (Array.isArray(arr)) this.state.cart = arr;
     } catch {}
   },
 
@@ -3284,12 +3308,12 @@ ensureHomeFirst() {
       // Store a snapshot for items that may not exist in PRODUCTS (e.g., dynamic pages like gloves)
       let imgSrc = product.img;
       try { if (imgSrc) imgSrc = new URL(imgSrc, location.href).href; } catch {}
-      // Determine shipping (dsr) for this line: prefer explicit opts.ship; else product.dsr; else none.
+      // Determine shipping (DSR) for this line: prefer explicit opts.ship; else product.dsr; default $100 per item when absent or invalid
       const rawShip = (opts && Object.prototype.hasOwnProperty.call(opts, 'ship')) ? opts.ship
         : (Object.prototype.hasOwnProperty.call(product, 'dsr') ? product.dsr : undefined);
       const shipAmount = (() => {
         const n = Number(rawShip);
-        return (Number.isFinite(n) && n > 0) ? n : 0;
+        return (Number.isFinite(n) && n > 0) ? n : 100; // default $100 when no dsr
       })();
       this.state.cart.push({
         id: product.id,
@@ -3350,7 +3374,11 @@ ensureHomeFirst() {
   // Total shipping from per-line shipAmount values (dsr) × qty
   get shippingTotal() {
     try {
-      return this.state.cart.reduce((sum, i) => sum + ((Number(i.shipAmount)||0) * (i.qty||0)), 0);
+      return this.state.cart.reduce((sum, i) => {
+        const per = Number(i.shipAmount);
+        const perItem = (Number.isFinite(per) && per > 0) ? per : 100; // fallback to $100 if missing
+        return sum + (perItem * (i.qty||0));
+      }, 0);
     } catch { return 0; }
   },
 
@@ -3366,6 +3394,7 @@ ensureHomeFirst() {
   const img = i.product?.img || 'assets/img/EZSportslogo.png';
       const title = i.product?.title || 'Item';
       const price = typeof i.product?.price === 'number' ? i.product.price : 0;
+      const shipPer = (()=>{ const n = Number(i.shipAmount); return (Number.isFinite(n) && n > 0) ? n : 100; })();
       return `
       <div class="cart-row">
         <img src="${img}" alt="${title}" width="64" height="64" class="rounded-xs object-cover"/>
@@ -3373,6 +3402,7 @@ ensureHomeFirst() {
           <strong>${title}</strong>
           ${variant ? `<div class=\"text-sm text-muted\">${variant}</div>` : ''}
           <div class="opacity-80">Qty: <button class="icon-btn" data-dec="${key}">−</button> ${i.qty} <button class="icon-btn" data-inc="${key}">+</button></div>
+          <div class="text-sm muted">Shipping: ${currency.format(shipPer)} × ${i.qty}</div>
         </div>
         <div class="text-right">
           <div>${currency.format(price * i.qty)}</div>
@@ -3384,8 +3414,27 @@ ensureHomeFirst() {
 
     if (this.ui.items) this.ui.items.innerHTML = rows || '<p>Your cart is empty.</p>';
     if (this.ui.count) this.ui.count.textContent = String(this.state.cart.reduce((s, i) => s + i.qty, 0));
-  // Display combined total (items + shipping) in mini-cart summary
-  if (this.ui.subtotal) this.ui.subtotal.textContent = currency.format(this.total);
+  // Ensure totals breakdown in mini-cart footer: Subtotal (items), Shipping, Total
+  try {
+    const footer = this.ui.subtotal ? this.ui.subtotal.closest('.totals')?.parentElement : null;
+    const parent = this.ui.subtotal ? this.ui.subtotal.closest('.totals') : null;
+    const ensureRow = (id, label) => {
+      let el = document.getElementById(id);
+      if (!el && parent) {
+        const row = document.createElement('div');
+        row.className = 'totals';
+        row.innerHTML = `<span>${label}</span><strong id="${id}">$0.00</strong>`;
+        parent.insertAdjacentElement('afterend', row);
+        el = row.querySelector('strong');
+      }
+      return el || document.getElementById(id);
+    };
+    if (this.ui.subtotal) this.ui.subtotal.textContent = currency.format(this.subtotal);
+    const shipEl = ensureRow('cart-shipping', 'Shipping');
+    if (shipEl) shipEl.textContent = currency.format(this.shippingTotal);
+    const totalEl = ensureRow('cart-total', 'Total');
+    if (totalEl) totalEl.textContent = currency.format(this.total);
+  } catch {}
     if (this.state.cart.length) {
       try { window.trackEvent && window.trackEvent('view_cart', { items: this.state.cart.map(i => ({ id: i.id, price: i.price, qty: i.qty })) }); } catch {}
     }
@@ -3410,7 +3459,7 @@ ensureHomeFirst() {
 
   checkout() {
     try {
-      const cents = Math.round(this.subtotal * 100);
+      const cents = Math.round(this.total * 100); // include shipping in checkout amount snapshot
       localStorage.setItem('checkoutTotalCents', String(cents));
       // persist cart for the checkout page
       this.persist();
