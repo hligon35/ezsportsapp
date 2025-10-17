@@ -157,7 +157,8 @@ function showMessage(text, isError = true) {
 document.addEventListener('DOMContentLoaded', () => {
   const form = document.getElementById('auth-form');
   const toggleLink = document.getElementById('toggle-link');
-  const peek = document.getElementById('peek-password');
+  const peekBtn1 = document.querySelector('.auth-peek-btn[data-target="password"]');
+  const peekBtn2 = document.querySelector('.auth-peek-btn[data-target="password2"]');
   const demoBtn = null;
 
   // start clean in Login mode
@@ -174,20 +175,31 @@ document.addEventListener('DOMContentLoaded', () => {
     toggleMode();
   });
 
-  if (peek) {
+  if (peekBtn1) {
     const pw = document.getElementById('password');
-    const label = document.querySelector('label.auth-peek');
-    const setType = () => { pw.type = peek.checked ? 'text' : 'password'; };
-    peek.addEventListener('change', setType);
-    if (label) {
-      label.addEventListener('click', (e) => {
-        if (e.target !== peek) {
-          e.preventDefault();
-          peek.checked = !peek.checked;
-          setType();
-        }
-      });
-    }
+    const toggle = () => {
+      const pressed = peekBtn1.getAttribute('aria-pressed') === 'true';
+      const next = !pressed;
+      peekBtn1.setAttribute('aria-pressed', String(next));
+      pw.type = next ? 'text' : 'password';
+      peekBtn1.setAttribute('aria-label', next ? 'Hide password' : 'Show password');
+      peekBtn1.title = next ? 'Hide password' : 'Show password';
+    };
+    peekBtn1.addEventListener('click', toggle);
+  }
+
+  // Confirm password eye toggle
+  if (peekBtn2) {
+    const pw2 = document.getElementById('password2');
+    const toggle2 = () => {
+      const pressed = peekBtn2.getAttribute('aria-pressed') === 'true';
+      const next = !pressed;
+      peekBtn2.setAttribute('aria-pressed', String(next));
+      pw2.type = next ? 'text' : 'password';
+      peekBtn2.setAttribute('aria-label', next ? 'Hide confirm password' : 'Show confirm password');
+      peekBtn2.title = next ? 'Hide confirm password' : 'Show confirm password';
+    };
+    peekBtn2.addEventListener('click', toggle2);
   }
 
   // demo login removed
