@@ -268,7 +268,11 @@
       if (idx > 0) { const [picked] = displayPairs.splice(idx,1); displayPairs.unshift(picked); }
     } catch {}
     // Include product-level dsr (shipping dollar) if present
-    const dsr = Number(p.dsr ?? 0) || 0;
+    // Free shipping override for Batting Mat and Armor Basket
+    const lid = String(p.sku || p.id || '').toLowerCase();
+    const lt = String(p.name || p.title || '').toLowerCase();
+    const isFreeShip = (lid === 'battingmat' || lid === 'armorbasket') || (/\bbatting\s*mat\b/.test(lt)) || (/armor\s*(baseball)?\s*cart|armor\s*basket/.test(lt));
+    const dsr = isFreeShip ? 0 : (Number(p.dsr ?? 0) || 0);
     return { id, title, price, priceMin, priceMax, primary, galleryPairs, displayPairs, features, description, variations, dsr };
   }
 
@@ -303,6 +307,10 @@
       .map(v => Number(v.dsr ?? 0))
       .filter(n => Number.isFinite(n) && n > 0) : [];
     const initialShippingText = (() => {
+      const lid = String(prod.id||'').toLowerCase();
+      const lt = String(prod.title||'').toLowerCase();
+      const isFreeShip = (lid === 'battingmat' || lid === 'armorbasket') || (/\bbatting\s*mat\b/.test(lt)) || (/armor\s*(baseball)?\s*cart|armor\s*basket/.test(lt));
+      if (isFreeShip) return `Shipping: Free`;
       if (variationDsrs.length) {
         const min = Math.min(...variationDsrs);
         const max = Math.max(...variationDsrs);
@@ -453,22 +461,29 @@
           }
           // Shipping (dsr): prefer selected variation's dsr, else product-level, else keep initial/range
           if (shipEl) {
-            const dsr = Number(opt?.dataset?.dsr||0) || 0;
-            if (dsr > 0) {
-              shipEl.textContent = `Shipping: $${dsr.toFixed(2)}`;
+            const lid = String(prod.id||'').toLowerCase();
+            const lt = String(prod.title||'').toLowerCase();
+            const isFreeShip = (lid === 'battingmat' || lid === 'armorbasket') || (/\bbatting\s*mat\b/.test(lt)) || (/armor\s*(baseball)?\s*cart|armor\s*basket/.test(lt));
+            if (isFreeShip) {
+              shipEl.textContent = `Shipping: Free`;
             } else {
-              // Recompute from variations or product-level
-              const vDsrs = Array.isArray(prod.variations) ? prod.variations
-                .map(v => Number(v.dsr ?? 0))
-                .filter(n => Number.isFinite(n) && n > 0) : [];
-              if (vDsrs.length) {
-                const min = Math.min(...vDsrs); const max = Math.max(...vDsrs);
-                shipEl.textContent = (min===max) ? `Shipping: $${min.toFixed(2)}` : `Shipping: $${min.toFixed(2)} - $${max.toFixed(2)}`;
-              } else if (Number(prod.dsr||0) > 0) {
-                shipEl.textContent = `Shipping: $${Number(prod.dsr).toFixed(2)}`;
+              const dsr = Number(opt?.dataset?.dsr||0) || 0;
+              if (dsr > 0) {
+                shipEl.textContent = `Shipping: $${dsr.toFixed(2)}`;
               } else {
-                // New policy fallback: show $100 flat when no dsr present
-                shipEl.textContent = `Shipping: $${(100).toFixed(2)}`;
+                // Recompute from variations or product-level
+                const vDsrs = Array.isArray(prod.variations) ? prod.variations
+                  .map(v => Number(v.dsr ?? 0))
+                  .filter(n => Number.isFinite(n) && n > 0) : [];
+                if (vDsrs.length) {
+                  const min = Math.min(...vDsrs); const max = Math.max(...vDsrs);
+                  shipEl.textContent = (min===max) ? `Shipping: $${min.toFixed(2)}` : `Shipping: $${min.toFixed(2)} - $${max.toFixed(2)}`;
+                } else if (Number(prod.dsr||0) > 0) {
+                  shipEl.textContent = `Shipping: $${Number(prod.dsr).toFixed(2)}`;
+                } else {
+                  // New policy fallback: show $100 flat when no dsr present
+                  shipEl.textContent = `Shipping: $${(100).toFixed(2)}`;
+                }
               }
             }
           }
@@ -708,7 +723,14 @@
         // Include per-product shipping only when an explicit dsr is defined (>0). Otherwise omit and default $100 applies at checkout.
         const product = { id: prod.id, title: chosenLabel, price: chosenPrice, img: chosenImg, category: 'netting' };
         const opts = { size, color };
-        if (Number(chosenShipRaw) > 0) opts.ship = Number(chosenShipRaw);
+        // Free shipping override
+        try {
+          const lid = String(prod.id||'').toLowerCase();
+          const lt = String(prod.title||'').toLowerCase();
+          const isFreeShip = (lid === 'battingmat' || lid === 'armorbasket') || (/\bbatting\s*mat\b/.test(lt)) || (/armor\s*(baseball)?\s*cart|armor\s*basket/.test(lt));
+          if (isFreeShip) opts.ship = 0;
+        } catch {}
+        if (Number(chosenShipRaw) > 0 && typeof opts.ship === 'undefined') opts.ship = Number(chosenShipRaw);
         window.Store && window.Store.add(product, opts);
       } catch {}
     });

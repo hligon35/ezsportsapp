@@ -9,6 +9,7 @@ This project is a lightweight, stateless-frontend + JSON file–backed API demo 
 - Dynamic product API with caching, search, category and field projection
 - Mini-cart with localStorage persistence & ecommerce analytics event hooks
 - Auto product sync on server boot via env flag
+- Tax calculation at checkout based on shipping address (state-based, env-overridable)
 - Basic SEO (OpenGraph, JSON‑LD: Organization + ItemList) and performance tweaks (preconnect, lazy loading, LCP hint)
 - Simple analytics event dispatcher (client) with placeholders for server ingestion
 
@@ -108,6 +109,7 @@ Endpoints:
 
 - `GET /api/config` → `{ pk, enabled }`
 - `POST /api/create-payment-intent` → `{ clientSecret, amount }` (amount computed from current product DB; includes shipping logic)
+  - Response also includes a `breakdown` with `subtotal`, `shipping`, `discount`, `tax`, and `total`.
 - `POST /webhook/stripe` (raw body) for `payment_intent.succeeded` (placeholder logic)
 
 Product/price sync (Stripe): If a product lacks a Stripe Product or matching Price, the sync script creates them (unless `--no-stripe`). Price changes create a new Stripe Price (never mutate old ones).
@@ -153,6 +155,30 @@ Quick test
 2) Admin → Marketing → Create Coupon (e.g., code `SAVE10`, type `percent`, value `10`).
 3) Back in Checkout, enter `SAVE10` and Apply. You should see a Discount row and reduced Total.
 4) With Stripe keys configured, complete a test payment; the coupon will be marked as used on success (webhook).
+
+## Taxes
+
+Checkout computes sales tax server-side using a simple, efficient state-based rate map keyed by the shipping address:
+
+- Default: United States → Georgia (GA) at 7%.
+- Taxable base: subtotal + shipping − discount (never negative). Tax is rounded to the nearest cent.
+- The server is authoritative and returns a breakdown with tax; the client mirrors this for responsive UX and test mode.
+
+Environment overrides:
+
+```env
+# Provide a JSON object mapping countries → states → decimal rates
+TAX_RATES_JSON={"US": {"GA": 0.07, "FL": 0.06, "TX": 0.0825}}
+
+# Or a simple CSV for US states (country assumed US)
+TAX_RATES=GA:0.07,FL:0.06,TX:0.0825
+```
+
+Notes
+
+- If no rate is found for the destination state, tax is 0.
+- The checkout UI hides the Tax row when tax equals 0 and displays "Free" when shipping is $0.00.
+- Extend the rate map by setting the env vars without code changes.
 
 ## Analytics Events
 

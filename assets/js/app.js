@@ -3380,11 +3380,20 @@ ensureHomeFirst() {
       let imgSrc = product.img;
       try { if (imgSrc) imgSrc = new URL(imgSrc, location.href).href; } catch {}
       // Determine shipping (DSR) for this line: prefer explicit opts.ship; else product.dsr; default $100 per item when absent or invalid
-      const rawShip = (opts && Object.prototype.hasOwnProperty.call(opts, 'ship')) ? opts.ship
-        : (Object.prototype.hasOwnProperty.call(product, 'dsr') ? product.dsr : undefined);
+      // Free shipping override for Batting Mat and Armor Basket
+      const lid = String(product.id || '').toLowerCase();
+      const lt = String(product.title || '').toLowerCase();
+      const freeShipOverride = (lid === 'battingmat' || lid === 'armorbasket') || (/\bbatting\s*mat\b/.test(lt)) || (/armor\s*(baseball)?\s*cart|armor\s*basket/.test(lt));
+      const rawShip = freeShipOverride ? 0 : ((opts && Object.prototype.hasOwnProperty.call(opts, 'ship')) ? opts.ship
+        : (Object.prototype.hasOwnProperty.call(product, 'dsr') ? product.dsr : undefined));
       const shipAmount = (() => {
         const n = Number(rawShip);
-        return (Number.isFinite(n) && n > 0) ? n : 100; // default $100 when no dsr
+        // Respect zero as an explicit free shipping flag
+        if (Number.isFinite(n)) {
+          if (n === 0) return 0;
+          if (n > 0) return n;
+        }
+        return 100; // default $100 when no dsr
       })();
       this.state.cart.push({
         id: product.id,
@@ -3446,9 +3455,15 @@ ensureHomeFirst() {
   get shippingTotal() {
     try {
       return this.state.cart.reduce((sum, i) => {
-        const per = Number(i.shipAmount);
-        const perItem = (Number.isFinite(per) && per > 0) ? per : 100; // fallback to $100 if missing
-        return sum + (perItem * (i.qty||0));
+        const raw = Number(i.shipAmount);
+        let perItem = 100; // default when missing/invalid
+        if (Number.isFinite(raw)) {
+          if (raw === 0) perItem = 0; // explicit free shipping
+          else if (raw > 0) perItem = raw; // valid per-item dsr
+          // else keep default 100
+        }
+        const qty = Math.max(1, Number(i.qty) || 1);
+        return sum + (perItem * qty);
       }, 0);
     } catch { return 0; }
   },
@@ -3465,7 +3480,7 @@ ensureHomeFirst() {
   const img = i.product?.img || 'assets/img/EZSportslogo.png';
       const title = i.product?.title || 'Item';
       const price = typeof i.product?.price === 'number' ? i.product.price : 0;
-      const shipPer = (()=>{ const n = Number(i.shipAmount); return (Number.isFinite(n) && n > 0) ? n : 100; })();
+  const shipPer = (()=>{ const n = Number(i.shipAmount); if (Number.isFinite(n)) { if (n===0) return 0; if (n>0) return n; } return 100; })();
       return `
       <div class="cart-row">
         <img src="${img}" alt="${title}" width="64" height="64" class="rounded-xs object-cover"/>
@@ -3473,7 +3488,7 @@ ensureHomeFirst() {
           <strong>${title}</strong>
           ${variant ? `<div class=\"text-sm text-muted\">${variant}</div>` : ''}
           <div class="opacity-80">Qty: <button class="icon-btn" data-dec="${key}">−</button> ${i.qty} <button class="icon-btn" data-inc="${key}">+</button></div>
-          <div class="text-sm muted">Shipping: ${currency.format(shipPer)} × ${i.qty}</div>
+          <div class="text-sm muted">Shipping: ${shipPer===0 ? 'Free' : currency.format(shipPer)} × ${i.qty}</div>
         </div>
         <div class="text-right">
           <div>${currency.format(price * i.qty)}</div>
@@ -3501,8 +3516,8 @@ ensureHomeFirst() {
       return el || document.getElementById(id);
     };
     if (this.ui.subtotal) this.ui.subtotal.textContent = currency.format(this.subtotal);
-    const shipEl = ensureRow('cart-shipping', 'Shipping');
-    if (shipEl) shipEl.textContent = currency.format(this.shippingTotal);
+  const shipEl = ensureRow('cart-shipping', 'Shipping');
+  if (shipEl) shipEl.textContent = (this.shippingTotal === 0) ? 'Free' : currency.format(this.shippingTotal);
     const totalEl = ensureRow('cart-total', 'Total');
     if (totalEl) totalEl.textContent = currency.format(this.total);
   } catch {}
