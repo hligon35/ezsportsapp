@@ -57,12 +57,37 @@ class EmailService {
           return { ...email, status: 'sent', provider: 'cloudflare-worker' };
         } else {
           const body = await resp.text().catch(()=> '');
-          throw new Error(`Cloudflare email failed ${resp.status}: ${body}`);
+          const cfError = new Error(`Cloudflare email failed ${resp.status}: ${body}`);
+          // Attempt SMTP fallback if transporter is configured
+          if (this.transporter) {
+            try {
+              const info = await this.transporter.sendMail({ from: this.from, to, subject, text, html });
+              await this.db.update('emails', { id: email.id }, { status: 'sent', provider: 'smtp', providerId: info?.messageId || null, sentAt: new Date().toISOString(), error: cfError.message });
+              return { ...email, status: 'sent', provider: 'smtp', providerId: info?.messageId || null };
+            } catch (smtpErr) {
+              await this.db.update('emails', { id: email.id }, { status: 'failed', provider: 'cloudflare-worker|smtp', error: `${cfError.message} | SMTP: ${smtpErr.message}`, failedAt: new Date().toISOString() });
+              return { ...email, status: 'failed', provider: 'cloudflare-worker|smtp', error: `${cfError.message} | SMTP: ${smtpErr.message}` };
+            }
+          }
+          // No transporter available, record CF failure
+          throw cfError;
         }
       } catch (e) {
+        // If we are here, Cloudflare path threw synchronously before we could fallback
+        // Try SMTP if available
+        if (this.transporter) {
+          try {
+            const info = await this.transporter.sendMail({ from: this.from, to, subject, text, html });
+            await this.db.update('emails', { id: email.id }, { status: 'sent', provider: 'smtp', providerId: info?.messageId || null, sentAt: new Date().toISOString(), error: e.message });
+            return { ...email, status: 'sent', provider: 'smtp', providerId: info?.messageId || null };
+          } catch (smtpErr) {
+            await this.db.update('emails', { id: email.id }, { status: 'failed', provider: 'cloudflare-worker|smtp', error: `${e.message} | SMTP: ${smtpErr.message}`, failedAt: new Date().toISOString() });
+            console.warn('Email send via Cloudflare then SMTP failed:', `${e.message} | SMTP: ${smtpErr.message}`);
+            return { ...email, status: 'failed', provider: 'cloudflare-worker|smtp', error: `${e.message} | SMTP: ${smtpErr.message}` };
+          }
+        }
         await this.db.update('emails', { id: email.id }, { status: 'failed', provider: 'cloudflare-worker', error: e.message, failedAt: new Date().toISOString() });
         console.warn('Email send via Cloudflare failed:', e.message);
-        // Do not attempt SMTP fallback automatically to avoid double-sends; return failure
         return { ...email, status: 'failed', provider: 'cloudflare-worker', error: e.message };
       }
     }
