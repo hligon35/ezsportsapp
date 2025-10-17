@@ -1,0 +1,33 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, v1.1 ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+      - name: Install server deps
+        working-directory: server
+        run: npm ci || npm install
+      - name: Start server
+        working-directory: server
+        run: node index.js &
+      - name: Wait for health
+        run: |
+          for i in {1..20}; do
+            curl -fsS http://localhost:4242/health && exit 0 || true
+            sleep 1
+          done
+          echo "Server did not become healthy in time" && exit 1
+      - name: Run smoke test
+        run: node server/scripts/smoke-test.js http://localhost:4242
