@@ -14,7 +14,7 @@
     "products:sync:dry": "node server/scripts/sync-products.js --dry --no-stripe",
     "screens:build": "node server/scripts/build-screens-catalog.js",
     "gloves:build": "node server/scripts/build-gloves-catalog.js",
-    "test": "jest --runInBand",
+    "test": "jest --runInBand --testPathIgnorePatterns=tests/browser",
     "test:e2e": "jest --runInBand --verbose",
     "test:browser": "playwright test",
     "pw:install": "playwright install --with-deps"

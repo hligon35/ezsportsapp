@@ -35,6 +35,17 @@ try {
 } catch (e) {
   console.warn('Stripe SDK failed to initialize:', e.message);
 }
+// Warn if Stripe keys are mismatched
+try {
+  const hasSecret = !!process.env.STRIPE_SECRET_KEY;
+  const hasPublishable = !!process.env.STRIPE_PUBLISHABLE_KEY;
+  if (hasSecret && !hasPublishable) {
+    console.warn('Stripe config: STRIPE_SECRET_KEY is set but STRIPE_PUBLISHABLE_KEY is missing. Frontend will disable Stripe.');
+  }
+  if (!hasSecret && hasPublishable) {
+    console.warn('Stripe config: STRIPE_PUBLISHABLE_KEY is set but STRIPE_SECRET_KEY is missing. Backend cannot create PaymentIntents.');
+  }
+} catch {}
 
 // Database and services
 const DatabaseManager = require('./database/DatabaseManager');
@@ -341,8 +352,14 @@ redirects.forEach(([source, dest]) => {
 
 // Lightweight config endpoint for frontend checkout/test mode
 app.get('/api/config', (req, res) => {
-  const enabled = !!process.env.STRIPE_SECRET_KEY;
-  res.json({ pk: process.env.STRIPE_PUBLISHABLE_KEY || 'pk_test_your_publishable_key', enabled });
+  const hasSecret = !!process.env.STRIPE_SECRET_KEY;
+  const hasPublishable = !!process.env.STRIPE_PUBLISHABLE_KEY;
+  const enabled = hasSecret && hasPublishable;
+  res.json({
+    pk: hasPublishable ? process.env.STRIPE_PUBLISHABLE_KEY : null,
+    enabled,
+    missing: { secret: !hasSecret, publishable: !hasPublishable }
+  });
 });
 
 // Fallback endpoints (defensive): ensure core routes respond in dev even if router mounting is altered
