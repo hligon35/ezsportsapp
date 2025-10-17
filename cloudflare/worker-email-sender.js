@@ -21,6 +21,14 @@ export default {
     const from = String(body.from || env.DEFAULT_FROM || 'no-reply@yourdomain.com');
     if (!to || !subject) return new Response('Missing to/subject', { status: 400 });
 
+    // Minimal, privacy-safe logging
+    const mask = (addr) => {
+      try {
+        const [local, domain] = String(addr).split('@');
+        return `***@${domain || 'unknown'}`;
+      } catch { return 'unknown'; }
+    };
+
     const mailChannelsPayload = {
       personalizations: [{ to: [{ email: to }] }],
       from: { email: from, name: body.fromName || 'EZ Sports Netting' },
@@ -28,7 +36,12 @@ export default {
       content: [
         { type: 'text/plain', value: text },
         { type: 'text/html', value: html }
-      ]
+      ],
+      // Envelope can help MailChannels align MAIL FROM / RCPT TO for DMARC/SPF checks
+      envelope: {
+        from: from,
+        to: [to]
+      }
     };
 
     const resp = await fetch('https://api.mailchannels.net/tx/v1/send', {
@@ -38,8 +51,10 @@ export default {
     });
     if (!resp.ok) {
       const b = await resp.text();
+      console.warn(`MailChannels SEND FAILED -> to=${mask(to)} from=${mask(from)} status=${resp.status} body=${b?.slice(0,200)}`);
       return new Response(`MailChannels error ${resp.status}: ${b}`, { status: 502 });
     }
+    console.log(`MailChannels accepted -> to=${mask(to)} from=${mask(from)} status=${resp.status}`);
     return new Response('OK');
   }
 };
