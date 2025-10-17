@@ -226,11 +226,13 @@ router.post('/products/sync', requireAdmin, async (req, res) => {
     const stripeFlag = String(req.query.stripe || '1');
     const dryFlag = String(req.query.dry || '0');
     const deactFlag = String(req.query.deactivateRemoved || '0');
+    const fromDbFlag = String(req.query.from || 'db');
 
-    const args = ['scripts/sync-products.js'];
+  const args = ['scripts/sync-products.js'];
     if (!(stripeFlag === '1' || /true/i.test(stripeFlag))) args.push('--no-stripe');
     if (dryFlag === '1' || /true/i.test(dryFlag)) args.push('--dry');
     if (deactFlag === '1' || /true/i.test(deactFlag)) args.push('--deactivate-removed');
+  if (fromDbFlag === 'db') args.push('--from-db');
 
     const cwd = path.join(__dirname, '..');
     const child = spawn('node', args, { cwd, env: process.env });
