@@ -1,1 +1,26 @@
-[]
+[
+  {
+    "email": "u1760730503015@example.com",
+    "name": "",
+    "subscribed": true,
+    "createdAt": "2025-10-17T19:48:23.024Z",
+    "updatedAt": "2025-10-17T19:48:23.024Z",
+    "id": 2
+  },
+  {
+    "email": "u1760730950146@example.com",
+    "name": "",
+    "subscribed": true,
+    "createdAt": "2025-10-17T19:55:50.155Z",
+    "updatedAt": "2025-10-17T19:55:50.155Z",
+    "id": 3
+  },
+  {
+    "email": "u1760730992918@example.com",
+    "name": "",
+    "subscribed": true,
+    "createdAt": "2025-10-17T19:56:32.925Z",
+    "updatedAt": "2025-10-17T19:56:32.925Z",
+    "id": 4
+  }
+]

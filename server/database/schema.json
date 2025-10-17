@@ -2,12 +2,14 @@
   "metadata": {
     "version": "1.0.0",
     "created": "2025-08-12T00:00:00.000Z",
-    "lastModified": "2025-10-17T19:38:14.739Z",
+    "lastModified": "2025-10-17T20:07:21.991Z",
     "autoIncrement": {
       "users": 1005,
       "products": 2000,
       "orders": 3003,
-      "analytics": 1780
+      "analytics": 1789,
+      "subscribers": 4,
+      "emails": 3
     }
   },
   "schema": {
