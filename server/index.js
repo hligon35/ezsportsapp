@@ -11,6 +11,21 @@ const rateLimit = require('express-rate-limit');
 const cookieParser = require('cookie-parser');
 const fsSync = require('fs');
 const crypto = require('crypto');
+// Optional monitoring (Sentry) — initialized only when DSN is provided
+let Sentry = null;
+try {
+  if (process.env.SENTRY_DSN) {
+    Sentry = require('@sentry/node');
+    Sentry.init({
+      dsn: process.env.SENTRY_DSN,
+      tracesSampleRate: Number(process.env.SENTRY_TRACES_SAMPLE_RATE || 0),
+      environment: process.env.NODE_ENV || 'development',
+    });
+  }
+} catch (e) {
+  console.warn('Sentry initialization failed:', e.message);
+  Sentry = null;
+}
 // Initialize Stripe client only if a secret key is provided (set in Render env)
 let stripe = null;
 try {
@@ -30,6 +45,7 @@ const InvoiceService = require('./services/InvoiceService');
 const AnalyticsService = require('./services/AnalyticsService');
 const couponService = new CouponService();
 const { requireAdmin } = require('./middleware/auth');
+const AddressService = require('./services/AddressService');
 
 // Initialize database
 const db = new DatabaseManager();
@@ -37,6 +53,7 @@ const productService = new ProductService();
 const orderService = new OrderService();
 const invoiceService = new InvoiceService();
 const analyticsService = new AnalyticsService();
+const addressService = new AddressService();
 
 // Initialize database on startup
 db.initialize().catch(console.error);
@@ -51,6 +68,17 @@ const analyticsRoutes = require('./routes/analytics');
 const marketingRoutes = require('./routes/marketing');
 const adminRoutes = require('./routes/admin');
 const app = express();
+// Hide Express signature
+app.disable('x-powered-by');
+// Attach Sentry request handler (if enabled) before other middleware
+if (Sentry) {
+  try {
+    app.use(Sentry.Handlers.requestHandler());
+    if (Sentry.Handlers.tracingHandler) {
+      app.use(Sentry.Handlers.tracingHandler());
+    }
+  } catch {}
+}
 // Optional: Google Maps Places API key exposure for client autocomplete
 app.get('/api/maps-config', (req, res) => {
   // Only expose key for known origins; otherwise return null
@@ -578,6 +606,22 @@ app.post('/api/create-payment-intent', async (req, res) => {
     if (!Array.isArray(items) || items.length === 0) return res.status(400).json({ error: 'Items are required' });
     const normItems = items.map(i => ({ id: String(i.id || '').trim(), qty: Math.max(1, Math.min(20, parseInt(i.qty || 1))) }));
     const safeCurrency = (String(currency || 'usd').toLowerCase() === 'usd') ? 'usd' : 'usd';
+    // Optional: validate/normalize shipping address before calculations
+    let normalizedShipping = shipping;
+    try {
+      const wantValidate = String(process.env.ADDRESS_VALIDATION_ENABLED || '').toLowerCase() === 'true';
+      if (wantValidate) {
+        const result = await addressService.validateAndNormalize(shipping);
+        if (!result.valid) {
+          return res.status(400).json({ error: 'Invalid shipping address' });
+        }
+        normalizedShipping = result.address;
+      }
+    } catch (e) {
+      // Do not block checkout on validator errors; proceed with original shipping
+      normalizedShipping = shipping;
+    }
+
     const subtotal = await calcSubtotalCents(normItems);
     const shippingCents = await calcShippingCents(normItems, subtotal);
     let amount = subtotal + shippingCents; // initial base before discounts/tax
@@ -600,7 +644,7 @@ app.post('/api/create-payment-intent', async (req, res) => {
     }
 
     // Compute taxes based on shipping address and post-discount amount
-  const taxCents = calcTaxCents(subtotal, shippingCents, discountCents, shipping);
+  const taxCents = calcTaxCents(subtotal, shippingCents, discountCents, normalizedShipping);
   amount = Math.max(0, subtotal + shippingCents - discountCents + taxCents);
 
     const description = `EZ Sports order — ${items.map(i => `${i.id}x${i.qty}`).join(', ')}`;
@@ -648,12 +692,12 @@ app.post('/api/create-payment-intent', async (req, res) => {
       shipping: {
         name: customer.name || 'Customer',
         address: {
-          line1: shipping.address1 || '',
-          line2: shipping.address2 || undefined,
-          city: shipping.city || '',
-          state: shipping.state || '',
-          postal_code: shipping.postal || '',
-          country: shipping.country || 'US',
+          line1: normalizedShipping.address1 || '',
+          line2: normalizedShipping.address2 || undefined,
+          city: normalizedShipping.city || '',
+          state: normalizedShipping.state || '',
+          postal_code: normalizedShipping.postal || '',
+          country: normalizedShipping.country || 'US',
         }
       }
     }, { idempotencyKey: idemKey });
@@ -755,3 +799,9 @@ const server = startServer();
 // Graceful shutdown
 process.on('SIGINT', () => { server.close(() => process.exit(0)); });
 process.on('SIGTERM', () => { server.close(() => process.exit(0)); });
+process.on('unhandledRejection', (reason) => {
+  console.error('Unhandled Rejection:', reason);
+});
+process.on('uncaughtException', (err) => {
+  console.error('Uncaught Exception:', err);
+});

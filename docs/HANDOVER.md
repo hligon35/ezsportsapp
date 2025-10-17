@@ -23,6 +23,12 @@ This document summarizes what is implemented, what was added in this review, and
   - `server/index.js` — Lines ~56–69 and ~88–91 (added)
 - Safer Google Maps key exposure (origin-gated)
   - `server/index.js` — Lines ~35–48 (added)
+- Optional Sentry monitoring hooks (request/tracing/error)
+  - `server/index.js` — initialization near top and request handler (lines ~14–31, ~60–70)
+  - Controlled by env: `SENTRY_DSN`, `SENTRY_TRACES_SAMPLE_RATE`
+- Address validation scaffolding (Google or SmartyStreets)
+  - `server/services/AddressService.js` — new file
+  - Integrated in checkout flow to normalize/validate shipping (see `server/index.js` near create-payment-intent)
 - Admin-protected routes for orders, products, analytics, inventory
   - `server/routes/*.js` — Various `requireAdmin` enforced
 - JWT-based auth with cookie configuration and refresh/logout
@@ -59,6 +65,9 @@ This document summarizes what is implemented, what was added in this review, and
         }
       }));
 
+- CI/CD workflow for lint/build/test (optional)
+  - Not added by default (no tests yet). Suggested `.github/workflows/ci.yml` with Node 18, install, and `npm --prefix server run start` smoke.
+
 - Stripe webhook endpoint secret
   - Add to environment: `STRIPE_WEBHOOK_SECRET=whsec_xxx` (Stripe Dashboard → Developers → Webhooks)
   - Render Dashboard or `.env` file.
@@ -86,24 +95,32 @@ This document summarizes what is implemented, what was added in this review, and
   - or SMTP_*: Your SMTP provider credentials
 - Cloudflare Analytics (optional)
   - CLOUDFLARE_API_TOKEN: Cloudflare Dashboard → My Profile → API Tokens (Analytics Read)
-  - CLOUDFLARE_ZONE_ID: Cloudflare Dashboard → Websites → <your site> → Overview
+  - CLOUDFLARE_ZONE_ID: Cloudflare Dashboard → Websites → your site → Overview
 - Google Maps (optional autocomplete)
   - GOOGLE_MAPS_API_KEY: Google Cloud Console → APIs & Services → Credentials → API Keys; enable Places API
+- Address validation (optional)
+  - ADDRESS_VALIDATION_ENABLED=true
+  - ADDRESS_VALIDATION_PROVIDER=smartystreets or google
+  - For SmartyStreets: SMARTY_AUTH_ID, SMARTY_AUTH_TOKEN (<https://www.smarty.com/>)
+  - For Google Address Validation API: Use GOOGLE_MAPS_API_KEY with Address Validation API enabled
+- Monitoring (optional)
+  - SENTRY_DSN: Sentry project DSN (Settings → Projects → your project → Client Keys)
+  - SENTRY_TRACES_SAMPLE_RATE: 0.0–1.0 (e.g., 0.1)
 - CORS allowlist
   - CORS_ORIGINS: Comma-separated origins for your frontends
 
 ## 📍 Where to retrieve values
 
-- Stripe Dashboard → https://dashboard.stripe.com → Developers
+- Stripe Dashboard → <https://dashboard.stripe.com> → Developers
 - Render Dashboard → Your Service → Environment
-- SendGrid Dashboard → https://app.sendgrid.com → Settings → API Keys
-- Cloudflare Dashboard → https://dash.cloudflare.com → Profile and Zone settings
-- Google Cloud Console → https://console.cloud.google.com → APIs & Services
+- SendGrid Dashboard → <https://app.sendgrid.com> → Settings → API Keys
+- Cloudflare Dashboard → <https://dash.cloudflare.com> → Profile and Zone settings
+- Google Cloud Console → <https://console.cloud.google.com> → APIs & Services
 
 ## QA and Monitoring
 
 - Smoke test
-  - Run: node server/scripts/smoke-test.js http://localhost:4242
+  - Run: `node server/scripts/smoke-test.js http://localhost:4242`
   - Exits 0 on success
 - Logs
   - Server uses morgan("tiny") and prints warnings for asset 404s and webhook handling.
@@ -116,6 +133,7 @@ This document summarizes what is implemented, what was added in this review, and
 - Render blueprint `render.yaml` is present. Ensure env vars are set before deployment (see .env.example).
 - Enable `FORCE_HTTPS=true` and `TRUST_PROXY=1` in production for secure cookies and HSTS.
 - Configure Stripe webhook to point to `https://<your-host>/webhook/stripe` with the signing secret.
+- If enabling address validation, ensure corresponding API is enabled and keys are present.
 
 ## Handover checklist template
 
@@ -128,11 +146,13 @@ This document summarizes what is implemented, what was added in this review, and
   - [x] compression enabled
   - [x] cache headers for static assets
   - [x] service worker configured
+  - [ ] CDN cache review (Cloudflare page rules, image optimization if desired)
 - E‑commerce
   - [x] Stripe PI creation with idempotency
   - [x] Webhook handling for payment/refund/dispute
   - [x] Taxes and shipping computed server-side
   - [x] Coupons integrated
+  - [ ] Address validation enabled and tested (if desired)
 - QA
   - [x] Smoke test available
   - [ ] E2E tests added
@@ -140,3 +160,4 @@ This document summarizes what is implemented, what was added in this review, and
   - [x] render.yaml present
   - [ ] Webhook configured in Stripe
   - [ ] Env vars populated in Render
+  - [ ] Sentry DSN configured (optional)
