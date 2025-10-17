@@ -2279,8 +2279,29 @@ ensureHomeFirst() {
         if (!res.ok) throw new Error('not found');
         const json = await res.json();
         if (json && (typeof json === 'object' || Array.isArray(json))) {
-          this._prodList = json;
-          return json;
+          // Filter out hidden/draft/inactive items so they never render on pages
+          const isVisible = (p) => {
+            try {
+              if (!p || typeof p !== 'object') return false;
+              if (p.hidden === true) return false;
+              if (p.draft === true) return false;
+              if (p.active === false) return false;
+              if (p.exclude === true || p.excluded === true) return false;
+            } catch {}
+            return true;
+          };
+          let filtered = json;
+          try {
+            if (json && json.categories && typeof json.categories === 'object') {
+              const newCats = {};
+              for (const [name, arr] of Object.entries(json.categories)) {
+                newCats[name] = Array.isArray(arr) ? arr.filter(isVisible) : arr;
+              }
+              filtered = { ...json, categories: newCats };
+            }
+          } catch {}
+          this._prodList = filtered;
+          return filtered;
         }
       } catch (e) { /* try next */ }
     }
