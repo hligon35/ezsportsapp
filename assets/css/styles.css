@@ -51,13 +51,14 @@
 /* Color dots for products with multiple color options */
 .color-dots {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap; /* force single row */
   gap: 4px;
   margin: 8px 0 6px;
   min-height: 28px;
-  align-items: flex-start;
-  max-width: 120px; /* Ensures wrapping for clean two-row layout */
+  align-items: center;
   justify-content: flex-start;
+  overflow-x: auto; /* allow horizontal scroll if needed */
+  -webkit-overflow-scrolling: touch;
 }
 
 .color-dot {
@@ -123,7 +124,7 @@ body.lscreens-subnav .color-dot { width: 14px; height: 14px; }
     gap: 3px; 
     margin: 6px 0 4px; 
     min-height: 24px; 
-    max-width: 100px; /* Smaller max-width on mobile for better wrapping */
+    overflow-x: auto; /* maintain single row with scroll on mobile */
   }
 }
 .pagination-btn.is-active,
