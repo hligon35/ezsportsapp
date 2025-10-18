@@ -64,6 +64,67 @@
           </form>
         </div>
       </details>
+
+      <details class="info-block mt-1r">
+        <summary>Favorites</summary>
+        <div class="info-content">
+          <div id="favorites-empty" class="muted">No favorites yet.</div>
+          <ul id="favorites-list" class="list"></ul>
+        </div>
+      </details>
+
+      <details class="info-block mt-1r">
+        <summary>Saved addresses</summary>
+        <div class="info-content">
+          <div id="addresses-empty" class="muted">No saved addresses yet.</div>
+          <div id="addresses-list" class="stack-05"></div>
+          <hr/>
+          <form id="address-form" class="auth-form">
+            <div class="grid-2">
+              <input type="text" id="addr-name" placeholder="Full name"/>
+              <input type="tel" id="addr-phone" placeholder="Phone"/>
+            </div>
+            <input type="text" id="addr-address1" placeholder="Address line 1" required />
+            <input type="text" id="addr-address2" placeholder="Address line 2 (optional)" />
+            <div class="grid-3">
+              <input type="text" id="addr-city" placeholder="City" required />
+              <input type="text" id="addr-state" placeholder="State" required />
+              <input type="text" id="addr-postal" placeholder="Postal code" required />
+            </div>
+            <div class="row">
+              <label class="checkbox">
+                <input type="checkbox" id="addr-default"/> Default address
+              </label>
+              <span class="muted text-xs">Country defaults to US</span>
+            </div>
+            <div class="row gap-06">
+              <button class="btn btn-primary" type="submit">Save Address</button>
+              <button class="btn btn-ghost" type="button" id="addr-cancel" hidden>Cancel</button>
+            </div>
+            <div id="address-msg" class="text-center" aria-live="polite"></div>
+          </form>
+        </div>
+      </details>
+
+      <details class="info-block mt-1r">
+        <summary>Payment methods</summary>
+        <div class="info-content">
+          <div id="pm-empty" class="muted">No saved cards.</div>
+          <ul id="pm-list" class="list"></ul>
+          <div id="pm-add">
+            <button id="pm-start" class="btn">Add a card</button>
+            <div id="pm-add-area" class="stack-05" hidden>
+              <div id="card-element" class="card-element"></div>
+              <div class="row gap-06">
+                <button id="pm-confirm" class="btn btn-primary" type="button">Save Card</button>
+                <button id="pm-cancel" class="btn btn-ghost" type="button">Cancel</button>
+              </div>
+              <div id="pm-msg" class="text-center" aria-live="polite"></div>
+            </div>
+          </div>
+          <div id="pm-note" class="muted text-xs"></div>
+        </div>
+      </details>
     </section>
   </main>
 
@@ -80,7 +141,6 @@
             <img src="assets/img/facebook.png" alt="Facebook" />
           </a>
           <a href="#" aria-label="Instagram"><img src="assets/img/instagram.png" alt="Instagram" /></a>
-          <a href="#" aria-label="X"><img src="assets/img/xwhite.png" alt="X" /></a>
         </div>
       </div>
       <nav aria-label="Footer">
@@ -140,6 +200,15 @@
   <script type="module" src="assets/js/app.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
+      const base = window.__API_BASE || '';
+      const currency = new Intl.NumberFormat(undefined, { style: 'currency', currency: 'USD' });
+      const fetchJSON = async (url, opts={}) => {
+        const res = await fetch(url, { credentials: 'include', ...opts });
+        const data = await res.json().catch(()=>({}));
+        if (!res.ok) throw new Error(data.message || `HTTP ${res.status}`);
+        return data;
+      };
+
       // Load current user and enforce auth for this page
       try {
         const user = JSON.parse(localStorage.getItem('currentUser')||'null');
@@ -209,6 +278,219 @@
           pmsg.textContent = err.message || 'Error updating password';
           pmsg.classList.add('text-error');
         }
+      });
+
+      // Favorites
+      (async function loadFavorites(){
+        try {
+          const data = await fetchJSON(`${base}/api/users/me/favorites`);
+          const list = Array.isArray(data.favorites) ? data.favorites : [];
+          const ul = document.getElementById('favorites-list');
+          const empty = document.getElementById('favorites-empty');
+          ul.innerHTML = '';
+          if (!list.length) { empty.style.display = 'block'; return; }
+          empty.style.display = 'none';
+          list.forEach(id => {
+            const li = document.createElement('li');
+            li.className = 'row space-between';
+            const left = document.createElement('span');
+            left.textContent = id;
+            const rm = document.createElement('button');
+            rm.className = 'btn btn-ghost btn-sm';
+            rm.textContent = 'Remove';
+            rm.addEventListener('click', async () => {
+              try {
+                await fetchJSON(`${base}/api/users/me/favorites/${encodeURIComponent(id)}`, { method:'DELETE' });
+                li.remove();
+                if (!ul.children.length) document.getElementById('favorites-empty').style.display = 'block';
+              } catch (e) { alert(e.message || 'Failed'); }
+            });
+            const link = document.createElement('a');
+            link.href = `product.html?pid=${encodeURIComponent(id)}`;
+            link.textContent = 'View';
+            link.className = 'btn btn-ghost btn-sm';
+            const actions = document.createElement('span');
+            actions.className = 'row gap-06';
+            actions.append(link, rm);
+            li.append(left, actions);
+            ul.appendChild(li);
+          });
+        } catch {}
+      })();
+
+      // Addresses
+      let editingAddressId = null;
+      const addrMsg = document.getElementById('address-msg');
+      const addrForm = document.getElementById('address-form');
+      const addrCancel = document.getElementById('addr-cancel');
+      const resetAddrForm = () => {
+        addrForm.reset(); editingAddressId = null; addrCancel.hidden = true; addrMsg.textContent = '';
+      };
+      const collectAddr = () => ({
+        id: editingAddressId || undefined,
+        name: document.getElementById('addr-name').value.trim(),
+        phone: document.getElementById('addr-phone').value.trim(),
+        address1: document.getElementById('addr-address1').value.trim(),
+        address2: document.getElementById('addr-address2').value.trim(),
+        city: document.getElementById('addr-city').value.trim(),
+        state: document.getElementById('addr-state').value.trim(),
+        postal: document.getElementById('addr-postal').value.trim(),
+        isDefault: document.getElementById('addr-default').checked,
+      });
+      const renderAddresses = (arr=[]) => {
+        const wrap = document.getElementById('addresses-list');
+        const empty = document.getElementById('addresses-empty');
+        wrap.innerHTML='';
+        if (!arr.length) { empty.style.display='block'; return; }
+        empty.style.display='none';
+        arr.forEach(a => {
+          const card = document.createElement('div');
+          card.className = 'card card--plain row space-between';
+          const label = document.createElement('div');
+          label.innerHTML = `
+            <strong>${(a.name||'').replace(/</g,'&lt;')}</strong> ${a.isDefault ? '<span class="badge">Default</span>' : ''}<br/>
+            ${(a.address1||'').replace(/</g,'&lt;')} ${a.address2?('<br/>'+a.address2.replace(/</g,'&lt;')):''}<br/>
+            ${(a.city||'')}, ${(a.state||'')} ${(a.postal||'')}<br/>
+            ${a.country||'US'}
+          `;
+          const actions = document.createElement('div');
+          actions.className = 'row gap-06';
+          const edit = document.createElement('button'); edit.className='btn btn-ghost btn-sm'; edit.textContent='Edit';
+          edit.addEventListener('click', ()=>{
+            editingAddressId = a.id; addrCancel.hidden=false;
+            document.getElementById('addr-name').value = a.name||'';
+            document.getElementById('addr-phone').value = a.phone||'';
+            document.getElementById('addr-address1').value = a.address1||'';
+            document.getElementById('addr-address2').value = a.address2||'';
+            document.getElementById('addr-city').value = a.city||'';
+            document.getElementById('addr-state').value = a.state||'';
+            document.getElementById('addr-postal').value = a.postal||'';
+            document.getElementById('addr-default').checked = !!a.isDefault;
+            window.scrollTo({ top: addrForm.getBoundingClientRect().top + window.scrollY - 80, behavior:'smooth' });
+          });
+          const del = document.createElement('button'); del.className='btn btn-ghost btn-sm'; del.textContent='Delete';
+          del.addEventListener('click', async ()=>{
+            if (!confirm('Delete this address?')) return;
+            try { await fetchJSON(`${base}/api/users/me/addresses/${encodeURIComponent(a.id)}`, { method:'DELETE' }); loadAddresses(); } catch(e) { alert(e.message||'Failed'); }
+          });
+          if (!a.isDefault) {
+            const mkDef = document.createElement('button'); mkDef.className='btn btn-ghost btn-sm'; mkDef.textContent='Make default';
+            mkDef.addEventListener('click', async ()=>{
+              try { await fetchJSON(`${base}/api/users/me/addresses/${encodeURIComponent(a.id)}`, { method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ isDefault: true }) }); loadAddresses(); } catch(e) { alert(e.message||'Failed'); }
+            });
+            actions.appendChild(mkDef);
+          }
+          actions.append(edit, del);
+          card.append(label, actions);
+          wrap.appendChild(card);
+        });
+      };
+      async function loadAddresses(){
+        try { const data = await fetchJSON(`${base}/api/users/me/addresses`); renderAddresses(Array.isArray(data.addresses)?data.addresses:[]); } catch { renderAddresses([]); }
+      }
+      loadAddresses();
+      addrForm.addEventListener('submit', async (e)=>{
+        e.preventDefault(); addrMsg.textContent='';
+        try {
+          const body = collectAddr();
+          if (!body.address1 || !body.city || !body.state || !body.postal) throw new Error('Please complete address.');
+          if (editingAddressId) {
+            await fetchJSON(`${base}/api/users/me/addresses/${encodeURIComponent(editingAddressId)}`, { method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) });
+          } else {
+            await fetchJSON(`${base}/api/users/me/addresses`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) });
+          }
+          resetAddrForm();
+          loadAddresses();
+          addrMsg.textContent = 'Saved';
+        } catch(err) { addrMsg.textContent = err.message || 'Error saving'; addrMsg.classList.add('text-error'); }
+      });
+      addrCancel.addEventListener('click', resetAddrForm);
+
+      // Payment methods (Stripe)
+      let stripe = null, elements = null, card = null, setup_client_secret = null;
+      const pmNote = document.getElementById('pm-note');
+      const pmList = document.getElementById('pm-list');
+      const pmEmpty = document.getElementById('pm-empty');
+      async function loadConfig(){
+        try {
+          const cfg = await fetchJSON(`${base}/api/config`);
+          if (!cfg || !cfg.enabled || !cfg.pk) {
+            pmNote.textContent = 'Cards are disabled at the moment.';
+            document.getElementById('pm-start').disabled = true;
+            return null;
+          }
+          pmNote.textContent = '';
+          return cfg;
+        } catch { pmNote.textContent = 'Cards are unavailable.'; return null; }
+      }
+      async function loadPMs(){
+        try {
+          const data = await fetchJSON(`${base}/api/users/me/payment-methods`);
+          const list = Array.isArray(data.paymentMethods) ? data.paymentMethods : [];
+          pmList.innerHTML = '';
+          if (!list.length) { pmEmpty.style.display='block'; return; }
+          pmEmpty.style.display='none';
+          list.forEach(pm => {
+            const li = document.createElement('li');
+            const last4 = pm?.card?.last4 || '••••';
+            const brand = (pm?.card?.brand || 'card').toUpperCase();
+            const exp = pm?.card ? `${pm.card.exp_month}/${String(pm.card.exp_year).slice(-2)}` : '';
+            const txt = document.createElement('span');
+            txt.textContent = `${brand} •••• ${last4} ${exp ? '('+exp+')':''}`;
+            const del = document.createElement('button'); del.className='btn btn-ghost btn-sm'; del.textContent='Remove';
+            del.addEventListener('click', async ()=>{ if (confirm('Remove this card?')) { try { await fetchJSON(`${base}/api/users/me/payment-methods/${encodeURIComponent(pm.id)}`, { method:'DELETE' }); loadPMs(); } catch(e){ alert(e.message||'Failed'); } } });
+            li.append(txt, del);
+            pmList.appendChild(li);
+          });
+        } catch { pmList.innerHTML=''; pmEmpty.style.display='block'; }
+      }
+      loadPMs();
+
+      function mountCard(stripeInstance) {
+        if (card) return; // already mounted
+        elements = stripeInstance.elements();
+        card = elements.create('card');
+        card.mount('#card-element');
+      }
+      async function ensureStripe(pk) {
+        if (stripe) return stripe;
+        await new Promise((resolve,reject)=>{
+          const s = document.createElement('script'); s.src='https://js.stripe.com/v3/'; s.async=true; s.onload=resolve; s.onerror=reject; document.head.appendChild(s);
+        });
+        stripe = window.Stripe(pk);
+        return stripe;
+      }
+      const pmStart = document.getElementById('pm-start');
+      const pmArea = document.getElementById('pm-add-area');
+      const pmMsg = document.getElementById('pm-msg');
+      const pmCancel = document.getElementById('pm-cancel');
+      const pmConfirm = document.getElementById('pm-confirm');
+      pmStart.addEventListener('click', async ()=>{
+        pmMsg.textContent='';
+        const cfg = await loadConfig();
+        if (!cfg) return;
+        try {
+          const res = await fetchJSON(`${base}/api/users/me/stripe/setup-intent`, { method:'POST' });
+          setup_client_secret = res.clientSecret;
+          await ensureStripe(cfg.pk);
+          mountCard(stripe);
+          pmArea.hidden = false; pmStart.disabled = true;
+        } catch(e) { pmMsg.textContent = e.message || 'Unable to start card setup'; pmMsg.classList.add('text-error'); }
+      });
+      pmCancel.addEventListener('click', ()=>{ pmArea.hidden=true; pmStart.disabled=false; pmMsg.textContent=''; });
+      pmConfirm.addEventListener('click', async ()=>{
+        pmMsg.textContent='';
+        try {
+          if (!stripe || !card || !setup_client_secret) throw new Error('Not ready');
+          const user = JSON.parse(localStorage.getItem('currentUser')||'null') || {};
+          const result = await stripe.confirmCardSetup(setup_client_secret, {
+            payment_method: { card, billing_details: { name: user.name || user.email || 'Customer', email: user.email || '' } }
+          });
+          if (result.error) throw result.error;
+          pmMsg.textContent = 'Card saved.';
+          pmArea.hidden = true; pmStart.disabled = false; card && card.clear && card.clear();
+          loadPMs();
+        } catch(e) { pmMsg.textContent = e.message || 'Failed to save card'; pmMsg.classList.add('text-error'); }
       });
     });
   </script>
