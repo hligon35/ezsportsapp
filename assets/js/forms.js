@@ -32,8 +32,8 @@
     try {
       const ok = await loadTurnstile();
       if (!ok || !SITE_KEY) return '';
-      if (getToken._pending) return getToken._pending;
-      getToken._pending = new Promise(resolve => {
+      if (window.__turnstileTokenPromise) return await window.__turnstileTokenPromise;
+      window.__turnstileTokenPromise = new Promise(resolve => {
         const host = document.createElement('div');
         host.style.cssText='position:fixed;left:-9999px;top:-9999px;';
         document.body.appendChild(host);
@@ -42,16 +42,16 @@
         try {
           wid = window.turnstile.render(host, {
             sitekey: SITE_KEY,
-            size: 'flexible',
+            size: 'invisible',
             callback: t=>{ resolve(t||''); cleanup(wid); },
             'error-callback': ()=>{ resolve(''); cleanup(wid); },
             'timeout-callback': ()=>{ resolve(''); cleanup(wid); }
           });
         } catch { resolve(''); cleanup(wid); return; }
-        try { window.turnstile.execute(wid); } catch { resolve(''); cleanup(wid); }
+        try { window.turnstile.execute(wid); } catch { try{ if(wid) window.turnstile.reset(wid); }catch{} resolve(''); cleanup(wid); }
         setTimeout(()=>{ resolve(''); cleanup(wid); }, 8000);
-      }).finally(()=>{ getToken._pending=null; });
-      return await getToken._pending;
+      }).finally(()=>{ window.__turnstileTokenPromise=null; });
+      return await window.__turnstileTokenPromise;
     } catch { return ''; }
   }
 
@@ -90,7 +90,7 @@
           let data = {};
           const primaryUrl = endpointFor('subscribe');
           try {
-            const res = await fetch(primaryUrl, { method:'POST', headers:{'Content-Type':'text/plain'}, body: JSON.stringify(payload) });
+            const res = await fetch(primaryUrl, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
             if (res.ok) {
               data = await res.json().catch(()=>({}));
             } else if (res.status === 404 || res.status === 405) {
@@ -100,7 +100,7 @@
             }
           } catch {
             // Fallback to Apps Script
-            const res2 = await fetch(FORM_ENDPOINT, { method:'POST', headers:{'Content-Type':'text/plain'}, body: JSON.stringify(payload) });
+            const res2 = await fetch(FORM_ENDPOINT, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
             data = await res2.json().catch(()=>({}));
           }
           if (!data.ok) throw 0;
@@ -140,7 +140,7 @@
         let data = {};
         const primaryUrl = endpointFor('contact');
         try {
-          const res = await fetch(primaryUrl, { method:'POST', headers:{'Content-Type':'text/plain'}, body: JSON.stringify(payload) });
+          const res = await fetch(primaryUrl, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
           if (res.ok) {
             data = await res.json().catch(()=>({}));
           } else if (res.status === 404 || res.status === 405) {
@@ -149,7 +149,7 @@
             data = await res.json().catch(()=>({}));
           }
         } catch {
-          const res2 = await fetch(FORM_ENDPOINT, { method:'POST', headers:{'Content-Type':'text/plain'}, body: JSON.stringify(payload) });
+          const res2 = await fetch(FORM_ENDPOINT, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
           data = await res2.json().catch(()=>({}));
         }
         if (!data.ok) throw 0;

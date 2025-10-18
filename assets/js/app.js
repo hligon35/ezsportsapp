@@ -124,8 +124,9 @@ async function fetchProducts() {
     try {
       const ok = await loadTurnstile();
       if (!ok || !window.TURNSTILE_SITE_KEY) return '';
-      if (getTurnstileToken._pending) return await getTurnstileToken._pending;
-      getTurnstileToken._pending = new Promise(resolve => {
+      // Use a global singleflight so multiple modules/pages don't double-execute()
+      if (window.__turnstileTokenPromise) return await window.__turnstileTokenPromise;
+      window.__turnstileTokenPromise = new Promise(resolve => {
         const host = document.createElement('div');
         host.style.cssText = 'position:fixed;left:-9999px;top:-9999px;';
         document.body.appendChild(host);
@@ -135,16 +136,16 @@ async function fetchProducts() {
         try {
           wid = window.turnstile.render(host, {
             sitekey: window.TURNSTILE_SITE_KEY,
-            size: 'flexible', // valid sizes: compact, normal, flexible
+            size: 'invisible', // programmatic token; avoid auto-execute conflicts
             callback: (token) => { resolve(token||''); cleanup(wid); },
             'error-callback': () => { resolve(''); cleanup(wid); },
             'timeout-callback': () => { resolve(''); cleanup(wid); }
           });
         } catch(err) { resolve(''); cleanup(wid); return; }
-        try { window.turnstile.execute(wid); } catch { resolve(''); cleanup(wid); }
+        try { window.turnstile.execute(wid); } catch { try { if (wid) window.turnstile.reset(wid); } catch {} resolve(''); cleanup(wid); }
         setTimeout(()=>{ resolve(''); cleanup(wid); }, 8000);
-      }).finally(()=>{ getTurnstileToken._pending = null; });
-      return await getTurnstileToken._pending;
+      }).finally(()=>{ window.__turnstileTokenPromise = null; });
+      return await window.__turnstileTokenPromise;
     } catch { return ''; }
   }
 
@@ -640,6 +641,53 @@ ensurePerformanceOptimizations() {
           head.appendChild(l);
         }
       };
+      // Feature detection and conditional compat.css load (runs once)
+      (function compatDetect(){
+        try {
+          const html = document.documentElement;
+          // flex-gap detection
+          let flexGap = true;
+          try {
+            const d = document.createElement('div');
+            d.style.display = 'flex'; d.style.gap = '1px';
+            d.appendChild(document.createElement('div'));
+            d.appendChild(document.createElement('div'));
+            document.body.appendChild(d);
+            flexGap = (d.scrollHeight === 1) || (d.getBoundingClientRect().height <= 2);
+            d.remove();
+          } catch { flexGap = false; }
+          if (!flexGap) html.classList.add('no-flex-gap');
+
+          // aspect-ratio support
+          if (!CSS || !CSS.supports || !CSS.supports('aspect-ratio: 4/3')) {
+            html.classList.add('no-aspect-ratio');
+          }
+          // color-mix support
+          try {
+            if (!(CSS && CSS.supports && CSS.supports('background: color-mix(in oklab, #fff 50%, #000 50%)'))) {
+              html.classList.add('no-color-mix');
+            }
+          } catch { html.classList.add('no-color-mix'); }
+          // backdrop-filter support
+          try {
+            if (!(CSS && CSS.supports && (CSS.supports('backdrop-filter: blur(2px)') || CSS.supports('-webkit-backdrop-filter: blur(2px)')))) {
+              html.classList.add('no-backdrop-filter');
+            }
+          } catch { html.classList.add('no-backdrop-filter'); }
+
+          // If any no-* class applied, ensure compat.css is loaded
+          const needCompat = html.classList.contains('no-flex-gap')
+            || html.classList.contains('no-aspect-ratio')
+            || html.classList.contains('no-color-mix')
+            || html.classList.contains('no-backdrop-filter');
+          if (needCompat && !head.querySelector('link[rel="stylesheet"][href*="assets/css/compat.css"]')) {
+            const link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.href = 'assets/css/compat.css';
+            head.appendChild(link);
+          }
+        } catch {}
+      })();
       // Preconnects
       ensureLink({ rel: 'preconnect', href: 'https://fonts.googleapis.com' });
       ensureLink({ rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' });

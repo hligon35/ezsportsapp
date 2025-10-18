@@ -1,0 +1,28 @@
+/* Admin-specific responsive utilities (avoid inline styles) */
+
+.admin-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem;
+}
+.admin-kpi-grid.small {
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+}
+
+.card-light {
+  background: #f7faff;
+  border: 1px solid #e6edf6;
+  border-radius: .8rem;
+  padding: 1rem;
+}
+
+.text-sm-muted { font-size: .8rem; }
+.kpi-lg { font-size: 1.6rem; font-weight: 800; }
+.m-0 { margin: 0; }
+.ml-05 { margin-left: .5rem; }
+.error-text { display: none; color: #b00; }
+.newsletter-grid-1 { display: grid; grid-template-columns: 1fr; }
+
+@media (max-width: 640px){
+  .admin-kpi-grid { gap: .75rem; }
+}
