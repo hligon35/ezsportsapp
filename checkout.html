@@ -14,11 +14,19 @@
   <style>
     .checkout-container { max-width: 900px; margin: 2rem auto; background: #fff; border-radius: 1.2rem; box-shadow: 0 4px 24px rgba(12,32,64,.10); padding: 2rem; }
     .checkout-grid { display: grid; grid-template-columns: 1.2fr .8fr; gap: 1.2rem; align-items: start; }
+    /* Allow grid children to shrink/wrap instead of forcing overflow */
+    .checkout-grid > * { min-width: 0; min-height: 0; }
     #payment-form { display: flex; flex-direction: column; gap: 1rem; }
     .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: .6rem; }
     label { font-weight: 700; font-size: .9rem; }
     input, select { padding: .6rem .7rem; border:1px solid #cfe0f5; border-radius: .6rem; width: 100%; box-sizing: border-box; }
-    .order-card { background:#f7faff; border:1px solid #e6edf6; border-radius: .8rem; padding: 1rem; }
+    .order-card { background:#f7faff; border:1px solid #e6edf6; border-radius: .8rem; padding: 1rem; height:auto; overflow:visible; }
+    /* Order summary specific tweaks for perfect wrapping */
+    .checkout-container aside.order-card { align-self: start; }
+    .checkout-container .row-between { gap: .5rem; }
+    .checkout-container #order-lines .flex-row > div:first-child { flex: 1 1 auto; min-width: 0; }
+    .checkout-container #order-lines .text-right { flex: 0 0 auto; white-space: nowrap; margin-left: .5rem; }
+    .checkout-container #order-lines .flex-row > div:first-child > strong { overflow-wrap: anywhere; }
     #payment-message { color: var(--red); font-weight: 600; }
     /* Ensure Stripe Payment Element has breathing room and never clips */
     #payment-element { padding: .25rem 0 .5rem; min-height: 52px; }

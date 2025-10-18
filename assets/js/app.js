@@ -1453,9 +1453,9 @@ ensureHomeFirst() {
           ...[
             'bulletft_blacklscreen_a.avif','bulletft_columbiabluelscreen_a.avif','bulletft_darkgreenlscreen_a.avif','bulletft_greenlscreen_a.avif','bulletft_maroonlscreen_a.avif','bulletft_navylscreen_a.avif','bulletft_orangelscreen_a.avif','bulletft_purplelscreen_a.avif','bulletft_redlscreen_alt.avif','bulletft_royallscreen_a.avif','bulletft_yellowlscreen_a.avif'
           ].map(n => join(BASE, 'Baseball_L_Screens', 'BULLETFT', n)),
-          // BULLETJRBB
+          // BULLETJRBB (renamed to color-based filenames)
           ...[
-            'bulletjrbb1a.avif','bulletjrbb2a.avif','bulletjrbb3a.avif','bulletjrbb4a.avif','bulletjrbb5a.avif','bulletjrbb6a.avif','bulletjrbb7a.avif','bulletjrbb8a.avif','bulletjrbb9a.avif','bulletjrbb10a.avif','bulletjrbb11a.avif'
+            'bulletjrbb_black_a.avif','bulletjrbb_columbia_a.avif','bulletjrbb_darkgreen_a.avif','bulletjrbb_green_a.avif','bulletjrbb_maroon_a.avif','bulletjrbb_navy_a.avif','bulletjrbb_orange_a.avif','bulletjrbb_purple_a.avif','bulletjrbb_red_a.avif','bulletjrbb_royal_.avif','bulletjrbb_yellow_a.avif'
           ].map(n => join(BASE, 'Baseball_L_Screens', 'BULLETJRBB', n)),
           // BULLETL
           ...[
@@ -1473,7 +1473,7 @@ ensureHomeFirst() {
         protective: [
           // 10x10
           ...[
-            'protective10x10_blackscreen (1).avif','protective10x10_columbiabluescreen (1).avif','protective10x10_darkgreenscreen (1).avif','protective10x10_greenscreen (1).avif','protective10x10_maroonscreen (1).avif','protective10x10_navyscreen (1).avif','protective10x10_orangescreen (1).avif','protective10x10_purplescreen (1).avif','protective10x10_redscreen (1).avif','protective10x10_ryoalscreen (1).avif','protective10x10_yellowscreen (1).avif'
+            'protective10x10_blackscreen (1).avif','protective10x10_columbiabluescreen (1).avif','protective10x10_darkgreenscreen (1).avif','protective10x10_greenscreen (1).avif','protective10x10_maroonscreen (1).avif','protective10x10_navyscreen (1).avif','protective10x10_orangescreen (1).avif','protective10x10_purplescreen (1).avif','protective10x10_redscreen (1).avif','protective10x10_royalscreen (1).avif','protective10x10_yellowscreen (1).avif'
           ].map(n => join(BASE, 'Protective_Screens', 'PROTECTIVE10X10', n)),
           // 7x7
           ...[
@@ -1485,9 +1485,9 @@ ensureHomeFirst() {
           ].map(n => join(BASE, 'Protective_Screens', 'PROTECTIVE8X8', n))
         ],
         pocket: [
-          // Pro
+          // Pro (renamed to color-based filenames)
           ...[
-            'pppro1a.avif','pppro2a.avif','pppro3a.avif','pppro4a.avif','pppro5a.avif','pppro6a.avif','pppro7a.avif','pppro8a.avif','pppro9a.avif','pppro10a.avif','pppro11a.avif','pppro12a.avif'
+            'pppro_black_a.avif','pppro__columbia_a.avif','pppro_darkgreen_a.avif','pppro_green_a.avif','pppro_maroon_a.avif','pppro_navy_a.avif','pppro1_orange_a.avif','pppro_purple_a.avif','pppro_red_a.avif','pppro_royal_a.avif','pppro_yellow_a.avif'
           ].map(n => join(BASE, "Pitcher's_Pockets", 'BBPP-PRO', n)),
           // 9-hole
           ...[
@@ -2822,14 +2822,13 @@ ensureHomeFirst() {
     } catch {}
     if (!sources.length) return [];
 
-    // Special-case: Bullet JR images are numbered without color tokens.
-    // Return all JR images as neutral for now; we'll classify and recolor dots after render.
+    // Special-case (legacy): some Bullet JR images were previously numbered without color tokens.
+    // Only apply this fallback if we actually detect numbered filenames; otherwise
+    // proceed with normal color extraction (new colored filenames are supported).
     try {
       const lowerSources = sources.map(s => ({ src: s, name: (s.split('/').pop()||'').toLowerCase() }));
-      const looksLikeJR = lowerSources.some(it => /^bulletjrbb\d{1,2}(a)?\./.test(it.name))
-        || /bulletjrbb/i.test(String(product.id||product.sku||product.title||''));
-      if (looksLikeJR) {
-        // Prefer non-zoom ('a') first but include all up to 11
+      const hasNumberedJR = lowerSources.some(it => /^bulletjrbb\d{1,2}(a)?\./.test(it.name));
+      if (hasNumberedJR) {
         const seq = lowerSources.sort((a,b)=>{
           const re = /bulletjrbb(\d{1,2})(a)?\./;
           const ma = a.name.match(re); const mb = b.name.match(re);

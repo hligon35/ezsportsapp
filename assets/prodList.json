@@ -1396,20 +1396,19 @@
           "price": 299.95,
           "lastSynced": "2025-09-25"
         },
-        "img": "assets/prodImgs/Pitcher's_Pockets/BBPP-PRO/pppro1a.avif",
+        "img": "assets/prodImgs/Pitcher's_Pockets/BBPP-PRO/pppro_black_a.avif",
         "images": [
-          "assets/prodImgs/Pitcher's_Pockets/BBPP-PRO/pppro1a.avif",
-          "assets/prodImgs/Pitcher's_Pockets/BBPP-PRO/pppro2a.avif",
-          "assets/prodImgs/Pitcher's_Pockets/BBPP-PRO/pppro3a.avif",
-          "assets/prodImgs/Pitcher's_Pockets/BBPP-PRO/pppro4a.avif",
-          "assets/prodImgs/Pitcher's_Pockets/BBPP-PRO/pppro5a.avif",
-          "assets/prodImgs/Pitcher's_Pockets/BBPP-PRO/pppro6a.avif",
-          "assets/prodImgs/Pitcher's_Pockets/BBPP-PRO/pppro7a.avif",
-          "assets/prodImgs/Pitcher's_Pockets/BBPP-PRO/pppro8a.avif",
-          "assets/prodImgs/Pitcher's_Pockets/BBPP-PRO/pppro9a.avif",
-          "assets/prodImgs/Pitcher's_Pockets/BBPP-PRO/pppro10a.avif",
-          "assets/prodImgs/Pitcher's_Pockets/BBPP-PRO/pppro11a.avif",
-          "assets/prodImgs/Pitcher's_Pockets/BBPP-PRO/pppro12a.avif"
+          "assets/prodImgs/Pitcher's_Pockets/BBPP-PRO/pppro_black_a.avif",
+          "assets/prodImgs/Pitcher's_Pockets/BBPP-PRO/pppro__columbia_a.avif",
+          "assets/prodImgs/Pitcher's_Pockets/BBPP-PRO/pppro_darkgreen_a.avif",
+          "assets/prodImgs/Pitcher's_Pockets/BBPP-PRO/pppro_green_a.avif",
+          "assets/prodImgs/Pitcher's_Pockets/BBPP-PRO/pppro_maroon_a.avif",
+          "assets/prodImgs/Pitcher's_Pockets/BBPP-PRO/pppro_navy_a.avif",
+          "assets/prodImgs/Pitcher's_Pockets/BBPP-PRO/pppro1_orange_a.avif",
+          "assets/prodImgs/Pitcher's_Pockets/BBPP-PRO/pppro_purple_a.avif",
+          "assets/prodImgs/Pitcher's_Pockets/BBPP-PRO/pppro_red_a.avif",
+          "assets/prodImgs/Pitcher's_Pockets/BBPP-PRO/pppro_royal_a.avif",
+          "assets/prodImgs/Pitcher's_Pockets/BBPP-PRO/pppro_yellow_a.avif"
         ]
       }
     ],
@@ -1542,19 +1541,19 @@
           "price": "349.95 - 499.95",
           "lastSynced": "2025-09-25"
         },
-        "img": "assets/prodImgs/Baseball_L_Screens/BULLETJRBB/bulletjrbb1a.avif",
+        "img": "assets/prodImgs/Baseball_L_Screens/BULLETJRBB/bulletjrbb_black_a.avif",
         "images": [
-          "assets/prodImgs/Baseball_L_Screens/BULLETJRBB/bulletjrbb1a.avif",
-          "assets/prodImgs/Baseball_L_Screens/BULLETJRBB/bulletjrbb2a.avif",
-          "assets/prodImgs/Baseball_L_Screens/BULLETJRBB/bulletjrbb3a.avif",
-          "assets/prodImgs/Baseball_L_Screens/BULLETJRBB/bulletjrbb4a.avif",
-          "assets/prodImgs/Baseball_L_Screens/BULLETJRBB/bulletjrbb5a.avif",
-          "assets/prodImgs/Baseball_L_Screens/BULLETJRBB/bulletjrbb6a.avif",
-          "assets/prodImgs/Baseball_L_Screens/BULLETJRBB/bulletjrbb7a.avif",
-          "assets/prodImgs/Baseball_L_Screens/BULLETJRBB/bulletjrbb8a.avif",
-          "assets/prodImgs/Baseball_L_Screens/BULLETJRBB/bulletjrbb9a.avif",
-          "assets/prodImgs/Baseball_L_Screens/BULLETJRBB/bulletjrbb10a.avif",
-          "assets/prodImgs/Baseball_L_Screens/BULLETJRBB/bulletjrbb11a.avif"
+          "assets/prodImgs/Baseball_L_Screens/BULLETJRBB/bulletjrbb_black_a.avif",
+          "assets/prodImgs/Baseball_L_Screens/BULLETJRBB/bulletjrbb_columbia_a.avif",
+          "assets/prodImgs/Baseball_L_Screens/BULLETJRBB/bulletjrbb_darkgreen_a.avif",
+          "assets/prodImgs/Baseball_L_Screens/BULLETJRBB/bulletjrbb_green_a.avif",
+          "assets/prodImgs/Baseball_L_Screens/BULLETJRBB/bulletjrbb_maroon_a.avif",
+          "assets/prodImgs/Baseball_L_Screens/BULLETJRBB/bulletjrbb_navy_a.avif",
+          "assets/prodImgs/Baseball_L_Screens/BULLETJRBB/bulletjrbb_orange_a.avif",
+          "assets/prodImgs/Baseball_L_Screens/BULLETJRBB/bulletjrbb_purple_a.avif",
+          "assets/prodImgs/Baseball_L_Screens/BULLETJRBB/bulletjrbb_red_a.avif",
+          "assets/prodImgs/Baseball_L_Screens/BULLETJRBB/bulletjrbb_royal_.avif",
+          "assets/prodImgs/Baseball_L_Screens/BULLETJRBB/bulletjrbb_yellow_a.avif"
         ]
       },
       {
@@ -1689,6 +1688,7 @@
           "assets/prodImgs/Baseball_L_Screens/BULLETCOMBO/bulletcombo_blacklscreen_a.avif",
           "assets/prodImgs/Baseball_L_Screens/BULLETCOMBO/bulletcombo_columbiabluelscreen_a.avif",
           "assets/prodImgs/Baseball_L_Screens/BULLETCOMBO/bulletcombo_darkgreenlscreen_a.avif",
+          "assets/prodImgs/Baseball_L_Screens/BULLETCOMBO/bulletcombo_greenlscreen_a.avif",
           "assets/prodImgs/Baseball_L_Screens/BULLETCOMBO/bulletcombo_maroonlscreen_a.avif",
           "assets/prodImgs/Baseball_L_Screens/BULLETCOMBO/bulletcombo_navylscreen_a.avif",
           "assets/prodImgs/Baseball_L_Screens/BULLETCOMBO/bulletcombo_orangelscreen_a.avif",
@@ -1898,6 +1898,7 @@
           "assets/prodImgs/Baseball_L_Screens/BULLETFP/bulletfp_columbiabluescreen_a.avif",
           "assets/prodImgs/Baseball_L_Screens/BULLETFP/bulletfp_darkgreenscreen_a.avif",
           "assets/prodImgs/Baseball_L_Screens/BULLETFP/bulletfp_greenscreen_a.avif",
+          "assets/prodImgs/Baseball_L_Screens/BULLETFP/bulletfp_maroonscreen_a.avif",
           "assets/prodImgs/Baseball_L_Screens/BULLETFP/bulletfp_navyscreen_a.avif",
           "assets/prodImgs/Baseball_L_Screens/BULLETFP/bulletfp_orangescreen_a.avif",
           "assets/prodImgs/Baseball_L_Screens/BULLETFP/bulletfp_purplescreen_a.avif",
@@ -2256,7 +2257,7 @@
           "assets/prodImgs/Protective_Screens/PROTECTIVE10X10/protective10x10_orangescreen (1).avif",
           "assets/prodImgs/Protective_Screens/PROTECTIVE10X10/protective10x10_purplescreen (1).avif",
           "assets/prodImgs/Protective_Screens/PROTECTIVE10X10/protective10x10_redscreen (1).avif",
-          "assets/prodImgs/Protective_Screens/PROTECTIVE10X10/protective10x10_ryoalscreen (1).avif",
+          "assets/prodImgs/Protective_Screens/PROTECTIVE10X10/protective10x10_royalscreen (1).avif",
           "assets/prodImgs/Protective_Screens/PROTECTIVE10X10/protective10x10_yellowscreen (1).avif"
         ]
       }
