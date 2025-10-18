@@ -6,21 +6,30 @@
   <title>Admin Panel | EZ Sports Netting</title>
   <link rel="icon" href="assets/img/EZSportslogo.png" type="image/png" />
   <link rel="stylesheet" href="assets/css/styles.css?v=6" />
+  <link rel="stylesheet" href="assets/css/admin.css?v=1" />
   <style>
-    .admin-container { max-width: 1000px; margin: 2rem auto; padding: 2rem; }
-    .admin-section { background: #fff; border-radius: 1.2rem; box-shadow: 0 4px 24px rgba(12,32,64,.10); padding: 2rem; margin-bottom: 2rem; }
+    .admin-container { max-width: 1000px; margin: 2rem auto; padding: clamp(1rem, 3.5vw, 2rem); }
+    .admin-section { background: #fff; border-radius: 1.2rem; box-shadow: 0 4px 24px rgba(12,32,64,.10); padding: clamp(1rem, 3.5vw, 2rem); margin-bottom: 2rem; }
     .product-form { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
-    .product-form input, .product-form textarea, .product-form select { padding: .8rem; border: 1px solid #cfe0f5; border-radius: .6rem; }
+    .product-form input, .product-form textarea, .product-form select { padding: .8rem; border: 1px solid #cfe0f5; border-radius: .6rem; width: 100%; box-sizing: border-box; }
     .product-list { display: grid; gap: 1rem; }
-    .product-item { display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: #f7faff; border-radius: .8rem; }
-    .admin-nav { display: flex; gap: 1rem; margin-bottom: 2rem; }
+    .product-item { display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: #f7faff; border-radius: .8rem; flex-wrap: wrap; gap: .6rem; }
+    .admin-nav { display: flex; gap: .6rem; row-gap: .5rem; margin-bottom: 1.25rem; flex-wrap: wrap; overflow-x: visible; }
   .admin-nav button { padding: .8rem 1.5rem; border: none; background: #e6edf6; border-radius: .6rem; cursor: pointer; color:#0b2a4a; font-weight:700; }
   .admin-nav button.active { background: var(--primary, #0b64d4); color: #ffffff; box-shadow: 0 2px 10px rgba(11,100,212,.25); }
   /* Inventory UI removed for dropship model */
     .hidden{display:none;}
-    .toolbar{display:flex; gap:1rem; align-items:center; margin-bottom:1rem; flex-wrap:wrap;}
+    .toolbar{display:flex; gap:.75rem; align-items:center; margin-bottom:1rem; flex-wrap:wrap;}
     .filter-select{margin-left:.5rem; padding:.4rem;}
-    @media (max-width: 768px) { .product-form { grid-template-columns: 1fr; } }
+    @media (max-width: 768px) {
+      .product-form { grid-template-columns: 1fr; }
+      .admin-nav button { padding: .55rem .8rem; font-size: .9rem; }
+    }
+    @media (max-width: 640px) {
+      .admin-nav { margin-bottom: 1rem; }
+      .admin-nav .ml-auto { flex: 1 0 100%; text-align: right; }
+      .product-item { align-items: flex-start; }
+    }
   </style>
 </head>
 <body>
@@ -145,37 +154,37 @@
       <div id="marketing-section" class="admin-section hidden">
         <h3>Marketing</h3>
         <div class="stack-05">
-          <section style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1rem;">
-            <div class="card" style="background:#f7faff;border:1px solid #e6edf6;border-radius:.8rem;padding:1rem;">
-              <div class="muted" style="font-size:.8rem;">Active subscribers</div>
-              <div id="w-subs-active" style="font-size:1.6rem;font-weight:800;">–</div>
+          <section class="admin-kpi-grid">
+            <div class="card card-light">
+              <div class="muted text-sm-muted">Active subscribers</div>
+              <div id="w-subs-active" class="kpi-lg">–</div>
             </div>
-            <div class="card" style="background:#f7faff;border:1px solid #e6edf6;border-radius:.8rem;padding:1rem;">
-              <div class="muted" style="font-size:.8rem;">Coupons (total)</div>
-              <div id="w-coupons-total" style="font-size:1.6rem;font-weight:800;">–</div>
+            <div class="card card-light">
+              <div class="muted text-sm-muted">Coupons (total)</div>
+              <div id="w-coupons-total" class="kpi-lg">–</div>
             </div>
-            <div class="card" style="background:#f7faff;border:1px solid #e6edf6;border-radius:.8rem;padding:1rem;">
-              <div class="muted" style="font-size:.8rem;">Active coupons</div>
-              <div id="w-coupons-active" style="font-size:1.6rem;font-weight:800;">–</div>
+            <div class="card card-light">
+              <div class="muted text-sm-muted">Active coupons</div>
+              <div id="w-coupons-active" class="kpi-lg">–</div>
             </div>
-            <div class="card" style="background:#f7faff;border:1px solid #e6edf6;border-radius:.8rem;padding:1rem;">
-              <div class="muted" style="font-size:.8rem;">Total redemptions</div>
-              <div id="w-coupons-used" style="font-size:1.6rem;font-weight:800;">–</div>
+            <div class="card card-light">
+              <div class="muted text-sm-muted">Total redemptions</div>
+              <div id="w-coupons-used" class="kpi-lg">–</div>
             </div>
           </section>
           <section>
             <h4>Top codes</h4>
-            <ul id="w-top-codes" class="muted" style="margin:0;"></ul>
+            <ul id="w-top-codes" class="muted m-0"></ul>
           </section>
           <section>
             <h4>Send Newsletter</h4>
-            <form id="newsletter-form" class="product-form" style="grid-template-columns:1fr;">
+            <form id="newsletter-form" class="product-form newsletter-grid-1">
               <input type="text" id="nl-subject" placeholder="Subject" required />
               <textarea id="nl-text" placeholder="Plain text content (optional)" rows="3"></textarea>
               <textarea id="nl-html" placeholder="HTML content" rows="6"></textarea>
               <div>
                 <button type="submit" class="btn btn-primary">Queue Newsletter</button>
-                <span id="nl-status" class="muted" style="margin-left:.5rem;"></span>
+                <span id="nl-status" class="muted ml-05"></span>
               </div>
             </form>
           </section>
@@ -194,17 +203,17 @@
               <input type="text" id="cp-emails" placeholder="Restrict to emails (comma-separated, optional)" />
               <button type="submit" class="btn btn-primary">Create Coupon</button>
             </form>
-            <div id="coupon-status" class="muted" style="margin-top:.5rem;"></div>
+            <div id="coupon-status" class="muted mt-05"></div>
           </section>
           <section>
             <div class="flex-row space-between items-center"><h4>Coupons</h4><button id="coupons-refresh" class="btn btn-ghost" type="button">Refresh</button></div>
             <div id="coupons-list" class="product-list"><p class="muted">Loading coupons…</p></div>
-            <div id="coupons-error" class="muted" style="display:none;color:#b00;"></div>
+            <div id="coupons-error" class="muted error-text"></div>
           </section>
           <section>
             <div class="flex-row space-between items-center"><h4>Subscribers</h4><button id="subs-refresh" class="btn btn-ghost" type="button">Refresh</button></div>
             <div id="subs-list" class="product-list"><p class="muted">Loading subscribers…</p></div>
-            <div id="subs-error" class="muted" style="display:none;color:#b00;"></div>
+            <div id="subs-error" class="muted error-text"></div>
           </section>
         </div>
       </div>
@@ -224,7 +233,7 @@
           </label>
           <button class="btn btn-secondary" id="finance-refresh-btn">Refresh</button>
         </div>
-        <section class="cards mt-4" id="finance-kpis" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:1rem;">
+  <section class="cards mt-4 admin-kpi-grid small" id="finance-kpis">
           <div class="card-sm"><div class="muted">Gross</div><div class="kpi" id="fin-gross">$0.00</div></div>
           <div class="card-sm"><div class="muted">Refunds</div><div class="kpi" id="fin-refunds">$0.00</div></div>
           <div class="card-sm"><div class="muted">Fees</div><div class="kpi" id="fin-fees">$0.00</div></div>
@@ -267,7 +276,7 @@
           </label>
           <button class="btn btn-secondary" id="traffic-refresh-btn">Refresh</button>
         </div>
-        <section class="cards mt-4" id="traffic-kpis" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:1rem;">
+  <section class="cards mt-4 admin-kpi-grid small" id="traffic-kpis">
           <div class="card-sm"><div class="muted">Requests</div><div class="kpi" id="cf-reqs">0</div></div>
           <div class="card-sm"><div class="muted">Cache Hit %</div><div class="kpi" id="cf-cache">0%</div></div>
           <div class="card-sm"><div class="muted">Bandwidth</div><div class="kpi" id="cf-band">0 MB</div></div>
