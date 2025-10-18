@@ -1,11 +1,21 @@
 const express = require('express');
 const router = express.Router();
+const crypto = require('crypto');
 const UserService = require('../services/UserService');
 const EmailService = require('../services/EmailService');
 const { signToken, requireAdmin, requireAuth, setAuthCookie, clearAuthCookie, getUserFromRequest } = require('../middleware/auth');
 
 const userService = new UserService();
 const emailService = new EmailService();
+// Stripe client for payment method management (optional)
+let stripe = null;
+try {
+  if (process.env.STRIPE_SECRET_KEY) {
+    stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+  }
+} catch (e) {
+  console.warn('Stripe in users router failed to initialize:', e.message);
+}
 
 // Register new user (requires firstName, lastName, email, password; optional password2 for confirmation)
 router.post('/register', async (req, res) => {
@@ -133,6 +143,152 @@ router.post('/refresh', requireAuth, (req, res) => {
   const token = signToken({ id: req.user.id, email: req.user.email, isAdmin: req.user.isAdmin });
   setAuthCookie(res, token);
   res.json({ token });
+});
+
+// ---------- Favorites ----------
+router.get('/me/favorites', requireAuth, async (req, res) => {
+  try {
+    const me = await userService.getUserById(req.user.id);
+    const favs = Array.isArray(me?.favorites) ? me.favorites : [];
+    res.json({ favorites: favs });
+  } catch (e) { res.status(500).json({ message: e.message }); }
+});
+
+router.post('/me/favorites', requireAuth, async (req, res) => {
+  try {
+    const { productId } = req.body || {};
+    if (!productId) return res.status(400).json({ message: 'productId required' });
+    const me = await userService.getUserById(req.user.id);
+    const favs = new Set(Array.isArray(me?.favorites) ? me.favorites : []);
+    favs.add(String(productId));
+    await userService.updateUser(req.user.id, { favorites: Array.from(favs) });
+    res.json({ favorites: Array.from(favs) });
+  } catch (e) { res.status(500).json({ message: e.message }); }
+});
+
+router.delete('/me/favorites/:productId', requireAuth, async (req, res) => {
+  try {
+    const { productId } = req.params;
+    const me = await userService.getUserById(req.user.id);
+    const favs = new Set(Array.isArray(me?.favorites) ? me.favorites : []);
+    favs.delete(String(productId));
+    await userService.updateUser(req.user.id, { favorites: Array.from(favs) });
+    res.json({ favorites: Array.from(favs) });
+  } catch (e) { res.status(500).json({ message: e.message }); }
+});
+
+// ---------- Addresses ----------
+function normalizeAddress(a){
+  if (!a) return null;
+  return {
+    id: a.id || crypto.randomUUID(),
+    name: (a.name||'').trim() || undefined,
+    address1: (a.address1||'').trim(),
+    address2: (a.address2||'').trim() || undefined,
+    city: (a.city||'').trim(),
+    state: (a.state||'').trim(),
+    postal: (a.postal||'').trim(),
+    country: (a.country||'US').trim().toUpperCase(),
+    phone: (a.phone||'').trim() || undefined,
+    isDefault: Boolean(a.isDefault)
+  };
+}
+
+router.get('/me/addresses', requireAuth, async (req, res) => {
+  try {
+    const me = await userService.getUserById(req.user.id);
+    const list = Array.isArray(me?.addresses) ? me.addresses : [];
+    res.json({ addresses: list });
+  } catch (e) { res.status(500).json({ message: e.message }); }
+});
+
+router.post('/me/addresses', requireAuth, async (req, res) => {
+  try {
+    const addr = normalizeAddress(req.body||{});
+    if (!addr || !addr.address1 || !addr.city || !addr.state || !addr.postal) {
+      return res.status(400).json({ message: 'Missing required address fields' });
+    }
+    const me = await userService.getUserById(req.user.id);
+    const list = Array.isArray(me?.addresses) ? me.addresses : [];
+    if (addr.isDefault) list.forEach(a=>a.isDefault=false);
+    list.push(addr);
+    await userService.updateUser(req.user.id, { addresses: list });
+    res.status(201).json({ address: addr, addresses: list });
+  } catch (e) { res.status(500).json({ message: e.message }); }
+});
+
+router.put('/me/addresses/:id', requireAuth, async (req, res) => {
+  try {
+    const id = req.params.id;
+    const me = await userService.getUserById(req.user.id);
+    const list = Array.isArray(me?.addresses) ? me.addresses : [];
+    const idx = list.findIndex(a=>String(a.id)===String(id));
+    if (idx === -1) return res.status(404).json({ message: 'Address not found' });
+    const updated = { ...list[idx], ...normalizeAddress({ ...list[idx], ...req.body, id }) };
+    if (updated.isDefault) list.forEach(a=>a.isDefault=false);
+    list[idx] = updated;
+    await userService.updateUser(req.user.id, { addresses: list });
+    res.json({ address: updated, addresses: list });
+  } catch (e) { res.status(500).json({ message: e.message }); }
+});
+
+router.delete('/me/addresses/:id', requireAuth, async (req, res) => {
+  try {
+    const id = req.params.id;
+    const me = await userService.getUserById(req.user.id);
+    const list = Array.isArray(me?.addresses) ? me.addresses : [];
+    const next = list.filter(a=>String(a.id)!==String(id));
+    await userService.updateUser(req.user.id, { addresses: next });
+    res.json({ addresses: next });
+  } catch (e) { res.status(500).json({ message: e.message }); }
+});
+
+// ---------- Payment Methods (Stripe) ----------
+router.post('/me/stripe/setup-intent', requireAuth, async (req, res) => {
+  try {
+    if (!stripe) return res.status(503).json({ message: 'Stripe not configured' });
+    let me = await userService.getUserById(req.user.id);
+    let customerId = me.stripeCustomerId;
+    if (!customerId) {
+      const customer = await stripe.customers.create({ email: me.email, name: me.name || `${me.firstName||''} ${me.lastName||''}`.trim() });
+      customerId = customer.id;
+      await userService.updateUser(req.user.id, { stripeCustomerId: customerId });
+      me = await userService.getUserById(req.user.id);
+    }
+    const si = await stripe.setupIntents.create({ customer: customerId, payment_method_types: ['card'] });
+    res.json({ clientSecret: si.client_secret, customerId });
+  } catch (e) { res.status(500).json({ message: e.message }); }
+});
+
+router.get('/me/payment-methods', requireAuth, async (req, res) => {
+  try {
+    if (!stripe) return res.json({ paymentMethods: [] });
+    const me = await userService.getUserById(req.user.id);
+    if (!me.stripeCustomerId) return res.json({ paymentMethods: [] });
+    const list = await stripe.paymentMethods.list({ customer: me.stripeCustomerId, type: 'card' });
+    res.json({ paymentMethods: list.data || [] });
+  } catch (e) { res.status(500).json({ message: e.message }); }
+});
+
+router.delete('/me/payment-methods/:pmId', requireAuth, async (req, res) => {
+  try {
+    if (!stripe) return res.status(503).json({ message: 'Stripe not configured' });
+    const pmId = req.params.pmId;
+    await stripe.paymentMethods.detach(pmId);
+    res.json({ ok: true });
+  } catch (e) { res.status(500).json({ message: e.message }); }
+});
+
+router.post('/me/payment-methods/default', requireAuth, async (req, res) => {
+  try {
+    if (!stripe) return res.status(503).json({ message: 'Stripe not configured' });
+    const { pmId } = req.body || {};
+    if (!pmId) return res.status(400).json({ message: 'pmId required' });
+    const me = await userService.getUserById(req.user.id);
+    if (!me.stripeCustomerId) return res.status(400).json({ message: 'No Stripe customer' });
+    const customer = await stripe.customers.update(me.stripeCustomerId, { invoice_settings: { default_payment_method: pmId } });
+    res.json({ ok: true, customer });
+  } catch (e) { res.status(500).json({ message: e.message }); }
 });
 
 // Delete user (admin only)
