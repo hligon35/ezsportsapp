@@ -9,6 +9,9 @@ class EmailService {
     this.from = process.env.SMTP_FROM || process.env.MAIL_FROM || 'no-reply@ezsports.app';
     this.cfUrl = process.env.CF_EMAIL_WEBHOOK_URL || '';
     this.cfApiKey = process.env.CF_EMAIL_API_KEY || '';
+    this.cfAccessId = process.env.CF_ACCESS_CLIENT_ID || '';
+    this.cfAccessSecret = process.env.CF_ACCESS_CLIENT_SECRET || '';
+    this.debug = String(process.env.EMAIL_DEBUG || '').toLowerCase() === 'true';
     // Configure SMTP transport if environment variables are present
     const hasSendgrid = !!process.env.SENDGRID_API_KEY;
     const hasSmtp = !!process.env.SMTP_HOST;
@@ -48,6 +51,20 @@ class EmailService {
         if (fromName) payload.fromName = fromName;
         const headers = { 'Content-Type': 'application/json' };
         if (this.cfApiKey) headers['Authorization'] = `Bearer ${this.cfApiKey}`;
+        // Optional Cloudflare Access service token support
+        if (this.cfAccessId && this.cfAccessSecret) {
+          headers['CF-Access-Client-Id'] = this.cfAccessId;
+          headers['CF-Access-Client-Secret'] = this.cfAccessSecret;
+        }
+        if (this.debug) {
+          console.log('[EmailService] POST worker', {
+            url: this.cfUrl,
+            hasAuth: !!this.cfApiKey,
+            hasAccess: !!(this.cfAccessId && this.cfAccessSecret),
+            to: String(to).slice(-12),
+            subject: subject.slice(0,48)
+          });
+        }
         let doFetch = (typeof fetch === 'function') ? fetch : null;
         if (!doFetch) {
           try { doFetch = require('undici').fetch; } catch { /* no-op */ }
@@ -65,10 +82,14 @@ class EmailService {
           return { ...email, status: 'sent', provider: 'cloudflare-worker' };
         } else {
           const body = await resp.text().catch(()=> '');
+          if (this.debug) {
+            console.warn('[EmailService] Worker response not OK', { status: resp.status, body: body?.slice(0,200) });
+          }
           const cfError = new Error(`Cloudflare email failed ${resp.status}: ${body}`);
           // Attempt SMTP fallback if transporter is configured
           if (this.transporter) {
             try {
+              if (this.debug) console.log('[EmailService] Falling back to SMTP…');
               const info = await this.transporter.sendMail({ from: from || this.from, to, subject, text, html, replyTo });
               await this.db.update('emails', { id: email.id }, { status: 'sent', provider: 'smtp', providerId: info?.messageId || null, sentAt: new Date().toISOString(), error: cfError.message });
               return { ...email, status: 'sent', provider: 'smtp', providerId: info?.messageId || null };
@@ -85,6 +106,7 @@ class EmailService {
         // Try SMTP if available
         if (this.transporter) {
           try {
+            if (this.debug) console.log('[EmailService] Worker call threw, sending via SMTP…', e.message);
             const info = await this.transporter.sendMail({ from: from || this.from, to, subject, text, html, replyTo });
             await this.db.update('emails', { id: email.id }, { status: 'sent', provider: 'smtp', providerId: info?.messageId || null, sentAt: new Date().toISOString(), error: e.message });
             return { ...email, status: 'sent', provider: 'smtp', providerId: info?.messageId || null };
