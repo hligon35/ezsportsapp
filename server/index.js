@@ -441,6 +441,11 @@ app.use((req, res, next) => {
   res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
   res.setHeader('X-Frame-Options', 'SAMEORIGIN');
   res.setHeader('Permissions-Policy', 'geolocation=(), microphone=(), camera=()');
+  // IMPORTANT: Do not enable cross-origin isolation on pages that load third-party scripts like Stripe.js.
+  // Some hosts or middleware may default these; we explicitly relax them to avoid blocking https://js.stripe.com/v3/.
+  // See error: net::ERR_BLOCKED_BY_RESPONSE.NotSameOriginAfterDefaultedToSameOriginByCoep
+  res.setHeader('Cross-Origin-Embedder-Policy', 'unsafe-none');
+  res.setHeader('Cross-Origin-Opener-Policy', 'same-origin-allow-popups');
   next();
 });
 
