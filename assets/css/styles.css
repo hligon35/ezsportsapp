@@ -1534,6 +1534,11 @@ nav.quick-links li a[href="careers.html"]{
 .ml-025 { margin-left: .25rem; }
 .ml-035 { margin-left: .35rem; }
 .text-sm { font-size: .8rem; }
+.text-strong { font-weight: 700; }
+.flex-1 { flex: 1 1 auto; }
+.gap-075 { gap: .75rem; }
+.stack-06{ display:grid; gap:.6rem; }
+.items-start { align-items: flex-start; }
 .text-muted { color: #555; }
 .flex-row { display: flex; }
 .gap-05 { gap: .5rem; }

@@ -6,14 +6,13 @@ const API_BASE_ANALYTICS = (() => {
   const bases = [];
   const isHttp = location.protocol.startsWith('http');
   const onLiveServer = isHttp && location.port === '5500';
-  // Try only localhost/127.0.0.1 when on Live Server to avoid POSTing to 5500
-  if (onLiveServer) {
-    ['127.0.0.1', 'localhost'].forEach(h => ports.forEach(p => bases.push(`http://${h}:${p}`)));
-  } else {
-    // Same-origin first, then localhost fallbacks
-    if (isHttp) bases.push(`${location.protocol}//${location.host}`);
-    ['127.0.0.1', 'localhost'].forEach(h => ports.forEach(p => bases.push(`http://${h}:${p}`)));
-  }
+  // Prefer explicit overrides first
+  try { if (window.__API_BASE) bases.push(String(window.__API_BASE).replace(/\/$/, '')); } catch {}
+  try { const meta = document.querySelector('meta[name="api-base"]'); if (meta && meta.content) bases.push(String(meta.content).replace(/\/$/, '')); } catch {}
+  // Same-origin next (unless on Live Server where we avoid posting to 5500)
+  if (!onLiveServer && isHttp) bases.push(`${location.protocol}//${location.host}`);
+  // Localhost fallbacks last
+  ['127.0.0.1', 'localhost'].forEach(h => ports.forEach(p => bases.push(`http://${h}:${p}`)));
   return Array.from(new Set(bases));
 })();
 
@@ -40,7 +39,7 @@ async function postWithFallback(path, data) {
         body: JSON.stringify(data)
       });
       // Stop retrying after first HTTP response to avoid duplicate 400 logs
-      try { window.__API_BASE = base; } catch {}
+      try { if (res.ok) window.__API_BASE = base; } catch {}
       return res.ok;
     } catch {}
   }

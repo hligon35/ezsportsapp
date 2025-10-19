@@ -125,7 +125,14 @@ if (String(process.env.FORCE_HTTPS || '').toLowerCase() === 'true') {
 
 // CORS with optional allowlist and credentials for cookie-based auth
 const envOrigins = (process.env.CORS_ORIGINS || '').split(',').map(s => s.trim()).filter(Boolean);
-const devOrigins = ['http://127.0.0.1:5500', 'http://localhost:5500', 'http://localhost:4242'];
+const devOrigins = [
+  'http://127.0.0.1:5500',
+  'http://localhost:5500',
+  'http://localhost:4242',
+  // Common production domains for the static site (adjust if your domain changes)
+  'https://www.ezsportsnetting.com',
+  'https://ezsportsnetting.com'
+];
 const allowList = envOrigins.length ? envOrigins : devOrigins;
 const corsOptions = {
   origin: (origin, cb) => {

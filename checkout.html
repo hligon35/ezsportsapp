@@ -62,8 +62,24 @@
   <main id="main">
     <div class="checkout-container">
       <h2>Checkout</h2>
+      <div class="row items-center gap-06 muted text-sm" aria-label="Security notice">
+        <span>Payments are processed securely by Stripe. We never store your full card details.</span>
+        <img src="assets/img/stripe-badge.svg" alt="Powered by Stripe" height="22" onerror="this.style.display='none'"/>
+      </div>
       <div class="checkout-grid">
         <form id="payment-form">
+          <section class="order-card" id="guest-prompt" hidden>
+            <div class="row space-between items-center gap-06">
+              <div>
+                <strong>Have an account?</strong>
+                <div class="muted">Sign in to auto-fill your info and save orders for easy tracking.</div>
+              </div>
+              <div class="row gap-06">
+                <a class="btn btn-secondary" href="login.html?redirect=checkout.html">Sign in</a>
+                <a class="btn btn-ghost" href="account.html">Create account</a>
+              </div>
+            </div>
+          </section>
           <section class="order-card">
             <h3>Customer</h3>
             <div class="field-row">
@@ -77,8 +93,8 @@
               </div>
             </div>
           </section>
-          <section class="order-card">
-            <h3>Shipping</h3>
+          <section class="order-card" aria-labelledby="shipping-title">
+            <h3 id="shipping-title">Shipping</h3>
             <div class="field-row">
               <div>
                 <label for="address1">Address</label>
@@ -167,16 +183,17 @@
           <section class="order-card">
             <h3>Payment</h3>
             <div id="payment-element"><!--Stripe.js injects here--></div>
+            <p class="muted text-sm">Your card details are encrypted and processed by Stripe. We never store full card numbers on our servers.</p>
              <button id="submit" type="submit" class="btn btn-primary">Pay</button>
             <div id="payment-message"></div>
           </section>
         </form>
         <aside class="order-card">
           <h3>Order Summary</h3>
-          <div class="stack-03" style="margin-bottom: .75rem;">
-            <label for="promo-code" style="font-weight:700;font-size:.9rem;">Promo code</label>
-            <div class="flex-row" style="gap:.5rem;align-items:center;">
-              <input id="promo-code" name="promo" placeholder="Enter code" style="flex:1;" />
+          <div class="stack-03">
+            <label for="promo-code" class="text-strong text-sm">Promo code</label>
+            <div class="flex-row items-center gap-06">
+              <input id="promo-code" name="promo" placeholder="Enter code" class="flex-1" />
               <button id="apply-code" class="btn btn-secondary" type="button">Apply</button>
             </div>
             <div id="promo-msg" class="muted" role="status" aria-live="polite"></div>
@@ -186,8 +203,8 @@
            <div class="stack-03">
              <div class="row-between"><span>Subtotal</span><strong id="sum-subtotal">$0.00</strong></div>
              <div class="row-between"><span>Shipping</span><strong id="sum-shipping">$0.00</strong></div>
-             <div class="row-between" id="tax-row" style="display:none;"><span>Tax</span><strong id="sum-tax">$0.00</strong></div>
-             <div class="row-between" id="discount-row" style="display:none;"><span>Discount <span id="discount-code-label"></span></span><strong id="sum-discount">-$0.00</strong></div>
+             <div class="row-between" id="tax-row" hidden><span>Tax</span><strong id="sum-tax">$0.00</strong></div>
+             <div class="row-between" id="discount-row" hidden><span>Discount <span id="discount-code-label"></span></span><strong id="sum-discount">-$0.00</strong></div>
              <div class="row-between"><span>Total</span><strong id="sum-total">$0.00</strong></div>
           </div>
         </aside>

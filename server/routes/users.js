@@ -265,8 +265,14 @@ router.get('/me/payment-methods', requireAuth, async (req, res) => {
     if (!stripe) return res.json({ paymentMethods: [] });
     const me = await userService.getUserById(req.user.id);
     if (!me.stripeCustomerId) return res.json({ paymentMethods: [] });
-    const list = await stripe.paymentMethods.list({ customer: me.stripeCustomerId, type: 'card' });
-    res.json({ paymentMethods: list.data || [] });
+    const [list, customer] = await Promise.all([
+      stripe.paymentMethods.list({ customer: me.stripeCustomerId, type: 'card' }),
+      stripe.customers.retrieve(me.stripeCustomerId)
+    ]);
+    const defaultPaymentMethodId = (customer && customer.invoice_settings && customer.invoice_settings.default_payment_method) ?
+      (typeof customer.invoice_settings.default_payment_method === 'string' ? customer.invoice_settings.default_payment_method : customer.invoice_settings.default_payment_method?.id) :
+      undefined;
+    res.json({ paymentMethods: list.data || [], defaultPaymentMethodId });
   } catch (e) { res.status(500).json({ message: e.message }); }
 });
 

@@ -77,7 +77,7 @@
         <summary>Saved addresses</summary>
         <div class="info-content">
           <div id="addresses-empty" class="muted">No saved addresses yet.</div>
-          <div id="addresses-list" class="stack-05"></div>
+          <div id="addresses-list" class="stack-06"></div>
           <hr/>
           <form id="address-form" class="auth-form">
             <div class="grid-2">
@@ -337,7 +337,7 @@
         postal: document.getElementById('addr-postal').value.trim(),
         isDefault: document.getElementById('addr-default').checked,
       });
-      const renderAddresses = (arr=[]) => {
+          const renderAddresses = (arr=[]) => {
         const wrap = document.getElementById('addresses-list');
         const empty = document.getElementById('addresses-empty');
         wrap.innerHTML='';
@@ -349,6 +349,7 @@
           const label = document.createElement('div');
           label.innerHTML = `
             <strong>${(a.name||'').replace(/</g,'&lt;')}</strong> ${a.isDefault ? '<span class="badge">Default</span>' : ''}<br/>
+            ${a.phone ? `<span class="muted text-sm">${(a.phone||'').replace(/</g,'&lt;')}</span><br/>` : ''}
             ${(a.address1||'').replace(/</g,'&lt;')} ${a.address2?('<br/>'+a.address2.replace(/</g,'&lt;')):''}<br/>
             ${(a.city||'')}, ${(a.state||'')} ${(a.postal||'')}<br/>
             ${a.country||'US'}
@@ -427,19 +428,31 @@
         try {
           const data = await fetchJSON(`${base}/api/users/me/payment-methods`);
           const list = Array.isArray(data.paymentMethods) ? data.paymentMethods : [];
+          const defaultPmId = data.defaultPaymentMethodId;
           pmList.innerHTML = '';
           if (!list.length) { pmEmpty.style.display='block'; return; }
           pmEmpty.style.display='none';
           list.forEach(pm => {
             const li = document.createElement('li');
+            li.className = 'row space-between items-center';
             const last4 = pm?.card?.last4 || '••••';
             const brand = (pm?.card?.brand || 'card').toUpperCase();
-            const exp = pm?.card ? `${pm.card.exp_month}/${String(pm.card.exp_year).slice(-2)}` : '';
+            const exp = pm?.card ? `${String(pm.card.exp_month).padStart(2,'0')}/${String(pm.card.exp_year).slice(-2)}` : '';
             const txt = document.createElement('span');
-            txt.textContent = `${brand} •••• ${last4} ${exp ? '('+exp+')':''}`;
+            txt.innerHTML = `${brand} •••• ${last4} ${exp ? `<span class="muted">(${exp})</span>`:''} ${pm.id===defaultPmId?'<span class="badge">Default</span>':''}`;
+            const actions = document.createElement('span'); actions.className = 'row gap-06';
+            if (pm.id !== defaultPmId) {
+              const mkDef = document.createElement('button'); mkDef.className='btn btn-ghost btn-sm'; mkDef.textContent='Make default';
+              mkDef.addEventListener('click', async ()=>{
+                try { await fetchJSON(`${base}/api/users/me/payment-methods/default`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ pmId: pm.id }) }); loadPMs(); }
+                catch(e){ alert(e.message||'Failed'); }
+              });
+              actions.appendChild(mkDef);
+            }
             const del = document.createElement('button'); del.className='btn btn-ghost btn-sm'; del.textContent='Remove';
             del.addEventListener('click', async ()=>{ if (confirm('Remove this card?')) { try { await fetchJSON(`${base}/api/users/me/payment-methods/${encodeURIComponent(pm.id)}`, { method:'DELETE' }); loadPMs(); } catch(e){ alert(e.message||'Failed'); } } });
-            li.append(txt, del);
+            actions.appendChild(del);
+            li.append(txt, actions);
             pmList.appendChild(li);
           });
         } catch { pmList.innerHTML=''; pmEmpty.style.display='block'; }

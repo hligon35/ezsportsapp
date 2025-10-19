@@ -131,17 +131,17 @@ function updateSummary(cart, applied, shippingAddr){
   if (el('sum-subtotal')) el('sum-subtotal').textContent = currencyFmt(fromCents(sub));
   if (el('sum-shipping')) el('sum-shipping').textContent = ship === 0 ? 'Free' : currencyFmt(fromCents(ship));
   const taxRow = document.getElementById('tax-row');
-  if (taxRow) taxRow.style.display = tax > 0 ? '' : 'none';
+  if (taxRow) taxRow.hidden = !(tax > 0);
   const taxEl = document.getElementById('sum-tax');
   if (taxEl) taxEl.textContent = currencyFmt(fromCents(tax));
   if (discount > 0) {
     const row = document.getElementById('discount-row');
-    if (row) row.style.display = '';
+    if (row) row.hidden = false;
     const dEl = document.getElementById('sum-discount');
     if (dEl) dEl.textContent = '-' + currencyFmt(fromCents(discount));
   } else {
     const row = document.getElementById('discount-row');
-    if (row) row.style.display = 'none';
+    if (row) row.hidden = true;
   }
   if (el('sum-total')) el('sum-total').textContent = currencyFmt(fromCents(total));
   return { sub, ship, discount, tax, total };
@@ -169,6 +169,37 @@ async function initialize() {
   let elements = null;
   let orderId = null;
   let serverBreakdown = null; // latest server-provided breakdown
+
+  // Prefill for logged-in users: name/email + default shipping address
+  try {
+    const user = JSON.parse(localStorage.getItem('currentUser')||'null');
+    const guestPrompt = document.getElementById('guest-prompt');
+    if (user && user.id) {
+      if (guestPrompt) guestPrompt.hidden = true;
+      const nm = document.getElementById('name'); if (nm && !nm.value) nm.value = user.name || `${user.firstName||''} ${user.lastName||''}`.trim();
+      const em = document.getElementById('email'); if (em && !em.value) em.value = user.email || '';
+      const base = (typeof window !== 'undefined' && window.__API_BASE) ? String(window.__API_BASE) : '';
+      try {
+        const res = await fetch(`${base}/api/users/me/addresses`, { credentials: 'include' });
+        if (res.ok) {
+          const data = await res.json();
+          const list = Array.isArray(data.addresses) ? data.addresses : [];
+          const def = list.find(a=>a.isDefault) || list[0];
+          if (def) {
+            const set = (id, v) => { const el = document.getElementById(id); if (el && !el.value) el.value = v || ''; };
+            set('address1', def.address1);
+            set('address2', def.address2);
+            set('city', def.city);
+            set('state', def.state);
+            set('postal', def.postal);
+            const country = document.getElementById('country'); if (country && !country.value) country.value = def.country || 'US';
+          }
+        }
+      } catch {}
+    } else {
+      if (guestPrompt) guestPrompt.hidden = false;
+    }
+  } catch {}
 
   // Render order lines with price and quantity
   const lines = cart.map(i => {
@@ -245,11 +276,11 @@ async function initialize() {
             const shipEl = document.getElementById('sum-shipping');
             if (shipEl) shipEl.textContent = (bd.shipping === 0) ? 'Free' : currencyFmt(fromCents(bd.shipping));
             const taxRow = document.getElementById('tax-row');
-            if (taxRow) taxRow.style.display = bd.tax && bd.tax > 0 ? '' : 'none';
+            if (taxRow) taxRow.hidden = !(bd.tax && bd.tax > 0);
             if (Number.isFinite(bd.tax)) set('sum-tax', bd.tax);
             if (bd.discount && bd.discount > 0) {
               const row = document.getElementById('discount-row');
-              if (row) row.style.display = '';
+              if (row) row.hidden = false;
               const dEl = document.getElementById('sum-discount');
               if (dEl) dEl.textContent = '-' + currencyFmt(fromCents(bd.discount));
             }
