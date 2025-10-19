@@ -461,7 +461,7 @@ attachSubscribeHandlers() {
       forms.forEach((form) => {
         if (form.__wired) return; // avoid duplicate bindings
         form.__wired = true;
-        // Remove any inline onsubmit attributes added by legacy markup
+        // Remove any inline onsubmit attributes added by legacy markup to prevent alert-only behavior
         try { form.removeAttribute('onsubmit'); } catch {}
         form.addEventListener('submit', async (e) => {
           e.preventDefault();
@@ -476,16 +476,34 @@ attachSubscribeHandlers() {
           if (btn) { btn.disabled = true; btn.textContent = 'Subscribing…'; }
           try {
             const payload = { email, source: 'footer', referer: location.href, hp };
-            const res = await fetch('/api/marketing/subscribe', {
-              method: 'POST',
-              headers: { 'Content-Type': 'text/plain' },
-              body: JSON.stringify(payload),
-            });
-            if (res.ok) {
+            // Prefer calling the Render backend directly to ensure emails queue server-side
+            // Build candidate API bases similar to analytics module
+            const bases = [];
+            try { if (window.__API_BASE) bases.push(String(window.__API_BASE).replace(/\/$/, '')); } catch {}
+            try { const meta = document.querySelector('meta[name="api-base"]'); if (meta && meta.content) bases.push(String(meta.content).replace(/\/$/, '')); } catch {}
+            // Default Render base as final fallback
+            bases.push('https://ezsportsapp.onrender.com');
+
+            let lastErr = '';
+            let ok = false;
+            for (const base of bases) {
+              try {
+                const url = `${base}/api/marketing/subscribe`;
+                const res = await fetch(url, {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'text/plain' },
+                  body: JSON.stringify(payload),
+                });
+                if (res.ok) { ok = true; break; }
+                lastErr = await res.text().catch(()=>`HTTP ${res.status}`);
+              } catch (err) {
+                lastErr = err?.message || 'Network error';
+              }
+            }
+            if (ok) {
               form.innerHTML = '<h4>Thanks for subscribing!</h4><p>Check your inbox for a confirmation.</p>';
             } else {
-              const msg = await res.text().catch(()=>'');
-              alert('Subscription failed. Please try again later.' + (msg ? `\n${msg}` : ''));
+              alert('Subscription failed. Please try again later.' + (lastErr ? `\n${lastErr}` : ''));
               if (btn) { btn.disabled = false; btn.textContent = 'Subscribe'; }
             }
           } catch (err) {

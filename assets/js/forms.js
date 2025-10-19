@@ -2,16 +2,22 @@
 // Safe to load while main app.js is in repair. Preserves existing endpoint & Turnstile usage.
 (function(){
   const FORM_ENDPOINT = 'https://script.google.com/macros/s/AKfycbw1npuTQiIpGQqlB6LPh4AoihC9bVW8XngIq270ZYaQfZ7msW1zz5cOjmWwATkrqtmr/exec';
-  // Decide endpoint strategy:
-  // 1. If running on production domain, use relative /api proxies (hide upstream URL & enable easier header control).
-  // 2. If running on localhost AND the user created the marketing proxy functions, also use /api.
-  // 3. Fallback: direct Apps Script URL.
-  const host = location.hostname.toLowerCase();
-  const hasProxy = true; // we created /api/marketing/*
-  function endpointFor(kind){
-    const rel = kind === 'subscribe' ? '/api/marketing/subscribe' : '/api/marketing/contact';
-    if ((host.endsWith('ezsportsnetting.com') || /^(localhost|127\.0\.0\.1)$/.test(host)) && hasProxy) return rel;
-    return FORM_ENDPOINT;
+  // Prefer calling the Render backend directly so emails queue server-side; fallback to Apps Script if needed.
+  function apiBases(){
+    const bases = [];
+    try { if (window.__API_BASE) bases.push(String(window.__API_BASE).replace(/\/$/, '')); } catch {}
+    try { const meta = document.querySelector('meta[name="api-base"]'); if (meta && meta.content) bases.push(String(meta.content).replace(/\/$/, '')); } catch {}
+    // Default known backend
+    bases.push('https://ezsportsapp.onrender.com');
+    // de-dup
+    return Array.from(new Set(bases.filter(Boolean)));
+  }
+  function endpointsFor(kind){
+    const path = kind === 'subscribe' ? '/api/marketing/subscribe' : '/api/marketing/contact';
+    const list = apiBases().map(b => `${b}${path}`);
+    // Always include Apps Script as final fallback for logging/backup
+    list.push(FORM_ENDPOINT);
+    return list;
   }
   const SITE_KEY = window.TURNSTILE_SITE_KEY || '0x4AAAAAAB5rtUiQ1MiqGIxp';
 
@@ -87,22 +93,15 @@
             referer: document.referrer||'',
             'cf-turnstile-response': token
           };
-          // Send with fallback: try local /api first, if 404/405/network error, retry direct Apps Script
+          // Try server endpoints first (Render backend), then fallback to Apps Script
           let data = {};
-          const primaryUrl = endpointFor('subscribe');
-          try {
-            const res = await fetch(primaryUrl, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
-            if (res.ok) {
+          let ok = false;
+          for (const url of endpointsFor('subscribe')) {
+            try {
+              const res = await fetch(url, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
               data = await res.json().catch(()=>({}));
-            } else if (res.status === 404 || res.status === 405) {
-              throw new Error('proxy-unavailable');
-            } else {
-              data = await res.json().catch(()=>({}));
-            }
-          } catch {
-            // Fallback to Apps Script
-            const res2 = await fetch(FORM_ENDPOINT, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
-            data = await res2.json().catch(()=>({}));
+              if (res.ok && data && data.ok !== false) { ok = true; break; }
+            } catch { /* try next */ }
           }
           // Treat success only when not flagged as spam and either
           // - proxy saved a subscriber record, or
@@ -110,7 +109,7 @@
           const isSpam = data && (data.spam === true);
           const savedViaProxy = !!(data && data.ok && data.subscriber && data.subscriber.id);
           const okViaAppsScript = !!(data && data.ok && !('subscriber' in data));
-          if (!data.ok || isSpam || !(savedViaProxy || okViaAppsScript)) {
+          if (!ok || isSpam || !(savedViaProxy || okViaAppsScript)) {
             console.debug('Subscribe: not confirmed:', { data, isSpam, savedViaProxy, okViaAppsScript });
             throw 0;
           }
@@ -146,23 +145,17 @@
           referer: document.referrer||'',
           'cf-turnstile-response': token
         };
-        // Send with fallback similar to subscribe
+        // Try server endpoints first, then fallback to Apps Script
         let data = {};
-        const primaryUrl = endpointFor('contact');
-        try {
-          const res = await fetch(primaryUrl, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
-          if (res.ok) {
+        let ok = false;
+        for (const url of endpointsFor('contact')) {
+          try {
+            const res = await fetch(url, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
             data = await res.json().catch(()=>({}));
-          } else if (res.status === 404 || res.status === 405) {
-            throw new Error('proxy-unavailable');
-          } else {
-            data = await res.json().catch(()=>({}));
-          }
-        } catch {
-          const res2 = await fetch(FORM_ENDPOINT, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
-          data = await res2.json().catch(()=>({}));
+            if (res.ok && data && data.ok !== false) { ok = true; break; }
+          } catch { /* try next */ }
         }
-        if (!data.ok) throw 0;
+        if (!ok || !data.ok) throw 0;
         msgEl.textContent='Message sent!'; msgEl.style.color='green';
         form.reset();
       } catch { msgEl.textContent='Could not send right now.'; msgEl.style.color='red'; }
