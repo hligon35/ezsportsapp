@@ -592,12 +592,14 @@ async function calcShippingCents(items = [], _subtotalCents, _method = 'standard
 function loadTaxRates() {
   // Defaults: collect in GA at 7% unless overridden
   const defaults = { US: { GA: 0.07 } };
+  // 1) Highest precedence: TAX_RATES_JSON env (stringified object like { "US": { "GA": 0.07 } })
   try {
     if (process.env.TAX_RATES_JSON) {
       const parsed = JSON.parse(process.env.TAX_RATES_JSON);
       if (parsed && typeof parsed === 'object') return parsed;
     }
   } catch {}
+  // 2) Next: TAX_RATES env (CSV like GA:0.07,FL:0.06)
   try {
     if (process.env.TAX_RATES) {
       const parts = String(process.env.TAX_RATES).split(',').map(s=>s.trim()).filter(Boolean);
@@ -609,6 +611,34 @@ function loadTaxRates() {
         if (key && Number.isFinite(r) && r >= 0) out.US[key] = r;
       }
       if (Object.keys(out.US).length) return out;
+    }
+  } catch {}
+  // 3) Finally: try reading a repo-provided JSON file at assets/js/taxRates.json with full state names
+  try {
+    const filePath = path.join(__dirname, '..', 'assets', 'js', 'taxRates.json');
+    if (fsSync.existsSync(filePath)) {
+      const raw = fsSync.readFileSync(filePath, 'utf8');
+      const byName = JSON.parse(raw);
+      if (byName && typeof byName === 'object') {
+        // Map full state names to USPS abbreviations
+        const NAME_TO_ABBR = {
+          'ALABAMA':'AL','ALASKA':'AK','ARIZONA':'AZ','ARKANSAS':'AR','CALIFORNIA':'CA','COLORADO':'CO','CONNECTICUT':'CT','DELAWARE':'DE','DISTRICT OF COLUMBIA':'DC','FLORIDA':'FL','GEORGIA':'GA','HAWAII':'HI','IDAHO':'ID','ILLINOIS':'IL','INDIANA':'IN','IOWA':'IA','KANSAS':'KS','KENTUCKY':'KY','LOUISIANA':'LA','MAINE':'ME','MARYLAND':'MD','MASSACHUSETTS':'MA','MICHIGAN':'MI','MINNESOTA':'MN','MISSISSIPPI':'MS','MISSOURI':'MO','MONTANA':'MT','NEBRASKA':'NE','NEVADA':'NV','NEW HAMPSHIRE':'NH','NEW JERSEY':'NJ','NEW MEXICO':'NM','NEW YORK':'NY','NORTH CAROLINA':'NC','NORTH DAKOTA':'ND','OHIO':'OH','OKLAHOMA':'OK','OREGON':'OR','PENNSYLVANIA':'PA','RHODE ISLAND':'RI','SOUTH CAROLINA':'SC','SOUTH DAKOTA':'SD','TENNESSEE':'TN','TEXAS':'TX','UTAH':'UT','VERMONT':'VT','VIRGINIA':'VA','WASHINGTON':'WA','WEST VIRGINIA':'WV','WISCONSIN':'WI','WYOMING':'WY'
+        };
+        const out = { US: {} };
+        for (const [key, val] of Object.entries(byName)) {
+          const rate = Number(val);
+          if (!Number.isFinite(rate) || rate < 0) continue;
+          const k = String(key||'').trim();
+          let abbr = '';
+          if (k.length === 2 && /^[A-Za-z]{2}$/.test(k)) {
+            abbr = k.toUpperCase();
+          } else {
+            abbr = NAME_TO_ABBR[k.toUpperCase()] || '';
+          }
+          if (abbr) out.US[abbr] = rate;
+        }
+        if (Object.keys(out.US).length) return out;
+      }
     }
   } catch {}
   return defaults;
