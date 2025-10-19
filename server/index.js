@@ -30,7 +30,10 @@ try {
 let stripe = null;
 try {
   if (process.env.STRIPE_SECRET_KEY) {
-    stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+    // Pin a modern API version to ensure features like automatic_tax are supported
+    stripe = require('stripe')(process.env.STRIPE_SECRET_KEY, {
+      apiVersion: process.env.STRIPE_API_VERSION || '2022-11-15'
+    });
   }
 } catch (e) {
   console.warn('Stripe SDK failed to initialize:', e.message);
@@ -673,13 +676,15 @@ app.post('/api/create-payment-intent', async (req, res) => {
     }
 
     // Compute taxes (manual fallback) or delegate to Stripe Tax when enabled
-    const useAutomaticTax = String(process.env.STRIPE_TAX_AUTOMATIC || '').toLowerCase() === 'true';
+    const useAutomaticTaxEnv = String(process.env.STRIPE_TAX_AUTOMATIC || '').toLowerCase() === 'true';
     let taxCents = 0;
-    if (useAutomaticTax) {
+    let usedAutomaticTax = false;
+    if (useAutomaticTaxEnv) {
       // When Automatic Tax is enabled on the PaymentIntent, Stripe computes the tax
       // amount based on your account tax registrations and the provided address.
       // We set the amount to the pre-tax total and let Stripe add tax at confirmation.
       amount = Math.max(0, subtotal + shippingCents - discountCents);
+      usedAutomaticTax = true;
     } else {
       taxCents = calcTaxCents(subtotal, shippingCents, discountCents, normalizedShipping);
       amount = Math.max(0, subtotal + shippingCents - discountCents + taxCents);
@@ -714,33 +719,79 @@ app.post('/api/create-payment-intent', async (req, res) => {
       .digest('hex')
       .slice(0, 64);
 
-    const paymentIntent = await stripe.paymentIntents.create({
-      amount,
-      currency: safeCurrency,
-      description,
-      metadata: {
-        email: customer.email || '',
-        name: customer.name || '',
-        items: normItems.map(i => `${i.id}:${i.qty}`).join('|'),
-        order_id: newOrder?.id ? String(newOrder.id) : '',
-        coupon_code: appliedCoupon ? String(appliedCoupon.code) : ''
-      },
-      automatic_payment_methods: { enabled: true },
-      // Enable Stripe Automatic Tax if configured
-      ...(useAutomaticTax ? { automatic_tax: { enabled: true } } : {}),
-      receipt_email: customer.email || undefined,
-      shipping: {
-        name: customer.name || 'Customer',
-        address: {
-          line1: normalizedShipping.address1 || '',
-          line2: normalizedShipping.address2 || undefined,
-          city: normalizedShipping.city || '',
-          state: normalizedShipping.state || '',
-          postal_code: normalizedShipping.postal || '',
-          country: normalizedShipping.country || 'US',
+    let paymentIntent;
+    try {
+      paymentIntent = await stripe.paymentIntents.create({
+        amount,
+        currency: safeCurrency,
+        description,
+        metadata: {
+          email: customer.email || '',
+          name: customer.name || '',
+          items: normItems.map(i => `${i.id}:${i.qty}`).join('|'),
+          order_id: newOrder?.id ? String(newOrder.id) : '',
+          coupon_code: appliedCoupon ? String(appliedCoupon.code) : ''
+        },
+        automatic_payment_methods: { enabled: true },
+        // Enable Stripe Automatic Tax if configured (may be rejected on older API versions)
+        ...(usedAutomaticTax ? { automatic_tax: { enabled: true } } : {}),
+        receipt_email: customer.email || undefined,
+        shipping: {
+          name: customer.name || 'Customer',
+          address: {
+            line1: normalizedShipping.address1 || '',
+            line2: normalizedShipping.address2 || undefined,
+            city: normalizedShipping.city || '',
+            state: normalizedShipping.state || '',
+            postal_code: normalizedShipping.postal || '',
+            country: normalizedShipping.country || 'US',
+          }
         }
+      }, { idempotencyKey: idemKey });
+    } catch (err) {
+      // Fallback: If the account/API version rejects automatic_tax, retry with manual tax
+      const msg = String(err?.message || '');
+      const code = String(err?.code || '');
+      const param = String(err?.raw?.param || '');
+      const unknownAutoTax = usedAutomaticTax && (msg.includes('automatic_tax') || code === 'parameter_unknown' || param === 'automatic_tax');
+      if (unknownAutoTax) {
+        try {
+          // Compute manual tax and retry without automatic_tax
+          taxCents = calcTaxCents(subtotal, shippingCents, discountCents, normalizedShipping);
+          amount = Math.max(0, subtotal + shippingCents - discountCents + taxCents);
+          usedAutomaticTax = false;
+          paymentIntent = await stripe.paymentIntents.create({
+            amount,
+            currency: safeCurrency,
+            description,
+            metadata: {
+              email: customer.email || '',
+              name: customer.name || '',
+              items: normItems.map(i => `${i.id}:${i.qty}`).join('|'),
+              order_id: newOrder?.id ? String(newOrder.id) : '',
+              coupon_code: appliedCoupon ? String(appliedCoupon.code) : ''
+            },
+            automatic_payment_methods: { enabled: true },
+            receipt_email: customer.email || undefined,
+            shipping: {
+              name: customer.name || 'Customer',
+              address: {
+                line1: normalizedShipping.address1 || '',
+                line2: normalizedShipping.address2 || undefined,
+                city: normalizedShipping.city || '',
+                state: normalizedShipping.state || '',
+                postal_code: normalizedShipping.postal || '',
+                country: normalizedShipping.country || 'US',
+              }
+            }
+          }, { idempotencyKey: idemKey + '-manualtax' });
+        } catch (e2) {
+          throw e2;
+        }
+      } else {
+        throw err;
       }
-    }, { idempotencyKey: idemKey });
+    }
     // Return client secret and linked order id so the frontend can keep them in sync
     res.json({
       clientSecret: paymentIntent.client_secret,
@@ -751,9 +802,10 @@ app.post('/api/create-payment-intent', async (req, res) => {
         subtotal: subtotal,
         shipping: shippingCents,
         discount: discountCents,
-        tax: useAutomaticTax ? null : taxCents,
+        tax: usedAutomaticTax ? null : taxCents,
         total: amount
-      }
+      },
+      notes: usedAutomaticTax ? undefined : 'Automatic Tax unavailable for this account/API version; using manual tax fallback.'
     });
   } catch (err) {
     console.error(err);
