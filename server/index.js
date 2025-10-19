@@ -138,8 +138,12 @@ const corsOptions = {
 app.use(cors(corsOptions));
 // Ensure preflight is handled for any route
 app.options('*', cors(corsOptions));
+// Helmet security headers (CSP disabled for now). Also disable COEP/COOP here
+// because we handle them manually to ensure third-party scripts like Stripe.js work.
 app.use(helmet({
-  contentSecurityPolicy: false // Keep disabled for now to avoid breaking inline scripts/styles; tighten later
+  contentSecurityPolicy: false, // Keep disabled for now to avoid breaking inline scripts/styles; tighten later
+  crossOriginEmbedderPolicy: false,
+  crossOriginOpenerPolicy: false
 }));
 // Add HSTS explicitly (works when behind proxy with trust proxy enabled)
 try {
@@ -429,6 +433,20 @@ app.use((req, res, next) => {
   next();
 });
 
+// Global headers for static and API responses (must run BEFORE express.static for HTML/JS/CSS)
+app.use((req, res, next) => {
+  // Cache rules applied later as well, but we set security headers early so static files get them
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  res.setHeader('X-Frame-Options', 'SAMEORIGIN');
+  res.setHeader('Permissions-Policy', 'geolocation=(), microphone=(), camera=()');
+  // IMPORTANT: Do not enable cross-origin isolation on pages that load third-party scripts like Stripe.js.
+  // Some hosts or middleware may default these; we explicitly relax them to avoid blocking https://js.stripe.com/v3/.
+  // See error: net::ERR_BLOCKED_BY_RESPONSE.NotSameOriginAfterDefaultedToSameOriginByCoep
+  res.setHeader('Cross-Origin-Embedder-Policy', 'unsafe-none');
+  res.setHeader('Cross-Origin-Opener-Policy', 'same-origin-allow-popups');
+  next();
+});
+
 app.use(express.static(path.join(__dirname, '..')));
 
 // Static assets caching (1 year for immutable, 1 hour for html)
@@ -438,14 +456,6 @@ app.use((req, res, next) => {
   } else if (/\.(?:html)$/i.test(req.url)) {
     res.setHeader('Cache-Control', 'public, max-age=3600');
   }
-  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
-  res.setHeader('X-Frame-Options', 'SAMEORIGIN');
-  res.setHeader('Permissions-Policy', 'geolocation=(), microphone=(), camera=()');
-  // IMPORTANT: Do not enable cross-origin isolation on pages that load third-party scripts like Stripe.js.
-  // Some hosts or middleware may default these; we explicitly relax them to avoid blocking https://js.stripe.com/v3/.
-  // See error: net::ERR_BLOCKED_BY_RESPONSE.NotSameOriginAfterDefaultedToSameOriginByCoep
-  res.setHeader('Cross-Origin-Embedder-Policy', 'unsafe-none');
-  res.setHeader('Cross-Origin-Opener-Policy', 'same-origin-allow-popups');
   next();
 });
 
