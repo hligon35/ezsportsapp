@@ -43,7 +43,20 @@ class EmailService {
     // Always write to outbox for auditability
     const record = { to, subject, html, text, tags, replyTo, from: from || this.from, fromName, status: this.transporter ? 'sending' : 'queued', createdAt: new Date().toISOString() };
     const email = await this.db.insert('emails', record);
-    // Prefer Cloudflare Worker HTTP if configured
+    // Prefer SMTP first if available (more predictable deliverability), then fallback to Cloudflare Worker
+    if (this.transporter) {
+      try {
+        if (this.debug) console.log('[EmailService] Sending via SMTP…');
+        const info = await this.transporter.sendMail({ from: from || this.from, to, subject, text, html, replyTo });
+        await this.db.update('emails', { id: email.id }, { status: 'sent', provider: 'smtp', providerId: info?.messageId || null, sentAt: new Date().toISOString() });
+        if (this.debug) console.log('[EmailService] SMTP sent', { id: info?.messageId || null });
+        return { ...email, status: 'sent', provider: 'smtp', providerId: info?.messageId || null };
+      } catch (smtpErr) {
+        if (this.debug) console.warn('[EmailService] SMTP failed, trying Worker…', smtpErr?.message||smtpErr);
+        // fall through to Worker
+      }
+    }
+
     if (this.cfUrl) {
       try {
         const payload = { to, subject, html, text, from: from || this.from };
@@ -86,10 +99,10 @@ class EmailService {
             console.warn('[EmailService] Worker response not OK', { status: resp.status, body: body?.slice(0,200) });
           }
           const cfError = new Error(`Cloudflare email failed ${resp.status}: ${body}`);
-          // Attempt SMTP fallback if transporter is configured
+          // Attempt SMTP fallback if transporter is configured and Worker failed
           if (this.transporter) {
             try {
-              if (this.debug) console.log('[EmailService] Falling back to SMTP…');
+              if (this.debug) console.log('[EmailService] Worker failed; sending via SMTP…');
               const info = await this.transporter.sendMail({ from: from || this.from, to, subject, text, html, replyTo });
               await this.db.update('emails', { id: email.id }, { status: 'sent', provider: 'smtp', providerId: info?.messageId || null, sentAt: new Date().toISOString(), error: cfError.message });
               return { ...email, status: 'sent', provider: 'smtp', providerId: info?.messageId || null };
