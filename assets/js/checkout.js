@@ -2,10 +2,42 @@
 // Publishable key will be provided by a config endpoint or fallback (dev)
 let stripe;
 let stripeEnabled = false;
+// API base configuration: prefer window.__API_BASE or <meta name="api-base" content="https://api.example.com">
+// Fallback guess: Render default domain from service name (adjust if your service name changes)
+const __META_API = (function(){ try{ return (document.querySelector('meta[name="api-base"]')?.content||'').trim(); }catch{ return ''; } })();
+const GUESSED_BASES = [ 'https://ezsportsapp.onrender.com' ];
+let API_BASE = (typeof window !== 'undefined' && window.__API_BASE ? String(window.__API_BASE) : __META_API).replace(/\/$/, '');
+
+async function fetchJsonWithFallback(path, options){
+  const bases = [ API_BASE || '', ...GUESSED_BASES.filter(b => b && b !== API_BASE) ];
+  let lastErr = null;
+  for (const base of bases) {
+    const url = base ? (base + path) : path;
+    try {
+      const res = await fetch(url, options);
+      // Success path
+      if (res.ok) {
+        // If we succeeded using a guessed base, persist it for subsequent calls
+        if (base && base !== API_BASE) API_BASE = base;
+        return await res.json();
+      }
+      // If 404 and we haven't tried all, continue to next base
+      if (res.status === 404) { continue; }
+      // Other HTTP errors: return parsed error payload if possible
+      try { return await res.json(); } catch { return { error: `HTTP ${res.status}` }; }
+    } catch (e) {
+      lastErr = e;
+      // Try next base
+    }
+  }
+  // If everything failed, surface a generic error
+  if (lastErr) return { error: lastErr.message || 'Network error' };
+  return { error: 'Request failed' };
+}
 async function getStripe() {
   if (stripe) return stripe;
   try {
-    const cfg = await fetch('/api/config').then(r=>r.ok?r.json():{ pk: 'pk_test_your_publishable_key', enabled: false });
+    const cfg = await fetchJsonWithFallback('/api/config', { method: 'GET' });
     try { window.__stripeCfg = cfg; } catch {}
     stripeEnabled = !!cfg.enabled;
     stripe = Stripe(cfg.pk || 'pk_test_your_publishable_key');
@@ -166,9 +198,9 @@ async function initialize() {
     await getStripe();
     if (!stripeEnabled) return;
     try {
-      const intentResp = await fetch('/api/create-payment-intent', {
+      const intentResp = await fetchJsonWithFallback('/api/create-payment-intent', {
         method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(getPayload())
-      }).then(r => r.json());
+      });
       if (intentResp && !intentResp.error) {
         clientSecret = intentResp.clientSecret;
         amount = intentResp.amount;
@@ -255,8 +287,7 @@ async function initialize() {
     const code = (codeInput?.value || '').trim();
     if (!code) { msg.textContent = 'Enter a code.'; return; }
     try {
-      const res = await fetch('/api/marketing/validate-coupon', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ code, email: (new FormData(form)).get('email')||'' }) });
-      const data = await res.json();
+      const data = await fetchJsonWithFallback('/api/marketing/validate-coupon', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ code, email: (new FormData(form)).get('email')||'' }) });
       if (data.valid) {
         appliedCoupon = data.coupon ? { code: data.coupon.code, type: data.coupon.type, value: data.coupon.value } : { code, type:'percent', value:0 };
         document.getElementById('discount-code-label').textContent = `(${appliedCoupon.code})`;
@@ -297,7 +328,7 @@ async function initialize() {
       try {
         const payload = getPayload();
         // Try to create order via backend (unauthenticated endpoint)
-        const resp = await fetch('/api/order', { method:'POST', headers:{'Content-Type':'application/json'}, credentials:'include', body: JSON.stringify(payload) });
+        const respJson = await fetchJsonWithFallback('/api/order', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
         // Compute totals locally for confirmation
         const sub = calcSubtotalCents(cart);
         const ship = calcShippingCentsForCart(cart);
@@ -305,10 +336,7 @@ async function initialize() {
         const tax = Math.round(Math.max(0, sub + ship - discount) * taxRateForAddress(getShippingAddress()));
         const total = sub + ship - discount + tax;
         let orderId = Date.now();
-        if (resp.ok) {
-          const data = await resp.json();
-          orderId = data.orderId || orderId;
-        }
+        if (respJson && respJson.orderId) { orderId = respJson.orderId; }
         // Build a local order snapshot for confirmation
         const items = cart.map(i=>({ productName: i.title || i.id, id: i.id, quantity: i.qty, price: Number(i.price)||0, subtotal: (Number(i.price)||0) * (i.qty||0) }));
         const order = {
