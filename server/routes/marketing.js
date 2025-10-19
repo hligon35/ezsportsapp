@@ -25,7 +25,7 @@ router.post('/subscribe', async (req, res) => {
     let queuedInternal = false;
     let queuedWelcome = false;
     try {
-      const inbox = (process.env.CONTACT_INBOX || 'info@ezsportsnetting.com').trim();
+  const inbox = (process.env.CONTACT_INBOX || 'info@ezsportsnetting.com').trim();
       if (inbox) {
         const html = `
           <h2>New Newsletter Subscriber</h2>
@@ -34,7 +34,7 @@ router.post('/subscribe', async (req, res) => {
           ${source ? `<p><strong>Source:</strong> ${source}</p>` : ''}
           ${referer ? `<p><strong>Referrer:</strong> ${referer}</p>` : ''}
         `;
-        const out = await mail.queue({ to: inbox, subject: 'New subscriber', html, text: `Email: ${addr}\nName: ${name||''}\nSource: ${source||''}\nReferrer: ${referer||''}`, tags: ['subscribe','internal'] });
+        const out = await mail.queue({ to: inbox, subject: 'New subscriber', html, text: `Email: ${addr}\nName: ${name||''}\nSource: ${source||''}\nReferrer: ${referer||''}`, tags: ['subscribe','internal'], replyTo: addr });
         queuedInternal = !!out;
       }
     } catch (_) { queuedInternal = false; }
@@ -44,7 +44,7 @@ router.post('/subscribe', async (req, res) => {
         <p>Thanks for subscribing to EZ Sports Netting!</p>
         <p>We’ll send occasional deals and product updates. You can unsubscribe anytime.</p>
       `;
-      const out2 = await mail.queue({ to: addr, subject: 'Thanks for subscribing to EZ Sports Netting', html, text: 'Thanks for subscribing to EZ Sports Netting! We’ll send occasional deals and product updates.', tags: ['subscribe','welcome'] });
+  const out2 = await mail.queue({ to: addr, subject: 'Thanks for subscribing to EZ Sports Netting', html, text: 'Thanks for subscribing to EZ Sports Netting! We’ll send occasional deals and product updates.', tags: ['subscribe','welcome'], replyTo: inbox });
       queuedWelcome = !!out2;
     } catch (_) { queuedWelcome = false; }
 
@@ -84,6 +84,7 @@ router.post('/contact', async (req, res) => {
     const subject = (body.subject || '').toString().trim() || 'New Contact Form Submission';
     const turnstile = body['cf-turnstile-response'] || body.cfTurnstileToken || '';
     const honeypot = body.hp || body._honeypot || '';
+    const bypassTurnstile = ((process.env.TURNSTILE_BYPASS || process.env.CF_TURNSTILE_BYPASS || '').toLowerCase() === 'true');
 
     // Basic anti-spam: honeypot should be empty
     if (honeypot) return res.json({ ok: true, queued: false, spam: true });
@@ -93,7 +94,7 @@ router.post('/contact', async (req, res) => {
     // Optional Cloudflare Turnstile verification (enable by setting CF_TURNSTILE_SECRET)
     try {
       const tsSecret = (process.env.CF_TURNSTILE_SECRET || '').trim();
-      if (tsSecret) {
+      if (tsSecret && !bypassTurnstile) {
         const doFetch = (typeof fetch === 'function') ? fetch : (require('undici').fetch);
         const resp = await doFetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
           method: 'POST',
@@ -125,7 +126,8 @@ router.post('/contact', async (req, res) => {
         subject: `[Contact] ${subject}`,
         html,
         text: `From: ${name} <${email}>\n${phone ? `Phone: ${phone}\n` : ''}\nSubject: ${subject}\n\n${message}`,
-        tags: ['contact']
+        tags: ['contact'],
+        replyTo: email
       });
       queued = true;
     } catch (e) {
@@ -146,7 +148,8 @@ router.post('/contact', async (req, res) => {
         subject: 'We received your message',
         html: ackHtml,
         text: `Hi ${name},\n\nThanks for contacting EZ Sports Netting! We received your message and will get back to you soon.\n\n---\nYour message:\n${message}`,
-        tags: ['contact','ack']
+        tags: ['contact','ack'],
+        replyTo: inbox
       });
     } catch (_) { /* ignore ack errors */ }
 

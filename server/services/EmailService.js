@@ -36,14 +36,16 @@ class EmailService {
     }
   }
 
-  async queue({ to, subject, html, text, tags=[] }){
+  async queue({ to, subject, html, text, tags=[], replyTo = undefined, from = undefined, fromName = undefined }){
     // Always write to outbox for auditability
-    const record = { to, subject, html, text, tags, status: this.transporter ? 'sending' : 'queued', createdAt: new Date().toISOString() };
+    const record = { to, subject, html, text, tags, replyTo, from: from || this.from, fromName, status: this.transporter ? 'sending' : 'queued', createdAt: new Date().toISOString() };
     const email = await this.db.insert('emails', record);
     // Prefer Cloudflare Worker HTTP if configured
     if (this.cfUrl) {
       try {
-        const payload = { to, subject, html, text, from: this.from };
+        const payload = { to, subject, html, text, from: from || this.from };
+        if (replyTo) payload.replyTo = replyTo;
+        if (fromName) payload.fromName = fromName;
         const headers = { 'Content-Type': 'application/json' };
         if (this.cfApiKey) headers['Authorization'] = `Bearer ${this.cfApiKey}`;
         let doFetch = (typeof fetch === 'function') ? fetch : null;
@@ -61,7 +63,7 @@ class EmailService {
           // Attempt SMTP fallback if transporter is configured
           if (this.transporter) {
             try {
-              const info = await this.transporter.sendMail({ from: this.from, to, subject, text, html });
+              const info = await this.transporter.sendMail({ from: from || this.from, to, subject, text, html, replyTo });
               await this.db.update('emails', { id: email.id }, { status: 'sent', provider: 'smtp', providerId: info?.messageId || null, sentAt: new Date().toISOString(), error: cfError.message });
               return { ...email, status: 'sent', provider: 'smtp', providerId: info?.messageId || null };
             } catch (smtpErr) {
@@ -77,7 +79,7 @@ class EmailService {
         // Try SMTP if available
         if (this.transporter) {
           try {
-            const info = await this.transporter.sendMail({ from: this.from, to, subject, text, html });
+            const info = await this.transporter.sendMail({ from: from || this.from, to, subject, text, html, replyTo });
             await this.db.update('emails', { id: email.id }, { status: 'sent', provider: 'smtp', providerId: info?.messageId || null, sentAt: new Date().toISOString(), error: e.message });
             return { ...email, status: 'sent', provider: 'smtp', providerId: info?.messageId || null };
           } catch (smtpErr) {
@@ -94,7 +96,7 @@ class EmailService {
     if (!this.transporter) return email;
 
     try {
-      const info = await this.transporter.sendMail({ from: this.from, to, subject, text, html });
+      const info = await this.transporter.sendMail({ from: from || this.from, to, subject, text, html, replyTo });
       await this.db.update('emails', { id: email.id }, { status: 'sent', providerId: info?.messageId || null, sentAt: new Date().toISOString() });
       return { ...email, status: 'sent', providerId: info?.messageId || null };
     } catch (e) {
