@@ -15,8 +15,8 @@
   function endpointsFor(kind){
     const path = kind === 'subscribe' ? '/api/marketing/subscribe' : '/api/marketing/contact';
     const list = apiBases().map(b => `${b}${path}`);
-    // Always include Apps Script as final fallback for logging/backup
-    list.push(FORM_ENDPOINT);
+    // For subscribe, include Apps Script as an extra logging fallback; for contact, do NOT (CORS + spam/security)
+    if (kind === 'subscribe') list.push(FORM_ENDPOINT);
     return list;
   }
   const SITE_KEY = window.TURNSTILE_SITE_KEY || '0x4AAAAAAB5rtUiQ1MiqGIxp';
@@ -36,28 +36,32 @@
   }
   async function getToken(){
     try {
-      const ok = await loadTurnstile();
-      if (!ok || !SITE_KEY) return '';
-      if (window.__turnstileTokenPromise) return await window.__turnstileTokenPromise;
-      window.__turnstileTokenPromise = new Promise(resolve => {
-        const host = document.createElement('div');
-        host.style.cssText='position:fixed;left:-9999px;top:-9999px;';
-        document.body.appendChild(host);
-        let wid=null; let cleaned=false;
-        const cleanup=(id)=>{ if(cleaned) return; cleaned=true; try{window.turnstile.remove(id);}catch{} try{host.remove();}catch{} };
-        try {
-          wid = window.turnstile.render(host, {
-            sitekey: SITE_KEY,
-            size: 'flexible',
-            appearance: 'execute',
-            callback: t=>{ resolve(t||''); cleanup(wid); },
-            'error-callback': ()=>{ resolve(''); cleanup(wid); },
-            'timeout-callback': ()=>{ resolve(''); cleanup(wid); }
+      // Create the singleflight promise immediately to avoid a race when multiple callers arrive after script load
+      if (!window.__turnstileTokenPromise) {
+        window.__turnstileTokenPromise = (async () => {
+          const ok = await loadTurnstile();
+          if (!ok || !SITE_KEY || !window.turnstile) return '';
+          return await new Promise(resolve => {
+            const host = document.createElement('div');
+            host.style.cssText='position:fixed;left:-9999px;top:-9999px;';
+            document.body.appendChild(host);
+            let wid=null; let cleaned=false;
+            const cleanup=(id)=>{ if(cleaned) return; cleaned=true; try{window.turnstile.remove(id);}catch{} try{host.remove();}catch{} };
+            try {
+              wid = window.turnstile.render(host, {
+                sitekey: SITE_KEY,
+                size: 'flexible',
+                appearance: 'execute',
+                callback: t=>{ resolve(t||''); cleanup(wid); },
+                'error-callback': ()=>{ resolve(''); cleanup(wid); },
+                'timeout-callback': ()=>{ resolve(''); cleanup(wid); }
+              });
+            } catch { resolve(''); cleanup(wid); return; }
+            try { window.turnstile.execute(wid); } catch { try{ if(wid) window.turnstile.reset(wid); window.turnstile.execute(wid); }catch{} resolve(''); cleanup(wid); }
+            setTimeout(()=>{ resolve(''); cleanup(wid); }, 8000);
           });
-        } catch { resolve(''); cleanup(wid); return; }
-        try { window.turnstile.execute(wid); } catch { try{ if(wid) window.turnstile.reset(wid); }catch{} resolve(''); cleanup(wid); }
-        setTimeout(()=>{ resolve(''); cleanup(wid); }, 8000);
-      }).finally(()=>{ window.__turnstileTokenPromise=null; });
+        })().finally(()=>{ window.__turnstileTokenPromise = null; });
+      }
       return await window.__turnstileTokenPromise;
     } catch { return ''; }
   }
