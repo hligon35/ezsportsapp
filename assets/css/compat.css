@@ -1,0 +1,112 @@
+/*
+  EZ Sports Netting — Cross‑browser compatibility layer
+  Safe fallbacks for older browsers. Loaded after styles.css and guarded by feature-detection classes.
+*/
+
+/* 1) Flex gap fallback: add spacing via margins when flex-gap is unsupported */
+.no-flex-gap .row > *:not(:last-child),
+.no-flex-gap .price-row > *:not(:last-child),
+.no-flex-gap .color-dots > *:not(:last-child),
+.no-flex-gap .pd-thumbs > *:not(:last-child),
+.no-flex-gap .variant-row > *:not(:last-child),
+.no-flex-gap .product-detail-layout .thumbs > *:not(:last-child),
+.no-flex-gap .netting-subnav > *:not(:last-child) {
+  margin-right: .6rem;
+}
+.no-flex-gap .header-actions > *:not(:last-child) {
+  margin-right: .75rem;
+}
+
+/* 2) Aspect-ratio fallback: use padding-top intrinsics */
+.no-aspect-ratio .product-card .media.aspect,
+.no-aspect-ratio .product-detail-layout .main-image,
+.no-aspect-ratio .pd-main {
+  position: relative;
+  height: 0;
+  padding-top: 75%; /* 4:3 */
+}
+.no-aspect-ratio .carousel-slide .slide-media {
+  position: relative;
+  height: 0;
+  padding-top: 56.25%; /* 16:9 */
+}
+.no-aspect-ratio .product-card .media.aspect > *,
+.no-aspect-ratio .product-detail-layout .main-image > *,
+.no-aspect-ratio .pd-main > *,
+.no-aspect-ratio .carousel-slide .slide-media > * {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* 3) color-mix (oklab) fallbacks: replace with simple brand->black gradients */
+.no-color-mix .expert-cta {
+  background: linear-gradient(135deg, #241773 0%, #000 100%) !important;
+}
+.no-color-mix .netting-hero,
+.no-color-mix .net-hero,
+.no-color-mix .contact-hero,
+.no-color-mix .turf-hero {
+  background: linear-gradient(135deg, #241773 0%, #000 100%) !important;
+}
+.no-color-mix .netting-hero--baseball,
+.no-color-mix .nh-baseball,
+.no-color-mix .netting-hero--golf,
+.no-color-mix .nh-golf,
+.no-color-mix .netting-hero--lacrosse,
+.no-color-mix .nh-lacrosse,
+.no-color-mix .netting-hero--soccer,
+.no-color-mix .nh-soccer,
+.no-color-mix .nh-commercial-netting,
+.no-color-mix .net-hero.nh-training-facility,
+.no-color-mix .net-hero.nh-sports-netting,
+.no-color-mix .net-hero.nh-commercial-netting,
+.no-color-mix .net-hero.nh-hitting-facility,
+.no-color-mix .net-hero.nh-batting-cage,
+.no-color-mix .net-hero.nh-foul-ball,
+.no-color-mix .net-hero.nh-overhead,
+.no-color-mix .net-hero.nh-backstop,
+.no-color-mix .net-hero.nh-baseball-l-screen,
+.no-color-mix .net-hero.nh-pitchers-pocket,
+.no-color-mix .net-hero.nh-diving-range,
+.no-color-mix .net-hero.nh-golf-course,
+.no-color-mix .net-hero.nh-golf-cube,
+.no-color-mix .net-hero.nh-sports-baseball,
+.no-color-mix .net-hero.nh-basketball,
+.no-color-mix .net-hero.nh-cricket-football,
+.no-color-mix .net-hero.nh-sports-golf,
+.no-color-mix .net-hero.nh-hockey,
+.no-color-mix .net-hero.nh-sports-lacrosse,
+.no-color-mix .net-hero.nh-multi-sport,
+.no-color-mix .net-hero.nh-sports-soccer,
+.no-color-mix .net-hero.nh-softball,
+.no-color-mix .net-hero.nh-tennis,
+.no-color-mix .net-hero.nh-volleyball,
+.no-color-mix .net-hero.nh-auto-drone,
+.no-color-mix .net-hero.nh-drone-enclosure,
+.no-color-mix .net-hero.nh-warehouse,
+.no-color-mix .net-hero.nh-safety-netting,
+.no-color-mix .net-hero.nh-debris-netting,
+.no-color-mix .net-hero.nh-landfill-netting {
+  background: linear-gradient(135deg, #241773 0%, #000 100%) !important;
+}
+.no-color-mix .bg-purple-diag-1,
+.no-color-mix .bg-purple-diag-2,
+.no-color-mix .bg-purple-vert,
+.no-color-mix .bg-purple-horiz {
+  background: linear-gradient(135deg, #241773 0%, #ffffff 140%) !important;
+}
+
+/* 4) :focus-visible fallback → :focus */
+@supports not selector(:focus-visible) {
+  a:focus, button:focus, [role="button"]:focus, .chip:focus {
+    outline: none;
+    box-shadow: var(--ring);
+  }
+}
+
+/* 5) Backdrop filter fallback (Safari old / others): stronger backdrop tint */
+.no-backdrop-filter .product-detail-dialog::backdrop {
+  background: rgba(0,0,0,.65);
+}

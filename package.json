@@ -9,7 +9,22 @@
     "init-db": "npm --prefix server run init-db",
     "db:stats": "npm --prefix server run db:stats",
     "db:backup": "npm --prefix server run db:backup",
-    "db:reset": "npm --prefix server run db:reset"
+    "db:reset": "npm --prefix server run db:reset",
+    "products:sync": "node server/scripts/sync-products.js",
+    "products:sync:dry": "node server/scripts/sync-products.js --dry --no-stripe",
+    "screens:build": "node server/scripts/build-screens-catalog.js",
+    "gloves:build": "node server/scripts/build-gloves-catalog.js",
+    "test": "jest --runInBand --testPathIgnorePatterns=tests/browser",
+    "test:e2e": "jest --runInBand --verbose",
+    "test:browser": "playwright test",
+    "pw:install": "playwright install --with-deps"
+  },
+  "devDependencies": {
+    "dotenv": "^16.6.1",
+    "jest": "^29.7.0",
+    "@playwright/test": "^1.48.2",
+    "supertest": "^7.1.4",
+    "wait-on": "^8.0.5"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",

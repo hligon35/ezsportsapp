@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>We’re opening soon | EZ Sports Netting</title>
+  <link rel="icon" href="assets/img/favicon-32.png" type="image/png" />
+  <link rel="stylesheet" href="assets/css/styles.css" />
+  <style>
+    :root { --cs-bg: #f7f7f7; }
+    body { margin:0; background: var(--cs-bg); color:#111; font: 16px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
+    .cs-wrap { min-height: 100dvh; display:flex; align-items:center; justify-content:center; padding: 2rem; }
+    .cs-frame { width:100%; max-width: 1100px; display:grid; grid-template-columns: 1fr; gap: clamp(1rem, 3vw, 2rem); align-items:center; }
+    @media (min-width: 820px) {
+      .cs-frame { grid-template-columns: minmax(240px, 420px) minmax(320px, 720px); }
+    }
+    .cs-hero { text-align:center; }
+    .cs-hero img { width: clamp(200px, 28vw, 380px); height:auto; filter: drop-shadow(0 6px 18px rgba(0,0,0,0.08)); }
+    .cs-card { width:100%; background:#fff; border:1px solid #e6e6e6; border-radius: 16px; padding: clamp(1.25rem, 3vw, 2rem); box-shadow: 0 6px 24px rgba(0,0,0,0.06); text-align:center; position:relative; overflow:hidden; }
+    @media (min-width: 820px) { .cs-card { text-align: left; } }
+    .cs-badge { display:inline-block; font-size:.875rem; background:#111; color:#fff; padding:.25rem .5rem; border-radius:999px; }
+    h1 { font-size: clamp(1.5rem, 3.5vw, 2.25rem); margin:.5rem 0 0; }
+    p { margin:.25rem 0; color:#444; }
+    .cs-cta { margin-top: 1rem; display:flex; gap:.5rem; justify-content:center; flex-wrap: wrap; }
+    @media (min-width: 820px) { .cs-cta { justify-content:flex-start; } }
+    .btn { appearance:none; border: 1px solid #111; background:#111; color:#fff; padding:.65rem 1rem; border-radius: 10px; cursor:pointer; font-weight:600; }
+    .btn.ghost { background:transparent; color:#111; }
+    .cs-note { font-size:.875rem; color:#666; margin-top:.75rem; }
+    /* Mobile: center logo above card and make it match card width */
+    @media (max-width: 819.98px) {
+      .cs-hero { text-align: center; }
+      .cs-hero img { width: 100%; max-width: none; display:block; margin: 0 auto; }
+    }
+  </style>
+  <meta name="robots" content="noindex" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <script>
+    // Query param helpers for emergency toggles (gate=off or unlock=1)
+    (function(){
+      try {
+        const sp = new URLSearchParams(location.search);
+        if (sp.get('gate') === 'off') { localStorage.setItem('__COMING_SOON__','off'); }
+        if (sp.has('unlock')) { localStorage.setItem('comingSoonUnlocked', JSON.stringify({ at: Date.now() })); }
+      } catch {}
+    })();
+  </script>
+</head>
+<body>
+  <main class="cs-wrap" aria-labelledby="title">
+    <div class="cs-frame">
+      <div class="cs-hero" aria-hidden="true">
+        <img src="assets/img/EZSportslogo.png" alt="EZ Sports Netting" />
+      </div>
+      <section class="cs-card" role="dialog" aria-modal="true" aria-describedby="desc">
+      <span class="cs-badge">Opening soon</span>
+      <h1 id="title">We’re getting the nets just right</h1>
+      <p id="desc">We’re putting the final tweaks on the EZ Sports experience. Check back shortly.</p>
+      <div class="cs-cta">
+        <a class="btn ghost" href="mailto:info@ezsportsnetting.com">Contact us</a>
+        <a class="btn" href="support.html">Support</a>
+      </div>
+      </section>
+    </div>
+  </main>
+
+  <script>
+    (function(){
+      const KEY = 'comingSoonUnlocked';
+      const MAX_WINDOW_MS = 5000; // 5 seconds
+      const REQUIRED_CLICKS = 7;
+      let clicks = 0; let start = 0; let timer = null;
+      const unlocked = (function(){
+        try {
+          const raw = localStorage.getItem(KEY);
+          if (!raw) return false;
+          const { at } = JSON.parse(raw);
+          // 24h access window
+          return at && (Date.now() - at) < (24*60*60*1000);
+        } catch { return false; }
+      })();
+      if (unlocked) {
+        // Already unlocked – proceed
+        location.replace('index.html');
+        return;
+      }
+      function grantAccess(){
+        try { localStorage.setItem(KEY, JSON.stringify({ at: Date.now() })); } catch {}
+        location.replace('index.html');
+      }
+      function reset(){ clicks = 0; start = 0; if (timer) { clearTimeout(timer); timer = null; } }
+      function onClick(){
+        const now = Date.now();
+        if (!start || (now - start) > MAX_WINDOW_MS) { start = now; clicks = 0; if (timer) clearTimeout(timer); timer = setTimeout(reset, MAX_WINDOW_MS + 25); }
+        clicks++;
+        if (clicks >= REQUIRED_CLICKS) grantAccess();
+      }
+      // Secret hotspot is the logo itself
+      const spot = document.querySelector('.cs-hero img');
+      if (spot) {
+        spot.addEventListener('click', onClick);
+      }
+    })();
+  </script>
+</body>
+</html>

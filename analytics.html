@@ -4,22 +4,22 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Analytics Dashboard | EZ Sports Netting</title>
-  <link rel="stylesheet" href="assets/css/styles.css" />
+  <link rel="stylesheet" href="assets/css/styles.css?v=6" />
 </head>
 <body>
+  <a class="skip" href="#main">Skip to content</a>
   <header class="site-header">
     <div class="container header-bar">
       <button class="menu-toggle" aria-label="Toggle menu" aria-expanded="false" aria-controls="primary-nav">☰</button>
       <a class="brand" href="index.html">
-  <img src="assets/EZSportslogo.png" alt="EZ Sports Netting logo" height="40"/>
+  <img src="assets/img/EZSportslogo.png" alt="EZ Sports Netting logo" height="40"/>
         <span>EZ Sports Netting</span>
       </a>
       <form class="search" role="search" aria-label="Search store">
-        <input type="search" name="q" placeholder="Search bats, gloves, helmets…" aria-label="Search"/>
+  <input type="search" name="q" placeholder="Search…" aria-label="Search"/>
         <button type="submit" class="btn btn-primary">Search</button>
       </form>
       <nav id="primary-nav" class="quick-links nav-centered" aria-label="Primary">
-        <a href="deals.html">Deals</a>
         <a href="about.html">About</a>
         <a href="netting-calculator.html">Netting Calculator</a>
         <button class="cart-btn" aria-haspopup="dialog" aria-controls="mini-cart" onclick="Store.toggleCart()">
@@ -51,6 +51,7 @@
       <div class="card-sm"><div class="muted">Unique Visitors</div><div class="kpi" id="uv">0</div></div>
       <div class="card-sm"><div class="muted">Orders</div><div class="kpi" id="orders">0</div></div>
       <div class="card-sm"><div class="muted">Revenue</div><div class="kpi" id="revenue">$0.00</div></div>
+      <div class="card-sm"><div class="muted">Avg Order Value</div><div class="kpi" id="aov">$0.00</div></div>
     </section>
 
   <section class="grid-2 mt-4">
@@ -68,13 +69,18 @@
       <h3>Favorites & Add-to-cart</h3>
       <ul id="fav-products" class="product-list"></ul>
     </section>
+
+  <section class="mt-4">
+      <h3>Order Status Breakdown</h3>
+      <ul id="status-breakdown" class="product-list"></ul>
+    </section>
   </main>
 
   <footer class="site-footer">
     <div class="container footer-grid">
       <div class="footer-brand-block">
         <a class="brand brand--light" href="index.html">
-          <img src="assets/EZSportslogo.png" alt="EZ Sports Netting logo" height="36"/>
+          <img src="assets/img/EZSportslogo.png" alt="EZ Sports Netting logo" height="36"/>
           <span>EZ Sports Netting</span>
         </a>
         <p class="muted">Better baseball through better gear.</p>
@@ -83,7 +89,6 @@
             <img src="assets/img/facebook.png" alt="Facebook" />
           </a>
           <a href="#" aria-label="Instagram"><img src="assets/img/instagram.png" alt="Instagram" /></a>
-          <a href="#" aria-label="X"><img src="assets/img/xwhite.png" alt="X" /></a>
         </div>
       </div>
       <nav aria-label="Footer">
@@ -100,7 +105,7 @@
         <ul>
           <li><a href="about.html">About</a></li>
           <li><a href="careers.html">Careers</a></li>
-          <li><a href="support.html">Support</a></li>
+          <li><a href="contactus.html">Contact Us</a></li>
         </ul>
       </nav>
       <form class="subscribe" onsubmit="event.preventDefault(); alert('Thanks for subscribing!')">
@@ -116,7 +121,28 @@
     </div>
   </footer>
 
-  <script type="module" src="assets/js/app.js"></script>
+  <!-- Mini cart dialog for cart button in header -->
+  <dialog id="mini-cart" class="mini-cart" aria-labelledby="cart-title">
+    <form method="dialog" class="mini-cart__backdrop" onclick="this.closest('dialog').close()"></form>
+    <section class="mini-cart__panel" role="document">
+      <header>
+        <h3 id="cart-title">Your cart</h3>
+        <button class="icon-btn" onclick="document.getElementById('mini-cart').close()" aria-label="Close">✕</button>
+      </header>
+      <div id="cart-items" class="mini-cart__items"></div>
+      <footer class="mini-cart__footer">
+        <div class="totals"><span>Subtotal</span><strong id="cart-subtotal">$0.00</strong></div>
+        <div class="totals"><span>Shipping</span><strong id="cart-shipping">$0.00</strong></div>
+        <div class="totals"><span>Total</span><strong id="cart-total">$0.00</strong></div>
+        <div class="stack-05">
+          <button type="button" class="btn btn-primary btn-block" onclick="Store.checkout()">Secure Checkout</button>
+          <a class="btn btn-ghost btn-block" href="index.html">Continue Shopping</a>
+        </div>
+      </footer>
+    </section>
+  </dialog>
+
   <script type="module" src="assets/js/analytics.js"></script>
+  <script type="module" src="assets/js/app.js"></script>
 </body>
 </html>

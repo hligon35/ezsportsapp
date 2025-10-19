@@ -5,21 +5,53 @@ const { requireAdmin } = require('../middleware/auth');
 
 const productService = new ProductService();
 
-// Get all products
+// Simple in‑memory cache (invalidated every 60s). Adequate for JSON file DB.
+let cache = { ts: 0, data: [] };
+const CACHE_TTL_MS = 60 * 1000;
+
+async function loadAll(includeInactive) {
+  const now = Date.now();
+  if (now - cache.ts > CACHE_TTL_MS) {
+    cache.data = await productService.getAllProducts(includeInactive);
+    cache.ts = now;
+  }
+  return cache.data;
+}
+
+// Get all products (with optional category/search)
 router.get('/', async (req, res) => {
   try {
-    const { category, search, includeInactive } = req.query;
+    const { category, search, includeInactive, fields, refresh, limit, offset } = req.query;
+    const incInactive = includeInactive === 'true';
     let products;
-
     if (search) {
       products = await productService.searchProducts(search);
     } else if (category) {
       products = await productService.getProductsByCategory(category);
     } else {
-      products = await productService.getAllProducts(includeInactive === 'true');
+      // If refresh=true explicitly bypass cache (simple admin/dev tool)
+      if (refresh === 'true') {
+        cache.ts = 0; // invalidate
+      }
+      products = await loadAll(incInactive);
+      if (!incInactive) {
+        products = products.filter(p => p.isActive !== false);
+      }
     }
-
-    res.json(products);
+    // Field filtering (?fields=id,name,price)
+    if (fields) {
+      const wanted = new Set(String(fields).split(',').map(f => f.trim()).filter(Boolean));
+      products = products.map(p => {
+        const o = {}; wanted.forEach(k => { if (p.hasOwnProperty(k)) o[k] = p[k]; }); return o; });
+    }
+    // Basic pagination (?limit=50&offset=0)
+    let lim = parseInt(limit, 10);
+    if (isNaN(lim) || lim <= 0) lim = products.length; // no limit
+    if (lim > 500) lim = 500; // hard cap to protect memory
+    let off = parseInt(offset, 10);
+    if (isNaN(off) || off < 0) off = 0;
+    const paged = products.slice(off, off + lim);
+    res.json(paged);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

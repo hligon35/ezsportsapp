@@ -19435,5 +19435,352 @@
     "createdAt": "2025-09-12T15:06:03.807Z",
     "updatedAt": "2025-09-12T15:06:03.807Z",
     "id": 1767
+  },
+  {
+    "type": "pageview",
+    "path": "/",
+    "referrer": "",
+    "visitorId": "v_c6ac55zpmmtmfohjre2",
+    "userId": null,
+    "timestamp": "2025-09-17T21:20:08.926Z",
+    "createdAt": "2025-09-17T21:20:09.006Z",
+    "updatedAt": "2025-09-17T21:20:09.006Z",
+    "id": 1768
+  },
+  {
+    "type": "pageview",
+    "path": "/bats.html",
+    "referrer": "",
+    "visitorId": "v_c6ac55zpmmtmfohjre2",
+    "userId": null,
+    "timestamp": "2025-09-17T21:20:25.705Z",
+    "createdAt": "2025-09-17T21:20:25.789Z",
+    "updatedAt": "2025-09-17T21:20:25.789Z",
+    "id": 1769
+  },
+  {
+    "type": "pageview",
+    "path": "/deals.html",
+    "referrer": "",
+    "visitorId": "v_c6ac55zpmmtmfohjre2",
+    "userId": null,
+    "timestamp": "2025-09-17T21:20:32.372Z",
+    "createdAt": "2025-09-17T21:20:32.462Z",
+    "updatedAt": "2025-09-17T21:20:32.469Z",
+    "id": 1770
+  },
+  {
+    "type": "pageview",
+    "path": "/gloves.html",
+    "referrer": "",
+    "visitorId": "v_c6ac55zpmmtmfohjre2",
+    "userId": null,
+    "timestamp": "2025-09-17T21:20:43.310Z",
+    "createdAt": "2025-09-17T21:20:43.376Z",
+    "updatedAt": "2025-09-17T21:20:43.376Z",
+    "id": 1771
+  },
+  {
+    "type": "pageview",
+    "path": "/batting-gloves.html",
+    "referrer": "",
+    "visitorId": "v_c6ac55zpmmtmfohjre2",
+    "userId": null,
+    "timestamp": "2025-09-17T21:20:45.223Z",
+    "createdAt": "2025-09-17T21:20:45.309Z",
+    "updatedAt": "2025-09-17T21:20:45.309Z",
+    "id": 1772
+  },
+  {
+    "type": "pageview",
+    "path": "/drip.html",
+    "referrer": "",
+    "visitorId": "v_c6ac55zpmmtmfohjre2",
+    "userId": null,
+    "timestamp": "2025-09-17T21:20:48.745Z",
+    "createdAt": "2025-09-17T21:20:48.828Z",
+    "updatedAt": "2025-09-17T21:20:48.828Z",
+    "id": 1773
+  },
+  {
+    "type": "pageview",
+    "path": "/apparel.html",
+    "referrer": "",
+    "visitorId": "v_c6ac55zpmmtmfohjre2",
+    "userId": null,
+    "timestamp": "2025-09-17T21:21:22.370Z",
+    "createdAt": "2025-09-17T21:21:22.424Z",
+    "updatedAt": "2025-09-17T21:21:22.424Z",
+    "id": 1774
+  },
+  {
+    "type": "pageview",
+    "path": "/about.html",
+    "referrer": "",
+    "visitorId": "v_c6ac55zpmmtmfohjre2",
+    "userId": null,
+    "timestamp": "2025-09-17T21:22:46.756Z",
+    "createdAt": "2025-09-17T21:22:46.767Z",
+    "updatedAt": "2025-09-17T21:22:46.767Z",
+    "id": 1775
+  },
+  {
+    "type": "pageview",
+    "path": "/index.html",
+    "referrer": "",
+    "visitorId": "v_c6ac55zpmmtmfohjre2",
+    "userId": null,
+    "timestamp": "2025-09-17T21:22:50.091Z",
+    "createdAt": "2025-09-17T21:22:50.110Z",
+    "updatedAt": "2025-09-17T21:22:50.110Z",
+    "id": 1776
+  },
+  {
+    "type": "pageview",
+    "path": "/checkout.html",
+    "referrer": "",
+    "visitorId": "v_eq6xwovj37umgv216gv",
+    "userId": null,
+    "timestamp": "2025-10-17T16:19:53.267Z",
+    "createdAt": "2025-10-17T16:19:53.357Z",
+    "updatedAt": "2025-10-17T16:19:53.357Z",
+    "id": 1777
+  },
+  {
+    "type": "pageview",
+    "path": "/",
+    "referrer": "",
+    "visitorId": null,
+    "userId": null,
+    "timestamp": "2025-10-17T16:51:51.171Z",
+    "createdAt": "2025-10-17T16:51:51.201Z",
+    "updatedAt": "2025-10-17T16:51:51.201Z",
+    "id": 1778
+  },
+  {
+    "type": "pageview",
+    "path": "/",
+    "referrer": "",
+    "visitorId": null,
+    "userId": null,
+    "timestamp": "2025-10-17T19:13:20.008Z",
+    "createdAt": "2025-10-17T19:13:20.021Z",
+    "updatedAt": "2025-10-17T19:13:20.021Z",
+    "id": 1779
+  },
+  {
+    "type": "pageview",
+    "path": "/",
+    "referrer": "",
+    "visitorId": null,
+    "userId": null,
+    "timestamp": "2025-10-17T19:38:14.695Z",
+    "createdAt": "2025-10-17T19:38:14.729Z",
+    "updatedAt": "2025-10-17T19:38:14.729Z",
+    "id": 1780
+  },
+  {
+    "type": "pageview",
+    "path": "/",
+    "referrer": "",
+    "visitorId": null,
+    "userId": null,
+    "timestamp": "2025-10-17T19:48:22.971Z",
+    "createdAt": "2025-10-17T19:48:22.996Z",
+    "updatedAt": "2025-10-17T19:48:22.996Z",
+    "id": 1781
+  },
+  {
+    "type": "pageview",
+    "path": "/",
+    "referrer": "",
+    "visitorId": null,
+    "userId": null,
+    "timestamp": "2025-10-17T19:55:50.096Z",
+    "createdAt": "2025-10-17T19:55:50.117Z",
+    "updatedAt": "2025-10-17T19:55:50.117Z",
+    "id": 1782
+  },
+  {
+    "type": "pageview",
+    "path": "/",
+    "referrer": "",
+    "visitorId": null,
+    "userId": null,
+    "timestamp": "2025-10-17T19:56:32.863Z",
+    "createdAt": "2025-10-17T19:56:32.896Z",
+    "updatedAt": "2025-10-17T19:56:32.896Z",
+    "id": 1783
+  },
+  {
+    "type": "pageview",
+    "path": "/index.html",
+    "referrer": "",
+    "visitorId": "v_cr5hywuot7wmgva1ift",
+    "userId": null,
+    "timestamp": "2025-10-17T20:04:05.699Z",
+    "createdAt": "2025-10-17T20:04:05.716Z",
+    "updatedAt": "2025-10-17T20:04:05.716Z",
+    "id": 1784
+  },
+  {
+    "type": "pageview",
+    "path": "/checkout.html",
+    "referrer": "",
+    "visitorId": "v_cr5hywuot7wmgva1ift",
+    "userId": null,
+    "timestamp": "2025-10-17T20:04:06.444Z",
+    "createdAt": "2025-10-17T20:04:06.449Z",
+    "updatedAt": "2025-10-17T20:04:06.449Z",
+    "id": 1785
+  },
+  {
+    "type": "view_cart",
+    "productId": {
+      "items": [
+        {
+          "id": "PITCHERSPOCKET9",
+          "price": 349.95,
+          "qty": 1
+        }
+      ]
+    },
+    "visitorId": "v_cr5hywuot7wmgva1ift",
+    "userId": null,
+    "timestamp": "2025-10-17T20:04:06.499Z",
+    "createdAt": "2025-10-17T20:04:06.508Z",
+    "updatedAt": "2025-10-17T20:04:06.508Z",
+    "id": 1786
+  },
+  {
+    "type": "pageview",
+    "path": "/index.html",
+    "referrer": "",
+    "visitorId": "v_3zlpllfc3csmgva5phb",
+    "userId": null,
+    "timestamp": "2025-10-17T20:07:21.425Z",
+    "createdAt": "2025-10-17T20:07:21.439Z",
+    "updatedAt": "2025-10-17T20:07:21.440Z",
+    "id": 1787
+  },
+  {
+    "type": "pageview",
+    "path": "/checkout.html",
+    "referrer": "",
+    "visitorId": "v_3zlpllfc3csmgva5phb",
+    "userId": null,
+    "timestamp": "2025-10-17T20:07:21.907Z",
+    "createdAt": "2025-10-17T20:07:21.912Z",
+    "updatedAt": "2025-10-17T20:07:21.912Z",
+    "id": 1788
+  },
+  {
+    "type": "view_cart",
+    "productId": {
+      "items": [
+        {
+          "id": "PITCHERSPOCKET9",
+          "price": 349.95,
+          "qty": 1
+        }
+      ]
+    },
+    "visitorId": "v_3zlpllfc3csmgva5phb",
+    "userId": null,
+    "timestamp": "2025-10-17T20:07:21.947Z",
+    "createdAt": "2025-10-17T20:07:21.975Z",
+    "updatedAt": "2025-10-17T20:07:21.975Z",
+    "id": 1789
+  },
+  {
+    "type": "pageview",
+    "path": "/index.html",
+    "referrer": "",
+    "visitorId": "v_fqldtxsgxo7mgvatnyk",
+    "userId": null,
+    "timestamp": "2025-10-17T20:25:59.205Z",
+    "createdAt": "2025-10-17T20:25:59.247Z",
+    "updatedAt": "2025-10-17T20:25:59.247Z",
+    "id": 1790
+  },
+  {
+    "type": "pageview",
+    "path": "/checkout.html",
+    "referrer": "",
+    "visitorId": "v_fqldtxsgxo7mgvatnyk",
+    "userId": null,
+    "timestamp": "2025-10-17T20:26:00.344Z",
+    "createdAt": "2025-10-17T20:26:00.350Z",
+    "updatedAt": "2025-10-17T20:26:00.350Z",
+    "id": 1791
+  },
+  {
+    "type": "view_cart",
+    "productId": {
+      "items": [
+        {
+          "id": "PITCHERSPOCKET9",
+          "price": 349.95,
+          "qty": 1
+        }
+      ]
+    },
+    "visitorId": "v_fqldtxsgxo7mgvatnyk",
+    "userId": null,
+    "timestamp": "2025-10-17T20:26:00.382Z",
+    "createdAt": "2025-10-17T20:26:00.394Z",
+    "updatedAt": "2025-10-17T20:26:00.394Z",
+    "id": 1792
+  },
+  {
+    "type": "pageview",
+    "path": "/index.html",
+    "referrer": "",
+    "visitorId": "v_i25cgvaaxm8mgvawz05",
+    "userId": null,
+    "timestamp": "2025-10-17T20:28:33.488Z",
+    "createdAt": "2025-10-17T20:28:33.499Z",
+    "updatedAt": "2025-10-17T20:28:33.499Z",
+    "id": 1793
+  },
+  {
+    "type": "view_cart",
+    "productId": {
+      "items": [
+        {
+          "id": "PITCHERSPOCKET9",
+          "price": 349.95,
+          "qty": 1
+        }
+      ]
+    },
+    "visitorId": "v_i25cgvaaxm8mgvawz05",
+    "userId": null,
+    "timestamp": "2025-10-17T20:28:34.005Z",
+    "createdAt": "2025-10-17T20:28:34.017Z",
+    "updatedAt": "2025-10-17T20:28:34.017Z",
+    "id": 1795
+  },
+  {
+    "type": "pageview",
+    "path": "/",
+    "referrer": "",
+    "visitorId": null,
+    "userId": null,
+    "timestamp": "2025-10-17T20:39:59.391Z",
+    "createdAt": "2025-10-17T20:39:59.415Z",
+    "updatedAt": "2025-10-17T20:39:59.415Z",
+    "id": 1796
+  },
+  {
+    "type": "pageview",
+    "path": "/",
+    "referrer": "",
+    "visitorId": null,
+    "userId": null,
+    "timestamp": "2025-10-17T20:45:11.922Z",
+    "createdAt": "2025-10-17T20:45:11.947Z",
+    "updatedAt": "2025-10-17T20:45:11.947Z",
+    "id": 1797
   }
 ]

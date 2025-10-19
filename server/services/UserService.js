@@ -1,11 +1,44 @@
 // User Service - Handle user operations
 const DatabaseManager = require('../database/DatabaseManager');
 const bcrypt = require('bcrypt');
+const crypto = require('crypto');
 
 class UserService {
   constructor() {
     this.db = new DatabaseManager();
     this.saltRounds = 10;
+  }
+
+  // Create a password reset token for a user by email (case-insensitive)
+  async createResetToken(email) {
+    const id = String(email || '').trim();
+    if (!id) throw new Error('Email is required');
+    const esc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    // Find exact or case-insensitive email match
+    let user = await this.db.findOne('users', { email: id });
+    if (!user) {
+      user = await this.db.findOne('users', { email: { $regex: `^${esc(id)}$`, $options: 'i' } });
+    }
+    if (!user) throw new Error('If an account exists for this email, you will receive a reset link.');
+
+    const token = crypto.randomBytes(32).toString('hex');
+    const expiresAt = new Date(Date.now() + (60 * 60 * 1000)).toISOString(); // 1 hour
+    await this.db.update('users', { id: user.id }, { resetToken: token, resetTokenExpires: expiresAt });
+    return { userId: user.id, token, expiresAt, email: user.email };
+  }
+
+  // Reset password using a valid, non-expired token
+  async resetPasswordWithToken(token, newPassword) {
+    const t = String(token || '').trim();
+    if (!t) throw new Error('Invalid reset token');
+    if (!newPassword || String(newPassword).length < 6) throw new Error('Password must be at least 6 characters');
+    const user = await this.db.findOne('users', { resetToken: t });
+    if (!user) throw new Error('Invalid or expired reset token');
+    const exp = new Date(user.resetTokenExpires || 0).getTime();
+    if (!exp || Date.now() > exp) throw new Error('Invalid or expired reset token');
+    const hashed = await bcrypt.hash(newPassword, this.saltRounds);
+    await this.db.update('users', { id: user.id }, { password: hashed, resetToken: null, resetTokenExpires: null });
+    return true;
   }
 
   // Register a new user
@@ -37,7 +70,12 @@ class UserService {
         name: fullName || undefined,
         firstName: firstName || undefined,
         lastName: lastName,
-        isAdmin: userData.email === 'admin@ezsports.com', // Auto-admin for specific email
+        // Admin if explicitly provided, or well-known admin emails
+        isAdmin: Boolean(
+          userData.isAdmin === true ||
+          userData.role === 'admin' ||
+          (userData.email && userData.email.toLowerCase() === 'amercedes@ezsportsnetting.com')
+        ),
         lastLogin: null
       };
 
@@ -82,7 +120,10 @@ class UserService {
   // Return user without password, ensuring expected fields
   const { password: _, ...userWithoutPassword } = user;
   const computedName = user.name || [user.firstName, user.lastName].filter(Boolean).join(' ').trim() || 'User';
-  const computedIsAdmin = Boolean(user.isAdmin || user.role === 'admin' || user.email === 'admin@ezsports.com');
+  const computedIsAdmin = Boolean(
+    user.isAdmin || user.role === 'admin' ||
+    ((user.email||'').toLowerCase() === 'amercedes@ezsportsnetting.com')
+  );
   return { ...userWithoutPassword, name: computedName, isAdmin: computedIsAdmin };
     } catch (error) {
       throw error;

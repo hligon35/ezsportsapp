@@ -7,14 +7,14 @@
   <meta name="description" content="Get help with orders, returns, warranty claims, sizing, shipping and payments at EZ Sports Netting." />
   <meta name="robots" content="index,follow" />
   <link rel="canonical" href="https://ezsportsnetting.com/support.html" />
-  <link rel="icon" type="image/png" href="assets/EZSportslogo.png" />
-  <link rel="icon" type="image/png" href="assets/img/favicon-32.png" sizes="32x32" />
+  <link rel="icon" type="image/png" href="assets/img/EZSportslogo.png" />
+  <link rel="icon" type="image/png" href="assets/img/EZSportslogo.png" sizes="32x32" />
   <meta property="og:title" content="EZ Sports Netting Support" />
   <meta property="og:description" content="Help center for orders, returns, warranty, sizing, shipping and payments." />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://ezsportsnetting.com/support.html" />
   <meta property="og:image" content="https://images.unsplash.com/photo-1521417531039-89f040b8d69e?q=80&w=1200&auto=format&fit=crop" />
-  <meta name="twitter:card" content="summary_large_image" />
+  <!-- <meta name="twitter:card" content="summary_large_image" /> -->
   <link rel="stylesheet" href="assets/css/styles.css" />
   <meta name="description" content="Get help with orders, returns, warranties, and product questions." />
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -27,15 +27,14 @@
     <div class="container header-bar">
       <button class="menu-toggle" aria-label="Toggle menu" aria-expanded="false" aria-controls="primary-nav">☰</button>
   <a class="brand" href="index.html">
-  <img src="assets/EZSportslogo.png" alt="EZ Sports Netting logo" height="40"/>
+  <img src="assets/img/EZSportslogo.png" alt="EZ Sports Netting logo" height="40"/>
         <span>EZ Sports Netting</span>
       </a>
       <form class="search" role="search" aria-label="Search store" onsubmit="event.preventDefault(); window.Store.search(this.q.value)">
-        <input type="search" name="q" placeholder="Search bats, gloves, helmets…" aria-label="Search"/>
+  <input type="search" name="q" placeholder="Search…" aria-label="Search"/>
         <button type="submit" class="btn btn-primary">Search</button>
       </form>
   <nav id="primary-nav" class="quick-links nav-centered" aria-label="Primary">
-    <a href="deals.html">Deals</a>
     <a href="about.html">About</a>
     <a href="netting-calculator.html">Netting Calculator</a>
     <button class="cart-btn" aria-haspopup="dialog" aria-controls="mini-cart" onclick="Store.toggleCart()">
@@ -86,7 +85,7 @@
     <div class="container footer-grid">
       <div class="footer-brand-block">
         <a class="brand brand--light" href="index.html">
-          <img src="assets/EZSportslogo.png" alt="EZ Sports Netting logo" height="36"/>
+          <img src="assets/img/EZSportslogo.png" alt="EZ Sports Netting logo" height="36"/>
           <span>EZ Sports Netting</span>
         </a>
         <p class="muted">Better baseball through better gear.</p>
@@ -95,7 +94,6 @@
             <img src="assets/img/facebook.png" alt="Facebook" />
           </a>
           <a href="#" aria-label="Instagram"><img src="assets/img/instagram.png" alt="Instagram" /></a>
-          <a href="#" aria-label="X"><img src="assets/img/xwhite.png" alt="X" /></a>
         </div>
       </div>
       <nav aria-label="Footer">
@@ -112,7 +110,7 @@
         <ul>
           <li><a href="about.html">About</a></li>
           <li><a href="careers.html">Careers</a></li>
-          <li><a href="support.html">Support</a></li>
+          <li><a href="contactus.html">Contact Us</a></li>
         </ul>
       </nav>
       <form class="subscribe" onsubmit="event.preventDefault(); alert('Thanks for subscribing!')">
@@ -136,10 +134,9 @@
       </header>
       <div id="cart-items" class="mini-cart__items"></div>
       <footer class="mini-cart__footer">
-        <div class="totals">
-          <span>Subtotal</span>
-          <strong id="cart-subtotal">$0.00</strong>
-        </div>
+        <div class="totals"><span>Subtotal</span><strong id="cart-subtotal">$0.00</strong></div>
+        <div class="totals"><span>Shipping</span><strong id="cart-shipping">$0.00</strong></div>
+        <div class="totals"><span>Total</span><strong id="cart-total">$0.00</strong></div>
         <div class="stack-05">
           <button type="button" class="btn btn-primary btn-block" onclick="Store.checkout()">Secure Checkout</button>
           <a class="btn btn-ghost btn-block" href="index.html#catalog">Continue Shopping</a>

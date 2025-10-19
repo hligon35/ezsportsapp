@@ -1,4 +1,4 @@
-const { ensureSchema, createUser, findUserByIdentifier, publicUser } = require('../_lib_db');
+const { ensureSchema, ensureOwnerAdmin, createUser, findUserByIdentifier, publicUser } = require('../_lib_db');
 
 module.exports = async function handler(req, res) {
   if (req.method === 'OPTIONS') {
@@ -9,7 +9,9 @@ module.exports = async function handler(req, res) {
   }
   if (req.method !== 'POST') return res.status(405).json({ message: 'Method Not Allowed' });
   try {
-    await ensureSchema();
+  await ensureSchema();
+  // Ensure owner admin exists for production bootstrapping
+  await ensureOwnerAdmin();
   const body = typeof req.body === 'string' ? JSON.parse(req.body||'{}') : (req.body || {});
   const { email, password, name } = body;
     if (!email || !password) return res.status(400).json({ message: 'Missing fields' });

@@ -5,8 +5,128 @@
   gap: .5rem;
   margin-top: 1.25rem;
 }
+/* Product detail dialog layout */
+.product-detail-dialog { width:min(100%,1000px); border:none; padding:0; background:transparent; }
+.product-detail-dialog::backdrop { background:rgba(0,0,0,.55); -webkit-backdrop-filter:blur(2px); backdrop-filter:blur(2px); }
+.product-detail-dialog .panel { max-height:90vh; overflow:auto; background:#fff; border-radius:12px; box-shadow:0 12px 34px -8px rgba(0,0,0,.3),0 4px 16px -4px rgba(0,0,0,.2); }
+/* Uniform padding rhythm for dialog sections */
+.product-detail-dialog .panel-head{display:flex;align-items:center;justify-content:space-between;padding:.85rem 1rem;border-bottom:1px solid var(--border)}
+.product-detail-dialog .panel-head h3{margin:0;font-size:1.1rem;font-weight:900}
+.product-detail-dialog .panel-body{padding:1rem}
+.product-detail-dialog .panel-foot{display:flex;gap:.5rem;justify-content:flex-end;padding:.85rem 1rem;border-top:1px solid var(--border)}
+.product-detail-layout { display:flex; flex-wrap:wrap; gap:2rem; }
+.product-detail-layout .gallery { flex:1 1 380px; min-width:320px; }
+.product-detail-layout .info { flex:1 1 340px; min-width:300px; }
+.product-detail-layout .main-image { aspect-ratio: 4/3; background:#f3f3f5; display:flex; align-items:center; justify-content:center; border:1px solid var(--border); border-radius:8px; overflow:hidden; margin-bottom:.75rem; }
+.product-detail-layout .main-image img { width:100%; height:100%; object-fit:contain; }
+
+/* Ensure the main product image always fits fully inside its box */
+#pd-main-img { width:100%; height:100%; max-width:100%; max-height:100%; object-fit:contain; object-position:center; display:block; }
+.product-detail-layout .thumbs { display:flex; flex-wrap:wrap; gap:.5rem; }
+.product-detail-layout .thumb { border:1px solid var(--border); background:#fff; border-radius:6px; padding:2px; cursor:pointer; display:inline-flex; }
+.product-detail-layout .thumb.active, .product-detail-layout .thumb:focus-visible { outline:none; border-color:var(--brand); box-shadow:0 0 0 2px color-mix(in oklab, white 50%, var(--brand) 60%); }
+.product-detail-layout .thumb img { width:54px; height:54px; object-fit:contain; }
+.product-detail-dialog h4 { margin:1.25rem 0 .5rem; font-size:1rem; font-weight:700; letter-spacing:.25px; }
+.product-detail-dialog .feature-list { list-style:disc; margin:.25rem 0 0 1.15rem; padding:0; font-size:.85rem; line-height:1.35; }
+.product-detail-dialog .feature-list li + li { margin-top:.25rem; }
+.product-detail-dialog .price-lg { font-size:1.4rem; font-weight:800; margin:.25rem 0 1rem; }
+/* Inputs in dialog: match site form aesthetics */
+.product-detail-dialog select, .product-detail-dialog input[type="number"], .product-detail-dialog input[type="text"]{
+  padding:.65rem .8rem; border:1px solid var(--border); border-radius:.6rem; background:#fff; color:var(--ink);
+}
+.product-detail-dialog .text-xs.muted{opacity:.8}
+@media (max-width:720px){
+  .product-detail-layout { flex-direction:column; }
+  .product-detail-dialog { width:min(100%,95vw); }
+}
 /* Pagination button refinement (replaces inline styles) */
 .pagination-btn { position:relative; min-width:42px; }
+.grid, #category-grid { --col-min:240px; display:grid; grid-template-columns:repeat(auto-fill,minmax(var(--col-min),1fr)); gap:1.1rem; }
+.product-card .media.aspect { aspect-ratio:4/3; display:flex; align-items:center; justify-content:center; background:#f5f5f7; border:1px solid var(--border); border-radius:8px; overflow:hidden; }
+.product-card .media.aspect img { width:100%; height:100%; object-fit:contain; }
+.product-card .price-row { display:flex; align-items:center; justify-content:space-between; gap:.5rem; margin-top:.45rem; }
+.product-card .price-row .actions { display:flex; gap:.35rem; }
+.product-card h3 { font-size:.9rem; font-weight:700; line-height:1.25; margin:.55rem 0 .25rem; min-height:2.4em; }
+
+/* Color dots for products with multiple color options */
+.color-dots {
+  display: flex;
+  flex-wrap: nowrap; /* force single row */
+  gap: 4px;
+  margin: 8px 0 6px;
+  min-height: 28px;
+  align-items: center;
+  justify-content: flex-start;
+  overflow-x: auto; /* allow horizontal scroll if needed */
+  -webkit-overflow-scrolling: touch;
+}
+
+.color-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 1px solid rgba(0,0,0,0.15);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  position: relative;
+  flex-shrink: 0;
+}
+/* Optional number label inside neutral dots */
+.color-dot .dot-label {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 8px;
+  line-height: 1;
+  font-weight: 800;
+  color: #111;
+  pointer-events: none;
+}
+
+.color-dot:hover {
+  transform: scale(1.15);
+  border-color: rgba(0,0,0,0.3);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+}
+
+.color-dot.active {
+  transform: scale(1.2);
+  border-color: var(--brand);
+  border-width: 2px;
+  box-shadow: 0 0 0 2px rgba(36,23,115,0.25);
+}
+
+/* Color mappings */
+.color-dot.black { background-color: #000000; }
+.color-dot.white { background-color: #ffffff; border-color: rgba(0,0,0,0.3); }
+.color-dot.red { background-color: #dc2626; }
+.color-dot.blue { background-color: #2563eb; }
+.color-dot.navy { background-color: #1e40af; }
+.color-dot.green { background-color: #16a34a; }
+.color-dot.darkgreen { background-color: #15803d; }
+.color-dot.yellow { background-color: #eab308; }
+.color-dot.orange { background-color: #ea580c; }
+.color-dot.purple { background-color: #9333ea; }
+.color-dot.maroon { background-color: #991b1b; }
+.color-dot.royal { background-color: #3b82f6; }
+.color-dot.columbiablue { background-color: #60a5fa; }
+.color-dot.brown { background-color: #8B4513; }
+.color-dot.neutral { background-color: #cbd5e1; border-color: rgba(0,0,0,0.25); }
+/* Slightly larger dots on L‑Screens pages for better visibility */
+body.lscreens-subnav .color-dot { width: 14px; height: 14px; }
+
+@media (max-width:560px){ 
+  .grid, #category-grid { --col-min:170px; gap:.85rem; } 
+  .product-card h3 { font-size:.8rem; } 
+  .color-dot { width: 10px; height: 10px; }
+  .color-dots { 
+    gap: 3px; 
+    margin: 6px 0 4px; 
+    min-height: 24px; 
+    overflow-x: auto; /* maintain single row with scroll on mobile */
+  }
+}
 .pagination-btn.is-active,
 .pagination-btn[aria-current="page"] { background: var(--brand); color:#fff; box-shadow:0 0 0 2px rgba(255,255,255,.15),0 0 0 4px rgba(36,23,115,.35); }
 .pagination-btn:focus-visible { outline:none; box-shadow:0 0 0 3px rgba(36,23,115,.45); }
@@ -75,6 +195,103 @@ body, .container, .footer-grid, .about-inner, .category-tiles .tiles, .grid, .ba
   --muted:#5a5a5a;         /* muted text; stays readable on white */
   /* Adjusted focus ring to work with deeper purple hue (slightly higher alpha) */
   --ring: 0 0 0 3px color-mix(in oklab, white 8%, var(--brand) 70% / 28%);
+  /* Gold CTA palette (accessible with white text) */
+  --gold:#8a6a00;          /* base (contrast AA with white) */
+  --gold-hover:#a07c00;    /* hover/ focus */
+  --gold-active:#6d5200;   /* active/ pressed */
+}
+
+/* Request Quote button state overrides (EZ Nets page) */
+.btn-quote { transition: background-color .25s, color .25s, box-shadow .25s; }
+.btn-quote:hover,
+.btn-quote:focus-visible { background: var(--gold-hover) !important; color:#000 !important; border-color: var(--gold-hover) !important; }
+.btn-quote:active { background:#ffffff !important; color:#000 !important; border-color: var(--brand) !important; }
+
+/* =====================================================================
+   Unified Brand Purple Palette Enforcement
+   Single hue: #241773. Differentiation via purple→white gradients only.
+   ===================================================================== */
+:root {
+  --brand:#241773 !important;
+  --brand-2:#241773 !important;
+  --primary:#241773 !important;
+  --ink-2:#241773 !important; /* secondary emphasis now purple when used */
+}
+
+/* Core gradient helper classes (directional variants) */
+.bg-purple-diag-1 { background:linear-gradient(135deg,#241773 0%, #ffffff 140%) !important; }
+.bg-purple-diag-2 { background:linear-gradient(45deg,#241773 0%, #ffffff 140%) !important; }
+.bg-purple-vert   { background:linear-gradient(180deg,#241773 0%, #ffffff 140%) !important; }
+.bg-purple-horiz  { background:linear-gradient(90deg,#241773 0%, #ffffff 140%) !important; }
+
+/* Replace multi‑hue purple backgrounds with single-hue gradients */
+.mega-hero, .net-hero, .netting-hero, .contact-hero, .turf-hero, .expert-cta, .spotlight-wrap,
+.banner, .banner.red, .banner.blue { background:linear-gradient(135deg,#241773 0%, #ffffff 160%) !important; }
+
+/* Remove decorative pseudo gradients that referenced older purples */
+.fr-card:before, .hero-card:before, .banner:before, .netting-hero:before, .mega-hero:after, .spotlight-wrap:after { background:none !important; }
+
+/* Buttons unify on purple except specialized quote button */
+.btn, .btn-primary, .btn-ghost, .btn-invert, .btn-pill, .icon-btn {
+  background:#241773 !important; border-color:#241773 !important; color:#ffffff !important;
+}
+.btn:hover, .btn-primary:hover, .btn-ghost:hover, .btn-invert:hover, .btn-pill:hover, .icon-btn:hover,
+.btn:focus-visible, .btn-primary:focus-visible { filter:brightness(1.06); }
+.btn:active, .btn-primary:active { filter:brightness(.9); }
+.btn-quote { background:#000 !important; border-color:#000 !important; color:#fff !important; }
+
+/* Nav & submenu */
+.quick-links a:hover, .quick-links .auth-link:hover { background:linear-gradient(135deg,#241773 0%, #241773 65%, #ffffff 140%) !important; color:#fff !important; }
+.quick-links a.is-active, .quick-links a[aria-current="page"] { background:linear-gradient(135deg,#241773 0%, #ffffff 130%) !important; color:#fff !important; }
+.quick-links .nav-submenu { background:#241773 !important; border-color:#241773 !important; }
+.quick-links .nav-submenu a { color:#fff !important; }
+.quick-links .nav-submenu a:hover { background:rgba(255,255,255,.15) !important; }
+
+/* Avatar */
+.profile-btn { background:#241773 !important; }
+.profile-btn:active { background:#ffffff !important; }
+
+/* Active chips / tags */
+.chip.is-active { background:#241773 !important; border-color:#241773 !important; color:#fff !important; }
+
+/* Focus rings keep readability */
+input:focus, textarea:focus, select:focus { border-color:#241773 !important; box-shadow:0 0 0 3px rgba(36,23,115,.35) !important; }
+
+/* Links */
+a, .inline-links a { color:#8a6a00; }
+a:hover, .inline-links a:hover { text-decoration:underline; }
+
+/* Dropdown & mini-cart subtle accents */
+.user-dropdown a:hover, .user-dropdown button:hover { background:rgba(36,23,115,.08) !important; }
+.mini-cart__panel header { border-color:#241773 !important; }
+
+/* Selection */
+::selection { background:#241773; color:#fff; }
+
+/* (Removed: legacy #lscreens-subnav external sub-navigation styles) */
+
+/* Utility catch-all: any old purple class variants collapse to brand */
+[class*="purple"], [class*="violet"], [class*="lavender"] { color:#241773 !important; }
+
+/* Preserve footer black for contrast; don't override it here */
+
+/* Subscribe button state styling */
+.subscribe button.btn-primary {
+  background: var(--gold) !important;
+  border-color: var(--gold) !important;
+  color: #000 !important;
+  transition: background .25s, color .25s, border-color .25s;
+}
+.subscribe button.btn-primary:hover,
+.subscribe button.btn-primary:focus-visible {
+  background: var(--brand) !important; /* purple on hover */
+  border-color: var(--brand) !important;
+  color:#fff !important;
+}
+.subscribe button.btn-primary:active {
+  background: #ffffff !important; /* white during click */
+  color:#000 !important;
+  border-color: var(--brand) !important;
 }
 
 /* Spacing utilities */
@@ -86,7 +303,13 @@ body, .container, .footer-grid, .about-inner, .category-tiles .tiles, .grid, .ba
   flex-wrap:wrap !important; 
   gap:.65rem !important; 
   margin:.85rem 0 1.35rem !important; 
+  justify-content:center !important; /* center pills so CTA naturally centers beneath */
+  text-align:center !important;
 }
+/* Center EZ Nets sub-navigation and its trailing quote button across all netting pages */
+#netting-subnav{justify-content:center}
+#netting-subnav + .btn, #netting-subnav + .btn-primary, #netting-subnav + .btn-quote{display:block;margin:0.75rem auto 0}
+.netting-subnav:not(.is-ready) { display:none !important; }
 .netting-subnav a { 
   padding:.55rem .9rem !important; 
   border:1px solid var(--border) !important; 
@@ -115,22 +338,73 @@ body, .container, .footer-grid, .about-inner, .category-tiles .tiles, .grid, .ba
   .netting-subnav a { font-size:.75rem; padding:.5rem .75rem; }
 }
 
-/* Consistent horizontal breathing room for netting hero sections */
+/* Consistent horizontal breathing room + palette-coordinated backgrounds for EZ Nets heroes */
 .netting-hero, .net-hero {
   /* preserve existing top/bottom padding from inline styles, only adjust sides */
   padding-left:clamp(.85rem,2.5vw,1.75rem) !important;
   padding-right:clamp(.85rem,2.5vw,1.75rem) !important;
-  /* Brighter, more orange gradient (reduced black, added warm glow) */
+  /* Brand-forward gradient using site palette (deep purple) with subtle highlight */
   background:
-    radial-gradient(circle at 82% 18%, color-mix(in oklab,var(--brand) 85%, #fff 15%) 0%, transparent 60%),
-    linear-gradient(132deg,
-      color-mix(in oklab,var(--brand) 100%, #fff 4%) 0%,
-      color-mix(in oklab,var(--brand) 96%, #000 4%) 40%,
-      color-mix(in oklab,var(--brand) 88%, #000 12%) 72%,
-      color-mix(in oklab,var(--brand) 78%, #000 22%) 100%) !important;
+    radial-gradient(circle at 80% 20%, color-mix(in oklab, var(--brand) 86%, #fff 14%) 0%, transparent 62%),
+    linear-gradient(135deg,
+      color-mix(in oklab, var(--brand) 96%, #000 4%) 0%,
+      color-mix(in oklab, var(--brand) 82%, #fff 18%) 100%) !important;
   color:#fff !important;
   border-radius:1.15rem !important;
   box-shadow:0 10px 38px -12px rgba(0,0,0,.55),0 4px 18px -6px rgba(0,0,0,.45);
+}
+
+/* Sport-specific variants (kept within site palette) */
+.netting-hero--baseball,
+.nh-baseball {
+  background:
+    radial-gradient(circle at 78% 22%, color-mix(in oklab, var(--brand) 88%, #fff 12%) 0%, transparent 62%),
+    linear-gradient(135deg,
+      color-mix(in oklab, var(--brand) 98%, #000 2%) 0%,
+      color-mix(in oklab, var(--brand) 78%, #fff 22%) 100%) !important;
+}
+
+.netting-hero--golf,
+.nh-golf {
+  background:
+    radial-gradient(circle at 78% 22%, color-mix(in oklab, var(--brand) 86%, #fff 14%) 0%, transparent 62%),
+    linear-gradient(135deg,
+      color-mix(in oklab, var(--brand) 94%, #000 6%) 0%,
+      color-mix(in oklab, var(--brand) 70%, #fff 30%) 100%) !important;
+}
+
+.netting-hero--lacrosse,
+.nh-lacrosse {
+  background:
+    radial-gradient(circle at 78% 22%, color-mix(in oklab, var(--brand) 80%, #fff 20%) 0%, transparent 62%),
+    linear-gradient(135deg,
+      color-mix(in oklab, var(--brand) 90%, #000 10%) 0%,
+      color-mix(in oklab, var(--brand) 70%, #fff 30%) 100%) !important;
+}
+
+.netting-hero--soccer,
+.nh-soccer {
+  background:
+    radial-gradient(circle at 78% 22%, color-mix(in oklab, var(--brand) 84%, #fff 16%) 0%, transparent 62%),
+    linear-gradient(135deg,
+      color-mix(in oklab, var(--brand) 94%, #000 6%) 0%,
+      color-mix(in oklab, var(--brand) 76%, #fff 24%) 100%) !important;
+}
+
+.nh-commercial-netting {
+  background:
+    radial-gradient(circle at 78% 22%, color-mix(in oklab, var(--brand) 92%, #fff 8%) 0%, transparent 62%),
+    linear-gradient(135deg,
+      color-mix(in oklab, var(--brand) 98%, #000 2%) 0%,
+      color-mix(in oklab, var(--brand) 74%, #fff 26%) 100%) !important;
+}
+
+/* Training facility hero: align with brand (remove teal/blue) */
+.net-hero.nh-training-facility {
+  background: linear-gradient(135deg,
+    color-mix(in oklab, var(--brand) 96%, #000 4%),
+    color-mix(in oklab, var(--brand) 76%, #000 24%)) !important;
+  color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem;
 }
 
 /* Contact hero spacing (align with netting hero horizontal rhythm) */
@@ -138,6 +412,56 @@ body, .container, .footer-grid, .about-inner, .category-tiles .tiles, .grid, .ba
   padding-left:clamp(.85rem,2.5vw,1.75rem) !important;
   padding-right:clamp(.85rem,2.5vw,1.75rem) !important;
 }
+
+/* Contact page layout and form aesthetics */
+.contact-grid { 
+  display:grid; 
+  gap:1.25rem; 
+  grid-template-columns: 1.2fr .8fr; 
+  align-items:start; 
+}
+@media (max-width: 860px){
+  .contact-grid { grid-template-columns: 1fr; }
+}
+
+.contact-form.card { 
+  padding:1.25rem; 
+  border-radius:.9rem; 
+  background:#fff; 
+  box-shadow:0 4px 24px rgba(12,32,64,.08);
+  display:grid; 
+  gap:.9rem; 
+}
+.contact-form label { display:grid; gap:.4rem; }
+.contact-form label > span { font-size:.85rem; color:var(--muted); }
+.contact-form input,
+.contact-form textarea {
+  padding:.85rem 1rem; 
+  border:1px solid var(--border); 
+  border-radius:.7rem; 
+  background:#fff; 
+  color:var(--ink); 
+}
+.contact-form textarea { min-height:140px; resize:vertical; }
+.contact-form input:focus,
+.contact-form textarea:focus { outline:none; box-shadow:var(--ring); border-color:var(--brand); }
+.contact-form input:invalid,
+.contact-form textarea:invalid { border-color: color-mix(in oklab, var(--red) 65%, #fff 35%); }
+.contact-form .row { display:flex; gap:.65rem; align-items:center; flex-wrap:wrap; }
+.contact-form .form-msg { font-size:.9rem; color:var(--muted); }
+.contact-form .form-msg.is-success { color:#15803d; }
+.contact-form .form-msg.is-error { color:#b91c1c; }
+
+.contact-side.card { 
+  padding:1.25rem; 
+  border-radius:.9rem; 
+  background:#fff; 
+  box-shadow:0 4px 24px rgba(12,32,64,.08);
+}
+.contact-side h3 { margin-top:.25rem; }
+.contact-side .checks { list-style:none; padding:0; margin:.5rem 0 0; display:grid; gap:.35rem; }
+.contact-side .checks li { position:relative; padding-left:1.4rem; }
+.contact-side .checks li::before { content:"✔"; position:absolute; left:0; top:0; color:#15803d; font-weight:700; }
 
 /* Global bottom expert CTA (injected on non-contact pages) */
 .expert-cta { 
@@ -223,7 +547,7 @@ body, .container, .footer-grid, .about-inner, .category-tiles .tiles, .grid, .ba
   .expert-cta { padding:2.35rem 1.05rem; margin:2.85rem auto 2.35rem; }
   .expert-cta h2 { font-size:1.9rem; }
   .expert-cta p { font-size:.9rem; }
-  .expert-cta .cta-btn { width:100%; justify-content:center; }
+  .expert-cta .cta-btn { justify-content:center; }
 }
 
 
@@ -280,17 +604,20 @@ body{
 .stack-03{ display:grid; gap:.3rem; }
 .row-between{ display:flex; justify-content:space-between; }
 .hidden{ display:none !important; }
+/* Generic row utility for inline controls */
+.row{ display:flex; gap:.6rem; align-items:center; flex-wrap:wrap; }
 /* Auth form layout */
 .auth-container{ max-width: 480px; margin: 2rem auto; background:#fff; border-radius:1.2rem; box-shadow:0 4px 24px rgba(12,32,64,.10); padding: 1.5rem; }
 .auth-form{ display:grid; grid-auto-rows:min-content; gap:.9rem; }
-.auth-form input{ width:100%; padding:.85rem 1rem; border:1px solid var(--border); border-radius:.7rem; }
+.auth-form input{ padding:.85rem 1rem; border:1px solid var(--border); border-radius:.7rem; width:100%; max-width:100%; box-sizing:border-box; }
 .auth-form .auth-field{ position:relative; display:block; }
-.auth-form .auth-field input[type="password"]{ padding-right:4.5rem; }
+.auth-form .auth-field input[type="password"],
+.auth-form .auth-field input.has-peek{ padding-right:2.4rem; }
 .auth-form .auth-peek{
   position:absolute;
   right:.5rem;
   top:50%;
-  transform: translateY(-52%);
+  transform: translateY(-50%);
   display:flex;
   align-items:center;
   gap:.35rem;
@@ -301,9 +628,28 @@ body{
   border-radius:.4rem;
   cursor:pointer;
 }
+
+/* Eye button variant for show/hide */
+.auth-peek-btn{
+  position:absolute;
+  right:.5rem;
+  top:50%;
+  transform:translateY(-50%);
+  width:32px; height:32px;
+  display:inline-grid; place-items:center;
+  border:none; background:transparent; color:#6b7280; /* gray-500 */
+  cursor:pointer; padding:0; border-radius:.4rem;
+}
+.auth-peek-btn:hover, .auth-peek-btn:focus-visible{ color:#374151; outline:none; box-shadow:var(--ring); }
+.auth-peek-btn .eye-closed{ display:none; }
+.auth-peek-btn[aria-pressed="true"] .eye-open{ display:none; }
+.auth-peek-btn[aria-pressed="true"] .eye-closed{ display:block; }
 .auth-form .auth-peek input{ width:auto; margin:0; vertical-align:middle; position:relative; top:-1px; }
 .auth-form .auth-peek .peek-label{ font-size:.8rem; opacity:.75; line-height:1; }
-.auth-form .grid-2{ display:grid; grid-template-columns:1fr 1fr; gap:.6rem; }
+.auth-form .grid-2{ display:grid; grid-template-columns:1fr; gap:.6rem; }
+@media(min-width:520px){
+  .auth-form .grid-2{ grid-template-columns:1fr 1fr; }
+}
 .auth-form .btn{ height: 44px; }
 img{max-width:100%;display:block}
 .container{max-width:1200px;width:100%;margin-inline:auto;padding-inline:clamp(.9rem,4vw,2rem)}
@@ -315,6 +661,8 @@ img{max-width:100%;display:block}
 /* Header */
 .site-header{position:sticky;top:0;z-index:30;background:#000000;color:#fff;border-bottom:1px solid rgba(255,255,255,.08);padding-top:25px}
 .header-bar{display:flex;align-items:center;gap:1rem;min-height:51px;flex-wrap:wrap}
+/* Header layout: brand left, nav center, actions right */
+.site-header .header-bar{justify-content:space-between}
 .brand{display:flex;align-items:center;gap:.6rem;color:#fff;text-decoration:none;font-weight:900;letter-spacing:.3px}
 .brand img{filter:drop-shadow(0 4px 12px rgba(0,0,0,.25));border-radius:0.75rem;background:#ffffff;}
 
@@ -332,7 +680,7 @@ img[src*="/logo.svg"]{
 .search{display:flex;gap:.5rem;flex:1;justify-content:center}
 .search{position:relative;gap:0}
 /* Search input with embedded icon via background SVG */
-.search input{width:min(680px,100%);border-radius:.75rem;border:1px solid var(--border);background:#fff;color:var(--ink);padding:.72rem 1rem .72rem 2.5rem;line-height:1.2;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' stroke='%2388989c' stroke-width='2' fill='none' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='8' cy='8' r='6'/%3E%3Cline x1='13' y1='13' x2='17' y2='17'/%3E%3C/svg%3E");background-repeat:no-repeat;background-size:18px 18px;background-position:12px 50%;}
+.search input{width:auto;min-width:16ch;max-width:100%;border-radius:.75rem;border:1px solid var(--border);background:#fff;color:var(--ink);padding:.72rem 1rem .72rem 2.5rem;line-height:1.2;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' stroke='%2388989c' stroke-width='2' fill='none' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='8' cy='8' r='6'/%3E%3Cline x1='13' y1='13' x2='17' y2='17'/%3E%3C/svg%3E");background-repeat:no-repeat;background-size:18px 18px;background-position:12px 50%;}
 /* Remove legacy absolute button icon usage */
 .search .btn{display:none !important}
 /* Focus state: darken icon by swapping filter */
@@ -344,18 +692,32 @@ img[src*="/logo.svg"]{
   .site-header .search input{padding:.7rem 1rem .7rem 2.45rem;background-position:12px 50%;}
 }
 .search input:focus{outline:none;box-shadow:var(--ring);border-color:var(--brand)}
-.quick-links{display:flex;align-items:center;justify-content:center;gap:1rem;order:2;flex:1 0 100%;margin-top:.4rem;visibility:hidden}
+.quick-links{display:flex;align-items:center;justify-content:center;gap:1rem;order:2;flex:1 1 auto;margin-top:.4rem;visibility:hidden}
 .site-header .header-bar{visibility:hidden}
 .nav-ready .quick-links{visibility:visible}
 .nav-ready .site-header .header-bar{visibility:visible}
 .quick-links a{color:#d3d0d7;text-decoration:none;opacity:.95}
 .quick-links .auth-link{color:#d3d0d7;text-decoration:none;opacity:.95;background:none;border:none;cursor:pointer;font:inherit;}
+
+/* Primary nav submenu (L-Screens) */
+.quick-links .has-submenu{position:relative}
+.quick-links .has-submenu > a::after{content:"▾";margin-left:.35rem;font-size:.85em}
+.quick-links .nav-submenu{position:absolute;top:calc(100% + .4rem);left:0;background:#0b0b0b;border:1px solid var(--border);border-radius:.6rem;box-shadow:0 8px 24px rgba(0,0,0,.32);display:none;min-width:220px;padding:.4rem;z-index:80;opacity:0;transform:translateY(-4px);transition:opacity .15s ease, transform .15s ease}
+/* For L-Screens: open the dropdown to the left by aligning submenu to the right edge */
+.quick-links .has-submenu.submenu-left > .nav-submenu{left:auto;right:0}
+.quick-links .has-submenu.open > .nav-submenu{display:block;opacity:1;transform:none}
+/* Keep submenu open when any child has focus (keyboard users) */
+.quick-links .has-submenu:focus-within > .nav-submenu{display:block}
+.quick-links .nav-submenu a{display:block;padding:.5rem .6rem;border-radius:.4rem;background:transparent;color:#d3d0d7}
+.quick-links .nav-submenu a:hover{background:#121212;color:#fff}
 .user-menu{display:flex;align-items:center;gap:.8rem;font-size:.9rem;position:relative}
 .user-menu span{color:#d3d0d7;opacity:.8;}
-.profile-btn{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:999px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.12);cursor:pointer}
-.profile-btn:hover{filter:brightness(1.05)}
-.avatar{display:inline-grid;place-items:center;width:28px;height:28px;border-radius:999px;background:#ffffff;color:var(--brand);font-weight:900}
-.user-dropdown{position:absolute;right:0;left:auto;transform:none;top:calc(100% + .5rem);background:#fff;color:#0b2a4a;border:1px solid var(--border);border-radius:.6rem;box-shadow:0 8px 24px rgba(12,32,64,.18);min-width:200px;padding:.35rem;display:none;z-index:50}
+.profile-btn{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:999px;border:2px solid #d4af37; /* gold border */ background:#4b2b82; /* purple */ cursor:pointer;transition:background .18s ease, filter .18s ease, border-color .18s ease}
+.profile-btn:hover,.profile-btn:focus-visible{background:#5b3699;filter:brightness(1.05);outline:none}
+.profile-btn:active{background:#ffffff;border-color:#b89125}
+.profile-btn:active .avatar{background:#ffffff}
+.avatar{display:inline-grid;place-items:center;width:32px;height:32px;border-radius:999px;background:transparent;color:#000 !important;font-weight:900;font-size:.9rem;letter-spacing:.4px;line-height:1;white-space:nowrap;}
+.user-dropdown{position:absolute;right:0;left:auto;transform:none;top:calc(100% + .5rem);background:#fff;color:#0b2a4a;border:1px solid var(--border);border-radius:.6rem;box-shadow:0 8px 24px rgba(12,32,64,.18);min-width:200px;padding:.35rem;display:none;z-index:200}
 .user-dropdown.open{display:block}
 .user-dropdown a,.user-dropdown button{display:block;width:100%;text-align:left;padding:.5rem .6rem;border:none;background:none;color:#0b2a4a;text-decoration:none;cursor:pointer;border-radius:.4rem}
 .user-dropdown a:hover,.user-dropdown button:hover{background:#f5f8ff}
@@ -380,6 +742,10 @@ img[src*="/logo.svg"]{
 
 /* Top-row actions container */
 .header-actions{margin-left:auto;display:flex;align-items:center;gap:.75rem}
+/* Slight left margin to keep cart from touching user menu */
+.site-header .cart-btn{margin-left:.5rem}
+/* Hide empty header-actions to avoid pushing layout */
+.header-actions:empty{display:none}
 /* Header break element to create second row in mid-range widths */
 .header-break{flex-basis:100%;height:0;display:none}
 /* Large / default single-row ordering: brand, search, login, cart, menu toggle */
@@ -395,41 +761,38 @@ img[src*="/logo.svg"]{
    Row2: menu toggle, search (full width)
 */
 @media (max-width:640px){
-  .header-break{display:block}
-  .site-header .header-bar{align-items:flex-start}
-  /* Row 1 */
-  .site-header .brand{order:1}
-  .site-header .header-actions{order:2;margin-left:auto}
-  .site-header .cart-btn{order:3;margin-left:.55rem}
-  /* Row 2: search and menu toggle share row; search shrinks before wrapping */
-  .site-header .search{order:4;flex:1 1 auto;min-width:150px;max-width:calc(100% - 118px);margin-top:.35rem}
-  .site-header .search input{width:100%;padding:.6rem .65rem .6rem 2.55rem;font-size:.87rem}
-  .site-header .menu-toggle{order:5;margin-left:.5rem;align-self:stretch}
-  /* Avoid full-width forcing toggle to next line on ultra narrow */
+  /* Mobile header: Row 1 brand centered; Row 2: search 60%, actions 20%, menu toggle 20% */
+  .site-header .header-bar{display:grid;grid-template-rows:auto auto;row-gap:.4rem;align-items:center;justify-items:stretch;grid-template-columns:100%;column-gap:.25rem;padding:0 .55rem .5rem}
+  .site-header .brand{grid-column:1 / -1;grid-row:1;justify-self:center;margin-inline:auto;margin-bottom:.4rem}
+  /* Second row defined with fractional distribution including gap fallback */
+  /* Adaptive columns: search grows, actions/menu size to content */
+  .site-header .header-bar{grid-template-columns:minmax(0,1fr) auto auto}
+  .site-header .search{grid-row:2;grid-column:1;order:unset;width:100%;min-width:0;margin:0;display:flex}
+  .site-header .search input{width:100%;min-width:0;padding:.6rem .65rem .6rem 2.4rem;font-size:.85rem}
+  .site-header .header-actions{grid-row:2;grid-column:2;order:unset;display:flex;justify-content:center;align-items:center;width:100%;margin:0;gap:.25rem}
+  .site-header .menu-toggle{grid-row:2;grid-column:3;order:unset;margin:0;justify-self:center;align-self:center;display:inline-flex;min-width:0}
+  .site-header .cart-btn{margin-left:.25rem}
+  .header-break{display:none}
+  /* Ensure inner elements shrink properly */
+  .site-header .header-actions .user-menu, .site-header .header-actions .auth-link, .site-header .header-actions .cart-btn{flex:0 1 auto}
+  /* Tighten extremely small widths */
   @media (max-width:480px){
-  .site-header .search{min-width:130px;max-width:calc(100% - 115px)}
+    .site-header .search input{font-size:.8rem;padding:.55rem .55rem .55rem 2.3rem}
   }
   @media (max-width:400px){
-  .site-header .search{min-width:115px;max-width:calc(100% - 110px)}
-  .site-header .search input{padding:.55rem .55rem .55rem 2.35rem;font-size:.8rem}
+    .site-header .search input{font-size:.78rem;padding:.5rem .5rem .5rem 2.15rem}
     .site-header .menu-toggle{padding:.5rem .55rem}
-    /* Icon-only search button */
-  /* Small variant inherits embedded style; tighten sizes */
-  .site-header .search .btn{width:38px;height:38px;left:.5rem}
-  .site-header .search input{padding:.6rem .6rem .6rem 2.4rem}
   }
   @media (max-width:360px){
-  .site-header .search{min-width:105px;max-width:calc(100% - 104px)}
-  .site-header .search input{padding:.5rem .5rem .5rem 2.2rem;font-size:.76rem}
-  .site-header .menu-toggle{font-size:.85rem}
-  .site-header .menu-toggle span{display:none}
-  .site-header .menu-toggle{padding:.55rem;width:42px;height:42px;display:inline-flex;align-items:center;justify-content:center}
+    .site-header .search input{font-size:.75rem;padding:.48rem .5rem .48rem 2.05rem}
+    .site-header .menu-toggle{font-size:.8rem;width:40px;height:40px;padding:.5rem}
+    .site-header .menu-toggle span{display:none}
   }
 }
 /* Mid sizes retain single-row default (allow existing nav collapse) */
 @media (min-width:641px) and (max-width:1200px){
   .site-header .menu-toggle{margin-right:.75rem}
-  .site-header .search input{width:100%}
+  .site-header .search input{width:auto;min-width:16ch;max-width:100%}
 }
 /* Multi-column nav when expanded still for mid sizes */
 @media (min-width:680px) and (max-width:1200px){
@@ -449,12 +812,79 @@ img[src*="/logo.svg"]{
   .quick-links{flex-basis:100%;order:4;display:none;flex-direction:column;align-items:flex-start;background:#000000;padding:.6rem .6rem 1rem;border-radius:.85rem;margin-top:.55rem;box-shadow:0 4px 18px rgba(0,0,0,.25)}
   .quick-links a{padding:.55rem .75rem;border-radius:.55rem;width:100%;}
   .quick-links.is-open{display:flex}
+  /* Submenu stacks under its trigger on mobile */
+  .quick-links .has-submenu{width:100%}
+  .quick-links .nav-submenu{position:static;display:none;width:100%;margin-top:.25rem;padding:.25rem;border:none;border-radius:.5rem;background:#0a0a0a;box-shadow:none}
+  .quick-links .has-submenu.open > .nav-submenu{display:block}
+  .quick-links .nav-submenu a{width:100%}
+
+  /* For L‑Screens specifically: when mobile menu is open, show its submenu as a flyout to the left of the menu panel */
+  .site-header .header-bar .quick-links .has-submenu.submenu-left > .nav-submenu{
+    position:absolute;
+    top:0;
+    right:calc(100% + .5rem);
+    left:auto;
+    width:min(320px,80vw);
+    max-height:calc(100dvh - 120px);
+    overflow:auto;
+    padding:.4rem;
+    background:#0b0b0b;
+    border:1px solid var(--border);
+    border-radius:.6rem;
+    box-shadow:0 8px 24px rgba(0,0,0,.32);
+    z-index:100;
+  }
   body.nav-open{overflow:hidden}
   /* Convert collapsed nav into an overlay dropdown that does NOT push header content */
   .site-header .header-bar{position:relative}
-  .site-header .header-bar .quick-links{position:absolute;top:100%;right:0;left:auto;flex-basis:auto;order:unset;width:min(420px,calc(100% - .75rem));max-height:calc(100dvh - 110px);overflow:auto;margin-top:.55rem;z-index:70}
+  .site-header .header-bar .quick-links{position:absolute;top:100%;right:0;left:auto;flex-basis:auto;order:unset;width:min(420px,calc(100% - .75rem));max-height:calc(100dvh - 110px);overflow-y:auto;overflow-x:visible;margin-top:.55rem;z-index:70}
   /* Re‑assert display when open (specificity bump because of absolute override) */
   .site-header .header-bar .quick-links.is-open{display:flex}
+  /* Hide the flyout unless the parent submenu is open */
+  .site-header .header-bar .quick-links .has-submenu.submenu-left > .nav-submenu{display:none}
+  .site-header .header-bar .quick-links .has-submenu.submenu-left.open > .nav-submenu{display:block;opacity:1;transform:none}
+}
+
+/* Small safeguards to avoid clipping on ultra-narrow widths */
+@media (max-width:480px){
+  .site-header .header-bar .quick-links{width:min(92vw, 420px)}
+  .site-header .header-bar .quick-links .has-submenu.submenu-left > .nav-submenu{
+    right:calc(100% + .35rem);
+    width:min(75vw, 320px);
+  }
+}
+
+/* Small phones/tablets: make the menu panel full-width and left-aligned for consistency */
+@media (max-width:640px){
+  .site-header .header-bar .quick-links{left:0; right:0; width:100%;}
+  /* When nav has the nav-centered utility, keep items left-aligned in mobile stacked panel */
+  .site-header .header-bar .quick-links.nav-centered{justify-content:flex-start !important}
+  /* Submenu stacks inline to avoid off-screen clipping on narrow devices */
+  .site-header .header-bar .quick-links .has-submenu.submenu-left > .nav-submenu{
+    position:static;
+    right:auto; left:auto; top:auto;
+    width:100%; max-height:none; overflow:visible;
+    padding:.25rem; margin-top:.25rem;
+    background:#0a0a0a; border:none; border-radius:.5rem; box-shadow:none;
+  }
+}
+
+/* When viewport is relatively narrow, anchor the flyout to the left edge so it stays fully visible */
+@media (max-width:768px){
+  .site-header .header-bar .quick-links .has-submenu.submenu-left.open > .nav-submenu{
+    left:8px; right:auto; width:min(90vw, 360px);
+  }
+}
+
+/* Extra-small fallback: stack submenu inline instead of flyout to avoid off-screen clipping */
+@media (max-width:420px){
+  .site-header .header-bar .quick-links .has-submenu.submenu-left > .nav-submenu{
+    position:static;
+    right:auto; left:auto; top:auto;
+    width:100%; max-height:none; overflow:visible;
+    padding:.25rem; margin-top:.25rem;
+    background:#0a0a0a; border:none; border-radius:.5rem; box-shadow:none;
+  }
 }
 /* Safeguard: if JS or old CSS attempts to force desktop, override below 1200px */
 @media (max-width:1200px){
@@ -473,22 +903,28 @@ img[src*="/logo.svg"]{
   .site-header .search input{padding:.7rem 1rem .7rem 2.45rem;line-height:1.25;font-size:.95rem}
 }
 
-/* Buttons */
-.btn{display:inline-flex;align-items:center;justify-content:center;padding:.8rem 1.1rem;border-radius:.9rem;font-weight:800;letter-spacing:.3px;border:1px solid var(--brand);text-decoration:none;cursor:pointer;transition:.18s ease-in-out;text-transform:uppercase;background:var(--brand);color:#fff}
+/* Buttons (gold primary theme) */
+.btn{display:inline-flex;align-items:center;justify-content:center;padding:.8rem 1.1rem;border-radius:.9rem;font-weight:800;letter-spacing:.3px;border:1px solid var(--gold);text-decoration:none;cursor:pointer;transition:.18s ease-in-out;text-transform:uppercase;background:var(--gold);color:#fff}
 .btn-quote{background:#000000;border-color:#000000;color:#fff}
 .btn-quote:hover{filter:brightness(1.12)}
 .btn.btn-dark{background:#000000;border-color:#000000;color:#fff}
 .btn.btn-dark:hover{filter:brightness(1.15)}
-.btn:hover{filter:brightness(1.05)}
-.btn-primary{background:var(--brand);border-color:var(--brand);color:#fff}
-.btn-ghost{background:var(--brand);border-color:var(--brand);color:#fff}
-.btn-ghost:hover{filter:brightness(1.05)}
-.btn-invert{background:var(--brand);border-color:var(--brand);color:#fff}
-.btn-block{width:100%}
-.btn-pill{border-radius:2rem;background:var(--brand);border:2px solid var(--brand);color:#fff;padding:.7rem 1.1rem;font-weight:900}
-/* Standardized black Request Quote button */
+.btn-primary{background:var(--gold);border-color:var(--gold);color:#fff}
+.btn-ghost{background:var(--gold);border-color:var(--gold);color:#fff}
+.btn-invert{background:var(--gold);border-color:var(--gold);color:#fff}
+.btn-pill{border-radius:2rem;background:var(--gold);border:2px solid var(--gold);color:#fff;padding:.7rem 1.1rem;font-weight:900}
+.btn:hover,.btn-primary:hover,.btn-ghost:hover,.btn-invert:hover,.btn-pill:hover{background:var(--gold-hover);border-color:var(--gold-hover);filter:none}
+.btn:active,.btn-primary:active,.btn-ghost:active,.btn-invert:active,.btn-pill:active{background:var(--gold-active);border-color:var(--gold-active);}
+.btn:focus-visible{outline:none;box-shadow:0 0 0 3px color-mix(in oklab, var(--gold) 65%, #fff 25%)}
+/* Preserve specialized quote button styling */
 .btn-quote{background:#000000 !important;color:#ffffff !important;border:1px solid #000000 !important;box-shadow:0 2px 6px rgba(0,0,0,.4);}
 .btn-quote:hover,.btn-quote:focus-visible{filter:brightness(1.15);outline:none;}
+.btn-block{width:100%}
+
+/* Fit-to-content defaults for form controls */
+input, select, textarea, button { width:auto; max-width:100%; }
+/* Keep intentional full-width helpers intact */
+.btn-block { width:100%; }
 
 /* Hero */
 .hero{position:relative;padding:clamp(25px,2vw,25px) 0 12px;background:#ffffff}
@@ -504,10 +940,10 @@ img[src*="/logo.svg"]{
 .category-tiles .tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem}
 .category-tiles .tiles{justify-items:center}
 .tile{position:relative;border-radius:1.1rem;overflow:hidden;text-decoration:none;color:var(--ink);background:var(--surface);border:1px solid var(--border);padding:.85rem .9rem .95rem;display:flex;flex-direction:column;gap:.5rem}
-.tile .tile-head h3{margin:.1rem 0 0;font-size:clamp(1.05rem,2.6vw,1.45rem);letter-spacing:.6px;text-transform:uppercase;color:var(--ink);text-align:center;line-height:1.05}
+.tile .tile-head h3{margin:.1rem 0 0;font-size:clamp(1rem,2.4vw,1.35rem);letter-spacing:.55px;text-transform:uppercase;color:var(--ink);text-align:center;line-height:1.15;word-break:break-word;overflow-wrap:anywhere}
 .tile .tile-head p{margin:0;color:var(--muted);text-align:center;font-weight:700;letter-spacing:.45px;text-transform:uppercase;font-size:clamp(.55rem,1.7vw,.65rem)}
 .tile .media{position:relative}
-.tile img{aspect-ratio:2/1;/* wider => shorter */object-fit:cover;border-radius:.75rem;box-shadow:0 8px 22px rgba(10,42,74,.10);max-height:clamp(140px,20vh,200px)}
+.tile img{aspect-ratio:2/1;/* wider => shorter */object-fit:contain;border-radius:.75rem;box-shadow:0 8px 22px rgba(10,42,74,.10);max-height:clamp(150px,22vh,220px);background:#fff;padding:.35rem}
 .tile .tile-cta{position:absolute;left:50%;bottom:10px;transform:translateX(-50%);max-width:90%;}
 .tile .tile-cta .btn.btn-pill{white-space:nowrap;padding:.7rem 1.55rem;font-size:.72rem;letter-spacing:.6px;}
 @media (max-width:600px){
@@ -558,7 +994,7 @@ img[src*="/logo.svg"]{
 }
 
 /* About image height constraint */
-.about-inner img{max-height:520px;object-fit:cover;width:100%}
+.about-inner img{max-height:520px;object-fit:contain;width:100%;background:#fff;padding:.4rem;border-radius:.75rem}
 
 @media (max-width: 800px){
   .about-inner img{max-height:380px}
@@ -657,18 +1093,39 @@ img[src*="/logo.svg"]{
 .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-top:1rem}
 .card{background:var(--surface);border:1px solid var(--border);border-radius:1rem;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 8px 24px rgba(12,32,64,.06)}
 .card .media{background:#ffffff}
-.card .media img{width:100%;height:auto;aspect-ratio:4/3;object-fit:cover;display:block}
+.card .media{position:relative;display:flex;align-items:center;justify-content:center;height:clamp(150px,18vh,210px);}
+.card .media.no-link{height:clamp(150px,18vh,210px);} /* ensure the rope group card matches standard card media height */
+.card .media img{width:100%;height:100%;aspect-ratio:4/3;object-fit:contain;display:block;padding:.4rem;background:#fff;border-radius:.6rem}
 .card .body{padding:.9rem;display:flex;flex-direction:column;flex:1}
 .price-row{display:flex;justify-content:space-between;align-items:center;margin-top:auto;padding-top:.4rem}
 .price-row{gap:.5rem;flex-wrap:wrap}
 .price-row .btn{white-space:nowrap}
+.price-row.right{justify-content:flex-end}
 .price{font-weight:800;letter-spacing:.2px}
 .was-price{opacity:.7;text-decoration:line-through}
 .badge{background:var(--red);color:#fff;border-radius:.4rem;padding:.15rem .35rem;font-size:.72rem;font-weight:800}
 .wide{grid-column:span 2}
 
+/* L-Screens sub nav card tweaks: left-align price under title; color dots and Add on one row */
+/* Keep price block consistent but left-align specifically for L-Screens pages */
+.card .body .price-centered{ text-align:center; font-weight:800; margin:.15rem 0 .35rem; }
+body.lscreens-subnav .card .body .price-centered{ text-align:left; }
+/* Ensure variant row spaces color dots and Add button */
+body.lscreens-subnav .card .body .variant-row{ display:flex; align-items:center; justify-content:space-between; gap:.5rem; margin-top:.15rem; }
+body.lscreens-subnav .card .body .actions-row{ display:flex; justify-content:flex-end; margin-top:auto; }
+body.lscreens-subnav .card .body .actions-row.right{ justify-content:flex-end; }
+
 /* About */
-.about-inner{display:grid;grid-template-columns:1.1fr .9fr;gap:1.2rem;align-items:center;margin-top:1rem}
+.about-inner{display:grid;grid-template-columns:1.05fr .95fr;gap:1.4rem;align-items:center;margin-top:1rem}
+.about-inner > div { display:flex; flex-direction:column; justify-content:center; align-self:center; max-width:620px; }
+.about-inner > div h1 { line-height:1.05; }
+.about-inner > div p.muted { margin:0 0 .9rem; font-size:clamp(.95rem,1.05rem + .2vw,1.15rem); line-height:1.35; }
+@media (min-width:1200px){
+  .about-inner{grid-template-columns:1fr 1fr;}
+}
+@media (max-width:860px){
+  .about-inner > div { max-width:100%; }
+}
 .about .checks{list-style:none;padding:0;margin:1rem 0 0;display:grid;gap:.4rem}
 .about .checks li{position:relative;padding-left:1.5rem}
 .about .checks li::before{content:"✔";position:absolute;left:0;top:0;color:#69e480}
@@ -692,7 +1149,13 @@ img[src*="/logo.svg"]{
 .socials img { height: 20px; width: 20px; display: block; object-fit: contain; }
 .brand--light{opacity:1}
 .subscribe .row{display:flex;gap:.5rem}
-.subscribe input{flex:1;padding:.65rem .8rem;border-radius:.6rem;border:1px solid var(--border);background:#fff;color:var(--ink)}
+.subscribe input{flex:0 1 auto;width:auto;min-width:16ch;max-width:100%;padding:.65rem .8rem;border-radius:.6rem;border:1px solid var(--border);background:#fff;color:var(--ink)}
+.site-footer a[href="careers.html"],
+.site-footer li a[href="careers.html"],
+nav.quick-links a[href="careers.html"],
+nav.quick-links li a[href="careers.html"]{
+  display:none !important;
+}
 
 /* Expert help footer form */
 /* Ensure all footer columns align to the top */
@@ -762,7 +1225,17 @@ img[src*="/logo.svg"]{
   .quick-links a{padding:.25rem .5rem;background:#000000;border-radius:.5rem}
   .btn{padding:.65rem .85rem;font-size:.78rem}
   .tile img{max-height:120px}
-  .footer-grid{grid-template-columns:1fr}
+  /* Footer: keep Brand top, show Shop + Company side-by-side, then Subscribe full width */
+  .footer-grid{grid-template-columns:1fr 1fr;grid-template-areas:
+    "brand brand"
+    "shop company"
+    "subscribe subscribe";}
+  .footer-grid > .footer-brand-block{grid-area:brand}
+  .footer-grid > nav:nth-of-type(1){grid-area:shop}
+  .footer-grid > nav:nth-of-type(2){grid-area:company}
+  .footer-grid > .subscribe{grid-area:subscribe}
+  .footer-grid > nav{align-items:flex-start}
+  .footer-grid > nav h4, .footer-grid > nav li, .footer-grid > nav a{text-align:left}
   .subfooter{flex-direction:column;gap:.5rem;text-align:center}
   .about-inner{gap:.9rem}
   .mini-cart__panel{width:min(100%,100vw)}
@@ -845,7 +1318,7 @@ img[src*="/logo.svg"]{
 .turf-grid{display:grid;gap:1.1rem;margin:1.75rem 0 2.5rem;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
 .turf-card{background:#fff;border:1px solid var(--border);border-radius:1rem;padding:1rem;box-shadow:0 4px 18px rgba(12,32,64,.06);display:flex;flex-direction:column;gap:.55rem;position:relative}
 .turf-card h3{margin:.2rem 0 .3rem;font-size:1rem;text-transform:uppercase;letter-spacing:.5px;font-weight:900}
-.turf-media img{display:block;width:100%;height:auto;border-radius:.75rem;box-shadow:0 6px 18px rgba(12,32,64,.15);object-fit:cover}
+.turf-media img{display:block;width:100%;height:auto;border-radius:.75rem;box-shadow:0 6px 18px rgba(12,32,64,.15);object-fit:contain;background:#fff;padding:.4rem}
 .badge-turf{position:absolute;top:.65rem;right:.65rem;background:var(--brand);color:#fff;font-size:.6rem;font-weight:800;padding:.3rem .5rem;border-radius:.45rem;letter-spacing:.5px}
 .inventory-callouts{display:grid;gap:1rem;margin:2.5rem 0 3rem;grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
 .inventory-box{background:#ffffff;border:2px dashed var(--border);border-radius:1rem;padding:1.1rem;display:flex;flex-direction:column;gap:.65rem;align-items:flex-start;box-shadow:0 2px 10px rgba(0,0,0,.04)}
@@ -875,13 +1348,28 @@ img[src*="/logo.svg"]{
 /* Ensures all hero variants have consistent     */
 /* left/right breathing room across pages        */
 /* --------------------------------------------- */
-.netting-hero, .net-hero, .contact-hero, .turf-hero { padding-inline:clamp(.9rem,4vw,2rem) !important; }
+.netting-hero, .net-hero, .contact-hero, .turf-hero, .hero { padding-inline:clamp(.9rem,4vw,2rem) !important; }
+/* Ensure consistent vertical breathing room for all hero containers */
+.netting-hero, .net-hero, .contact-hero, .turf-hero, .hero { padding-block:clamp(1.8rem,5vw,3.2rem) !important; }
 /* Sport-specific netting hero variants */
 .netting-hero--baseball { background: linear-gradient(135deg,#111 0%,var(--brand) 100%) !important; color:#fff; border-radius:1.1rem; }
-.netting-hero--golf { background: linear-gradient(135deg,#061b2f 0%,var(--brand) 100%) !important; color:#fff; border-radius:1.1rem; }
-.netting-hero--lacrosse { background: linear-gradient(135deg,#102b1f 0%,var(--brand) 100%) !important; color:#fff; border-radius:1.1rem; }
-.netting-hero--soccer { background: linear-gradient(135deg,#091b33 0%,var(--brand) 100%) !important; color:#fff; border-radius:1.1rem; }
+.netting-hero--golf { background: linear-gradient(135deg, color-mix(in oklab, var(--brand) 92%, #000 8%) 0%, color-mix(in oklab, var(--brand) 70%, #fff 30%) 100%) !important; color:#fff; border-radius:1.1rem; }
+.netting-hero--lacrosse { background: linear-gradient(135deg,#000 0%,var(--brand) 100%) !important; color:#fff; border-radius:1.1rem; }
+.netting-hero--soccer { background: linear-gradient(135deg,#000 0%,var(--brand) 100%) !important; color:#fff; border-radius:1.1rem; }
 .netting-hero h1 { margin:0 0 .4rem; font-size:clamp(1.7rem,4.2vw,2.8rem); text-transform:uppercase; letter-spacing:.6px; font-weight:900 }
+
+/* L-Screens hero specific: center CTA buttons and let them size to content */
+.netting-hero .hero-ctas { display:flex; justify-content:center; flex-wrap:wrap; gap:.6rem; margin-top:.85rem; }
+.netting-hero .hero-ctas .btn { width:auto; }
+
+/* Ensure 4-up layout for Shop by Type tiles on wider screens */
+@media (min-width: 900px){
+  .category-tiles .tiles { grid-template-columns: repeat(4,1fr) !important; gap:1.15rem !important; }
+  .category-tiles .tile { width:100%; max-width:330px; display:flex; flex-direction:column; }
+  .category-tiles .tile .media { height:clamp(160px,17vh,230px); display:flex; align-items:center; justify-content:center; }
+  .category-tiles .tile .media img { aspect-ratio:4/3; object-fit:contain; max-height:100%; width:100%; background:#fff; padding:.35rem; }
+  .category-tiles .tile .tile-head { padding:.75rem .85rem .65rem; }
+}
 
 /* Netting layout helpers */
 .net-cols { display:grid; gap:1.25rem; margin:1.25rem 0 1.75rem; grid-template-columns:1fr; }
@@ -902,6 +1390,10 @@ img[src*="/logo.svg"]{
 .summary > div{display:flex;justify-content:space-between;gap:1rem}
 .summary .total{font-size:1.15rem;font-weight:900}
 .actions{margin-top:.5rem}
+/* Netting calculator: make the Add Configured Net button fit content */
+#add-cart{ width:auto; white-space:nowrap; }
+/* Center the calculator button row only within the calculator card */
+.calc-card .actions{ display:flex; justify-content:center; }
 
 /* Desktop enhancement: only widen beyond 1100px */
 @media (min-width:1101px){
@@ -990,7 +1482,7 @@ img[src*="/logo.svg"]{
 .expert-form-wrap{max-width:760px}
 .expert-form-wrap h3{margin:1rem 0 .5rem}
 .expert-form{max-width:660px;margin:0 auto;display:grid;gap:.65rem}
-.expert-form input,.expert-form textarea{width:100%;padding:.75rem .9rem;border-radius:.75rem;border:1px solid var(--border);background:#fff;color:var(--ink)}
+.expert-form input,.expert-form textarea{padding:.75rem .9rem;border-radius:.75rem;border:1px solid var(--border);background:#fff;color:var(--ink)}
 .expert-form input:focus,.expert-form textarea:focus{outline:none;box-shadow:var(--ring);border-color:var(--brand)}
 .expert-form textarea{border-radius:.75rem}
 .expert-form .btn{border-radius:1.2rem;font-weight:900}
@@ -1002,7 +1494,13 @@ img[src*="/logo.svg"]{
 .net-carousel{position:relative;background:#ffffff;border:1px solid var(--border);border-radius:1.25rem;padding:1.25rem 1.1rem 2.4rem;box-shadow:0 8px 28px rgba(12,32,64,.08);overflow:hidden}
 .carousel-track{display:flex;transition:transform .55s cubic-bezier(.6,.15,.3,1);width:100%}
 .carousel-slide{flex:0 0 100%;display:flex;flex-direction:column;align-items:center;gap:.85rem;padding:.25rem .5rem}
-.carousel-slide .slide-media{width:100%;aspect-ratio:16/9;display:grid;place-items:center;border:2px dashed var(--border);border-radius:.9rem;background:#f5f7fa;color:#555;font-weight:900;font-size:clamp(1.1rem,3.2vw,2rem);letter-spacing:.5px;text-transform:uppercase;position:relative;overflow:hidden}
+.carousel-slide .slide-media{width:100%;margin:0;aspect-ratio:16/9;display:grid;place-items:center;border:2px dashed var(--border);border-radius:.9rem;background:#f5f7fa;color:#555;font-weight:900;font-size:clamp(1.1rem,3.2vw,2rem);letter-spacing:.5px;text-transform:uppercase;position:relative;overflow:hidden}
+.carousel-slide .slide-media img{width:100%;height:100%;object-fit:cover;object-position:50% 50%;display:block}
+
+/* Hero Rotator (L-Screens) */
+.hero-rotator{position:relative;width:100%;max-width:100%;aspect-ratio:16/10;border-radius:1rem;overflow:hidden;isolation:isolate;background:#fff}
+.hero-rotator .hr-slide{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;object-position:center center;opacity:0;transition:opacity 1s ease;will-change:opacity;padding:0!important;background:transparent!important;border-radius:0!important}
+.hero-rotator .hr-slide.is-active{opacity:1}
 .carousel-slide .slide-media span{position:relative;z-index:2;padding:.35rem .75rem;border-radius:.5rem;background:rgba(255,255,255,.85);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
 .carousel-slide .slide-title{margin:0;font-size:clamp(.95rem,2.4vw,1.25rem);font-weight:900;text-transform:uppercase;letter-spacing:.5px;text-align:center}
 .carousel-arrow{position:absolute;top:50%;transform:translateY(-50%);background:#000000;color:#fff;border:none;width:42px;height:42px;border-radius:50%;display:grid;place-items:center;font-size:1.75rem;cursor:pointer;font-weight:300;box-shadow:0 4px 18px rgba(0,0,0,.25);transition:.18s}
@@ -1057,34 +1555,114 @@ img[src*="/logo.svg"]{
 /* Variant row used in product cards */
 .variant-row { display:flex; gap:.5rem; align-items:center; margin:.25rem 0; }
 
+/* L-Screens: Title and price on one row; color dots on bottom */
+body.lscreens-subnav .card .body .title-price-row{ display:flex; align-items:baseline; justify-content:space-between; gap:.5rem; }
+body.lscreens-subnav .card .body .title-price-row .price{ font-weight:700; font-size:.95em; white-space:nowrap; }
+body.lscreens-subnav .card .body .color-dots{ margin-top:.4rem; }
+
+/* Product pages: make option dropdown and buttons fit content width */
+#product-detail .pd-info #pd-option-block { justify-items: start; align-items: start; }
+#product-detail .pd-info #pd-select-row { display:flex; gap:.5rem; flex-wrap:wrap; align-items:center; }
+#product-detail .pd-info .pd-option-select,
+#product-detail .pd-info .btn {
+  width: auto;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+#product-detail .pd-info .btn + .btn { margin-top: .5rem; }
+/* When buttons are placed side-by-side in a row, remove vertical spacing */
+#product-detail .pd-info .row .btn + .btn { margin-top: 0; }
+
+/* Modal detail (if used): same sizing */
+.product-detail-dialog .pd-info .stack-05 { justify-items: start; align-items: start; }
+.product-detail-dialog .pd-info #pd-select-row { display:flex; gap:.5rem; flex-wrap:wrap; align-items:center; }
+.product-detail-dialog .pd-info .pd-option-select,
+.product-detail-dialog .pd-info .btn {
+  width: auto;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+.product-detail-dialog .pd-info .btn + .btn { margin-top: .5rem; }
+/* Remove vertical spacing for horizontal button rows in modal */
+.product-detail-dialog .pd-info .row .btn + .btn { margin-top: 0; }
+
+/* Replacement aggregator card */
+.collective-card .pd-info .stack-05 { justify-items: start; align-items: start; }
+.collective-card .pd-info #pd-select-row { display:flex; gap:.5rem; flex-wrap:wrap; align-items:center; }
+.collective-card .pd-info .pd-option-select,
+.collective-card .pd-info .btn {
+  width: auto;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+.collective-card .pd-info .btn + .btn { margin-top: .5rem; }
+/* Remove vertical spacing for horizontal button rows in replacement aggregator */
+.collective-card .pd-info .row .btn + .btn { margin-top: 0; }
+
+/* Product detail page layout (gallery + info) */
+.product-page .product-detail { margin-top: 1rem; }
+.pd-grid { display: grid; grid-template-columns: 1.15fr .85fr; gap: 1rem; align-items: start; }
+.pd-media { min-width: 0; }
+.pd-main { background:#fff; border:1px solid var(--border); border-radius:.85rem; display:flex; align-items:center; justify-content:center; aspect-ratio:4/3; overflow:hidden; padding:.6rem; }
+.pd-main img { width:100%; height:100%; object-fit:contain; max-height:100%; }
+.pd-media { max-width:100%; }
+/* If image natural ratio is taller, prevent vertical clipping by allowing auto height under a max */
+.pd-main img { max-height:100%; }
+.pd-thumbs { display:flex; flex-wrap:wrap; gap:.5rem; margin-top:.5rem; }
+.pd-thumbs.is-scroll { flex-wrap:nowrap; overflow-x:auto; padding-bottom:.25rem; }
+.pd-thumbs .thumb { border:1px solid var(--border); background:#fff; border-radius:.5rem; padding:2px; cursor:pointer; }
+.pd-thumbs .thumb.is-active { border-color:var(--brand); box-shadow:0 0 0 2px color-mix(in oklab, white 50%, var(--brand) 60%); }
+.pd-thumbs .thumb img { width:54px; height:54px; object-fit:contain; display:block; }
+.pd-thumbs { display:flex; flex-wrap:wrap; gap:.5rem; margin-top:.5rem; }
+.pd-thumbs .thumb { border:1px solid var(--border); background:#fff; border-radius:.5rem; padding:2px; cursor:pointer; }
+.pd-thumbs .thumb:focus-visible, .pd-thumbs .thumb:hover { outline:none; border-color:var(--brand); box-shadow:0 0 0 2px color-mix(in oklab, white 50%, var(--brand) 60%); }
+.pd-thumbs .thumb img { width:54px; height:54px; object-fit:contain; display:block; }
+.pd-info .pd-title { margin: 0 0 .25rem; }
+.pd-info .price { font-size:1.25rem; font-weight:800; margin:.25rem 0 .75rem; }
+.pd-info .features { list-style:disc; margin:.25rem 0 0 1.15rem; padding:0; }
+.pd-info .features li + li { margin-top:.25rem; }
+.pd-desc { white-space:pre-wrap; }
+
+@media (max-width: 900px){
+  .pd-grid { grid-template-columns: 1fr; }
+}
+
 /* Page-specific net hero gradients (replaces per-page inline styles) */
-.net-hero.nh-training-facility { background: linear-gradient(135deg,#0f2f50,#093150) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
-.net-hero.nh-sports-netting { background: linear-gradient(135deg,#162a44,#0f2f50) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
-.net-hero.nh-commercial-netting { background: linear-gradient(135deg,#102535,#0b1b28) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
-.net-hero.nh-hitting-facility { background: linear-gradient(135deg,#0f2f50,#23496c) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
-.net-hero.nh-batting-cage { background: linear-gradient(135deg,#16324c,#214d72) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
-.net-hero.nh-foul-ball { background: linear-gradient(135deg,#132a40,#1c4768) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
-.net-hero.nh-overhead { background: linear-gradient(135deg,#0d2539,#153a56) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
-.net-hero.nh-backstop { background: linear-gradient(135deg,#0c253e,#114061) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
-.net-hero.nh-baseball-l-screen { background: linear-gradient(135deg,#102d46,#1c4d70) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
-.net-hero.nh-pitchers-pocket { background: linear-gradient(135deg,#0f2f50,#1d4d72) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
-.net-hero.nh-diving-range { background: linear-gradient(135deg,#15324b,#214b6a) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
-.net-hero.nh-golf-course { background: linear-gradient(135deg,#142c42,#1f4866) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
-.net-hero.nh-golf-cube { background: linear-gradient(135deg,#132d43,#1e4a68) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
-.net-hero.nh-sports-baseball { background: linear-gradient(135deg,#142f46,#1f4b6a) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
-.net-hero.nh-basketball { background: linear-gradient(135deg,#132e44,#1d4a69) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
-.net-hero.nh-cricket-football { background: linear-gradient(135deg,#122b42,#1c4765) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
-.net-hero.nh-sports-golf { background: linear-gradient(135deg,#112b41,#1d4764) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
-.net-hero.nh-hockey { background: linear-gradient(135deg,#102a40,#1a4562) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
-.net-hero.nh-sports-lacrosse { background: linear-gradient(135deg,#10283d,#1a435f) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
-.net-hero.nh-multi-sport { background: linear-gradient(135deg,#0f273b,#183f59) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
-.net-hero.nh-sports-soccer { background: linear-gradient(135deg,#11283c,#1b425d) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
-.net-hero.nh-softball { background: linear-gradient(135deg,#10273b,#1a425d) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
-.net-hero.nh-tennis { background: linear-gradient(135deg,#0f2539,#193f59) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
-.net-hero.nh-volleyball { background: linear-gradient(135deg,#0e2539,#183d56) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
-.net-hero.nh-auto-drone { background: linear-gradient(135deg,#0f2437,#173b54) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
-.net-hero.nh-drone-enclosure { background: linear-gradient(135deg,#0f2234,#16374d) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
-.net-hero.nh-warehouse { background: linear-gradient(135deg,#0e2233,#15374d) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
-.net-hero.nh-safety-netting { background: linear-gradient(135deg,#0d2232,#15384e) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
-.net-hero.nh-debris-netting { background: linear-gradient(135deg,#0c2232,#14374c) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
-.net-hero.nh-landfill-netting { background: linear-gradient(135deg,#0b2130,#133549) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
+.net-hero.nh-training-facility { background: linear-gradient(135deg, color-mix(in oklab, var(--brand) 96%, #000 4%), color-mix(in oklab, var(--brand) 76%, #000 24%)) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
+.net-hero.nh-sports-netting { background: linear-gradient(135deg, color-mix(in oklab, var(--brand) 95%, #000 5%), color-mix(in oklab, var(--brand) 72%, #000 28%)) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
+.net-hero.nh-commercial-netting { background: linear-gradient(135deg, color-mix(in oklab, var(--brand) 98%, #000 2%), color-mix(in oklab, var(--brand) 74%, #000 26%)) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
+.net-hero.nh-hitting-facility { background: linear-gradient(135deg, color-mix(in oklab, var(--brand) 94%, #000 6%), color-mix(in oklab, var(--brand) 68%, #000 32%)) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
+.net-hero.nh-batting-cage { background: linear-gradient(135deg, color-mix(in oklab, var(--brand) 96%, #000 4%), color-mix(in oklab, var(--brand) 72%, #000 28%)) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
+.net-hero.nh-foul-ball { background: linear-gradient(135deg, color-mix(in oklab, var(--brand) 97%, #000 3%), color-mix(in oklab, var(--brand) 70%, #000 30%)) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
+.net-hero.nh-overhead { background: linear-gradient(135deg, color-mix(in oklab, var(--brand) 93%, #000 7%), color-mix(in oklab, var(--brand) 66%, #000 34%)) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
+.net-hero.nh-backstop { background: linear-gradient(135deg, color-mix(in oklab, var(--brand) 95%, #000 5%), color-mix(in oklab, var(--brand) 68%, #000 32%)) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
+.net-hero.nh-baseball-l-screen { background: linear-gradient(135deg, color-mix(in oklab, var(--brand) 96%, #000 4%), color-mix(in oklab, var(--brand) 72%, #000 28%)) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
+.net-hero.nh-pitchers-pocket { background: linear-gradient(135deg, color-mix(in oklab, var(--brand) 95%, #000 5%), color-mix(in oklab, var(--brand) 70%, #000 30%)) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
+.net-hero.nh-diving-range { background: linear-gradient(135deg, color-mix(in oklab, var(--brand) 94%, #000 6%), color-mix(in oklab, var(--brand) 68%, #000 32%)) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
+.net-hero.nh-golf-course { background: linear-gradient(135deg, color-mix(in oklab, var(--brand) 96%, #000 4%), color-mix(in oklab, var(--brand) 76%, #000 24%)) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
+.net-hero.nh-golf-cube { background: linear-gradient(135deg, color-mix(in oklab, var(--brand) 94%, #000 6%), color-mix(in oklab, var(--brand) 74%, #000 26%)) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
+.net-hero.nh-sports-baseball { background: linear-gradient(135deg, color-mix(in oklab, var(--brand) 96%, #000 4%), color-mix(in oklab, var(--brand) 74%, #000 26%)) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
+.net-hero.nh-basketball { background: linear-gradient(135deg, color-mix(in oklab, var(--brand) 95%, #000 5%), color-mix(in oklab, var(--brand) 70%, #000 30%)) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
+.net-hero.nh-cricket-football { background: linear-gradient(135deg, color-mix(in oklab, var(--brand) 94%, #000 6%), color-mix(in oklab, var(--brand) 72%, #000 28%)) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
+.net-hero.nh-sports-golf { background: linear-gradient(135deg, color-mix(in oklab, var(--brand) 96%, #000 4%), color-mix(in oklab, var(--brand) 74%, #000 26%)) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
+.net-hero.nh-hockey { background: linear-gradient(135deg, color-mix(in oklab, var(--brand) 97%, #000 3%), color-mix(in oklab, var(--brand) 72%, #000 28%)) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
+.net-hero.nh-sports-lacrosse { background: linear-gradient(135deg, color-mix(in oklab, var(--brand) 95%, #000 5%), color-mix(in oklab, var(--brand) 70%, #000 30%)) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
+.net-hero.nh-multi-sport { background: linear-gradient(135deg, color-mix(in oklab, var(--brand) 94%, #000 6%), color-mix(in oklab, var(--brand) 68%, #000 32%)) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
+.net-hero.nh-sports-soccer { background: linear-gradient(135deg, color-mix(in oklab, var(--brand) 95%, #000 5%), color-mix(in oklab, var(--brand) 70%, #000 30%)) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
+.net-hero.nh-softball { background: linear-gradient(135deg, color-mix(in oklab, var(--brand) 96%, #000 4%), color-mix(in oklab, var(--brand) 72%, #000 28%)) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
+.net-hero.nh-tennis { background: linear-gradient(135deg, color-mix(in oklab, var(--brand) 94%, #000 6%), color-mix(in oklab, var(--brand) 68%, #000 32%)) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
+.net-hero.nh-volleyball { background: linear-gradient(135deg, color-mix(in oklab, var(--brand) 93%, #000 7%), color-mix(in oklab, var(--brand) 66%, #000 34%)) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
+.net-hero.nh-auto-drone { background: linear-gradient(135deg, color-mix(in oklab, var(--brand) 95%, #000 5%), color-mix(in oklab, var(--brand) 70%, #000 30%)) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
+.net-hero.nh-drone-enclosure { background: linear-gradient(135deg, color-mix(in oklab, var(--brand) 94%, #000 6%), color-mix(in oklab, var(--brand) 68%, #000 32%)) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
+.net-hero.nh-warehouse { background: linear-gradient(135deg, color-mix(in oklab, var(--brand) 93%, #000 7%), color-mix(in oklab, var(--brand) 66%, #000 34%)) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
+.net-hero.nh-safety-netting { background: linear-gradient(135deg, color-mix(in oklab, var(--brand) 92%, #000 8%), color-mix(in oklab, var(--brand) 64%, #000 36%)) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
+.net-hero.nh-debris-netting { background: linear-gradient(135deg, color-mix(in oklab, var(--brand) 92%, #000 8%), color-mix(in oklab, var(--brand) 64%, #000 36%)) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
+.net-hero.nh-landfill-netting { background: linear-gradient(135deg, color-mix(in oklab, var(--brand) 92%, #000 8%), color-mix(in oklab, var(--brand) 64%, #000 36%)) !important; color:#fff; border-radius:1.25rem; margin-top:1rem; padding:2.2rem 0 1.75rem; }
+
+/* L-Screens subcategory intro */
+.subcategory-intro { margin: .25rem auto 1rem; }
+.subcategory-intro .intro-card{ background:#fff; border:1px solid var(--border); border-radius:.9rem; padding:1rem; box-shadow:0 4px 20px rgba(12,32,64,.06); }
+.subcategory-intro h2.h3{ margin:.1rem 0 .4rem; }
+.subcategory-intro p{ margin:0 0 .65rem; }
+.range-chips{ list-style:none; padding:0; margin:0; display:flex; gap:.4rem; flex-wrap:wrap; }
+.chip-static{ display:inline-flex; align-items:center; padding:.35rem .6rem; border:1px solid var(--border); border-radius:999px; font-weight:700; font-size:.8rem; background:#fafafa; }

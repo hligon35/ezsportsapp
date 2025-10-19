@@ -30,17 +30,43 @@ router.post('/', requireAuth, async (req, res) => {
   }
 });
 
-// Get order by ID
+// Public minimal summary endpoint (no PII). Safe to expose on confirmation page.
+router.get('/summary/:id', async (req, res) => {
+  try {
+    const order = await orderService.getOrderById(req.params.id);
+    if (!order) return res.status(404).json({ message: 'Order not found' });
+    const items = Array.isArray(order.items) ? order.items.map(i => ({
+      id: i.productId || i.id,
+      productName: i.productName,
+      quantity: i.quantity,
+      subtotal: i.subtotal
+    })) : [];
+    const out = {
+      id: order.id,
+      status: order.status,
+      total: order.total,
+      items,
+      subtotal: order.subtotal,
+      shipping: order.shipping,
+      discount: order.discount
+    };
+    res.json(out);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// Get order by ID (authenticated, full details)
 router.get('/:id', requireAuth, async (req, res) => {
   try {
     const order = await orderService.getOrderById(req.params.id);
     if (!order) {
       return res.status(404).json({ message: 'Order not found' });
     }
-  // Only owner or admin can see
-  const isOwner = order.userId && String(order.userId) === String(req.user.id);
-  if (!isOwner && !req.user.isAdmin) return res.status(403).json({ message: 'Forbidden' });
-  res.json(order);
+    // Only owner or admin can see
+    const isOwner = order.userId && String(order.userId) === String(req.user.id);
+    if (!isOwner && !req.user.isAdmin) return res.status(403).json({ message: 'Forbidden' });
+    res.json(order);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

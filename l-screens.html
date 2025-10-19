@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>L-Screens | EZ Sports Netting</title>
   <meta name="description" content="Shop L-Screens at EZ Sports Netting." />
-  <link rel="icon" type="image/png" href="assets/EZSportslogo.png" />
-  <link rel="icon" type="image/png" href="assets/img/favicon-32.png" sizes="32x32" />
+  <link rel="icon" type="image/png" href="assets/img/EZSportslogo.png" />
+  <link rel="icon" type="image/png" href="assets/img/EZSportslogo.png" sizes="32x32" />
   <link rel="stylesheet" href="assets/css/styles.css" />
 </head>
 <body>
@@ -15,15 +15,14 @@
     <div class="container header-bar">
       <button class="menu-toggle" aria-label="Toggle menu" aria-expanded="false" aria-controls="primary-nav">☰</button>
       <a class="brand" href="index.html">
-  <img src="assets/EZSportslogo.png" alt="EZ Sports Netting logo" height="40"/>
+  <img src="assets/img/EZSportslogo.png" alt="EZ Sports Netting logo" height="40"/>
         <span>EZ Sports Netting</span>
       </a>
       <form class="search" role="search" aria-label="Search store" onsubmit="event.preventDefault(); window.Store.search(this.q.value)">
-        <input type="search" name="q" placeholder="Search bats, gloves, helmets…" aria-label="Search"/>
+  <input type="search" name="q" placeholder="Search…" aria-label="Search"/>
         <button type="submit" class="btn btn-primary">Search</button>
       </form>
       <nav id="primary-nav" class="quick-links nav-centered" aria-label="Primary">
-        <a href="deals.html">Deals</a>
         <a href="about.html">About</a>
         <a href="netting-calculator.html">Netting Calculator</a>
         <button class="cart-btn" aria-haspopup="dialog" aria-controls="mini-cart" onclick="Store.toggleCart()">
@@ -33,86 +32,60 @@
       </nav>
     </div>
   </header>
-  <main id="main" class="container">
-    <h1>L-Screens</h1>
-    <p class="muted">Protect your pitchers and coaches with durable L-Screens. Tap Add to drop items into your cart.</p>
-
-    <section class="stack-1">
-      <h2>Shop L-Screens</h2>
-      <div class="grid grid-3 product-grid">
-        <article class="card">
-          <div class="media"><img src="assets/img/screen1.avif" alt="Pro L-Screen" loading="lazy" /></div>
-          <div class="body">
-            <h3 class="h3-tight">Pro L-Screen</h3>
-            <div class="price-row">
-              <span class="price">$399.00</span>
-              <button class="btn btn-ghost js-add" data-id="ls-pro" data-title="Pro L-Screen" data-price="399.00" data-category="l-screens" data-img="assets/img/screen1.avif">Add</button>
-            </div>
+  <main id="main">
+    <section class="netting-hero">
+      <div class="container wrap about-inner">
+        <div>
+          <h1>L-Screens</h1>
+          <p class="muted">Your central hub for practice protection. Explore our durable L-screens, drill-ready protective screens, precision Pitcher's Pocket targets, and factory-fit replacements.</p>
+          <nav class="netting-subnav is-ready" aria-label="L-Screens sub navigation">
+            <a href="baseball-l-screens.html">Baseball</a>
+            <a href="protective-screens.html">Protective</a>
+            <a href="pitchers-pocket.html">Pitcher's Pocket</a>
+            <a href="replacement-screens.html">Replacements</a>
+          </nav>
+          <div class="stack-05 hero-ctas">
+            <a class="btn" href="contactus.html">Talk to a Netting Expert</a>
           </div>
-        </article>
+        </div>
+  <div class="hero-rotator" data-rotate="screen2,screen3,screen4,screen5,screen6" aria-hidden="true">
+    <img class="hr-slide is-active" src="assets/img/screen2.avif" alt="" width="1400" height="875" loading="eager" />
+    <img class="hr-slide" src="assets/img/screen3.avif" alt="" width="1400" height="875" loading="lazy" />
+    <img class="hr-slide" src="assets/img/screen4.avif" alt="" width="1400" height="875" loading="lazy" />
+    <img class="hr-slide" src="assets/img/screen5.avif" alt="" width="1400" height="875" loading="lazy" />
+    <img class="hr-slide" src="assets/img/screen6.avif" alt="" width="1400" height="875" loading="lazy" />
+  </div>
+      </div>
+    </section>
 
-        <article class="card">
-          <div class="media"><img src="assets/img/screen2.avif" alt="Portable L-Screen" loading="lazy" /></div>
-          <div class="body">
-            <h3 class="h3-tight">Portable L-Screen</h3>
-            <div class="price-row">
-              <span class="price">$329.00</span>
-              <button class="btn btn-ghost js-add" data-id="ls-portable" data-title="Portable L-Screen" data-price="329.00" data-category="l-screens" data-img="assets/img/screen2.avif">Add</button>
-            </div>
-          </div>
-        </article>
-
-        <article class="card">
-          <div class="media"><img src="assets/img/screen3.avif" alt="Heavy-Duty L-Screen" loading="lazy" /></div>
-          <div class="body">
-            <h3 class="h3-tight">Heavy-Duty L-Screen</h3>
-            <div class="price-row">
-              <span class="price">$499.00</span>
-              <button class="btn btn-ghost js-add" data-id="ls-heavy" data-title="Heavy-Duty L-Screen" data-price="499.00" data-category="l-screens" data-img="assets/img/screen3.avif">Add</button>
-            </div>
-          </div>
-        </article>
-
-        <article class="card">
-          <div class="media"><img src="assets/img/screen4.avif" alt="Junior L-Screen" loading="lazy" /></div>
-          <div class="body">
-            <h3 class="h3-tight">Junior L-Screen</h3>
-            <div class="price-row">
-              <span class="price">$249.00</span>
-              <button class="btn btn-ghost js-add" data-id="ls-junior" data-title="Junior L-Screen" data-price="249.00" data-category="l-screens" data-img="assets/img/screen4.avif">Add</button>
-            </div>
-          </div>
-        </article>
-
-        <article class="card">
-          <div class="media"><img src="assets/img/screen5.avif" alt="Foldable L-Screen" loading="lazy" /></div>
-          <div class="body">
-            <h3 class="h3-tight">Foldable L-Screen</h3>
-            <div class="price-row">
-              <span class="price">$289.00</span>
-              <button class="btn btn-ghost js-add" data-id="ls-foldable" data-title="Foldable L-Screen" data-price="289.00" data-category="l-screens" data-img="assets/img/screen5.avif">Add</button>
-            </div>
-          </div>
-        </article>
-
-        <article class="card">
-          <div class="media"><img src="assets/img/screen6.avif" alt="Pro Net Replacement" loading="lazy" /></div>
-          <div class="body">
-            <h3 class="h3-tight">Pro Net Replacement</h3>
-            <div class="price-row">
-              <span class="price">$149.00</span>
-              <button class="btn btn-ghost js-add" data-id="ls-net-replacement" data-title="Pro Net Replacement" data-price="149.00" data-category="l-screens" data-img="assets/img/screen6.avif">Add</button>
-            </div>
-          </div>
-        </article>
+    <section class="category-tiles container wrap">
+      <h2 class="section-title text-center">Shop by Type</h2>
+      <div class="tiles">
+        <a class="tile" href="baseball-l-screens.html">
+          <div class="tile-head"><h3>Baseball<br>L-Screens</h3><p>Game-speed protection</p></div>
+          <div class="media"><img src="assets/img/screen2.avif" alt="Baseball L-screens" loading="lazy" width="1400" height="875"/><div class="tile-cta"><span class="btn btn-pill">Shop</span></div></div>
+        </a>
+        <a class="tile" href="protective-screens.html">
+          <div class="tile-head"><h3>Protective<br>Screens</h3><p>Infield and cage drills</p></div>
+          <div class="media"><img src="assets/img/screen3.avif" alt="Protective screens" loading="lazy" width="1400" height="875"/><div class="tile-cta"><span class="btn btn-pill">Shop</span></div></div>
+        </a>
+        <a class="tile" href="pitchers-pocket.html">
+          <div class="tile-head"><h3>Pitcher's<br>Pocket</h3><p>Pinpoint accuracy</p></div>
+          <div class="media"><img src="assets/img/screen6.avif" alt="Pitcher's Pocket target" loading="lazy" width="1400" height="875"/><div class="tile-cta"><span class="btn btn-pill">Shop</span></div></div>
+        </a>
+        <a class="tile" href="replacement-screens.html">
+          <div class="tile-head"><h3>Replacement<br>Screens</h3><p>Factory-fit refresh</p></div>
+          <div class="media"><img src="assets/img/screen5.avif" alt="Replacement screens" loading="lazy" width="1400" height="875"/><div class="tile-cta"><span class="btn btn-pill">Shop</span></div></div>
+        </a>
       </div>
     </section>
   </main>
+  <!-- Product grid intentionally removed: l-screens hub should not display products. -->
   <footer class="site-footer">
     <div class="container footer-grid">
       <div class="footer-brand-block">
         <a class="brand brand--light" href="index.html">
-          <img src="assets/EZSportslogo.png" alt="EZ Sports Netting logo" height="36"/>
+          <img src="assets/img/EZSportslogo.png" alt="EZ Sports Netting logo" height="36"/>
           <span>EZ Sports Netting</span>
         </a>
         <p class="muted">Better baseball through better gear.</p>
@@ -121,7 +94,6 @@
             <img src="assets/img/facebook.png" alt="Facebook" />
           </a>
           <a href="#" aria-label="Instagram"><img src="assets/img/instagram.png" alt="Instagram" /></a>
-          <a href="#" aria-label="X"><img src="assets/img/xwhite.png" alt="X" /></a>
         </div>
       </div>
       <nav aria-label="Footer">
@@ -138,7 +110,7 @@
         <ul>
           <li><a href="about.html">About</a></li>
           <li><a href="careers.html">Careers</a></li>
-          <li><a href="support.html">Support</a></li>
+          <li><a href="contactus.html">Contact Us</a></li>
         </ul>
       </nav>
       <form class="subscribe" onsubmit="event.preventDefault(); alert('Thanks for subscribing!')">
@@ -164,10 +136,9 @@
       </header>
       <div id="cart-items" class="mini-cart__items"></div>
       <footer class="mini-cart__footer">
-        <div class="totals">
-          <span>Subtotal</span>
-          <strong id="cart-subtotal">$0.00</strong>
-        </div>
+        <div class="totals"><span>Subtotal</span><strong id="cart-subtotal">$0.00</strong></div>
+        <div class="totals"><span>Shipping</span><strong id="cart-shipping">$0.00</strong></div>
+        <div class="totals"><span>Total</span><strong id="cart-total">$0.00</strong></div>
         <div class="stack-05">
           <button type="button" class="btn btn-primary btn-block" onclick="Store.checkout()">Secure Checkout</button>
           <a class="btn btn-ghost btn-block" href="index.html#catalog">Continue Shopping</a>
@@ -177,19 +148,7 @@
   </dialog>
 
   <script type="module" src="assets/js/analytics.js"></script>
+  <script type="module" src="assets/js/product-loader.js"></script>
   <script type="module" src="assets/js/app.js"></script>
-  <script>
-    // Bind Add buttons to Store.add using inline product snapshots
-    window.addEventListener('DOMContentLoaded', () => {
-      document.querySelectorAll('.js-add').forEach(btn => {
-        if (btn._bound) return; btn._bound = true;
-        btn.addEventListener('click', () => {
-          const d = btn.dataset;
-          const product = { id: d.id, title: d.title, price: Number(d.price)||0, category: d.category||'l-screens', img: d.img };
-          try { window.Store && window.Store.add(product); } catch (e) { console.error(e); }
-        });
-      });
-    });
-  </script>
 </body>
 </html>

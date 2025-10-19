@@ -1,0 +1,28 @@
+{
+  "name": "div",
+  "price": 124.95,
+  "description": "Looking to replace your Bullet Screen netting? Our Bullet Screen replacement nets are the most durable nets on the market and the easiest to apply to your Bullet Screen frame. With years of experience, we have perfected our replacement l screen netting to meet the demands of any baseball and softball protective screen needs. From youth baseball/softball to the Major Leagues, our variety of different gauge netting is designed to withstand any level of impact. Our pillowcase style net allows for quick and easy installation with incredible strength and durability for your L screen. Trusted by facility owners and diamond sports organizations for over fifteen years, repair or replace your Bullet Screen with our replacement net. WARNING: This netting is intended to protect nearby players during batting practice or practice drills. However, it is possible a batted ball may ricochet off the netting and hit the batter or a nearby player, causing serious injury or even death.  Batters, pitchers, and nearby players should always wear appropriate protective equipment while using this product. WARNING: This netting is intended to protect nearby players during batting practice or practice drills. However, it is possible a batted ball may ricochet off the netting and hit the batter or a nearby player, causing serious injury or even death.  Batters, pitchers, and nearby players should always wear appropriate protective equipment while using this product. function positionHandler() {\n    return {\n        top: 0,\n        updatePosition() {\n            this.$nextTick(() => {\n                let viewportCenter = window.innerHeight / 2,\n                    parent = this.$el.parentElement,\n                    parentCenter = parent.clientHeight / 2,\n                    blockHeight = this.$el.offsetHeight / 2\n                this.top = viewportCenter - blockHeight;\n            });\n        }\n    };\n} {\n        \"body\": {\n            \"acidAdvancedReportsAjax\": {\"url\":\"https:\\/\\/betterbaseball.com\\/acid_acidreports\\/countViews\\/product\\/id\\/168018\\/\"}        }\n    } BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS",
+  "source_url": "https://betterbaseball.com/bullet-screen-replacement-netting",
+  "image_url": "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/r/e/replacement_net_bulletl.jpg",
+  "image_urls": [
+    "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/r/e/replacement_net_bulletl.jpg"
+  ],
+  "downloaded_images": [
+    "C:\\Users\\Harold Ligon\\Documents\\Coding\\SparQDigital\\BBScraper\\prodInfo\\Baseball_L-Screens\\images\\bullet-screen-replacement-netting_1.jpg"
+  ],
+  "category_path": [
+    "Baseball L-Screens",
+    "Bullet Screen Replacement Netting"
+  ],
+  "features": [
+    "Netting Only: Frame Sold Separately",
+    "Net Gauge: #60 Nylon",
+    "Color: Black",
+    "High-Quality: UV Treated Nylon Netting",
+    "Pro Grade: Double Layer Pillowcase Net",
+    "Easy Install: Over Bullet Screen Frame",
+    "All-Weather Materials: Protection from Outdoor Elements",
+    "Reinforced Edges: With 3/4in Rope to Prevent Fraying",
+    "Built Tough: For Training Facilities, Schools, & Organizations"
+  ]
+}

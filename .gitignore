@@ -16,6 +16,7 @@ logs/
 # Env & secrets
 .env
 .env.*
+server/.env
 
 # Build output
 dist/
@@ -45,3 +46,8 @@ server/stripe_test_*
 *.swp
 *.swo
 ~$*
+
+# Raw scraped product info (exclude deep image trees to avoid path length issues & repo bloat)
+assets/info/prodInfo/**/images/
+assets/info/prodInfo/**/downloaded_images/
+assets/info/prodInfo/**/raw/

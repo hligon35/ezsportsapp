@@ -1,0 +1,29 @@
+{
+  "name": "footer",
+  "price": 39.95,
+  "description": "Who needs wheels when you have Screen Bulletz? Screen Bulletz make moving your screen on turf so easy. The re-inforced L-Screen Leg Caps are designed to slide across all types of turf with ease. Make your baseball facility life a lot easier with the best L-Screen Leg Caps in the game, Screen Bulletz. Looking for an easy way to move your baseball screen around? Look no further than these Screen Bulletz L-Screen Leg Caps. Screen Bulletz easily slide over turf and hard surfaces, so you can quickly set up your screen before practice or hitting lessons. And since they're made from durable polycarbonate, Screen Bulletz protect your baseballs from rip and tears. Plus, the internal locking system keeps these L-Screen Leg Caps securely in place. Screen Bulletz L-Screen Leg Caps are designed to fit any Bullet Screen and Armor Screen, and they're a great way to keep players safe by preventing ricochets. These Screen Bulletz are designed to glide across all types of turf both indoor and outdoor. Best of all, they eliminate the need for wheels! Make your life easier when moving your screens on turf with Screen Bulletz. WARNING: Screen Bulletz are intended to protect the pitcher or nearby players during batting practice or practice drills. However, it is possible a batted ball may ricochet off the Screen Bulletz and hit the batter or a nearby player, causing serious injury or even death. Batters, pitchers, and nearby players should always wear appropriate protective equipment while using this product. WARNING: Screen Bulletz are intended to protect the pitcher or nearby players during batting practice or practice drills. However, it is possible a batted ball may ricochet off the Screen Bulletz and hit the batter or a nearby player, causing serious injury or even death. Batters, pitchers, and nearby players should always wear appropriate protective equipment while using this product. WARNING: Screen Bulletz are intended to protect the pitcher or nearby players during batting practice or practice drills. However, it is possible a batted ball may ricochet off the Screen Bulletz and hit the batter or a nearby player, causing serious injury or even death. Batters, pitchers, and nearby players should always wear appropriate protective equipment while using this product. WARNING: Screen Bulletz are intended to protect the pitcher or nearby players during batting practice or practice drills. However, it is possible a batted ball may ricochet off the Screen Bulletz and hit the batter or a nearby player, causing serious injury or even death. Batters, pitchers, and nearby players should always wear appropriate protective equipment while using this product. function positionHandler() {\n    return {\n        top: 0,\n        updatePosition() {\n            this.$nextTick(() => {\n                let viewportCenter = window.innerHeight / 2,\n                    parent = this.$el.parentElement,\n                    parentCenter = parent.clientHeight / 2,\n                    blockHeight = this.$el.offsetHeight / 2\n                this.top = viewportCenter - blockHeight;\n            });\n        }\n    };\n} {\n        \"body\": {\n            \"acidAdvancedReportsAjax\": {\"url\":\"https:\\/\\/betterbaseball.com\\/acid_acidreports\\/countViews\\/product\\/id\\/88613\\/\"}        }\n    } BALLPLAYERS KNOW. Email Address SIGN UP EXCLUSIVE DROPS & DEALS Our Superstore Atlanta 133 Carruth Dr Marietta, GA 30060 Directions Store Hours Mon-Sat: 9am - 8pm Sun: 10am - 7pm Customer Service (800) 997-4233 Contact Us FAQs Bat Warranties Returns Track Your Order Our Services Expert Bat Fittings Glove Repair Netting Installations Team Sales About Us Shipping Tools BB Bucks Tax Exempt Bullet Assembly Armor Assembly Gift Card Blog © 2025 by Better Baseball. All rights reserved. Site Map | Term & Conditions | Privacy Policy",
+  "source_url": "https://betterbaseball.com/l-screen-leg-caps-screen-bulletz-4-pack-screenbulletz",
+  "image_url": "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/s/c/screen_bulletz.jpg",
+  "image_urls": [
+    "https://images.betterbaseball.com/media/catalog/product/cache/ce8709217ad27f0e4f56319828d6c789/s/c/screen_bulletz.jpg"
+  ],
+  "downloaded_images": [
+    "C:\\Users\\Harold Ligon\\Documents\\Coding\\SparQDigital\\BBScraper\\prodInfo\\L-Screen_Leg_Caps_Screen_Bulletz_4-Pack_\\images\\l-screen-leg-caps-screen-bulletz-4-pack-screenbulletz_1.jpg"
+  ],
+  "category_path": [
+    "L-Screen Leg Caps: Screen Bulletz (4-Pack)",
+    "Baseball L-Screens"
+  ],
+  "features": [
+    "D elivery: Free & Fast Delivery on All Orders",
+    "Easy Mobility: Slides with Ease over Turf & Hard Surfaces",
+    "Protection: Prevents Baseball from Ripping & Tearing Apart",
+    "Construction: Polycarbonate High Density & Ultra Durable End Cap",
+    "Internal Locking System: Keeps Screen Bulletz Secured to Screen Legs",
+    "Designed to Fit: Bullet Screen Series & Armor Screen Series",
+    "Fit for: 1 5/8\" Pipe",
+    "Usage: Good for both Indoors & Outdoors",
+    "Safety: Prevents Ricochets & Keeps Players Safe",
+    "Added Benefit: Eliminates the Need for Wheels"
+  ]
+}

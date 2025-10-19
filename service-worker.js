@@ -1,8 +1,9 @@
-// Bumped versions to invalidate old cached layout assets (tablet nav + calc responsiveness)
-const CORE_CACHE = 'core-v6';
-const ASSET_CACHE = 'assets-v4';
+// Bumped versions to invalidate old cached assets (including social icons)
+const CORE_CACHE = 'core-v7';
+const ASSET_CACHE = 'assets-v5';
 const CORE = [
   '/index.html',
+  '/coming-soon.html',
   '/assets/css/styles.css',
   '/assets/js/app.js'
 ];
@@ -24,6 +25,21 @@ self.addEventListener('activate', e => {
 self.addEventListener('fetch', e => {
   const url = new URL(e.request.url);
   if (e.request.method !== 'GET') return;
+
+  // Always fetch fresh copies of social icon images to avoid stale caches
+  if (url.pathname.endsWith('/assets/img/facebook.png') || url.pathname.endsWith('/assets/img/instagram.png')) {
+    e.respondWith(
+      fetch(e.request)
+        .then(net => {
+          if (net && net.ok && net.type === 'basic') {
+            caches.open(ASSET_CACHE).then(cache => cache.put(e.request, net.clone())).catch(()=>{});
+          }
+          return net;
+        })
+        .catch(() => caches.match(e.request))
+    );
+    return;
+  }
 
   // Network-first for CSS & JS so layout/style changes show immediately
   if (/\.(?:css|js)$/.test(url.pathname)) {

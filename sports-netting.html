@@ -4,40 +4,52 @@
   <meta charset="UTF-8" />
   <title>Sports Netting — EZ Sports Netting</title>
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <meta name="description" content="Multi-sport netting solutions for baseball, soccer, lacrosse, and more. Placeholder page." />
-  <link rel="stylesheet" href="assets/css/styles.css?v=6" />
+  <meta name="description" content="Multi-sport netting solutions for baseball, soccer, lacrosse, and more." />
+  <link rel="stylesheet" href="assets/css/styles.css" />
   <script type="module" src="assets/js/app.js" defer></script>
 </head>
 <body>
   <header class="site-header">
     <div class="header-bar container">
-      <a href="index.html" class="brand"><img src="assets/img/ezsportslogo.jpg" alt="EZ Sports Netting logo" height="40"/><span>EZ Sports Netting</span></a>
+  <a href="index.html" class="brand"><img src="assets/img/EZSportslogo.png" alt="EZ Sports Netting logo" height="40"/><span>EZ Sports Netting</span></a>
       <form class="search" role="search" aria-label="Search"><input type="search" aria-label="Search" /><button type="submit" class="btn btn-primary">Search</button></form>
       <nav class="quick-links" id="primary-nav"></nav>
       <button class="menu-toggle" aria-label="Menu" aria-expanded="false">☰</button>
     </div>
   </header>
   <main id="main" class="container">
-  <section class="net-hero nh-sports-netting">
+    <section class="net-hero nh-sports-netting">
       <div class="wrap">
-    <h1>Sports Netting</h1>
-    <p>Placeholder: Unified safety and containment solutions for diverse sports environments.</p>
-        <div class="netting-subnav" id="netting-subnav"></div>
+        <h1>Sports Netting</h1>
+        <p>Unified safety and containment solutions for diverse sports environments.</p>
+        <div class="netting-subnav" id="netting-subnav">
+          <a href="baseball-netting.html">Baseball</a>
+          <a href="training-facility.html">Training Facility</a>
+          <a href="golf-netting.html">Golf</a>
+          <a href="sports-netting.html">Sports</a>
+          <a href="commercial-netting.html">Commercial</a>
+          <a href="netting-calculator.html">Calculator</a>
+          <a href="ez-nets.html">Overview</a>
+        </div>
         <button class="btn btn-primary" onclick="location.href='contactus.html'">Request Quote</button>
       </div>
     </section>
-  <section class="container wrap section-spaced">
+    <section class="container wrap section-spaced">
       <h2>Multi-Sport Applications</h2>
-      <p>Placeholder: Discuss mesh size selection, impact zones, spectator shielding, and modular field dividers.</p>
+      <p>Discuss mesh size selection, impact zones, spectator shielding, and modular field dividers.</p>
       <ul class="checks">
-        <li>High abrasion resistance (placeholder)</li>
-        <li>Outdoor UV stability (placeholder)</li>
-        <li>Portable panel options (placeholder)</li>
+        <li>High abrasion resistance</li>
+        <li>Outdoor UV stability</li>
+        <li>Portable panel options</li>
       </ul>
     </section>
   </main>
   <footer class="site-footer">
     <div class="container subfooter"><p>© <span id="year"></span> EZ Sports Netting.</p></div>
   </footer>
+  <script>
+    const sn = document.getElementById('netting-subnav');
+    if (sn) { const b = location.pathname.split('/').pop(); [...sn.querySelectorAll('a')].forEach(a=>{ if(a.getAttribute('href')===b) a.classList.add('is-active');}); }
+  </script>
 </body>
 </html>

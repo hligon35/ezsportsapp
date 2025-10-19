@@ -4,39 +4,48 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Admin Panel | EZ Sports Netting</title>
-  <link rel="icon" href="assets/img/favicon-32.png" type="image/png" />
-  <link rel="stylesheet" href="assets/css/styles.css" />
+  <link rel="icon" href="assets/img/EZSportslogo.png" type="image/png" />
+  <link rel="stylesheet" href="assets/css/styles.css?v=6" />
+  <link rel="stylesheet" href="assets/css/admin.css?v=1" />
   <style>
-    .admin-container { max-width: 1000px; margin: 2rem auto; padding: 2rem; }
-    .admin-section { background: #fff; border-radius: 1.2rem; box-shadow: 0 4px 24px rgba(12,32,64,.10); padding: 2rem; margin-bottom: 2rem; }
+    .admin-container { max-width: 1000px; margin: 2rem auto; padding: clamp(1rem, 3.5vw, 2rem); }
+    .admin-section { background: #fff; border-radius: 1.2rem; box-shadow: 0 4px 24px rgba(12,32,64,.10); padding: clamp(1rem, 3.5vw, 2rem); margin-bottom: 2rem; }
     .product-form { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
-    .product-form input, .product-form textarea, .product-form select { padding: .8rem; border: 1px solid #cfe0f5; border-radius: .6rem; }
+    .product-form input, .product-form textarea, .product-form select { padding: .8rem; border: 1px solid #cfe0f5; border-radius: .6rem; width: 100%; box-sizing: border-box; }
     .product-list { display: grid; gap: 1rem; }
-    .product-item { display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: #f7faff; border-radius: .8rem; }
-    .admin-nav { display: flex; gap: 1rem; margin-bottom: 2rem; }
+    .product-item { display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: #f7faff; border-radius: .8rem; flex-wrap: wrap; gap: .6rem; }
+    .admin-nav { display: flex; gap: .6rem; row-gap: .5rem; margin-bottom: 1.25rem; flex-wrap: wrap; overflow-x: visible; }
   .admin-nav button { padding: .8rem 1.5rem; border: none; background: #e6edf6; border-radius: .6rem; cursor: pointer; color:#0b2a4a; font-weight:700; }
   .admin-nav button.active { background: var(--primary, #0b64d4); color: #ffffff; box-shadow: 0 2px 10px rgba(11,100,212,.25); }
   /* Inventory UI removed for dropship model */
     .hidden{display:none;}
-    .toolbar{display:flex; gap:1rem; align-items:center; margin-bottom:1rem; flex-wrap:wrap;}
+    .toolbar{display:flex; gap:.75rem; align-items:center; margin-bottom:1rem; flex-wrap:wrap;}
     .filter-select{margin-left:.5rem; padding:.4rem;}
-    @media (max-width: 768px) { .product-form { grid-template-columns: 1fr; } }
+    @media (max-width: 768px) {
+      .product-form { grid-template-columns: 1fr; }
+      .admin-nav button { padding: .55rem .8rem; font-size: .9rem; }
+    }
+    @media (max-width: 640px) {
+      .admin-nav { margin-bottom: 1rem; }
+      .admin-nav .ml-auto { flex: 1 0 100%; text-align: right; }
+      .product-item { align-items: flex-start; }
+    }
   </style>
 </head>
 <body>
+  <a class="skip" href="#main">Skip to content</a>
   <header class="site-header">
     <div class="container header-bar">
       <button class="menu-toggle" aria-label="Toggle menu" aria-expanded="false" aria-controls="primary-nav">☰</button>
       <a class="brand" href="index.html">
-  <img src="assets/EZSportslogo.png" alt="EZ Sports Netting logo" height="40"/>
+  <img src="assets/img/EZSportslogo.png" alt="EZ Sports Netting logo" height="40"/>
         <span>EZ Sports Netting</span>
       </a>
       <form class="search" role="search" aria-label="Search store">
-        <input type="search" name="q" placeholder="Search bats, gloves, helmets…" aria-label="Search"/>
+  <input type="search" name="q" placeholder="Search…" aria-label="Search"/>
         <button type="submit" class="btn btn-primary">Search</button>
       </form>
       <nav id="primary-nav" class="quick-links nav-centered" aria-label="Primary">
-        <a href="deals.html">Deals</a>
         <a href="about.html">About</a>
         <a href="netting-calculator.html">Netting Calculator</a>
         <button class="cart-btn" aria-haspopup="dialog" aria-controls="mini-cart" onclick="Store.toggleCart()">
@@ -54,12 +63,25 @@
   <button onclick="showSection('invoices', this)">Invoices</button>
     <button onclick="showSection('orders', this)">Orders</button>
     <button onclick="showSection('users', this)">Users</button>
+    <button onclick="showSection('marketing', this)">Marketing</button>
+    <button onclick="showSection('finance', this)">Finance</button>
+    <button onclick="showSection('traffic', this)">Traffic</button>
   <a class="btn btn-ghost ml-auto" href="analytics.html">Analytics →</a>
       </div>
 
       <!-- Products Section -->
   <div id="products-section" class="admin-section">
         <h3>Product Management</h3>
+        <div class="toolbar">
+          <button type="button" id="btn-sync-products" class="btn btn-secondary">Run Product Sync</button>
+          <label class="muted">
+            <input type="checkbox" id="sync-dryrun" /> Dry run
+          </label>
+          <label class="muted">
+            <input type="checkbox" id="sync-deactivate" /> Deactivate removed (Stripe)
+          </label>
+          <span id="sync-status" class="muted"></span>
+        </div>
         <form id="product-form" class="product-form">
           <input type="text" id="product-name" placeholder="Product Name" required />
           <input type="number" id="product-price" placeholder="Price" step="0.01" required />
@@ -118,7 +140,160 @@
       <!-- Users Section -->
   <div id="users-section" class="admin-section hidden">
         <h3>User Management</h3>
+        <form id="billing-portal-form" class="toolbar" onsubmit="event.preventDefault(); window.openBillingPortal(document.getElementById('billing-email').value)">
+          <label>
+            <span>Billing email:</span>
+            <input id="billing-email" type="email" placeholder="customer@email.com" class="filter-select" required />
+          </label>
+          <button type="submit" class="btn btn-secondary">Open Billing Portal</button>
+        </form>
         <div id="users-list"></div>
+      </div>
+
+      <!-- Marketing Section -->
+      <div id="marketing-section" class="admin-section hidden">
+        <h3>Marketing</h3>
+        <div class="stack-05">
+          <section class="admin-kpi-grid">
+            <div class="card card-light">
+              <div class="muted text-sm-muted">Active subscribers</div>
+              <div id="w-subs-active" class="kpi-lg">–</div>
+            </div>
+            <div class="card card-light">
+              <div class="muted text-sm-muted">Coupons (total)</div>
+              <div id="w-coupons-total" class="kpi-lg">–</div>
+            </div>
+            <div class="card card-light">
+              <div class="muted text-sm-muted">Active coupons</div>
+              <div id="w-coupons-active" class="kpi-lg">–</div>
+            </div>
+            <div class="card card-light">
+              <div class="muted text-sm-muted">Total redemptions</div>
+              <div id="w-coupons-used" class="kpi-lg">–</div>
+            </div>
+          </section>
+          <section>
+            <h4>Top codes</h4>
+            <ul id="w-top-codes" class="muted m-0"></ul>
+          </section>
+          <section>
+            <h4>Send Newsletter</h4>
+            <form id="newsletter-form" class="product-form newsletter-grid-1">
+              <input type="text" id="nl-subject" placeholder="Subject" required />
+              <textarea id="nl-text" placeholder="Plain text content (optional)" rows="3"></textarea>
+              <textarea id="nl-html" placeholder="HTML content" rows="6"></textarea>
+              <div>
+                <button type="submit" class="btn btn-primary">Queue Newsletter</button>
+                <span id="nl-status" class="muted ml-05"></span>
+              </div>
+            </form>
+          </section>
+          <hr/>
+          <section>
+            <h4>Create Coupon</h4>
+            <form id="coupon-form" class="product-form">
+              <input type="text" id="cp-code" placeholder="Code (e.g., SAVE10)" required />
+              <select id="cp-type" required aria-label="Coupon Type">
+                <option value="percent">Percent %</option>
+                <option value="fixed">Fixed $</option>
+              </select>
+              <input type="number" id="cp-value" placeholder="Value (e.g., 10)" step="0.01" required />
+              <input type="date" id="cp-expires" placeholder="Expires (optional)" />
+              <input type="number" id="cp-maxuses" placeholder="Max uses (0 = unlimited)" min="0" />
+              <input type="text" id="cp-emails" placeholder="Restrict to emails (comma-separated, optional)" />
+              <button type="submit" class="btn btn-primary">Create Coupon</button>
+            </form>
+            <div id="coupon-status" class="muted mt-05"></div>
+          </section>
+          <section>
+            <div class="flex-row space-between items-center"><h4>Coupons</h4><button id="coupons-refresh" class="btn btn-ghost" type="button">Refresh</button></div>
+            <div id="coupons-list" class="product-list"><p class="muted">Loading coupons…</p></div>
+            <div id="coupons-error" class="muted error-text"></div>
+          </section>
+          <section>
+            <div class="flex-row space-between items-center"><h4>Subscribers</h4><button id="subs-refresh" class="btn btn-ghost" type="button">Refresh</button></div>
+            <div id="subs-list" class="product-list"><p class="muted">Loading subscribers…</p></div>
+            <div id="subs-error" class="muted error-text"></div>
+          </section>
+        </div>
+      </div>
+
+      <!-- Finance Section (Stripe) -->
+      <div id="finance-section" class="admin-section hidden">
+        <h3>Finance</h3>
+        <div class="toolbar">
+          <label>
+            <span>Timeframe:</span>
+            <select id="finance-timeframe" class="filter-select">
+              <option value="today">Today</option>
+              <option value="week" selected>Last 7 days</option>
+              <option value="month">This month</option>
+              <option value="all">All time</option>
+            </select>
+          </label>
+          <button class="btn btn-secondary" id="finance-refresh-btn">Refresh</button>
+        </div>
+  <section class="cards mt-4 admin-kpi-grid small" id="finance-kpis">
+          <div class="card-sm"><div class="muted">Gross</div><div class="kpi" id="fin-gross">$0.00</div></div>
+          <div class="card-sm"><div class="muted">Refunds</div><div class="kpi" id="fin-refunds">$0.00</div></div>
+          <div class="card-sm"><div class="muted">Fees</div><div class="kpi" id="fin-fees">$0.00</div></div>
+          <div class="card-sm"><div class="muted">Net</div><div class="kpi" id="fin-net">$0.00</div></div>
+        </section>
+        <section class="mt-4">
+          <h4>Balance</h4>
+          <div id="fin-balance" class="muted">–</div>
+        </section>
+        <section class="mt-4">
+          <h4>Cash Flow (Daily)</h4>
+          <canvas id="fin-chart" height="120"></canvas>
+        </section>
+        <section class="mt-4">
+          <div class="flex-row space-between items-center"><h4>Recent Payouts</h4></div>
+          <div id="fin-payouts" class="product-list"><p class="muted">No payouts.</p></div>
+        </section>
+        <section class="mt-4">
+          <div class="flex-row space-between items-center"><h4>Payout History (Local)</h4><button id="fin-payouts-local-refresh" class="btn btn-ghost" type="button">Refresh</button></div>
+          <div id="fin-payouts-local" class="product-list"><p class="muted">Loading…</p></div>
+        </section>
+        <section class="mt-4">
+          <div class="flex-row space-between items-center"><h4>Stripe Invoices</h4></div>
+          <div id="fin-invoices" class="product-list"><p class="muted">Loading…</p></div>
+        </section>
+      </div>
+
+      <!-- Traffic Section (Cloudflare) -->
+      <div id="traffic-section" class="admin-section hidden">
+        <h3>Traffic</h3>
+        <div class="toolbar">
+          <label>
+            <span>Timeframe:</span>
+            <select id="traffic-timeframe" class="filter-select">
+              <option value="today">Today</option>
+              <option value="week" selected>Last 7 days</option>
+              <option value="month">This month</option>
+              <option value="all">All time</option>
+            </select>
+          </label>
+          <button class="btn btn-secondary" id="traffic-refresh-btn">Refresh</button>
+        </div>
+  <section class="cards mt-4 admin-kpi-grid small" id="traffic-kpis">
+          <div class="card-sm"><div class="muted">Requests</div><div class="kpi" id="cf-reqs">0</div></div>
+          <div class="card-sm"><div class="muted">Cache Hit %</div><div class="kpi" id="cf-cache">0%</div></div>
+          <div class="card-sm"><div class="muted">Bandwidth</div><div class="kpi" id="cf-band">0 MB</div></div>
+          <div class="card-sm"><div class="muted">Threats</div><div class="kpi" id="cf-threats">0</div></div>
+        </section>
+        <section class="mt-4">
+          <h4>Top Paths</h4>
+          <ul id="cf-top-paths" class="product-list"></ul>
+        </section>
+        <section class="mt-4">
+          <h4>Requests (Daily)</h4>
+          <canvas id="cf-chart" height="120"></canvas>
+        </section>
+        <section class="mt-4">
+          <h4>By Country</h4>
+          <ul id="cf-by-country" class="product-list"></ul>
+        </section>
       </div>
     </div>
   </main>
@@ -126,7 +301,7 @@
     <div class="container footer-grid">
       <div class="footer-brand-block">
         <a class="brand brand--light" href="index.html">
-          <img src="assets/EZSportslogo.png" alt="EZ Sports Netting logo" height="36"/>
+          <img src="assets/img/EZSportslogo.png" alt="EZ Sports Netting logo" height="36"/>
           <span>EZ Sports Netting</span>
         </a>
         <p class="muted">Better baseball through better gear.</p>
@@ -135,7 +310,6 @@
             <img src="assets/img/facebook.png" alt="Facebook" />
           </a>
           <a href="#" aria-label="Instagram"><img src="assets/img/instagram.png" alt="Instagram" /></a>
-          <a href="#" aria-label="X"><img src="assets/img/xwhite.png" alt="X" /></a>
         </div>
       </div>
       <nav aria-label="Footer">
@@ -152,7 +326,7 @@
         <ul>
           <li><a href="about.html">About</a></li>
           <li><a href="careers.html">Careers</a></li>
-          <li><a href="support.html">Support</a></li>
+          <li><a href="contactus.html">Contact Us</a></li>
         </ul>
       </nav>
       <form class="subscribe" onsubmit="event.preventDefault(); alert('Thanks for subscribing!')">
@@ -181,9 +355,11 @@
           <span>Subtotal</span>
           <strong id="cart-subtotal">$0.00</strong>
         </div>
+          <div class="totals"><span>Shipping</span><strong id="cart-shipping">$0.00</strong></div>
+          <div class="totals"><span>Total</span><strong id="cart-total">$0.00</strong></div>
         <div class="stack-05">
           <button type="button" class="btn btn-primary btn-block" onclick="Store.checkout()">Secure Checkout</button>
-          <a class="btn btn-ghost btn-block" href="deals.html">Continue Shopping</a>
+          <a class="btn btn-ghost btn-block" href="index.html">Continue Shopping</a>
         </div>
       </footer>
     </section>
@@ -191,8 +367,10 @@
 
   <!-- Inventory-related modals removed for dropship model -->
 
-  <script type="module" src="assets/js/admin.js?v=20250822"></script>
-  <script type="module" src="assets/js/analytics.js?v=20250822"></script>
-  <script type="module" src="assets/js/app.js?v=20250822"></script>
+  <script type="module" src="assets/js/analytics.js"></script>
+  <!-- Optional chart library for admin dashboards -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js" crossorigin="anonymous"></script>
+  <script type="module" src="assets/js/admin.js"></script>
+  <script type="module" src="assets/js/app.js"></script>
 </body>
 </html>

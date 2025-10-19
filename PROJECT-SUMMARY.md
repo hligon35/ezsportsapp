@@ -177,3 +177,29 @@ The EZ Sports website has been successfully transformed into a full-featured eco
 - ✅ Git repository with all changes committed
 
 **Ready for deployment and production use!** 🚀
+
+## 🧼 Content Quality: Description Sanitization
+
+Scraped product descriptions occasionally contained embedded scripts, footer/navigation boilerplate, or repeated marketing blocks. A two‑layer sanitization pipeline was added:
+
+### 1. Ingestion (server/scripts/sync-products.js)
+
+- cleanDescription() strips `<script>` / `<style>` blocks, HTML tags, decodes a few entities, removes obvious boilerplate lines (privacy policy, terms, newsletter, etc.), collapses whitespace, truncates to 1000 chars.
+- Original raw text preserved (when modified) in `product.meta.originalDescription` for audit / future improvement.
+
+### 2. Frontend (assets/js/app.js)
+
+- sanitizeDescription() performs an additional defensive pass before rendering: removes scripting/styling, tags, known boilerplate phrases, oversized lines, duplicates, and truncates to 800 chars for dialog readability.
+- Empty / fully stripped descriptions display a friendly fallback: "Description coming soon.".
+
+### Benefits
+
+- Prevents accidental execution of injected markup.
+- Reduces visual noise and improves customer focus on true product info.
+- Keeps payload lean while retaining an audit trail (`originalDescription`) for later tuning.
+
+### Future Enhancements (optional)
+
+- Maintain a whitelist of allowed inline formatting (bold/italics) via minimal HTML sanitizer.
+- Automatic extraction of bullet‑like lines into structured features if not already present.
+- Language detection & auto‑translation pipeline if multi‑locale support is added.

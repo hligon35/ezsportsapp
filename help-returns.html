@@ -7,7 +7,7 @@
   <meta name="description" content="Return & exchange policy: timelines, condition requirements, and how to start a return at EZ Sports Netting." />
   <meta name="robots" content="index,follow" />
   <link rel="canonical" href="https://ezsportsnetting.com/help-returns.html" />
-  <link rel="icon" type="image/png" href="assets/EZSportslogo.png" />
+  <link rel="icon" type="image/png" href="assets/img/EZSportslogo.png" />
   <link rel="icon" type="image/png" href="assets/img/favicon-32.png" sizes="32x32" />
   <link rel="stylesheet" href="assets/css/styles.css" />
   <meta property="og:title" content="Returns & Exchanges Policy" />
@@ -22,15 +22,14 @@
     <div class="container header-bar">
       <button class="menu-toggle" aria-label="Toggle menu" aria-expanded="false" aria-controls="primary-nav">☰</button>
   <a class="brand" href="index.html">
-  <img src="assets/EZSportslogo.png" alt="EZ Sports Netting logo" height="40"/>
+  <img src="assets/img/EZSportslogo.png" alt="EZ Sports Netting logo" height="40"/>
         <span>EZ Sports Netting</span>
       </a>
       <form class="search" role="search" aria-label="Search store" onsubmit="event.preventDefault(); window.Store.search(this.q.value)">
-        <input type="search" name="q" placeholder="Search bats, gloves, helmets…" aria-label="Search"/>
+  <input type="search" name="q" placeholder="Search…" aria-label="Search"/>
         <button type="submit" class="btn btn-primary">Search</button>
       </form>
   <nav id="primary-nav" class="quick-links nav-centered" aria-label="Primary">
-    <a href="deals.html">Deals</a>
     <a href="about.html">About</a>
     <a href="netting-calculator.html">Netting Calculator</a>
     <button class="cart-btn" aria-haspopup="dialog" aria-controls="mini-cart" onclick="Store.toggleCart()">
@@ -47,21 +46,21 @@
         <ul>
           <li><strong>Return Window:</strong> Most items can be returned or exchanged within 30 days of delivery. Custom netting and special orders are non-returnable unless defective.</li>
           <li><strong>Eligibility:</strong> Items must be unused, in original packaging, and in resellable condition. Used, worn, or altered items are not eligible.</li>
-          <li><strong>How to Start a Return:</strong> Contact us at <a href="mailto:support@ezsportsnetting.com">support@ezsportsnetting.com</a> or <a href="support.html">submit a request</a> with your order number and reason for return.</li>
+          <li><strong>How to Start a Return:</strong> Contact us at <a href="mailto:support@ezsportsnetting.com">support@ezsportsnetting.com</a> or <a href="contactus.html">submit a request</a> with your order number and reason for return.</li>
           <li><strong>Return Shipping:</strong> Customers are responsible for return shipping costs unless the item is defective or we made an error. We recommend using a trackable shipping method.</li>
           <li><strong>Refunds:</strong> Issued to your original payment method within 5 business days of receiving and inspecting the return. Shipping charges are non-refundable.</li>
           <li><strong>Exchanges:</strong> For size or product exchanges, please initiate a return and place a new order for the desired item.</li>
           <li><strong>Restocking Fee:</strong> A 10% restocking fee may apply to non-defective returns of custom or bulk orders.</li>
         </ul>
-  <p class="muted mt-05">Questions about returns or exchanges? <a href="support.html">Contact support</a> for help with your order.</p>
+  <p class="muted mt-05">Questions about returns or exchanges? <a href="contactus.html">Contact us</a> for help with your order.</p>
       </div>
-  <p class="mt-05"><a class="btn btn-ghost" href="support.html">← Back to Support</a></p>
+  <p class="mt-05"><a class="btn btn-ghost" href="contactus.html">← Back to Contact Us</a></p>
   </main>
   <footer class="site-footer">
     <div class="container footer-grid">
       <div class="footer-brand-block">
         <a class="brand brand--light" href="index.html">
-          <img src="assets/EZSportslogo.png" alt="EZ Sports Netting logo" height="36"/>
+          <img src="assets/img/EZSportslogo.png" alt="EZ Sports Netting logo" height="36"/>
           <span>EZ Sports Netting</span>
         </a>
         <p class="muted">Better baseball through better gear.</p>
@@ -70,7 +69,6 @@
             <img src="assets/img/facebook.png" alt="Facebook" />
           </a>
           <a href="#" aria-label="Instagram"><img src="assets/img/instagram.png" alt="Instagram" /></a>
-          <a href="#" aria-label="X"><img src="assets/img/xwhite.png" alt="X" /></a>
         </div>
       </div>
       <nav aria-label="Footer">
@@ -87,7 +85,7 @@
         <ul>
           <li><a href="about.html">About</a></li>
           <li><a href="careers.html">Careers</a></li>
-          <li><a href="support.html">Support</a></li>
+          <li><a href="contactus.html">Contact Us</a></li>
         </ul>
       </nav>
       <form class="subscribe" onsubmit="event.preventDefault(); alert('Thanks for subscribing!')">
@@ -111,10 +109,9 @@
       </header>
       <div id="cart-items" class="mini-cart__items"></div>
       <footer class="mini-cart__footer">
-        <div class="totals">
-          <span>Subtotal</span>
-          <strong id="cart-subtotal">$0.00</strong>
-        </div>
+        <div class="totals"><span>Subtotal</span><strong id="cart-subtotal">$0.00</strong></div>
+        <div class="totals"><span>Shipping</span><strong id="cart-shipping">$0.00</strong></div>
+        <div class="totals"><span>Total</span><strong id="cart-total">$0.00</strong></div>
         <div class="stack-05">
           <button type="button" class="btn btn-primary btn-block" onclick="Store.checkout()">Secure Checkout</button>
           <a class="btn btn-ghost btn-block" href="index.html#catalog">Continue Shopping</a>

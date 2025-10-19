@@ -36,6 +36,32 @@ async function ensureSchema() {
   await sql`ALTER TABLE orders ADD COLUMN IF NOT EXISTS customer_name TEXT;`;
   await sql`ALTER TABLE orders ADD COLUMN IF NOT EXISTS shipping JSONB;`;
   await sql`ALTER TABLE orders ADD COLUMN IF NOT EXISTS summary TEXT;`;
+  // Stripe: map users -> stripe customer id for billing portal and future linkage
+  await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS stripe_customer_id TEXT;`;
+}
+
+// Ensure the owner admin exists in production DB without overwriting password on updates
+// idempotent: sets is_admin to true if the user exists; only sets password on initial insert
+async function ensureOwnerAdmin() {
+  const email = 'amercedes@ezsportsnetting.com';
+  const username = 'amercedes';
+  const name = 'EZ Sports Owner';
+  const pass = process.env.OWNER_ADMIN_PASSWORD || '#EZSports2025';
+  const existing = await sql`SELECT id FROM users WHERE lower(email)=lower(${email}) LIMIT 1;`;
+  if (existing.rows && existing.rows.length) {
+    if (String(process.env.OWNER_ADMIN_RESET || '').toLowerCase() === 'true') {
+      const password_hash = await bcrypt.hash(pass, 10);
+      await sql`UPDATE users SET is_admin=true, password_hash=${password_hash} WHERE email=${email};`;
+    } else {
+      await sql`UPDATE users SET is_admin=true WHERE email=${email};`;
+    }
+    return;
+  }
+  const password_hash = await bcrypt.hash(pass, 10);
+  await sql`
+    INSERT INTO users (email, username, name, password_hash, is_admin)
+    VALUES (${email}, ${username}, ${name}, ${password_hash}, true)
+  `;
 }
 
 async function findUserByIdentifier(identifier) {
@@ -101,7 +127,16 @@ async function markOrderPaidByPi(piId) {
 
 module.exports = {
   ensureSchema,
+  ensureOwnerAdmin,
   findUserByIdentifier,
+  // convenience helpers for email-based lookup used in admin portal
+  async getUserByEmail(email){
+    const { rows } = await sql`SELECT * FROM users WHERE lower(email)=lower(${email}) LIMIT 1;`;
+    return rows[0] || null;
+  },
+  async setUserStripeCustomer(email, customerId){
+    await sql`UPDATE users SET stripe_customer_id=${customerId} WHERE lower(email)=lower(${email});`;
+  },
   createUser,
   updateLastLogin,
   verifyPassword,

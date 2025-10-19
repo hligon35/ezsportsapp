@@ -8,19 +8,45 @@
   <style>
     .confirm-card{max-width:760px;margin:2rem auto;background:#fff;border:1px solid #e6edf6;border-radius:1rem;padding:2rem;box-shadow:0 4px 24px rgba(12,32,64,.08)}
     .muted{color:#516173}
+    .order-extras{margin:.5rem 0 1rem;}
   </style>
   <script>
     function currency(n){return n.toLocaleString(undefined,{style:'currency',currency:'USD'})}
-    function load(){
+    async function load(){
       try{
         const params=new URLSearchParams(location.search);
         const id=params.get('id');
-        const order=JSON.parse(sessionStorage.getItem('lastOrder')||'null');
+        // Prefer fetching a live order summary when id present
+        let order=null;
+        if (id) {
+          try {
+            const res = await fetch('/api/orders/summary/'+encodeURIComponent(id), { cache:'no-store' });
+            if (res.ok) order = await res.json();
+          } catch {}
+        }
+        if(!order){
+          order=JSON.parse(sessionStorage.getItem('lastOrder')||'null');
+        }
         if(order){
           document.getElementById('order-id').textContent = order.id || id || '—';
-          document.getElementById('total').textContent = currency(order.total||0);
+          document.getElementById('total').textContent = currency(Number(order.total||0));
           const lines=(order.items||[]).map(i=>`<li>${i.productName||i.id} × ${i.quantity||i.qty}</li>`).join('');
           document.getElementById('lines').innerHTML = lines || '<li>No items</li>';
+          const extras = document.getElementById('order-extras');
+          if (extras) {
+            const bits = [];
+            if (typeof order.subtotal === 'number') bits.push(`<div>Subtotal: <strong>${currency(Number(order.subtotal))}</strong></div>`);
+            if (typeof order.shipping === 'number') {
+              const s = Number(order.shipping);
+              const shipStr = s === 0 ? 'Free' : currency(s);
+              bits.push(`<div>Shipping: <strong>${shipStr}</strong></div>`);
+            }
+            if (typeof order.tax === 'number' && Number(order.tax) > 0) {
+              bits.push(`<div>Tax: <strong>${currency(Number(order.tax))}</strong></div>`);
+            }
+            if (typeof order.discount === 'number' && order.discount>0) bits.push(`<div>Discount${order.couponCode?` (${order.couponCode})`:''}: <strong>-${currency(Number(order.discount))}</strong></div>`);
+            extras.innerHTML = bits.join('');
+          }
         } else {
           document.getElementById('order-id').textContent = id || '—';
         }
@@ -35,7 +61,8 @@
         <p class="muted">Your order <strong>#<span id="order-id">—</span></strong> has been received. A confirmation email will be sent shortly.</p>
         <h3>Order details</h3>
         <ul id="lines"></ul>
-        <p><strong>Total:</strong> <span id="total">$0.00</span></p>
+  <div id="order-extras" class="muted order-extras"></div>
+  <p><strong>Total:</strong> <span id="total">$0.00</span></p>
         <div class="row gap-04">
           <a class="btn btn-primary" href="order-history.html">View your orders</a>
           <a class="btn btn-ghost" href="index.html">Continue shopping</a>

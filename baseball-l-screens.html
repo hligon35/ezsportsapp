@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Baseball L-Screens | EZ Sports Netting</title>
+  <meta name="description" content="Pro-grade baseball L-screens for batting practice and bullpens." />
+  <link rel="icon" type="image/png" href="assets/img/EZSportslogo.png" />
+  <link rel="icon" type="image/png" href="assets/img/EZSportslogo.png" sizes="32x32" />
+  <link rel="stylesheet" href="assets/css/styles.css" />
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <header class="site-header">
+    <div class="container header-bar">
+      <button class="menu-toggle" aria-label="Toggle menu" aria-expanded="false" aria-controls="primary-nav">☰</button>
+      <a class="brand" href="index.html">
+  <img src="assets/img/EZSportslogo.png" alt="EZ Sports Netting logo" height="40"/>
+        <span>EZ Sports Netting</span>
+      </a>
+      <form class="search" role="search" aria-label="Search store" onsubmit="event.preventDefault(); window.Store.search(this.q.value)">
+  <input type="search" name="q" placeholder="Search…" aria-label="Search"/>
+        <button type="submit" class="btn btn-primary">Search</button>
+      </form>
+      <nav id="primary-nav" class="quick-links nav-centered" aria-label="Primary"></nav>
+    </div>
+  </header>
+
+  <main id="main" class="container">
+    <h1>Baseball L-Screens</h1>
+    <p class="muted">Durable L-screens built for high-velocity batting practice and daily use.</p>
+    <section id="page-product-grid" class="grid grid-3 product-grid"></section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-grid"><!-- Canonical footer will be injected by app.js --></div>
+    <div class="subfooter container"><p>© <span id="year"></span> EZ Sports Netting.</p></div>
+  </footer>
+
+  <dialog id="mini-cart" class="mini-cart" aria-labelledby="cart-title">
+    <form method="dialog" class="mini-cart__backdrop" onclick="this.closest('dialog').close()"></form>
+    <section class="mini-cart__panel" role="document">
+      <header>
+        <h3 id="cart-title">Your cart</h3>
+        <button class="icon-btn" onclick="document.getElementById('mini-cart').close()" aria-label="Close">✕</button>
+      </header>
+      <div id="cart-items" class="mini-cart__items"></div>
+      <footer class="mini-cart__footer">
+        <div class="totals"><span>Subtotal</span><strong id="cart-subtotal">$0.00</strong></div>
+        <div class="totals"><span>Shipping</span><strong id="cart-shipping">$0.00</strong></div>
+        <div class="totals"><span>Total</span><strong id="cart-total">$0.00</strong></div>
+        <div class="stack-05">
+          <button type="button" class="btn btn-primary btn-block" onclick="Store.checkout()">Secure Checkout</button>
+          <a class="btn btn-ghost btn-block" href="index.html#catalog">Continue Shopping</a>
+        </div>
+      </footer>
+    </section>
+  </dialog>
+
+  <script type="module" src="assets/js/analytics.js"></script>
+  <script type="module" src="assets/js/product-loader.js"></script>
+  <script type="module" src="assets/js/app.js"></script>
+  <script></script>
+</body>
+</html>

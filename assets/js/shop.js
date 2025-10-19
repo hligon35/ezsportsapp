@@ -1,111 +1,47 @@
-// Shop page logic: loads categories and products and wires filters/search
+// Shop page logic: now relies exclusively on product-loader (prodList.json) output.
+// We wait for window.CATALOG_PRODUCTS (emitted via catalog:ready) then derive categories + render.
 
 const Shop = {
   state: {
     category: 'all',
     search: '',
     products: [],
-  categories: ['all','apparel','bats','gloves','batting-gloves','drip','gear','netting','helmets','l-screens','facility-field']
+    categories: ['all']
   },
 
-  async init() {
-  // Build category chips and sidebar
-    this.renderCategories();
-  // Prefer server-backed products; fallback to cached/local defaults
-  await this.loadProducts();
-  this.renderGrid();
-
-    // Wire search
+  init() {
+    // Wire search early
     const q = document.getElementById('shop-search');
     if (q) q.addEventListener('input', () => { this.state.search = q.value.trim(); this.renderGrid(); });
 
-    // Sync from query params
-    const params = new URLSearchParams(location.search);
-    const cat = params.get('cat');
-    if (cat) { this.state.category = cat; this.highlight(cat); this.renderGrid(); }
-  },
-
-  apiBases() {
-    const ports = [4242];
-    const bases = [];
-    const isHttp = location.protocol.startsWith('http');
-    const onLiveServer = isHttp && location.port === '5500';
-    if (onLiveServer) {
-      ['127.0.0.1','localhost'].forEach(h => ports.forEach(p => bases.push(`http://${h}:${p}`)));
+    // If product-loader already finished, ingest immediately; else wait for event.
+    if (Array.isArray(window.CATALOG_PRODUCTS) && window.CATALOG_PRODUCTS.length) {
+      this.ingest(window.CATALOG_PRODUCTS);
     } else {
-      if (isHttp) bases.push(`${location.protocol}//${location.host}`);
-      ['127.0.0.1','localhost'].forEach(h => ports.forEach(p => bases.push(`http://${h}:${p}`)));
+      window.addEventListener('catalog:ready', () => {
+        this.ingest(Array.isArray(window.CATALOG_PRODUCTS) ? window.CATALOG_PRODUCTS : []);
+      }, { once:true });
+      window.addEventListener('catalog:error', () => {
+        this.ingest([]);
+      }, { once:true });
     }
-    return Array.from(new Set(bases));
+
+    // Sync selected category from query string after ingest (ingest calls render)
+    const params = new URLSearchParams(location.search);
+    this._pendingCat = params.get('cat');
   },
 
-  async loadProducts() {
-    // 1) Try cache
-    try {
-      const cached = JSON.parse(localStorage.getItem('shopProducts')||'null');
-      if (Array.isArray(cached) && cached.length) { this.state.products = cached; return; }
-    } catch {}
-
-    // 2) Try server /api/products with base fallbacks
-    const bases = this.apiBases();
-    for (const base of bases) {
-      try {
-        const res = await fetch(`${base}/api/products`, { credentials: 'include' });
-        if (!res.ok) continue;
-        const items = await res.json();
-        const mapped = (items||[]).map(p => ({
-          id: p.id,
-          title: p.name || p.title || 'Item',
-          price: Number(p.price||0),
-          category: p.category || 'misc',
-          img: p.image || p.img || 'assets/img/bats.jpg',
-          stock: p.stock
-        }));
-        if (Array.isArray(mapped) && mapped.length > 0) {
-          this.state.products = mapped;
-          try { localStorage.setItem('shopProducts', JSON.stringify(mapped)); } catch {}
-          return;
-        }
-      } catch {}
+  ingest(list) {
+    this.state.products = list.slice();
+    // Derive categories dynamically from product data
+    const cats = Array.from(new Set(list.map(p => p.category))).sort();
+    this.state.categories = ['all', ...cats];
+    this.renderCategories();
+    if (this._pendingCat && this.state.categories.includes(this._pendingCat)) {
+      this.state.category = this._pendingCat;
+      this.highlight(this._pendingCat);
     }
-
-    // 3) Fallback to defaults from Store
-    try {
-      const getter = window.Store && window.Store.getProducts ? window.Store.getProducts : null;
-      this.state.products = getter ? getter() : [];
-    } catch { this.state.products = []; }
-
-    // 4) Final fallback to static catalog (mirrors individual pages)
-    if (!this.state.products || this.state.products.length === 0) {
-      try {
-        if (Array.isArray(window.CATALOG_PRODUCTS) && window.CATALOG_PRODUCTS.length) {
-          this.state.products = window.CATALOG_PRODUCTS;
-          try { localStorage.setItem('shopProducts', JSON.stringify(this.state.products)); } catch {}
-        }
-      } catch {}
-    }
-
-    // Guarantee at least 4 items for each known category by topping up from CATALOG_PRODUCTS
-    try {
-      const cats = this.state.categories.filter(c=>c!=='all');
-      const have = this.state.products || [];
-      const byCat = (arr,cat)=> (arr||[]).filter(p=>p.category===cat);
-      const catSrc = Array.isArray(window.CATALOG_PRODUCTS) ? window.CATALOG_PRODUCTS : [];
-      let changed = false;
-      cats.forEach(cat => {
-        const count = byCat(have, cat).length;
-        if (count < 4) {
-          const needed = 4 - count;
-          const pool = byCat(catSrc, cat).filter(p => !have.find(h => h.id === p.id));
-          const add = pool.slice(0, needed);
-          if (add.length) { have.push(...add); changed = true; }
-        }
-      });
-      if (changed) {
-        this.state.products = have;
-        try { localStorage.setItem('shopProducts', JSON.stringify(have)); } catch {}
-      }
-    } catch {}
+    this.renderGrid();
   },
 
   renderCategories() {
@@ -140,19 +76,8 @@ const Shop = {
     const grid = document.getElementById('shop-grid');
     if (!grid) return;
 
-    // Try to pull current products from Store as the source of truth if available
-    let products = [];
-    try {
-      if (window.Store) {
-        // window.Store maintains products via getProducts(); call that to get the latest
-        const getter = window.Store.getProducts || null;
-        products = getter ? getter() : [];
-      }
-    } catch { products = []; }
-    if (!products || !products.length) products = this.state.products || [];
-    if ((!products || products.length === 0) && Array.isArray(window.CATALOG_PRODUCTS)) {
-      products = window.CATALOG_PRODUCTS;
-    }
+    // Source of truth: state.products (from prodList.json via product-loader)
+    let products = this.state.products || [];
 
     const q = (this.state.search||'').toLowerCase();
     const cat = this.state.category;
@@ -180,7 +105,7 @@ const Shop = {
     grid.querySelectorAll('[data-id]').forEach(btn => btn.addEventListener('click', ()=>{
       const id = btn.getAttribute('data-id');
       const product = (products||[]).find(p => p.id === id);
-      if (product && window.Store) {
+      if (product && window.Store && typeof window.Store.add === 'function') {
         window.Store.add(product, {});
       }
       try { window.trackEvent && window.trackEvent('add_to_cart', id); } catch {}

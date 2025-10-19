@@ -19,7 +19,7 @@ async function createUsers() {
     const users = [
         {
             id: generateId(),
-            email: 'admin@ezsports.com',
+            email: 'admin@ezsportsnetting.com',
             password: adminPassword,
             firstName: 'Admin',
             lastName: 'User',
@@ -43,7 +43,7 @@ async function createUsers() {
     
     console.log('Users created successfully!');
     console.log('Login credentials:');
-    console.log('Admin: admin@ezsports.com / admin123');
+    console.log('Admin: admin@ezsportsnetting.com / admin123 (demo). Preferred admin is amercedes@ezsportsnetting.com');
     console.log('Demo: demo@user.com / demo123');
 }
 

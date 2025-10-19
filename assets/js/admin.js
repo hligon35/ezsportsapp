@@ -41,33 +41,75 @@ function getCurrentUser() {
   }
 }
 
-function getProducts() {
+// Products list (Admin) must come exclusively from assets/prodList.json
+let __prodListProducts = [];
+function __slug(str) {
+  return (str||'').toString().toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'');
+}
+function __pickPrice(obj) {
+  // Prefer MAP, then explicit price, then details.price, then wholesale
+  const from = (v) => (typeof v === 'number' ? v : (v && !isNaN(Number(v)) ? Number(v) : undefined));
+  return (
+    from(obj?.map) ??
+    from(obj?.price) ??
+    from(obj?.details?.price) ??
+    from(obj?.wholesale)
+  ) || 0;
+}
+async function loadProductsFromProdList(force=false) {
+  if (!force && __prodListProducts.length) return __prodListProducts;
   try {
-    return JSON.parse(localStorage.getItem('adminProducts') || '[]');
-  } catch {
-    return [];
+    const res = await fetch('assets/prodList.json', { credentials:'same-origin' });
+    if (!res.ok) throw new Error('Failed to load prodList.json');
+    const data = await res.json();
+    const out = [];
+    const categories = data && data.categories ? data.categories : {};
+    for (const [catName, items] of Object.entries(categories)) {
+      if (!Array.isArray(items)) continue;
+      for (const item of items) {
+        const base = {
+          sku: item.sku || '',
+          name: item.name || item.sku || 'Product',
+          image: item.img || (Array.isArray(item.images) ? item.images[0] : '') || '',
+          category: catName,
+          description: (item.details && item.details.description) || '',
+          isActive: true,
+          source: 'prodList'
+        };
+        if (Array.isArray(item.variations) && item.variations.length) {
+          for (const v of item.variations) {
+            const id = (item.sku ? `${item.sku}-${__slug(v.option||'opt')}` : `${__slug(base.name)}-${__slug(v.option||'opt')}`);
+            out.push({
+              id,
+              ...base,
+              name: `${base.name} (${v.option})`,
+              price: __pickPrice(v)
+            });
+          }
+        } else {
+          const id = item.sku || __slug(base.name) || ('prod-' + Date.now());
+          out.push({
+            id,
+            ...base,
+            price: __pickPrice(item)
+          });
+        }
+      }
+    }
+    __prodListProducts = out;
+  } catch (e) {
+    console.error('Failed to load prodList.json', e);
+    __prodListProducts = [];
   }
+  return __prodListProducts;
 }
 
-function saveProducts(products) {
-  localStorage.setItem('adminProducts', JSON.stringify(products));
-  // Also update the main PRODUCTS array for the shop
-  updateShopProducts(products);
-}
-
-function updateShopProducts(products) {
-  // Convert admin products to shop format
-  const shopProducts = products.map(p => ({
-    id: p.id,
-    title: p.name,
-    price: p.price,
-    category: p.category,
-    img: p.image || 'https://source.unsplash.com/600x400/?product',
-    description: p.description,
-    stock: p.stock
-  }));
-  localStorage.setItem('shopProducts', JSON.stringify(shopProducts));
-}
+// Legacy helpers retained for other admin features, but products list will not use them
+let __adminProductsCache = [];
+async function loadProductsFromServer() { return []; }
+function getProducts() { return __prodListProducts.slice(); }
+function saveProducts(_) { /* no-op for prod list enforcement */ }
+function updateShopProducts(_) { /* no-op for prod list enforcement */ }
 
 function getOrders() {
   try {
@@ -99,10 +141,14 @@ function showSection(section, btn) {
   if (section === 'products') renderProducts();
   if (section === 'orders') renderOrders();
   if (section === 'users') renderUsers();
+  if (section === 'marketing') renderMarketing();
   if (section === 'invoices') renderInvoices();
+  if (section === 'finance') renderFinance();
+  if (section === 'traffic') renderTraffic();
 }
 
-function renderProducts() {
+async function renderProducts() {
+  if (!__prodListProducts.length) { await loadProductsFromProdList(); }
   const products = getProducts();
   const list = document.getElementById('products-list');
 
@@ -114,12 +160,11 @@ function renderProducts() {
   list.innerHTML = products.map(p => `
     <div class="product-item">
       <div>
-        <strong>${p.name}</strong> - $${p.price}
-        <br><small>${p.category} | Stock: ${p.stock || 0}</small>
+        <strong>${p.name}</strong> - $${Number(p.price||0).toFixed(2)}
+        <br><small>${p.category}${p.sku?` | SKU: ${p.sku}`:''}</small>
       </div>
       <div>
-        <button class="btn btn-ghost" onclick="editProduct('${p.id}')">Edit</button>
-        <button class="btn btn-ghost text-red" onclick="deleteProduct('${p.id}')">Delete</button>
+        <!-- Admin Products list is read-only and reflects assets/prodList.json -->
       </div>
     </div>
   `).join('');
@@ -157,10 +202,12 @@ function renderOrders() {
             <strong>Order #${order.id}</strong> — <small>${order.status||'pending'}</small>
             <br><small>${new Date(order.createdAt||order.date).toLocaleString()}</small>
             <br>Items: ${order.items.map(i => `${(i.quantity||i.qty)}x ${i.productId||i.id}`).join(', ')}
+            ${order.paymentInfo && (order.paymentInfo.fees!=null || order.paymentInfo.net!=null) ? `<br><small>Fees: $${Number(order.paymentInfo.fees||0).toFixed(2)} • Net: $${Number(order.paymentInfo.net||0).toFixed(2)}</small>` : ''}
           </div>
           <div class="flex-row gap-05 items-center">
             <strong>$${(order.total||0).toFixed(2)}</strong>
             <a class="btn btn-ghost" href="${(window.__API_BASE||'')}/api/invoices/INV-${order.id}/print" target="_blank" rel="noopener">View Invoice</a>
+            ${order.customerInfo?.email ? `<button class="btn btn-ghost" data-portal="${order.customerInfo.email}">Billing Portal</button>` : ''}
             <select data-order-id="${order.id}" class="order-status-select">
               ${['pending','paid','fulfilled','cancelled'].map(s=>`<option value="${s}" ${s===(order.status||'pending')?'selected':''}>${s}</option>`).join('')}
             </select>
@@ -178,6 +225,13 @@ function renderOrders() {
 
       list.innerHTML = html + pager;
 
+      // Wire billing portal buttons
+      list.querySelectorAll('[data-portal]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const email = btn.getAttribute('data-portal');
+          if (email) openBillingPortal(email);
+        });
+      });
       // Wire updates
       list.querySelectorAll('[data-update-status]')
         .forEach(btn => btn.addEventListener('click', () => {
@@ -216,23 +270,40 @@ function renderUsers() {
           </div>
           <div>
             <small>ID: ${user.id}</small>
+            <button class="btn btn-ghost" data-user-portal="${user.email}">Billing Portal</button>
           </div>
         </div>
       `).join('');
+      list.querySelectorAll('[data-user-portal]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const email = btn.getAttribute('data-user-portal');
+          if (email) openBillingPortal(email);
+        });
+      });
     })
   .catch((e)=>{ list.innerHTML = `<p>Failed to load users. ${e.message||''}</p>`; });
 }
 
 function addProduct(productData) {
-  const products = getProducts();
-  const newProduct = {
-    id: generateId(),
-    ...productData,
-    createdAt: new Date().toISOString()
-  };
-  products.push(newProduct);
-  saveProducts(products);
-  renderProducts();
+  // Try backend first
+  (async () => {
+    try {
+      const res = await fetchAdmin('/api/products', { method: 'POST', body: JSON.stringify(productData) });
+      if (!res.ok) throw new Error('Failed');
+      const created = await res.json();
+      __adminProductsCache = [created, ...getProducts().filter(p => p.id !== created.id)];
+      saveProducts(__adminProductsCache);
+      renderProducts();
+      return;
+    } catch (_) {
+      // Fallback to local-only when offline
+      const products = getProducts();
+      const newProduct = { id: generateId(), ...productData, createdAt: new Date().toISOString() };
+      products.push(newProduct);
+      saveProducts(products);
+      renderProducts();
+    }
+  })();
 }
 
 function editProduct(id) {
@@ -253,21 +324,44 @@ function editProduct(id) {
 }
 
 function updateProduct(id, productData) {
-  const products = getProducts();
-  const index = products.findIndex(p => p.id === id);
-  if (index !== -1) {
-    products[index] = { ...products[index], ...productData };
-    saveProducts(products);
-    renderProducts();
-  }
+  (async () => {
+    try {
+      const res = await fetchAdmin(`/api/products/${encodeURIComponent(id)}`, { method: 'PUT', body: JSON.stringify(productData) });
+      if (!res.ok) throw new Error('Failed');
+      const updated = await res.json();
+      __adminProductsCache = getProducts().map(p => p.id === id ? { ...p, ...updated } : p);
+      saveProducts(__adminProductsCache);
+      renderProducts();
+      return;
+    } catch (_) {
+      // Local fallback
+      const products = getProducts();
+      const index = products.findIndex(p => p.id === id);
+      if (index !== -1) {
+        products[index] = { ...products[index], ...productData };
+        saveProducts(products);
+        renderProducts();
+      }
+    }
+  })();
 }
 
 function deleteProduct(id) {
   if (!confirm('Are you sure you want to delete this product?')) return;
-
-  const products = getProducts().filter(p => p.id !== id);
-  saveProducts(products);
-  renderProducts();
+  (async () => {
+    try {
+      const res = await fetchAdmin(`/api/products/${encodeURIComponent(id)}`, { method: 'DELETE' });
+      if (!res.ok) throw new Error('Failed');
+      __adminProductsCache = getProducts().filter(p => p.id !== id);
+      saveProducts(__adminProductsCache);
+      renderProducts();
+      return;
+    } catch (_) {
+      const products = getProducts().filter(p => p.id !== id);
+      saveProducts(products);
+      renderProducts();
+    }
+  })();
 }
 
 function cancelEdit() {
@@ -319,6 +413,38 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
+  // Wire Product Sync button
+  const syncBtn = document.getElementById('btn-sync-products');
+  const syncDry = document.getElementById('sync-dryrun');
+  const syncDeact = document.getElementById('sync-deactivate');
+  const syncStatus = document.getElementById('sync-status');
+  if (syncBtn && !syncBtn.__wired) {
+    syncBtn.__wired = true;
+    syncBtn.addEventListener('click', async () => {
+      try {
+        if (syncStatus) syncStatus.textContent = 'Running…';
+        syncBtn.disabled = true;
+        const params = new URLSearchParams();
+        params.set('stripe', '1');
+        if (syncDry && syncDry.checked) params.set('dry', '1');
+        if (syncDeact && syncDeact.checked) params.set('deactivateRemoved', '1');
+        const res = await fetchAdmin(`/api/admin/products/sync?${params.toString()}`, { method: 'POST' });
+        const data = await res.json().catch(()=>({}));
+        if (!res.ok || data.ok === false) throw new Error(data.message || 'Sync failed');
+        const wrote = (data.wrote!=null) ? `${data.wrote}` : '—';
+        const disc = (data.discovered!=null) ? `${data.discovered}` : '—';
+        const warns = Array.isArray(data.warnings) ? data.warnings.length : 0;
+        if (syncStatus) syncStatus.textContent = `Done. Wrote ${wrote}, discovered ${disc}${warns?`, warnings ${warns}`:''}.`;
+        // For visibility, also log stdout to console
+        try { console.info('[Product Sync] stdout:\n' + (data.stdout||'')); if (data.stderr) console.warn('[Product Sync] stderr:\n' + data.stderr); } catch {}
+      } catch (e) {
+        if (syncStatus) syncStatus.textContent = e.message || 'Sync failed';
+      } finally {
+        syncBtn.disabled = false;
+      }
+    });
+  }
+
   // Logout functionality
   const logoutBtn = document.getElementById('logout-btn');
   if (logoutBtn) {
@@ -334,6 +460,8 @@ document.addEventListener('DOMContentLoaded', () => {
   // Load initial data
   // Ensure the default tab (Products) is visible on load
   showSection('products', document.querySelector('.admin-nav button'));
+  // Load products exclusively from prodList.json for Admin > Products
+  loadProductsFromProdList().then(() => { try { renderProducts(); } catch {} });
   // Orders filters
   const statusFilter = document.getElementById('orders-status-filter');
   const refreshBtn = document.getElementById('orders-refresh-btn');
@@ -345,6 +473,18 @@ document.addEventListener('DOMContentLoaded', () => {
   const invRefreshBtn = document.getElementById('invoices-refresh-btn');
   if (invStatusFilter) invStatusFilter.addEventListener('change', renderInvoices);
   if (invRefreshBtn) invRefreshBtn.addEventListener('click', renderInvoices);
+  // Finance
+  const finTf = document.getElementById('finance-timeframe');
+  const finRefresh = document.getElementById('finance-refresh-btn');
+  if (finTf) finTf.addEventListener('change', renderFinance);
+  if (finRefresh) finRefresh.addEventListener('click', renderFinance);
+  const finPayoutsLocalRefresh = document.getElementById('fin-payouts-local-refresh');
+  if (finPayoutsLocalRefresh) finPayoutsLocalRefresh.addEventListener('click', renderFinance);
+  // Traffic
+  const trTf = document.getElementById('traffic-timeframe');
+  const trRefresh = document.getElementById('traffic-refresh-btn');
+  if (trTf) trTf.addEventListener('change', renderTraffic);
+  if (trRefresh) trRefresh.addEventListener('click', renderTraffic);
 });
 
 // Make functions global for onclick handlers
@@ -352,6 +492,178 @@ window.showSection = showSection;
 window.editProduct = editProduct;
 window.deleteProduct = deleteProduct;
 window.cancelEdit = cancelEdit;
+window.openBillingPortal = async function(email){
+  try {
+    if (!email) { alert('Enter a customer email first.'); return; }
+    const base = window.__API_BASE || API_BASES[0] || '';
+    const res = await fetch(`${base}/api/admin/billing-portal`, {
+      method: 'POST',
+      credentials: 'include',
+      headers: { ...authHeaders(), 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, return_url: location.origin + '/admin.html' })
+    });
+    const data = await res.json().catch(()=>({}));
+    if (!res.ok || !data.url) throw new Error(data.message||'Failed to create portal session');
+    window.location.href = data.url;
+  } catch (e) {
+    alert(e.message || 'Unable to open billing portal');
+  }
+}
+// Marketing helpers
+async function renderMarketing(){
+  // Initial loads
+  await loadSubscribers();
+  await loadCoupons();
+  await populateMarketingWidgets();
+
+  // Wire newsletter form
+  const nlForm = document.getElementById('newsletter-form');
+  const nlStatus = document.getElementById('nl-status');
+  if (nlForm && !nlForm.__wired) {
+    nlForm.__wired = true;
+    nlForm.addEventListener('submit', async (e)=>{
+      e.preventDefault();
+      nlStatus.textContent = 'Queuing…';
+      try {
+        const body = {
+          subject: document.getElementById('nl-subject').value,
+          text: document.getElementById('nl-text').value,
+          html: document.getElementById('nl-html').value
+        };
+        const res = await fetchAdmin('/api/marketing/admin/newsletter', { method:'POST', body: JSON.stringify(body) });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.message||'Failed');
+        nlStatus.textContent = `Queued ${data.queued||0} emails.`;
+        nlForm.reset();
+      } catch (e) { nlStatus.textContent = e.message || 'Failed'; }
+    });
+  }
+
+  // Wire coupon form
+  const cpForm = document.getElementById('coupon-form');
+  const cpStatus = document.getElementById('coupon-status');
+  if (cpForm && !cpForm.__wired) {
+    cpForm.__wired = true;
+    cpForm.addEventListener('submit', async (e)=>{
+      e.preventDefault();
+      cpStatus.textContent = 'Creating…';
+      try {
+        const emails = (document.getElementById('cp-emails').value||'').split(',').map(e=>e.trim()).filter(Boolean);
+        const body = {
+          code: document.getElementById('cp-code').value,
+          type: document.getElementById('cp-type').value,
+          value: Number(document.getElementById('cp-value').value||0),
+          expiresAt: document.getElementById('cp-expires').value || null,
+          maxUses: Number(document.getElementById('cp-maxuses').value||0),
+          userEmails: emails
+        };
+        const res = await fetchAdmin('/api/marketing/admin/coupons', { method:'POST', body: JSON.stringify(body) });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.message||'Failed');
+        cpStatus.textContent = 'Created.';
+        cpForm.reset();
+        await loadCoupons();
+      } catch (e) { cpStatus.textContent = e.message || 'Failed'; }
+    });
+  }
+
+  // Refresh buttons
+  const couRefresh = document.getElementById('coupons-refresh');
+  if (couRefresh && !couRefresh.__wired) { couRefresh.__wired = true; couRefresh.addEventListener('click', async () => { await loadCoupons(); await populateMarketingWidgets(); }); }
+  const subsRefresh = document.getElementById('subs-refresh');
+  if (subsRefresh && !subsRefresh.__wired) { subsRefresh.__wired = true; subsRefresh.addEventListener('click', async () => { await loadSubscribers(); await populateMarketingWidgets(); }); }
+}
+
+async function loadCoupons(){
+  try {
+    const el = document.getElementById('coupons-list');
+    const err = document.getElementById('coupons-error');
+    if (el) el.innerHTML = '<p class="muted">Loading coupons…</p>';
+    if (err) err.style.display = 'none';
+    const res = await fetchAdmin('/api/marketing/admin/coupons');
+    const list = res.ok ? await res.json() : [];
+    if (!el) return;
+    if (!list.length) { el.innerHTML = '<p>No coupons created.</p>'; return; }
+    el.innerHTML = list.map(c => `
+      <div class="product-item">
+        <div>
+          <strong>${c.code}</strong> — ${c.type==='percent'?c.value+'%':'$'+Number(c.value||0).toFixed(2)}
+          <br><small>Used ${c.used||0}${c.maxUses?` / ${c.maxUses}`:''} ${c.active===false?'(inactive)':''}</small>
+          ${c.expiresAt?`<br><small>Expires: ${new Date(c.expiresAt).toLocaleDateString()}</small>`:''}
+        </div>
+        <div>
+          ${c.active!==false?`<button class="btn btn-ghost" data-deact="${c.code}">Deactivate</button>`:''}
+        </div>
+      </div>
+    `).join('');
+    el.querySelectorAll('[data-deact]').forEach(btn => {
+      btn.addEventListener('click', async ()=>{
+        const code = btn.getAttribute('data-deact');
+        try {
+          const r = await fetchAdmin(`/api/marketing/admin/coupons/${encodeURIComponent(code)}/deactivate`, { method:'POST' });
+          if (!r.ok) throw new Error('Failed');
+          loadCoupons();
+        } catch (e) {
+          if (err) { err.style.display = ''; err.textContent = e.message || 'Failed to deactivate.'; }
+        }
+      });
+    });
+  } catch (e) {
+    const el = document.getElementById('coupons-list');
+    const err = document.getElementById('coupons-error');
+    if (el) el.innerHTML = '';
+    if (err) { err.style.display = ''; err.textContent = e.message || 'Failed to load coupons.'; }
+  }
+}
+
+async function loadSubscribers(){
+  const subsList = document.getElementById('subs-list');
+  const err = document.getElementById('subs-error');
+  if (subsList) subsList.innerHTML = '<p class="muted">Loading subscribers…</p>';
+  if (err) err.style.display = 'none';
+  try {
+    const subsRes = await fetchAdmin(`/api/marketing/admin/subscribers?activeOnly=true`);
+    const subs = subsRes.ok ? await subsRes.json() : [];
+    if (subsList) subsList.innerHTML = subs.length ? (`<ul>` + subs.map(s=>`<li>${s.email}${s.name?` — ${s.name}`:''}</li>`).join('') + `</ul>`) : '<p>No subscribers yet.</p>';
+  } catch (e) {
+    if (subsList) subsList.innerHTML = '';
+    if (err) { err.style.display=''; err.textContent = e.message || 'Failed to load subscribers.'; }
+  }
+}
+
+async function populateMarketingWidgets(){
+  // Subscribers active count
+  try {
+    const res = await fetchAdmin(`/api/marketing/admin/subscribers?activeOnly=true`);
+    const list = res.ok ? await res.json() : [];
+    const el = document.getElementById('w-subs-active');
+    if (el) el.textContent = Array.isArray(list) ? list.length : '0';
+  } catch { const el = document.getElementById('w-subs-active'); if (el) el.textContent = '—'; }
+
+  // Coupons aggregates & top codes
+  try {
+    const res = await fetchAdmin('/api/marketing/admin/coupons');
+    const list = res.ok ? await res.json() : [];
+    const total = list.length;
+    const active = list.filter(c=>c.active!==false).length;
+    const usedSum = list.reduce((s,c)=> s + (Number(c.used||0)), 0);
+    const top = list.slice().sort((a,b)=>(b.used||0)-(a.used||0)).slice(0,5);
+    const fmt = (n)=> (typeof n==='number' ? n.toLocaleString() : n);
+    const elTotal = document.getElementById('w-coupons-total'); if (elTotal) elTotal.textContent = fmt(total);
+    const elActive = document.getElementById('w-coupons-active'); if (elActive) elActive.textContent = fmt(active);
+    const elUsed = document.getElementById('w-coupons-used'); if (elUsed) elUsed.textContent = fmt(usedSum);
+    const listEl = document.getElementById('w-top-codes');
+    if (listEl) {
+      if (!top.length) listEl.innerHTML = '<li>No redemptions yet.</li>';
+      else listEl.innerHTML = top.map(c => `<li><strong>${c.code}</strong> — used ${Number(c.used||0)}${c.expiresAt?`, exp ${new Date(c.expiresAt).toLocaleDateString()}`:''}</li>`).join('');
+    }
+  } catch {
+    const elTotal = document.getElementById('w-coupons-total'); if (elTotal) elTotal.textContent = '—';
+    const elActive = document.getElementById('w-coupons-active'); if (elActive) elActive.textContent = '—';
+    const elUsed = document.getElementById('w-coupons-used'); if (elUsed) elUsed.textContent = '—';
+    const listEl = document.getElementById('w-top-codes'); if (listEl) listEl.innerHTML = '<li class="muted">Unavailable</li>';
+  }
+}
 
 // Invoices
 function renderInvoices() {
@@ -437,4 +749,137 @@ function printInvoice(invoiceId) {
       w.document.close();
     })
     .catch(()=> alert('Failed to load invoice'));
+}
+
+// Finance (Stripe)
+async function renderFinance(){
+  const tf = document.getElementById('finance-timeframe');
+  const timeframe = tf ? tf.value : 'week';
+  try {
+    const base = window.__API_BASE || API_BASES[0] || '';
+    const res = await fetch(`${base}/api/admin/stripe/summary?timeframe=${encodeURIComponent(timeframe)}`, { credentials:'include', headers: authHeaders() });
+    if (!res.ok) throw new Error(await res.text().catch(()=> 'Failed'));
+    const data = await res.json();
+    const fmt = (n)=> `$${Number(n||0).toFixed(2)}`;
+    const g = document.getElementById('fin-gross'); if (g) g.textContent = fmt(data.summary?.gross);
+    const r = document.getElementById('fin-refunds'); if (r) r.textContent = fmt(data.summary?.refunds);
+    const f = document.getElementById('fin-fees'); if (f) f.textContent = fmt(data.summary?.fees);
+    const n = document.getElementById('fin-net'); if (n) n.textContent = fmt(data.summary?.net);
+    const bal = document.getElementById('fin-balance');
+    if (bal) {
+      const avail = (data.balance?.available||[]).map(b=>`${b.currency.toUpperCase()}: ${fmt(b.amount)}`).join(', ') || '–';
+      const pend = (data.balance?.pending||[]).map(b=>`${b.currency.toUpperCase()}: ${fmt(b.amount)}`).join(', ') || '–';
+      bal.textContent = `Available: ${avail} | Pending: ${pend}`;
+    }
+    const payouts = document.getElementById('fin-payouts');
+    if (payouts) {
+      const list = (data.payouts||[]).map(p=>`<div class="product-item"><div><strong>${p.id}</strong><br><small>${new Date(p.created*1000).toLocaleString()}</small></div><div><strong>${fmt(p.amount)}</strong> <small>${p.status}</small></div></div>`).join('');
+      payouts.innerHTML = list || '<p class="muted">No payouts</p>';
+    }
+    // Chart: cash flow daily
+    try {
+      const el = document.getElementById('fin-chart');
+      if (el && window.Chart) {
+        const labels = (data.series||[]).map(p=>p.date);
+        const gross = (data.series||[]).map(p=>p.gross||0);
+        const net = (data.series||[]).map(p=>p.net||0);
+        const refunds = (data.series||[]).map(p=>p.refunds||0);
+        const fees = (data.series||[]).map(p=>p.fees||0);
+        if (el.__chart) { el.__chart.destroy(); }
+        el.__chart = new window.Chart(el.getContext('2d'), {
+          type: 'line',
+          data: { labels, datasets: [
+            { label:'Gross', data:gross, borderColor:'#2a6ef4', backgroundColor:'rgba(42,110,244,0.15)', tension:.25 },
+            { label:'Net', data:net, borderColor:'#0aa06e', backgroundColor:'rgba(10,160,110,0.15)', tension:.25 },
+            { label:'Refunds', data:refunds, borderColor:'#cc3344', backgroundColor:'rgba(204,51,68,0.15)', tension:.25 },
+            { label:'Fees', data:fees, borderColor:'#888', backgroundColor:'rgba(136,136,136,0.15)', tension:.25 }
+          ] },
+          options: { responsive:true, scales:{ y:{ beginAtZero:true, ticks:{ callback:(v)=>`$${Number(v).toFixed(0)}` } } }, plugins:{ legend:{ position:'bottom' } } }
+        });
+      }
+    } catch {}
+  } catch (e) {
+    const g = document.getElementById('fin-gross'); if (g) g.textContent = '—';
+    const r = document.getElementById('fin-refunds'); if (r) r.textContent = '—';
+    const f = document.getElementById('fin-fees'); if (f) f.textContent = '—';
+    const n = document.getElementById('fin-net'); if (n) n.textContent = '—';
+    const bal = document.getElementById('fin-balance'); if (bal) bal.textContent = 'Unavailable';
+    const payouts = document.getElementById('fin-payouts'); if (payouts) payouts.innerHTML = '<p class="muted">Unavailable</p>';
+  }
+  // Load local payout history
+  try {
+    const base = window.__API_BASE || API_BASES[0] || '';
+    const res = await fetch(`${base}/api/admin/stripe/payouts-local`, { credentials:'include', headers: authHeaders() });
+    const wrap = document.getElementById('fin-payouts-local');
+    if (wrap) {
+      if (!res.ok) { wrap.innerHTML = '<p class="muted">No local payouts.</p>'; }
+      else {
+        const data = await res.json();
+        const list = (data.items||[]).map(p=>`<div class="product-item"><div><strong>${p.id}</strong><br><small>${new Date(p.createdAt).toLocaleString()}</small>${p.arrivalDate?`<br><small>Arrived: ${new Date(p.arrivalDate).toLocaleDateString()}</small>`:''}</div><div><strong>$${Number(p.amount||0).toFixed(2)}</strong> <small>${p.status||''}</small></div></div>`).join('');
+        wrap.innerHTML = list || '<p class="muted">No local payouts.</p>';
+      }
+    }
+  } catch (e) {
+    const wrap = document.getElementById('fin-payouts-local'); if (wrap) wrap.innerHTML = '<p class="muted">Unavailable</p>';
+  }
+  // Also attempt to list invoices
+  try {
+    const base = window.__API_BASE || API_BASES[0] || '';
+    const tf = document.getElementById('finance-timeframe');
+    const timeframe = tf ? tf.value : 'week';
+    const res = await fetch(`${base}/api/admin/stripe/invoices?timeframe=${encodeURIComponent(timeframe)}&limit=10`, { credentials:'include', headers: authHeaders() });
+    const wrap = document.getElementById('fin-invoices');
+    if (!wrap) return;
+    if (!res.ok) { wrap.innerHTML = '<p class="muted">No Stripe invoices.</p>'; return; }
+    const data = await res.json();
+    const list = (data.items||[]).map(inv=>`<div class="product-item"><div><strong>${inv.number||inv.id}</strong> <small>${inv.status}</small><br><small>${new Date(inv.created*1000).toLocaleString()}</small><br>${inv.customer_email||''}</div><div><strong>$${Number(inv.total/100).toFixed(2)}</strong></div></div>`).join('');
+    wrap.innerHTML = list || '<p class="muted">No Stripe invoices.</p>';
+  } catch (e) {
+    const wrap = document.getElementById('fin-invoices'); if (wrap) wrap.innerHTML = '<p class="muted">Unavailable</p>';
+  }
+}
+
+// Traffic (Cloudflare)
+async function renderTraffic(){
+  const tf = document.getElementById('traffic-timeframe');
+  const timeframe = tf ? tf.value : 'week';
+  try {
+    const base = window.__API_BASE || API_BASES[0] || '';
+    const res = await fetch(`${base}/api/admin/cloudflare/summary?timeframe=${encodeURIComponent(timeframe)}`, { credentials:'include', headers: authHeaders() });
+    if (!res.ok) throw new Error(await res.text().catch(()=> 'Failed'));
+    const data = await res.json();
+    const reqs = document.getElementById('cf-reqs'); if (reqs) reqs.textContent = String(data.totals?.requests||0);
+    const cache = document.getElementById('cf-cache'); if (cache) cache.textContent = `${Math.round((data.cacheRatio||0)*100)}%`;
+    const band = document.getElementById('cf-band'); if (band) band.textContent = `${Number(data.bandwidthMB||0).toFixed(1)} MB`;
+    const thr = document.getElementById('cf-threats'); if (thr) thr.textContent = String(data.totals?.threats||0);
+    const top = document.getElementById('cf-top-paths'); if (top) top.innerHTML = (data.topPaths||[]).map(p=>`<li><code>${p.path}</code> — <strong>${p.requests}</strong></li>`).join('') || '<li class="muted">No data</li>';
+    const byc = document.getElementById('cf-by-country'); if (byc) byc.innerHTML = (data.byCountry||[]).map(c=>`<li>${c.country} — <strong>${c.requests}</strong></li>`).join('') || '<li class="muted">No data</li>';
+    // Chart: daily requests
+    try {
+      const el = document.getElementById('cf-chart');
+      if (el && window.Chart) {
+        const labels = (data.series||[]).map(p=>p.date);
+        const reqs = (data.series||[]).map(p=>p.requests||0);
+        const cached = (data.series||[]).map(p=>p.cachedRequests||0);
+        const threats = (data.series||[]).map(p=>p.threats||0);
+        if (el.__chart) { el.__chart.destroy(); }
+        el.__chart = new window.Chart(el.getContext('2d'), {
+          type: 'line',
+          data: { labels, datasets: [
+            { label:'Requests', data:reqs, borderColor:'#2a6ef4', backgroundColor:'rgba(42,110,244,0.15)', tension:.25 },
+            { label:'Cached', data:cached, borderColor:'#0aa06e', backgroundColor:'rgba(10,160,110,0.15)', tension:.25 },
+            { label:'Threats', data:threats, borderColor:'#cc3344', backgroundColor:'rgba(204,51,68,0.15)', tension:.25 }
+          ] },
+          options: { responsive:true, scales:{ y:{ beginAtZero:true } }, plugins:{ legend:{ position:'bottom' } } }
+        });
+      }
+    } catch {}
+  } catch (e) {
+    const reqs = document.getElementById('cf-reqs'); if (reqs) reqs.textContent = '—';
+    const cache = document.getElementById('cf-cache'); if (cache) cache.textContent = '—';
+    const band = document.getElementById('cf-band'); if (band) band.textContent = '—';
+    const thr = document.getElementById('cf-threats'); if (thr) thr.textContent = '—';
+    const top = document.getElementById('cf-top-paths'); if (top) top.innerHTML = '<li class="muted">Unavailable</li>';
+    const byc = document.getElementById('cf-by-country'); if (byc) byc.innerHTML = '<li class="muted">Unavailable</li>';
+  }
 }

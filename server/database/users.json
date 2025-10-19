@@ -1,19 +1,19 @@
 [
   {
     "id": "user_mpd5k67y9",
-    "email": "admin@ezsports.com",
+    "email": "admin@ezsportsnetting.com",
     "username": "admin",
     "password": "$2b$10$oTfY/cJ4d20i0USVn9jpKe8QUZdRb5MKwLJTxhs0CDmjuOqIDcGu2",
     "firstName": "Admin",
     "lastName": "User",
     "role": "admin",
     "createdAt": "2025-08-13T02:57:41.654Z",
-    "lastLogin": "2025-09-17T17:57:35.322Z",
-    "updatedAt": "2025-09-17T17:57:35.323Z"
+    "lastLogin": "2025-10-18T00:26:27.280Z",
+    "updatedAt": "2025-10-18T00:26:27.281Z"
   },
   {
     "username": "customer",
-    "email": "customer@ezsports.com",
+    "email": "customer@ezsportsnetting.com",
     "password": "$2b$10$1rUKDbLUuF.QVWV5HnahLeA3VPvJgwPf2TU1OtPoEKfjqiq5eRwCa",
     "name": "Test Customer",
     "isAdmin": false,

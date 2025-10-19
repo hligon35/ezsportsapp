@@ -2,6 +2,8 @@
 // Exposes window.CATALOG_PRODUCTS as an array of { id, title, price, category, img }.
 
 (function(){
+  // If dynamic loader already populated products, skip legacy static seed
+  if (Array.isArray(window.CATALOG_PRODUCTS) && window.CATALOG_PRODUCTS.length) return;
   const bats = (() => {
     const imgs = [
       'assets/img/bat1.avif','assets/img/bat2.avif','assets/img/bat3.avif','assets/img/bat4.avif','assets/img/bat5.avif','assets/img/bat6.avif','assets/img/bat7.avif','assets/img/bat8.avif','assets/img/bat9.avif','assets/img/bat10.avif','assets/img/bat11.avif','assets/img/bat12.avif','assets/img/bat13.avif','assets/img/bat14.avif','assets/img/bat15.avif'
@@ -64,12 +66,12 @@
   ];
 
   const lScreens = [
-    { id:'ls-pro', title:'Pro L-Screen', price:399.00, category:'l-screens', img:'assets/img/screen1.avif' },
-    { id:'ls-portable', title:'Portable L-Screen', price:329.00, category:'l-screens', img:'assets/img/screen2.avif' },
-    { id:'ls-heavy', title:'Heavy-Duty L-Screen', price:499.00, category:'l-screens', img:'assets/img/screen3.avif' },
-    { id:'ls-junior', title:'Junior L-Screen', price:249.00, category:'l-screens', img:'assets/img/screen4.avif' },
-    { id:'ls-foldable', title:'Foldable L-Screen', price:289.00, category:'l-screens', img:'assets/img/screen5.avif' },
-    { id:'ls-net-replacement', title:'Pro Net Replacement', price:149.00, category:'l-screens', img:'assets/img/screen6.avif' },
+    { id:'ls-pro', title:'Pro L-Screen', price:399.00, category:'l-screens', img:'assets/prodImgs/Bullet_L-Screens/bulletl1.avif' },
+    { id:'ls-portable', title:'Portable L-Screen', price:329.00, category:'l-screens', img:'assets/prodImgs/Bullet_L-Screens/bulletl2.avif' },
+    { id:'ls-heavy', title:'Heavy-Duty L-Screen', price:499.00, category:'l-screens', img:'assets/prodImgs/Bullet_L-Screens/bulletl3.avif' },
+    { id:'ls-junior', title:'Junior L-Screen', price:249.00, category:'l-screens', img:'assets/prodImgs/Bullet_L-Screens/bulletl4.avif' },
+    { id:'ls-foldable', title:'Foldable L-Screen', price:289.00, category:'l-screens', img:'assets/prodImgs/Bullet_L-Screens/bulletl6.avif' },
+    { id:'ls-net-replacement', title:'Pro Net Replacement', price:149.00, category:'l-screens', img:'assets/prodImgs/Bullet_L-Screens/bulletl7.avif' },
   ];
 
   const facilityField = [
