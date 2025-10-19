@@ -76,9 +76,10 @@ class EmailService {
           });
         } finally { clearTimeout(t); }
         if (resp && (resp.status === 202 || resp.status === 200)) {
-          await this.db.update('emails', { id: email.id }, { status: 'sent', provider: 'sendgrid-api', sentAt: new Date().toISOString() });
-          if (this.debug) console.log('[EmailService] SendGrid API accepted');
-          return { ...email, status: 'sent', provider: 'sendgrid-api' };
+          const msgId = resp.headers?.get?.('x-message-id') || null;
+          await this.db.update('emails', { id: email.id }, { status: 'sent', provider: 'sendgrid-api', providerId: msgId, sentAt: new Date().toISOString() });
+          if (this.debug) console.log('[EmailService] SendGrid API accepted', { messageId: msgId });
+          return { ...email, status: 'sent', provider: 'sendgrid-api', providerId: msgId };
         } else {
           const body = await (resp?.text?.() || Promise.resolve(''));
           if (this.debug) console.warn('[EmailService] SendGrid API not OK', { status: resp?.status, body: body?.slice(0,200) });

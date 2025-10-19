@@ -19,6 +19,15 @@
     if (kind === 'subscribe') list.push(FORM_ENDPOINT);
     return list;
   }
+  // Fetch with timeout to keep UI snappy
+  async function fetchWithTimeout(url, options, timeoutMs){
+    const controller = new AbortController();
+    const t = setTimeout(()=>controller.abort(), Math.max(1500, Number(timeoutMs||4000)));
+    try {
+      const res = await fetch(url, { ...(options||{}), signal: controller.signal });
+      return res;
+    } finally { clearTimeout(t); }
+  }
   // Prefer a single shared token fetcher from app.js to avoid duplicate execute() calls
   const SITE_KEY = window.TURNSTILE_SITE_KEY || '0x4AAAAAAB5rtUiQ1MiqGIxp';
   async function getToken(){
@@ -67,7 +76,7 @@
           let ok = false;
           for (const url of endpointsFor('subscribe')) {
             try {
-              const res = await fetch(url, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+              const res = await fetchWithTimeout(url, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) }, 4500);
               data = await res.json().catch(()=>({}));
               if (res.ok && data && data.ok !== false) { ok = true; break; }
             } catch { /* try next */ }
@@ -119,7 +128,7 @@
         let ok = false;
         for (const url of endpointsFor('contact')) {
           try {
-            const res = await fetch(url, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+            const res = await fetchWithTimeout(url, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) }, 4500);
             data = await res.json().catch(()=>({}));
             if (res.ok && data && data.ok !== false) { ok = true; break; }
           } catch { /* try next */ }

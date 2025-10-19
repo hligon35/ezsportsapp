@@ -78,63 +78,77 @@ router.post('/contact', async (req, res) => {
 
     if (!email || !message) return res.status(400).json({ ok: false, error: 'Missing email or message' });
 
-    // Optional Cloudflare Turnstile verification (enable by setting CF_TURNSTILE_SECRET)
-    try {
-      const tsSecret = (process.env.CF_TURNSTILE_SECRET || '').trim();
-      if (tsSecret && !bypassTurnstile) {
-        const doFetch = (typeof fetch === 'function') ? fetch : (require('undici').fetch);
-        const resp = await doFetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-          body: new URLSearchParams({ secret: tsSecret, response: turnstile || '' }).toString()
-        }).catch(() => null);
-        const data = resp ? await resp.json().catch(()=>({})) : {};
-        if (!data || data.success !== true) {
-          return res.status(400).json({ ok:false, error: 'Captcha verification failed' });
-        }
-      }
-    } catch { /* treat as no captcha when network fails */ }
-
-    const html = `
-      <h2>Contact Form Submission</h2>
-      <p><strong>Name:</strong> ${name}</p>
-      <p><strong>Email:</strong> ${email}</p>
-      ${phone ? `<p><strong>Phone:</strong> ${phone}</p>` : ''}
-      <p><strong>Subject:</strong> ${subject}</p>
-      <p><strong>Message:</strong></p>
-      <pre style="white-space:pre-wrap">${message}</pre>
-    `;
-
-    const inbox = (process.env.CONTACT_INBOX || 'info@ezsportsnetting.com').trim();
-    // Fire-and-forget the internal notification and the acknowledgement; do not await
-    try {
-      void mail.queue({
-        to: inbox,
-        subject: `[Contact] ${subject}`,
-        html,
-        text: `From: ${name} <${email}>\n${phone ? `Phone: ${phone}\n` : ''}\nSubject: ${subject}\n\n${message}`,
-        tags: ['contact'],
-        replyTo: email
-      }).catch(e=>console.warn('Contact email queue failed:', e?.message||e));
-
-      const ackHtml = `
-        <p>Hi ${name.replace(/</g,'&lt;')},</p>
-        <p>Thanks for contacting EZ Sports Netting! We received your message and will get back to you soon.</p>
-        <hr/>
-        <p><strong>Your message:</strong></p>
-        <pre style="white-space:pre-wrap">${message.replace(/</g,'&lt;')}</pre>
-      `;
-      void mail.queue({
-        to: email,
-        subject: 'We received your message',
-        html: ackHtml,
-        text: `Hi ${name},\n\nThanks for contacting EZ Sports Netting! We received your message and will get back to you soon.\n\n---\nYour message:\n${message}`,
-        tags: ['contact','ack'],
-        replyTo: inbox
-      }).catch(()=>{});
-    } catch {}
-
+    // Respond immediately to keep the UI snappy
     res.json({ ok: true, queued: true });
+
+    // Continue work in background: verify Turnstile (if enabled) and send emails.
+    setImmediate(async () => {
+      try {
+        // Optional Cloudflare Turnstile verification (enable by setting CF_TURNSTILE_SECRET)
+        let captchaOk = true;
+        try {
+          const tsSecret = (process.env.CF_TURNSTILE_SECRET || '').trim();
+          if (tsSecret && !bypassTurnstile) {
+            const doFetch = (typeof fetch === 'function') ? fetch : (require('undici').fetch);
+            const resp = await doFetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+              body: new URLSearchParams({ secret: tsSecret, response: turnstile || '' }).toString()
+            }).catch(() => null);
+            const data = resp ? await resp.json().catch(()=>({})) : {};
+            captchaOk = !!(data && data.success === true);
+          }
+        } catch { /* ignore */ }
+
+        const html = `
+          <h2>Contact Form Submission</h2>
+          <p><strong>Name:</strong> ${name}</p>
+          <p><strong>Email:</strong> ${email}</p>
+          ${phone ? `<p><strong>Phone:</strong> ${phone}</p>` : ''}
+          <p><strong>Subject:</strong> ${subject}</p>
+          <p><strong>Message:</strong></p>
+          <pre style="white-space:pre-wrap">${message}</pre>
+        `;
+
+        const inbox = (process.env.CONTACT_INBOX || 'info@ezsportsnetting.com').trim();
+
+        // Always send an acknowledgement to the sender (does not depend on captcha)
+        try {
+          const ackHtml = `
+            <p>Hi ${name.replace(/</g,'&lt;')},</p>
+            <p>Thanks for contacting EZ Sports Netting! We received your message and will get back to you soon.</p>
+            <hr/>
+            <p><strong>Your message:</strong></p>
+            <pre style="white-space:pre-wrap">${message.replace(/</g,'&lt;')}</pre>
+          `;
+          void mail.queue({
+            to: email,
+            subject: 'We received your message',
+            html: ackHtml,
+            text: `Hi ${name},\n\nThanks for contacting EZ Sports Netting! We received your message and will get back to you soon.\n\n---\nYour message:\n${message}`,
+            tags: ['contact','ack'],
+            replyTo: inbox
+          }).catch(()=>{});
+        } catch { /* ignore ack failure */ }
+
+        // Send internal notification only if captcha passes or bypass is enabled
+        if (captchaOk || bypassTurnstile) {
+          try {
+            void mail.queue({
+              to: inbox,
+              subject: `[Contact] ${subject}`,
+              html,
+              text: `From: ${name} <${email}>\n${phone ? `Phone: ${phone}\n` : ''}\nSubject: ${subject}\n\n${message}`,
+              tags: ['contact'],
+              replyTo: email
+            }).catch(e=>console.warn('Contact email queue failed:', e?.message||e));
+          } catch { /* ignore internal failure */ }
+        }
+      } catch (e) {
+        // Do not throw; background errors are logged only
+        if (process.env.EMAIL_DEBUG === 'true') console.warn('Background contact handler error:', e?.message||e);
+      }
+    });
   } catch (e) {
     res.status(500).json({ ok: false, error: e.message });
   }
