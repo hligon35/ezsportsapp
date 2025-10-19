@@ -53,7 +53,13 @@ class EmailService {
           try { doFetch = require('undici').fetch; } catch { /* no-op */ }
         }
         if (!doFetch) throw new Error('fetch is not available in this Node runtime');
-        const resp = await doFetch(this.cfUrl, { method: 'POST', headers, body: JSON.stringify(payload) });
+        // Bound Cloudflare worker call with a short timeout to avoid hanging
+        const controller = new AbortController();
+        const t = setTimeout(()=>controller.abort(), Number(process.env.EMAIL_HTTP_TIMEOUT_MS||2500));
+        let resp;
+        try {
+          resp = await doFetch(this.cfUrl, { method: 'POST', headers, body: JSON.stringify(payload), signal: controller.signal });
+        } finally { clearTimeout(t); }
         if (resp.ok) {
           await this.db.update('emails', { id: email.id }, { status: 'sent', provider: 'cloudflare-worker', sentAt: new Date().toISOString() });
           return { ...email, status: 'sent', provider: 'cloudflare-worker' };

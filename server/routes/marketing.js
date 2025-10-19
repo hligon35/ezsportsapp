@@ -21,11 +21,9 @@ router.post('/subscribe', async (req, res) => {
     // Save subscriber
     const s = await subs.addOrUpdate(addr, name);
 
-    // Queue emails (await to know if they actually queued)
-    let queuedInternal = false;
-    let queuedWelcome = false;
+    // Queue emails in the background (do not await)
     try {
-  const inbox = (process.env.CONTACT_INBOX || 'info@ezsportsnetting.com').trim();
+      const inbox = (process.env.CONTACT_INBOX || 'info@ezsportsnetting.com').trim();
       if (inbox) {
         const html = `
           <h2>New Newsletter Subscriber</h2>
@@ -34,40 +32,29 @@ router.post('/subscribe', async (req, res) => {
           ${source ? `<p><strong>Source:</strong> ${source}</p>` : ''}
           ${referer ? `<p><strong>Referrer:</strong> ${referer}</p>` : ''}
         `;
-        const out = await mail.queue({ to: inbox, subject: 'New subscriber', html, text: `Email: ${addr}\nName: ${name||''}\nSource: ${source||''}\nReferrer: ${referer||''}`, tags: ['subscribe','internal'], replyTo: addr });
-        queuedInternal = !!out;
+        // Fire-and-forget; log errors but don't delay response
+        void mail.queue({ to: inbox, subject: 'New subscriber', html, text: `Email: ${addr}\nName: ${name||''}\nSource: ${source||''}\nReferrer: ${referer||''}`, tags: ['subscribe','internal'], replyTo: addr }).catch(err=>console.warn('Subscribe internal email failed:', err?.message||err));
       }
-    } catch (_) { queuedInternal = false; }
-
-    try {
-      const html = `
+      const welcomeHtml = `
         <p>Thanks for subscribing to EZ Sports Netting!</p>
         <p>We’ll send occasional deals and product updates. You can unsubscribe anytime.</p>
       `;
-  const out2 = await mail.queue({ to: addr, subject: 'Thanks for subscribing to EZ Sports Netting', html, text: 'Thanks for subscribing to EZ Sports Netting! We’ll send occasional deals and product updates.', tags: ['subscribe','welcome'], replyTo: inbox });
-      queuedWelcome = !!out2;
-    } catch (_) { queuedWelcome = false; }
+      void mail.queue({ to: addr, subject: 'Thanks for subscribing to EZ Sports Netting', html: welcomeHtml, text: 'Thanks for subscribing to EZ Sports Netting! We’ll send occasional deals and product updates.', tags: ['subscribe','welcome'], replyTo: inbox }).catch(err=>console.warn('Subscribe welcome email failed:', err?.message||err));
+    } catch {}
 
-    // Optionally forward to Google Apps Script to log to Google Sheet
-    let forwarded = false;
+    // Optional Apps Script forward (non-blocking)
     try {
       const url = (process.env.MARKETING_APPS_SCRIPT_URL || '').trim();
       if (url) {
         const payload = { type: 'subscribe', email: addr, name, source: source || '', referer: referer || '' };
         const body = JSON.stringify(payload);
-        // Use global fetch if available (Node 18+)
-        const doFetch = (typeof fetch === 'function')
-          ? fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body })
-          : Promise.resolve(null);
-        const result = await Promise.race([
-          doFetch.then(r=> (r && r.ok) ? true : false).catch(()=>false),
-          new Promise(r=>setTimeout(()=>r(false), 1500)) // don't block response
-        ]);
-        forwarded = !!result;
+        const doFetch = (typeof fetch === 'function') ? fetch : null;
+        if (doFetch) { void doFetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body }).catch(()=>{}); }
       }
-    } catch { forwarded = false; }
+    } catch {}
 
-    res.json({ ok:true, subscriber: s, queuedInternal, queuedWelcome, forwarded });
+    // Respond immediately
+    res.json({ ok:true, subscriber: s });
   } catch (e) {
     res.status(400).json({ message: e.message });
   }
@@ -119,23 +106,17 @@ router.post('/contact', async (req, res) => {
     `;
 
     const inbox = (process.env.CONTACT_INBOX || 'info@ezsportsnetting.com').trim();
-    let queued = false;
+    // Fire-and-forget the internal notification and the acknowledgement; do not await
     try {
-      await mail.queue({
+      void mail.queue({
         to: inbox,
         subject: `[Contact] ${subject}`,
         html,
         text: `From: ${name} <${email}>\n${phone ? `Phone: ${phone}\n` : ''}\nSubject: ${subject}\n\n${message}`,
         tags: ['contact'],
         replyTo: email
-      });
-      queued = true;
-    } catch (e) {
-      console.warn('Contact email queue failed:', e.message);
-    }
+      }).catch(e=>console.warn('Contact email queue failed:', e?.message||e));
 
-    // Send an acknowledgement email to the sender (non-blocking)
-    try {
       const ackHtml = `
         <p>Hi ${name.replace(/</g,'&lt;')},</p>
         <p>Thanks for contacting EZ Sports Netting! We received your message and will get back to you soon.</p>
@@ -143,17 +124,17 @@ router.post('/contact', async (req, res) => {
         <p><strong>Your message:</strong></p>
         <pre style="white-space:pre-wrap">${message.replace(/</g,'&lt;')}</pre>
       `;
-      await mail.queue({
+      void mail.queue({
         to: email,
         subject: 'We received your message',
         html: ackHtml,
         text: `Hi ${name},\n\nThanks for contacting EZ Sports Netting! We received your message and will get back to you soon.\n\n---\nYour message:\n${message}`,
         tags: ['contact','ack'],
         replyTo: inbox
-      });
-    } catch (_) { /* ignore ack errors */ }
+      }).catch(()=>{});
+    } catch {}
 
-  res.json({ ok: true, queued });
+    res.json({ ok: true, queued: true });
   } catch (e) {
     res.status(500).json({ ok: false, error: e.message });
   }
