@@ -718,12 +718,35 @@ app.post('/api/create-payment-intent', async (req, res) => {
       newOrder = null;
     }
 
-    // Provide an idempotency key to prevent duplicate PI creation on retries
-    const idemKey = crypto
-      .createHash('sha256')
-      .update(JSON.stringify({ normItems, email: customer.email || '', existingOrderId: newOrder?.id || existingOrderId || null }))
-      .digest('hex')
-      .slice(0, 64);
+    // Provide an idempotency key to prevent duplicate PI creation on retries.
+    // IMPORTANT: Include all pricing-affecting inputs so that changing shipping, coupon,
+    // tax mode, or totals generates a new key and avoids Stripe idempotency collisions.
+    const makeIdemKey = (basis) =>
+      crypto.createHash('sha256').update(JSON.stringify(basis)).digest('hex').slice(0, 64);
+    const baseContext = {
+      items: normItems.map(i => ({ id: i.id, qty: i.qty })),
+      email: customer.email || '',
+      shipping: {
+        line1: normalizedShipping.address1 || '',
+        line2: normalizedShipping.address2 || '',
+        city: normalizedShipping.city || '',
+        state: normalizedShipping.state || '',
+        postal: normalizedShipping.postal || '',
+        country: normalizedShipping.country || 'US'
+      },
+      currency: safeCurrency,
+      couponCode: appliedCoupon ? String(appliedCoupon.code) : String(couponCode || ''),
+      // Include the server-derived breakdown to ensure the PI key changes when math changes
+      subtotal,
+      shippingCents,
+      // discountCents may be 0 when no coupon is applied
+      discountCents,
+      usedAutomaticTax,
+      // For auto tax we don't know tax yet; keep as null to differentiate
+      taxCents: usedAutomaticTax ? null : taxCents,
+      amount
+    };
+    let idemKey = makeIdemKey(baseContext);
 
     // Enforce Stripe minimum amounts by currency
     const minByCurrency = { usd: 50 };
@@ -773,6 +796,9 @@ app.post('/api/create-payment-intent', async (req, res) => {
           // Compute manual tax and retry without automatic_tax
           taxCents = calcTaxCents(subtotal, shippingCents, discountCents, normalizedShipping);
           amount = Math.max(0, subtotal + shippingCents - discountCents + taxCents);
+          // Recompute idempotency key for manual-tax attempt to reflect new totals and mode
+          const manualCtx = { ...baseContext, usedAutomaticTax: false, taxCents, amount };
+          idemKey = makeIdemKey(manualCtx);
           const { belowMin, min } = ensureMin(amount, safeCurrency);
           if (belowMin) {
             return res.status(400).json({ error: `Order total is below the minimum charge amount (${(min/100).toFixed(2)} USD). Please add another item.` });
@@ -802,7 +828,7 @@ app.post('/api/create-payment-intent', async (req, res) => {
                 country: normalizedShipping.country || 'US',
               }
             }
-          }, { idempotencyKey: idemKey + '-manualtax' });
+          }, { idempotencyKey: idemKey });
         } catch (e2) {
           throw e2;
         }
