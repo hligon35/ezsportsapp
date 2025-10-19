@@ -7,11 +7,12 @@ class EmailService {
     this.db = new DatabaseManager();
     this.transporter = null;
     this.from = process.env.SMTP_FROM || process.env.MAIL_FROM || 'no-reply@ezsports.app';
-    this.cfUrl = process.env.CF_EMAIL_WEBHOOK_URL || '';
+  this.cfUrl = process.env.CF_EMAIL_WEBHOOK_URL || '';
     this.cfApiKey = process.env.CF_EMAIL_API_KEY || '';
     this.cfAccessId = process.env.CF_ACCESS_CLIENT_ID || '';
     this.cfAccessSecret = process.env.CF_ACCESS_CLIENT_SECRET || '';
     this.debug = String(process.env.EMAIL_DEBUG || '').toLowerCase() === 'true';
+  this.sgKey = process.env.SENDGRID_API_KEY || '';
     // Configure SMTP transport if environment variables are present
     const hasSendgrid = !!process.env.SENDGRID_API_KEY;
     const hasSmtp = !!process.env.SMTP_HOST;
@@ -43,7 +44,53 @@ class EmailService {
     // Always write to outbox for auditability
     const record = { to, subject, html, text, tags, replyTo, from: from || this.from, fromName, status: this.transporter ? 'sending' : 'queued', createdAt: new Date().toISOString() };
     const email = await this.db.insert('emails', record);
-    // Prefer SMTP first if available (more predictable deliverability), then fallback to Cloudflare Worker
+    // 1) Prefer SendGrid HTTP API if API key is configured (avoids SMTP egress issues)
+    if (this.sgKey) {
+      try {
+        if (this.debug) console.log('[EmailService] Sending via SendGrid API…');
+        const payload = {
+          personalizations: [{ to: [{ email: to }] }],
+          from: { email: from || this.from, name: fromName || 'EZ Sports Netting' },
+          subject,
+          content: [
+            { type: 'text/plain', value: text || '' },
+            { type: 'text/html', value: html || (text ? `<pre>${text}</pre>` : '') }
+          ]
+        };
+        if (replyTo) payload.reply_to = { email: replyTo };
+        if (Array.isArray(tags) && tags.length) payload.categories = tags.slice(0, 10).map(String);
+        let doFetch = (typeof fetch === 'function') ? fetch : null;
+        if (!doFetch) { try { doFetch = require('undici').fetch; } catch { /* no-op */ } }
+        if (!doFetch) throw new Error('fetch unavailable');
+        const controller = new AbortController();
+        const t = setTimeout(()=>controller.abort(), Number(process.env.SENDGRID_HTTP_TIMEOUT_MS||4000));
+        let resp; try {
+          resp = await doFetch('https://api.sendgrid.com/v3/mail/send', {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${this.sgKey}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(payload),
+            signal: controller.signal
+          });
+        } finally { clearTimeout(t); }
+        if (resp && (resp.status === 202 || resp.status === 200)) {
+          await this.db.update('emails', { id: email.id }, { status: 'sent', provider: 'sendgrid-api', sentAt: new Date().toISOString() });
+          if (this.debug) console.log('[EmailService] SendGrid API accepted');
+          return { ...email, status: 'sent', provider: 'sendgrid-api' };
+        } else {
+          const body = await (resp?.text?.() || Promise.resolve(''));
+          if (this.debug) console.warn('[EmailService] SendGrid API not OK', { status: resp?.status, body: body?.slice(0,200) });
+          // fall through to SMTP
+        }
+      } catch (e) {
+        if (this.debug) console.warn('[EmailService] SendGrid API failed', e?.message||e);
+        // fall through to SMTP
+      }
+    }
+
+    // 2) Try SMTP (SendGrid SMTP or custom SMTP)
     if (this.transporter) {
       try {
         if (this.debug) console.log('[EmailService] Sending via SMTP…');
@@ -57,6 +104,7 @@ class EmailService {
       }
     }
 
+    // 3) Cloudflare Worker (MailChannels)
     if (this.cfUrl) {
       try {
         const payload = { to, subject, html, text, from: from || this.from };
