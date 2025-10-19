@@ -606,6 +606,9 @@ body{
 .hidden{ display:none !important; }
 /* Generic row utility for inline controls */
 .row{ display:flex; gap:.6rem; align-items:center; flex-wrap:wrap; }
+/* Align checkbox label text horizontally with the checkbox */
+label.checkbox{ display:inline-flex; align-items:center; gap:.45rem; line-height:1; }
+label.checkbox input[type="checkbox"]{ margin:0; position:relative; top:0; }
 /* Auth form layout */
 .auth-container{ max-width: 480px; margin: 2rem auto; background:#fff; border-radius:1.2rem; box-shadow:0 4px 24px rgba(12,32,64,.10); padding: 1.5rem; }
 .auth-form{ display:grid; grid-auto-rows:min-content; gap:.9rem; }
@@ -650,6 +653,8 @@ body{
 @media(min-width:520px){
   .auth-form .grid-2{ grid-template-columns:1fr 1fr; }
 }
+.auth-form .grid-3{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:.9rem; }
+@media (max-width:720px){ .auth-form .grid-3{ grid-template-columns:1fr; } }
 .auth-form .btn{ height: 44px; }
 img{max-width:100%;display:block}
 .container{max-width:1200px;width:100%;margin-inline:auto;padding-inline:clamp(.9rem,4vw,2rem)}
@@ -1150,6 +1155,11 @@ body.lscreens-subnav .card .body .actions-row.right{ justify-content:flex-end; }
 .brand--light{opacity:1}
 .subscribe .row{display:flex;gap:.5rem}
 .subscribe input{flex:0 1 auto;width:auto;min-width:16ch;max-width:100%;padding:.65rem .8rem;border-radius:.6rem;border:1px solid var(--border);background:#fff;color:var(--ink)}
+/* Payment methods: Add Card form visuals */
+#pm-add-area{ display:grid; gap:.75rem; }
+.auth-container #pm-add-area input { padding:.85rem 1rem; border:1px solid var(--border); border-radius:.7rem; width:100%; max-width:100%; box-sizing:border-box; background:#fff; color:var(--ink); }
+.card-element{ padding:.85rem 1rem; border:1px solid var(--border); border-radius:.7rem; background:#fff; }
+.card-element:focus-within{ outline:none; box-shadow:var(--ring); border-color:var(--brand); }
 .site-footer a[href="careers.html"],
 .site-footer li a[href="careers.html"],
 nav.quick-links a[href="careers.html"],

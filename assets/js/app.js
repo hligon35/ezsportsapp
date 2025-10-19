@@ -2501,10 +2501,10 @@ ensureHomeFirst() {
     const imagesList = (function(){
       try {
         const all = collectAll();
-        // De-dupe and keep up to 10 for UI usage (color dots, etc.)
+        // De-dupe and keep up to 11 for UI usage (color dots, etc.)
         const seen = new Set();
         const out = [];
-        for (const s of all) { if (!seen.has(s)) { seen.add(s); out.push(s); if (out.length >= 10) break; } }
+        for (const s of all) { if (!seen.has(s)) { seen.add(s); out.push(s); if (out.length >= 11) break; } }
         return out;
       } catch { return []; }
     })();

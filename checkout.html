@@ -62,10 +62,6 @@
   <main id="main">
     <div class="checkout-container">
       <h2>Checkout</h2>
-      <div class="row items-center gap-06 muted text-sm" aria-label="Security notice">
-        <span>Payments are processed securely by Stripe. We never store your full card details.</span>
-        <img src="assets/img/stripe-badge.svg" alt="Powered by Stripe" height="22" onerror="this.style.display='none'"/>
-      </div>
       <div class="checkout-grid">
         <form id="payment-form">
           <section class="order-card" id="guest-prompt" hidden>
@@ -183,7 +179,10 @@
           <section class="order-card">
             <h3>Payment</h3>
             <div id="payment-element"><!--Stripe.js injects here--></div>
-            <p class="muted text-sm">Your card details are encrypted and processed by Stripe. We never store full card numbers on our servers.</p>
+            <div class="row items-center gap-06 muted text-sm" aria-label="Security notice">
+              <span>Your card details are encrypted and processed by Stripe. We never store your full card number.</span>
+              <img src="assets/img/stripe-badge.svg" alt="Powered by Stripe" height="22" onerror="this.style.display='none'"/>
+            </div>
              <button id="submit" type="submit" class="btn btn-primary">Pay</button>
             <div id="payment-message"></div>
           </section>

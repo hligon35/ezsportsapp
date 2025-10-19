@@ -114,6 +114,7 @@
           <div id="pm-add">
             <button id="pm-start" class="btn">Add a card</button>
             <div id="pm-add-area" class="stack-05" hidden>
+              <input type="text" id="pm-cardholder" placeholder="Name on card" autocomplete="cc-name" />
               <div id="card-element" class="card-element"></div>
               <div class="row gap-06">
                 <button id="pm-confirm" class="btn btn-primary" type="button">Save Card</button>
@@ -490,18 +491,20 @@
           pmArea.hidden = false; pmStart.disabled = true;
         } catch(e) { pmMsg.textContent = e.message || 'Unable to start card setup'; pmMsg.classList.add('text-error'); }
       });
-      pmCancel.addEventListener('click', ()=>{ pmArea.hidden=true; pmStart.disabled=false; pmMsg.textContent=''; });
+      pmCancel.addEventListener('click', ()=>{ pmArea.hidden=true; pmStart.disabled=false; pmMsg.textContent=''; const nameEl=document.getElementById('pm-cardholder'); if(nameEl) nameEl.value=''; });
       pmConfirm.addEventListener('click', async ()=>{
         pmMsg.textContent='';
         try {
           if (!stripe || !card || !setup_client_secret) throw new Error('Not ready');
           const user = JSON.parse(localStorage.getItem('currentUser')||'null') || {};
+          const nameEl = document.getElementById('pm-cardholder');
+          const cardholderName = (nameEl && nameEl.value && nameEl.value.trim()) ? nameEl.value.trim() : (user.name || user.email || 'Customer');
           const result = await stripe.confirmCardSetup(setup_client_secret, {
-            payment_method: { card, billing_details: { name: user.name || user.email || 'Customer', email: user.email || '' } }
+            payment_method: { card, billing_details: { name: cardholderName, email: user.email || '' } }
           });
           if (result.error) throw result.error;
           pmMsg.textContent = 'Card saved.';
-          pmArea.hidden = true; pmStart.disabled = false; card && card.clear && card.clear();
+          pmArea.hidden = true; pmStart.disabled = false; card && card.clear && card.clear(); const nameEl2=document.getElementById('pm-cardholder'); if(nameEl2) nameEl2.value='';
           loadPMs();
         } catch(e) { pmMsg.textContent = e.message || 'Failed to save card'; pmMsg.classList.add('text-error'); }
       });
