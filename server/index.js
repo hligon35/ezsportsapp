@@ -459,11 +459,6 @@ app.use((req, res, next) => {
   next();
 });
 
-// 404 for unknown API routes
-app.use('/api', (req, res) => {
-  res.status(404).json({ message: 'Not Found' });
-});
-
 // Fallback static 404 logger for assets (after express.static)
 app.use((req, res, next) => {
   if (/\.(?:png|jpg|jpeg|svg|gif|webp|avif|ico)$/i.test(req.url)) {
