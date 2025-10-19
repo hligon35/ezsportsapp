@@ -262,19 +262,27 @@ async function initialize() {
     document.getElementById('sum-total').textContent = currencyFmt(fromCents(computedTotal));
   }
   if (!clientSecret) {
-    // Hide payment UI in test mode without Stripe
     const pe = document.getElementById('payment-element');
-    if (pe) pe.innerHTML = '<p class="muted">Test checkout active (no card required)</p>';
     const submit = document.getElementById('submit');
-    if (submit) submit.textContent = 'Place Order';
-    // If Stripe is disabled due to server config, surface a helpful note
-    try {
-      const cfg = window.__stripeCfg;
-      if (cfg && cfg.missing && (cfg.missing.secret || cfg.missing.publishable)) {
-        const msg = document.getElementById('payment-message');
-        if (msg) msg.textContent = 'Card payments are temporarily unavailable. You can still place your order and we will follow up to complete payment.';
-      }
-    } catch {}
+    if (stripeEnabled) {
+      // Stripe is configured, but PI could not be created. Do NOT silently fall back to test checkout.
+      if (pe) pe.innerHTML = '<p class="muted">Card payments are temporarily unavailable. Please verify your details and try again in a moment. If the problem persists, contact support.</p>';
+      if (submit) submit.textContent = 'Try Again';
+      const msg = document.getElementById('payment-message');
+      if (msg && !msg.textContent) msg.textContent = 'Unable to initialize payment. Please retry.';
+    } else {
+      // Stripe disabled: enable explicit test checkout fallback
+      if (pe) pe.innerHTML = '<p class="muted">Test checkout active (no card required)</p>';
+      if (submit) submit.textContent = 'Place Order';
+      // If Stripe is disabled due to server config, surface a helpful note
+      try {
+        const cfg = window.__stripeCfg;
+        if (cfg && cfg.missing && (cfg.missing.secret || cfg.missing.publishable)) {
+          const m2 = document.getElementById('payment-message');
+          if (m2) m2.textContent = 'Card payments are temporarily unavailable. You can still place your order and we will follow up to complete payment.';
+        }
+      } catch {}
+    }
   }
 
   // Shipping method selection removed; totals depend only on cart contents and coupon
@@ -322,8 +330,8 @@ async function initialize() {
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
     document.getElementById('submit').disabled = true;
-  // Decide mode: Real Stripe when we have a clientSecret; else test mode
-  const testMode = !clientSecret;
+    // Decide mode: Real Stripe when we have a clientSecret; else only allow test fallback when Stripe is disabled
+    const testMode = !clientSecret && !stripeEnabled;
     if (testMode) {
       try {
         const payload = getPayload();
