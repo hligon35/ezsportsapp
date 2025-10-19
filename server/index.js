@@ -355,10 +355,12 @@ app.get('/api/config', (req, res) => {
   const hasSecret = !!process.env.STRIPE_SECRET_KEY;
   const hasPublishable = !!process.env.STRIPE_PUBLISHABLE_KEY;
   const enabled = hasSecret && hasPublishable;
+  const automaticTax = String(process.env.STRIPE_TAX_AUTOMATIC || '').toLowerCase() === 'true';
   res.json({
     pk: hasPublishable ? process.env.STRIPE_PUBLISHABLE_KEY : null,
     enabled,
-    missing: { secret: !hasSecret, publishable: !hasPublishable }
+    missing: { secret: !hasSecret, publishable: !hasPublishable },
+    automaticTax
   });
 });
 
@@ -639,9 +641,9 @@ app.post('/api/create-payment-intent', async (req, res) => {
       normalizedShipping = shipping;
     }
 
-    const subtotal = await calcSubtotalCents(normItems);
-    const shippingCents = await calcShippingCents(normItems, subtotal);
-    let amount = subtotal + shippingCents; // initial base before discounts/tax
+  const subtotal = await calcSubtotalCents(normItems);
+  const shippingCents = await calcShippingCents(normItems, subtotal);
+  let amount = subtotal + shippingCents; // initial base before discounts/tax
 
     // Optional: apply coupon
     let appliedCoupon = null;
@@ -660,9 +662,18 @@ app.post('/api/create-payment-intent', async (req, res) => {
       }
     }
 
-    // Compute taxes based on shipping address and post-discount amount
-  const taxCents = calcTaxCents(subtotal, shippingCents, discountCents, normalizedShipping);
-  amount = Math.max(0, subtotal + shippingCents - discountCents + taxCents);
+    // Compute taxes (manual fallback) or delegate to Stripe Tax when enabled
+    const useAutomaticTax = String(process.env.STRIPE_TAX_AUTOMATIC || '').toLowerCase() === 'true';
+    let taxCents = 0;
+    if (useAutomaticTax) {
+      // When Automatic Tax is enabled on the PaymentIntent, Stripe computes the tax
+      // amount based on your account tax registrations and the provided address.
+      // We set the amount to the pre-tax total and let Stripe add tax at confirmation.
+      amount = Math.max(0, subtotal + shippingCents - discountCents);
+    } else {
+      taxCents = calcTaxCents(subtotal, shippingCents, discountCents, normalizedShipping);
+      amount = Math.max(0, subtotal + shippingCents - discountCents + taxCents);
+    }
 
     const description = `EZ Sports order — ${items.map(i => `${i.id}x${i.qty}`).join(', ')}`;
     // Create a local order first for analytics/visibility
@@ -705,6 +716,8 @@ app.post('/api/create-payment-intent', async (req, res) => {
         coupon_code: appliedCoupon ? String(appliedCoupon.code) : ''
       },
       automatic_payment_methods: { enabled: true },
+      // Enable Stripe Automatic Tax if configured
+      ...(useAutomaticTax ? { automatic_tax: { enabled: true } } : {}),
       receipt_email: customer.email || undefined,
       shipping: {
         name: customer.name || 'Customer',
@@ -728,7 +741,7 @@ app.post('/api/create-payment-intent', async (req, res) => {
         subtotal: subtotal,
         shipping: shippingCents,
         discount: discountCents,
-        tax: taxCents,
+        tax: useAutomaticTax ? null : taxCents,
         total: amount
       }
     });

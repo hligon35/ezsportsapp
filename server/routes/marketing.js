@@ -113,13 +113,19 @@ router.post('/contact', async (req, res) => {
     `;
 
     const inbox = (process.env.CONTACT_INBOX || 'info@ezsportsnetting.com').trim();
-    await mail.queue({
-      to: inbox,
-      subject: `[Contact] ${subject}`,
-      html,
-      text: `From: ${name} <${email}>\n${phone ? `Phone: ${phone}\n` : ''}\nSubject: ${subject}\n\n${message}`,
-      tags: ['contact']
-    });
+    let queued = false;
+    try {
+      await mail.queue({
+        to: inbox,
+        subject: `[Contact] ${subject}`,
+        html,
+        text: `From: ${name} <${email}>\n${phone ? `Phone: ${phone}\n` : ''}\nSubject: ${subject}\n\n${message}`,
+        tags: ['contact']
+      });
+      queued = true;
+    } catch (e) {
+      console.warn('Contact email queue failed:', e.message);
+    }
 
     // Send an acknowledgement email to the sender (non-blocking)
     try {
@@ -139,7 +145,7 @@ router.post('/contact', async (req, res) => {
       });
     } catch (_) { /* ignore ack errors */ }
 
-    res.json({ ok: true, queued: true });
+  res.json({ ok: true, queued });
   } catch (e) {
     res.status(500).json({ ok: false, error: e.message });
   }

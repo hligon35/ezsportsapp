@@ -42,7 +42,8 @@
         try {
           wid = window.turnstile.render(host, {
             sitekey: SITE_KEY,
-            size: 'invisible',
+            size: 'flexible',
+            appearance: 'execute',
             callback: t=>{ resolve(t||''); cleanup(wid); },
             'error-callback': ()=>{ resolve(''); cleanup(wid); },
             'timeout-callback': ()=>{ resolve(''); cleanup(wid); }

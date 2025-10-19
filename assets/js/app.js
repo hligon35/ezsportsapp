@@ -136,7 +136,8 @@ async function fetchProducts() {
         try {
           wid = window.turnstile.render(host, {
             sitekey: window.TURNSTILE_SITE_KEY,
-            size: 'invisible', // programmatic token; avoid auto-execute conflicts
+            size: 'flexible',
+            appearance: 'execute', // programmatic execution
             callback: (token) => { resolve(token||''); cleanup(wid); },
             'error-callback': () => { resolve(''); cleanup(wid); },
             'timeout-callback': () => { resolve(''); cleanup(wid); }
