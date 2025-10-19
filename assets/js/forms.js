@@ -104,7 +104,16 @@
             const res2 = await fetch(FORM_ENDPOINT, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
             data = await res2.json().catch(()=>({}));
           }
-          if (!data.ok) throw 0;
+          // Treat success only when not flagged as spam and either
+          // - proxy saved a subscriber record, or
+          // - Apps Script returned ok (no spam signal from GAS).
+          const isSpam = data && (data.spam === true);
+          const savedViaProxy = !!(data && data.ok && data.subscriber && data.subscriber.id);
+          const okViaAppsScript = !!(data && data.ok && !('subscriber' in data));
+          if (!data.ok || isSpam || !(savedViaProxy || okViaAppsScript)) {
+            console.debug('Subscribe: not confirmed:', { data, isSpam, savedViaProxy, okViaAppsScript });
+            throw 0;
+          }
           statusEl.textContent='Subscribed! Check your inbox for future deals.';
           if (emailInput) emailInput.value='';
         } catch { statusEl.textContent='Could not subscribe right now.'; }

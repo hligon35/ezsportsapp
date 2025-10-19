@@ -18,51 +18,56 @@ router.post('/subscribe', async (req, res) => {
     const addr = (email || '').toString().trim();
     if (!addr) return res.status(400).json({ message: 'Email is required' });
 
+    // Save subscriber
     const s = await subs.addOrUpdate(addr, name);
 
-    // Fire-and-forget: notify internal inbox and send thank-you to subscriber
-    (async () => {
-      try {
-        const inbox = (process.env.CONTACT_INBOX || 'info@ezsportsnetting.com').trim();
-        if (inbox) {
-          const html = `
-            <h2>New Newsletter Subscriber</h2>
-            <p><strong>Email:</strong> ${addr}</p>
-            ${name ? `<p><strong>Name:</strong> ${name}</p>` : ''}
-            ${source ? `<p><strong>Source:</strong> ${source}</p>` : ''}
-            ${referer ? `<p><strong>Referrer:</strong> ${referer}</p>` : ''}
-          `;
-          await mail.queue({ to: inbox, subject: 'New subscriber', html, text: `Email: ${addr}\nName: ${name||''}\nSource: ${source||''}\nReferrer: ${referer||''}`, tags: ['subscribe','internal'] });
-        }
-      } catch (e) { /* ignore internal notify errors */ }
-
-      try {
+    // Queue emails (await to know if they actually queued)
+    let queuedInternal = false;
+    let queuedWelcome = false;
+    try {
+      const inbox = (process.env.CONTACT_INBOX || 'info@ezsportsnetting.com').trim();
+      if (inbox) {
         const html = `
-          <p>Thanks for subscribing to EZ Sports Netting!</p>
-          <p>We’ll send occasional deals and product updates. You can unsubscribe anytime.</p>
+          <h2>New Newsletter Subscriber</h2>
+          <p><strong>Email:</strong> ${addr}</p>
+          ${name ? `<p><strong>Name:</strong> ${name}</p>` : ''}
+          ${source ? `<p><strong>Source:</strong> ${source}</p>` : ''}
+          ${referer ? `<p><strong>Referrer:</strong> ${referer}</p>` : ''}
         `;
-        await mail.queue({ to: addr, subject: 'Thanks for subscribing to EZ Sports Netting', html, text: 'Thanks for subscribing to EZ Sports Netting! We’ll send occasional deals and product updates.', tags: ['subscribe','welcome'] });
-      } catch (e) { /* ignore welcome email errors */ }
-    })();
+        const out = await mail.queue({ to: inbox, subject: 'New subscriber', html, text: `Email: ${addr}\nName: ${name||''}\nSource: ${source||''}\nReferrer: ${referer||''}`, tags: ['subscribe','internal'] });
+        queuedInternal = !!out;
+      }
+    } catch (_) { queuedInternal = false; }
+
+    try {
+      const html = `
+        <p>Thanks for subscribing to EZ Sports Netting!</p>
+        <p>We’ll send occasional deals and product updates. You can unsubscribe anytime.</p>
+      `;
+      const out2 = await mail.queue({ to: addr, subject: 'Thanks for subscribing to EZ Sports Netting', html, text: 'Thanks for subscribing to EZ Sports Netting! We’ll send occasional deals and product updates.', tags: ['subscribe','welcome'] });
+      queuedWelcome = !!out2;
+    } catch (_) { queuedWelcome = false; }
 
     // Optionally forward to Google Apps Script to log to Google Sheet
+    let forwarded = false;
     try {
       const url = (process.env.MARKETING_APPS_SCRIPT_URL || '').trim();
       if (url) {
         const payload = { type: 'subscribe', email: addr, name, source: source || '', referer: referer || '' };
         const body = JSON.stringify(payload);
-        // Use global fetch if available (Node 18+); ignore errors
+        // Use global fetch if available (Node 18+)
         const doFetch = (typeof fetch === 'function')
           ? fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body })
           : Promise.resolve(null);
-        await Promise.race([
-          doFetch.catch(()=>null),
-          new Promise(r=>setTimeout(()=>r(null), 1500)) // don't block response
+        const result = await Promise.race([
+          doFetch.then(r=> (r && r.ok) ? true : false).catch(()=>false),
+          new Promise(r=>setTimeout(()=>r(false), 1500)) // don't block response
         ]);
+        forwarded = !!result;
       }
-    } catch {/* ignore forwarding errors */}
+    } catch { forwarded = false; }
 
-    res.json({ ok:true, subscriber: s });
+    res.json({ ok:true, subscriber: s, queuedInternal, queuedWelcome, forwarded });
   } catch (e) {
     res.status(400).json({ message: e.message });
   }
