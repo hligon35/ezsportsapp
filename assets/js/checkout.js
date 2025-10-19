@@ -2,11 +2,19 @@
 // Publishable key will be provided by a config endpoint or fallback (dev)
 let stripe;
 let stripeEnabled = false;
+// Enable verbose logging with ?debug=1 or by setting window.__CHECKOUT_DEBUG = true
+const DEBUG = (() => {
+  try {
+    const qd = new URLSearchParams(window.location.search);
+    return qd.get('debug') === '1' || !!window.__CHECKOUT_DEBUG;
+  } catch { return false; }
+})();
 // API base configuration: prefer window.__API_BASE or <meta name="api-base" content="https://api.example.com">
 // Fallback guess: Render default domain from service name (adjust if your service name changes)
 const __META_API = (function(){ try{ return (document.querySelector('meta[name="api-base"]')?.content||'').trim(); }catch{ return ''; } })();
 const GUESSED_BASES = [ 'https://ezsportsapp.onrender.com' ];
 let API_BASE = (typeof window !== 'undefined' && window.__API_BASE ? String(window.__API_BASE) : __META_API).replace(/\/$/, '');
+if (DEBUG) { try { console.info('[checkout] initial API_BASE =', API_BASE || '(same-origin)'); } catch {} }
 
 async function fetchJsonWithFallback(path, options){
   const bases = [ API_BASE || '', ...GUESSED_BASES.filter(b => b && b !== API_BASE) ];
@@ -18,31 +26,46 @@ async function fetchJsonWithFallback(path, options){
       // Success path
       if (res.ok) {
         // If we succeeded using a guessed base, persist it for subsequent calls
-        if (base && base !== API_BASE) API_BASE = base;
+        if (base && base !== API_BASE) {
+          API_BASE = base;
+          if (DEBUG) { try { console.info('[checkout] API_BASE switched to', API_BASE); } catch {} }
+        }
         return await res.json();
       }
       // If 404 and we haven't tried all, continue to next base
-      if (res.status === 404) { continue; }
+      if (res.status === 404) {
+        if (DEBUG) { try { console.warn('[checkout] 404 at', url, 'trying next base'); } catch {} }
+        continue;
+      }
       // Other HTTP errors: return parsed error payload if possible
-      try { return await res.json(); } catch { return { error: `HTTP ${res.status}` }; }
+      try { return await res.json(); } catch {
+        if (DEBUG) { try { console.error('[checkout] HTTP error', res.status, 'at', url); } catch {} }
+        return { error: `HTTP ${res.status}` };
+      }
     } catch (e) {
       lastErr = e;
+      if (DEBUG) { try { console.warn('[checkout] fetch failed at', url, e?.message||e); } catch {} }
       // Try next base
     }
   }
   // If everything failed, surface a generic error
-  if (lastErr) return { error: lastErr.message || 'Network error' };
+  if (lastErr) {
+    if (DEBUG) { try { console.error('[checkout] all bases failed for', path, lastErr?.message||lastErr); } catch {} }
+    return { error: lastErr.message || 'Network error' };
+  }
   return { error: 'Request failed' };
 }
 async function getStripe() {
   if (stripe) return stripe;
   try {
-    const cfg = await fetchJsonWithFallback('/api/config', { method: 'GET' });
+  const cfg = await fetchJsonWithFallback('/api/config', { method: 'GET', cache: 'no-store' });
     try { window.__stripeCfg = cfg; } catch {}
     stripeEnabled = !!cfg.enabled;
+    if (DEBUG) { try { console.info('[checkout] /api/config ->', cfg); } catch {} }
     stripe = Stripe(cfg.pk || 'pk_test_your_publishable_key');
   } catch {
     stripeEnabled = false;
+    if (DEBUG) { try { console.warn('[checkout] /api/config failed; falling back to test pk'); } catch {} }
     stripe = Stripe('pk_test_your_publishable_key');
   }
   return stripe;
@@ -199,8 +222,9 @@ async function initialize() {
     if (!stripeEnabled) return;
     try {
       const intentResp = await fetchJsonWithFallback('/api/create-payment-intent', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(getPayload())
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(getPayload()), cache: 'no-store'
       });
+      if (DEBUG) { try { console.info('[checkout] PI response', intentResp); } catch {} }
       if (intentResp && !intentResp.error) {
         clientSecret = intentResp.clientSecret;
         amount = intentResp.amount;
@@ -245,6 +269,7 @@ async function initialize() {
         } catch {}
       }
       if (intentResp && intentResp.error) {
+        if (DEBUG) { try { console.error('[checkout] PI error', intentResp.error); } catch {} }
         const msg = document.getElementById('payment-message');
         if (msg) msg.textContent = intentResp.error || 'Could not initialize payment.';
       }
@@ -266,12 +291,14 @@ async function initialize() {
     const submit = document.getElementById('submit');
     if (stripeEnabled) {
       // Stripe is configured, but PI could not be created. Do NOT silently fall back to test checkout.
+      if (DEBUG) { try { console.warn('[checkout] Stripe enabled but no clientSecret — PI init failed, keeping real checkout disabled UI.'); } catch {} }
       if (pe) pe.innerHTML = '<p class="muted">Card payments are temporarily unavailable. Please verify your details and try again in a moment. If the problem persists, contact support.</p>';
       if (submit) submit.textContent = 'Try Again';
       const msg = document.getElementById('payment-message');
       if (msg && !msg.textContent) msg.textContent = 'Unable to initialize payment. Please retry.';
     } else {
       // Stripe disabled: enable explicit test checkout fallback
+      if (DEBUG) { try { console.warn('[checkout] Stripe disabled (cfg.enabled=false) — switching to test checkout fallback. API_BASE =', API_BASE||'(same-origin)'); } catch {} }
       if (pe) pe.innerHTML = '<p class="muted">Test checkout active (no card required)</p>';
       if (submit) submit.textContent = 'Place Order';
       // If Stripe is disabled due to server config, surface a helpful note

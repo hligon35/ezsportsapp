@@ -359,6 +359,8 @@ redirects.forEach(([source, dest]) => {
 
 // Lightweight config endpoint for frontend checkout/test mode
 app.get('/api/config', (req, res) => {
+  // Ensure clients do not cache this; stale 304 can break Stripe detection on the frontend
+  try { res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate'); } catch {}
   const hasSecret = !!process.env.STRIPE_SECRET_KEY;
   const hasPublishable = !!process.env.STRIPE_PUBLISHABLE_KEY;
   const enabled = hasSecret && hasPublishable;
