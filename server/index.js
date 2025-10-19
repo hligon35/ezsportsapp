@@ -479,6 +479,7 @@ app.use((err, req, res, next) => {
 
 // Dynamic pricing sourced from products DB (cached briefly in-memory)
 let priceCache = { ts: 0, map: new Map() };
+const normId = (v) => String(v || '').trim().toLowerCase();
 async function loadFallbackPriceMap() {
   try {
     const file = path.join(__dirname, '..', 'assets', 'prodList.json');
@@ -489,7 +490,7 @@ async function loadFallbackPriceMap() {
       for (const arr of Object.values(json.categories)) {
         if (!Array.isArray(arr)) continue;
         arr.forEach(p => {
-          const id = String(p.sku || p.id || p.name || '').trim();
+          const id = normId(p.sku || p.id || p.name || '');
           if (!id) return;
           const price = Number(p.map ?? p.price ?? p.wholesale ?? 0) || 0;
           const cents = Math.round(price * 100);
@@ -512,7 +513,7 @@ async function loadPriceMap() {
   all.forEach(p => {
     if (p.isActive === false) return;
     const cents = (typeof p.price === 'number' && isFinite(p.price)) ? Math.round(p.price * 100) : 0;
-    map.set(p.id, { cents, dsr: Number(p.dsr || 0) || 0 });
+    map.set(normId(p.id), { cents, dsr: Number(p.dsr || 0) || 0 });
   });
   // Merge fallback prodList prices for SKUs not present in DB
   try {
@@ -529,7 +530,7 @@ async function loadPriceMap() {
 async function calcSubtotalCents(items = []) {
   const priceMap = await loadPriceMap();
   return items.reduce((sum, it) => {
-    const rec = priceMap.get(it.id);
+    const rec = priceMap.get(normId(it.id));
     const cents = rec?.cents;
     if (!cents) return sum;
     const qty = Math.max(1, Number(it.qty) || 1);
@@ -558,7 +559,7 @@ async function calcShippingCents(items = [], _subtotalCents, _method = 'standard
         total += 0 * qty;
         continue;
       }
-      const rec = priceMap.get(it.id);
+      const rec = priceMap.get(normId(it.id));
       const dsr = Number(rec?.dsr || 0);
       const per = (Number.isFinite(dsr) && dsr > 0) ? dsr : 100;
       const qty = Math.max(1, Number(it.qty) || 1);
@@ -690,6 +691,11 @@ app.post('/api/create-payment-intent', async (req, res) => {
       amount = Math.max(0, subtotal + shippingCents - discountCents + taxCents);
     }
 
+    // Guard: ensure we actually priced the items
+    if (!Number.isFinite(subtotal) || subtotal <= 0) {
+      return res.status(400).json({ error: 'No priced items found for your cart. Please refresh your cart and try again.', details: { items: normItems.map(i => i.id) } });
+    }
+
     const description = `EZ Sports order — ${items.map(i => `${i.id}x${i.qty}`).join(', ')}`;
     // Create a local order first for analytics/visibility
     let newOrder = null;
@@ -718,6 +724,14 @@ app.post('/api/create-payment-intent', async (req, res) => {
       .update(JSON.stringify({ normItems, email: customer.email || '', existingOrderId: newOrder?.id || existingOrderId || null }))
       .digest('hex')
       .slice(0, 64);
+
+    // Enforce Stripe minimum amounts by currency
+    const minByCurrency = { usd: 50 };
+    const ensureMin = (amt, curr) => {
+      const key = String(curr || '').toLowerCase();
+      const min = minByCurrency[key] ?? 0;
+      return { belowMin: amt < min, min };
+    };
 
     let paymentIntent;
     try {
@@ -759,6 +773,10 @@ app.post('/api/create-payment-intent', async (req, res) => {
           // Compute manual tax and retry without automatic_tax
           taxCents = calcTaxCents(subtotal, shippingCents, discountCents, normalizedShipping);
           amount = Math.max(0, subtotal + shippingCents - discountCents + taxCents);
+          const { belowMin, min } = ensureMin(amount, safeCurrency);
+          if (belowMin) {
+            return res.status(400).json({ error: `Order total is below the minimum charge amount (${(min/100).toFixed(2)} USD). Please add another item.` });
+          }
           usedAutomaticTax = false;
           paymentIntent = await stripe.paymentIntents.create({
             amount,
@@ -790,6 +808,13 @@ app.post('/api/create-payment-intent', async (req, res) => {
         }
       } else {
         throw err;
+      }
+    }
+    // Final guard: if amount still under Stripe minimum, return a friendly message
+    {
+      const { belowMin, min } = ensureMin(amount, safeCurrency);
+      if (belowMin) {
+        return res.status(400).json({ error: `Order total is below the minimum charge amount (${(min/100).toFixed(2)} USD). Please add another item.` });
       }
     }
     // Return client secret and linked order id so the frontend can keep them in sync
