@@ -136,18 +136,23 @@ async function fetchProducts() {
         try {
           wid = window.turnstile.render(host, {
             sitekey: window.TURNSTILE_SITE_KEY,
-            size: 'flexible',
+            size: 'invisible',
             appearance: 'execute', // programmatic execution
             callback: (token) => { resolve(token||''); cleanup(wid); },
             'error-callback': () => { resolve(''); cleanup(wid); },
             'timeout-callback': () => { resolve(''); cleanup(wid); }
           });
         } catch(err) { resolve(''); cleanup(wid); return; }
-        try { window.turnstile.execute(wid); } catch { try { if (wid) window.turnstile.reset(wid); } catch {} resolve(''); cleanup(wid); }
+        try { window.turnstile.execute(wid); } catch { resolve(''); cleanup(wid); }
         setTimeout(()=>{ resolve(''); cleanup(wid); }, 8000);
       }).finally(()=>{ window.__turnstileTokenPromise = null; });
       return await window.__turnstileTokenPromise;
     } catch { return ''; }
+  }
+
+  // Expose a single shared token getter for other modules (e.g., forms.js) to reuse
+  if (!window.getTurnstileToken) {
+    try { window.getTurnstileToken = getTurnstileToken; } catch {}
   }
 
   // Timestamp for bot timing check (added to form submissions)

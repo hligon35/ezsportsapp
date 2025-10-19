@@ -19,50 +19,15 @@
     if (kind === 'subscribe') list.push(FORM_ENDPOINT);
     return list;
   }
+  // Prefer a single shared token fetcher from app.js to avoid duplicate execute() calls
   const SITE_KEY = window.TURNSTILE_SITE_KEY || '0x4AAAAAAB5rtUiQ1MiqGIxp';
-
-  // Lightweight Turnstile loader (redeclared safely)
-  async function loadTurnstile(){
-    if (window.turnstile) return true;
-    await new Promise(res=>{
-      const s=document.createElement('script');
-      s.src='https://challenges.cloudflare.com/turnstile/v0/api.js';
-      s.async=true; s.defer=true;
-      s.onload=()=>res(true); s.onerror=()=>res(false);
-      document.head.appendChild(s);
-    });
-    await new Promise(r=>setTimeout(r,40));
-    return !!window.turnstile;
-  }
   async function getToken(){
     try {
-      // Create the singleflight promise immediately to avoid a race when multiple callers arrive after script load
-      if (!window.__turnstileTokenPromise) {
-        window.__turnstileTokenPromise = (async () => {
-          const ok = await loadTurnstile();
-          if (!ok || !SITE_KEY || !window.turnstile) return '';
-          return await new Promise(resolve => {
-            const host = document.createElement('div');
-            host.style.cssText='position:fixed;left:-9999px;top:-9999px;';
-            document.body.appendChild(host);
-            let wid=null; let cleaned=false;
-            const cleanup=(id)=>{ if(cleaned) return; cleaned=true; try{window.turnstile.remove(id);}catch{} try{host.remove();}catch{} };
-            try {
-              wid = window.turnstile.render(host, {
-                sitekey: SITE_KEY,
-                size: 'flexible',
-                appearance: 'execute',
-                callback: t=>{ resolve(t||''); cleanup(wid); },
-                'error-callback': ()=>{ resolve(''); cleanup(wid); },
-                'timeout-callback': ()=>{ resolve(''); cleanup(wid); }
-              });
-            } catch { resolve(''); cleanup(wid); return; }
-            try { window.turnstile.execute(wid); } catch { try{ if(wid) window.turnstile.reset(wid); window.turnstile.execute(wid); }catch{} resolve(''); cleanup(wid); }
-            setTimeout(()=>{ resolve(''); cleanup(wid); }, 8000);
-          });
-        })().finally(()=>{ window.__turnstileTokenPromise = null; });
+      if (typeof window.getTurnstileToken === 'function') {
+        return await window.getTurnstileToken();
       }
-      return await window.__turnstileTokenPromise;
+      // Fallback minimal: no token
+      return '';
     } catch { return ''; }
   }
 
