@@ -318,7 +318,19 @@ app.post('/webhook/stripe', express.raw({ type: 'application/json' }), async (re
   }
 });
 
-// JSON parser AFTER webhook route
+// Marketing endpoints: accept lax bodies (any content-type) and try JSON parse before the global JSON parser
+app.use('/api/marketing', express.text({ type: '*/*', limit: '100kb' }), (req, _res, next) => {
+  if (typeof req.body === 'string') {
+    const s = req.body.trim();
+    if (s.startsWith('{') && s.endsWith('}')) {
+      try { req.body = JSON.parse(s); } catch { /* leave as string */ }
+    }
+  }
+  next();
+});
+app.use('/api/marketing', marketingRoutes);
+
+// JSON parser AFTER webhook route (and after marketing special-case)
 app.use(express.json({ limit: '100kb' }));
 
 // API routes
@@ -329,16 +341,7 @@ app.use('/api/inventory', inventoryRoutes);
 app.use('/api/invoices', invoiceRoutes);
 app.use('/api/analytics', analyticsRoutes);
 // Accept text/plain payloads (JSON string) for marketing endpoints to support legacy/form fallbacks
-app.use('/api/marketing', express.text({ type: ['text/plain', 'text/*'], limit: '100kb' }), (req, _res, next) => {
-  if (typeof req.body === 'string') {
-    const s = req.body.trim();
-    if (s.startsWith('{') && s.endsWith('}')) {
-      try { req.body = JSON.parse(s); } catch { /* leave as string */ }
-    }
-  }
-  next();
-});
-app.use('/api/marketing', marketingRoutes);
+// (marketing routes are mounted above to avoid JSON parser errors on malformed bodies)
 app.use('/api/admin', adminRoutes);
 
 // Legacy redirects for removed static pages (migrated from previous hosting config)

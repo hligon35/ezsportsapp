@@ -29,7 +29,24 @@ class DatabaseManager {
     try {
       const filePath = path.join(this.dbPath, this.collections[collection]);
       const data = await fs.readFile(filePath, 'utf8');
-      return JSON.parse(data);
+      try {
+        return JSON.parse(data);
+      } catch (parseErr) {
+        // Attempt a minimal repair: trim BOM/whitespace and retry; otherwise back up corrupt file
+        let txt = data.replace(/^\uFEFF/, '').trim();
+        try {
+          const repaired = JSON.parse(txt);
+          // Write back the repaired JSON to keep DB healthy
+          await fs.writeFile(filePath, JSON.stringify(repaired, null, 2), 'utf8');
+          return repaired;
+        } catch (_) {
+          const bak = filePath + ".corrupt-" + new Date().toISOString().replace(/[:.]/g,'-') + ".bak";
+          await fs.writeFile(bak, data, 'utf8').catch(()=>{});
+          // Start fresh for this collection
+          await fs.writeFile(filePath, JSON.stringify([], null, 2), 'utf8');
+          return [];
+        }
+      }
     } catch (error) {
       if (error.code === 'ENOENT') {
         return [];
