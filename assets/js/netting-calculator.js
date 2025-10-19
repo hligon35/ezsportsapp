@@ -102,7 +102,8 @@ function readForm(form){
     widIn: form.querySelector('#wid-in').value,
     border: form.querySelector('input[name="border"]:checked')?.value || 'regular',
     qty: Math.max(1, Number(form.querySelector('#qty').value) || 1),
-    fab: form.querySelector('input[name="fab"]:checked')?.value || 'standard'
+    // Fabrication selection removed; default to standard for backward compatibility
+    fab: 'standard'
   };
 }
 
@@ -203,26 +204,13 @@ function setup(){
   const usage = (data.usage||'').trim();
   const mesh = MESHES.find(m=>m.id===data.meshId);
   const isBaseball = !!mesh && (mesh.sport === 'baseball' || /baseball/i.test(mesh.label));
-  const variantColor = `${t.mesh.label}${(isBaseball && usage)?` • ${usage}`:''} | ${data.border}${data.fab==='expedited'?' | Expedited':''}`;
+  const variantColor = `${t.mesh.label}${(isBaseball && usage)?` • ${usage}`:''} | ${data.border}`;
 
     // Add N times for quantity
     const n = data.qty;
     for(let i=0;i<n;i++){
-      window.Store?.add(product, { size: variantSize, color: variantColor });
-    }
-    // Add expedited fee as separate line item once
-    if (data.fab === 'expedited') {
-      const feeProduct = {
-        id: 'custom-net-expedited-fee',
-        title: 'Expedited Fabrication (3–6 days)',
-        price: EXPEDITED_FEE,
-        category: 'netting',
-        img: 'https://images.unsplash.com/photo-1551892374-5d94925ad893?q=80&w=800&auto=format&fit=crop'
-      };
-      if (window.PRODUCTS && !window.PRODUCTS.find(p=>p.id==='custom-net-expedited-fee')){
-        window.PRODUCTS.push(feeProduct);
-      }
-      window.Store?.add(feeProduct, { size: '—', color: '—' });
+      // Enforce $100 shipping rule for calculator items by passing explicit per-item ship amount
+      window.Store?.add(product, { size: variantSize, color: variantColor, ship: 100 });
     }
     window.Store?.openCart();
   });

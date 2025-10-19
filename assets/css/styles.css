@@ -1156,7 +1156,7 @@ body.lscreens-subnav .card .body .actions-row.right{ justify-content:flex-end; }
 .subscribe .row{display:flex;gap:.5rem}
 .subscribe input{flex:0 1 auto;width:auto;min-width:16ch;max-width:100%;padding:.65rem .8rem;border-radius:.6rem;border:1px solid var(--border);background:#fff;color:var(--ink)}
 /* Payment methods: Add Card form visuals */
-#pm-add-area{ display:grid; gap:.75rem; }
+#pm-add-area{ display:grid; gap:.75rem; align-content:start; justify-items:stretch; }
 .auth-container #pm-add-area input { padding:.85rem 1rem; border:1px solid var(--border); border-radius:.7rem; width:100%; max-width:100%; box-sizing:border-box; background:#fff; color:var(--ink); }
 .card-element{ padding:.85rem 1rem; border:1px solid var(--border); border-radius:.7rem; background:#fff; }
 .card-element:focus-within{ outline:none; box-shadow:var(--ring); border-color:var(--brand); }
@@ -1293,7 +1293,11 @@ nav.quick-links li a[href="careers.html"]{
 .calc-form{display:grid;gap:.9rem}
 .calc-form .form-row{display:grid;gap:.35rem}
 .calc-form .dims{display:grid;grid-template-columns:1fr auto 1fr auto;gap:.5rem;align-items:center}
-.calc-form input[type=number], .calc-form select{padding:.65rem .7rem;border:1px solid var(--border);border-radius:.6rem}
+.calc-form input[type=number], .calc-form select{padding:.5rem .65rem;border:1px solid var(--border);border-radius:.6rem}
+.calc-form input[type=number]{ width:6ch; }
+.calc-form .dims input[type=number]{ width:6ch; }
+.calc-form .qty input[type=number]{ width:5ch; text-align:center; }
+.calc-form .qty .icon-btn{ width:auto; min-width:32px; height:32px; }
 .calc-form .unit{opacity:.65}
 .calc-form fieldset{border:1px solid var(--border);border-radius:.75rem;padding:.65rem}
 .calc-form legend{padding:0 .25rem;font-weight:800;color:var(--ink-2)}
