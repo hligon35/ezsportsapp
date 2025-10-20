@@ -1,0 +1,20 @@
+[
+  {
+    "to": "u1760925460971@example.com",
+    "subject": "Thanks for subscribing to EZ Sports Netting",
+    "html": "\n        <p>Thanks for subscribing to EZ Sports Netting!</p>\n        <p>We’ll send occasional deals and product updates. You can unsubscribe anytime.</p>\n      ",
+    "text": "Thanks for subscribing to EZ Sports Netting! We’ll send occasional deals and product updates.",
+    "tags": [
+      "subscribe",
+      "welcome"
+    ],
+    "replyTo": "info@ezsportsnetting.com",
+    "from": "no-reply@ezsports.app",
+    "status": "queued",
+    "createdAt": "2025-10-20T01:57:40.988Z",
+    "retryCount": 0,
+    "nextAttemptAt": "2025-10-20T01:57:40.980Z",
+    "updatedAt": "2025-10-20T01:57:40.988Z",
+    "id": 4
+  }
+]

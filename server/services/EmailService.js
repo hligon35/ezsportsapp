@@ -42,8 +42,36 @@ class EmailService {
 
   async queue({ to, subject, html, text, tags=[], replyTo = undefined, from = undefined, fromName = undefined }){
     // Always write to outbox for auditability
-    const record = { to, subject, html, text, tags, replyTo, from: from || this.from, fromName, status: this.transporter ? 'sending' : 'queued', createdAt: new Date().toISOString() };
+    const record = {
+      to,
+      subject,
+      html,
+      text,
+      tags,
+      replyTo,
+      from: from || this.from,
+      fromName,
+      status: this.transporter || this.sgKey || this.cfUrl ? 'sending' : 'queued',
+      createdAt: new Date().toISOString(),
+      retryCount: 0,
+      // Optional next attempt backoff scheduling (used by retry worker)
+      nextAttemptAt: new Date(Date.now()).toISOString()
+    };
     const email = await this.db.insert('emails', record);
+    // Try to deliver immediately; callers can ignore the promise for fire-and-forget
+    try {
+      return await this.deliverExisting(email);
+    } catch (e) {
+      // If delivery threw synchronously, keep it queued for the retry worker
+      if (this.debug) console.warn('[EmailService] initial deliver failed; left queued', e?.message||e);
+      return email;
+    }
+  }
+
+  // Deliver an existing record (used by queue and retry worker)
+  async deliverExisting(email){
+    const { id, to, subject, html, text, tags = [], replyTo, from, fromName } = email || {};
+    if (!to || !subject) throw new Error('Email record incomplete');
     // 1) Prefer SendGrid HTTP API if API key is configured (avoids SMTP egress issues)
     if (this.sgKey) {
       try {
@@ -77,7 +105,7 @@ class EmailService {
         } finally { clearTimeout(t); }
         if (resp && (resp.status === 202 || resp.status === 200)) {
           const msgId = resp.headers?.get?.('x-message-id') || null;
-          await this.db.update('emails', { id: email.id }, { status: 'sent', provider: 'sendgrid-api', providerId: msgId, sentAt: new Date().toISOString() });
+          await this.db.update('emails', { id }, { status: 'sent', provider: 'sendgrid-api', providerId: msgId, sentAt: new Date().toISOString() });
           if (this.debug) console.log('[EmailService] SendGrid API accepted', { messageId: msgId });
           return { ...email, status: 'sent', provider: 'sendgrid-api', providerId: msgId };
         } else {
@@ -96,7 +124,7 @@ class EmailService {
       try {
         if (this.debug) console.log('[EmailService] Sending via SMTP…');
         const info = await this.transporter.sendMail({ from: from || this.from, to, subject, text, html, replyTo });
-        await this.db.update('emails', { id: email.id }, { status: 'sent', provider: 'smtp', providerId: info?.messageId || null, sentAt: new Date().toISOString() });
+        await this.db.update('emails', { id }, { status: 'sent', provider: 'smtp', providerId: info?.messageId || null, sentAt: new Date().toISOString() });
         if (this.debug) console.log('[EmailService] SMTP sent', { id: info?.messageId || null });
         return { ...email, status: 'sent', provider: 'smtp', providerId: info?.messageId || null };
       } catch (smtpErr) {
@@ -140,7 +168,7 @@ class EmailService {
           resp = await doFetch(this.cfUrl, { method: 'POST', headers, body: JSON.stringify(payload), signal: controller.signal });
         } finally { clearTimeout(t); }
         if (resp.ok) {
-          await this.db.update('emails', { id: email.id }, { status: 'sent', provider: 'cloudflare-worker', sentAt: new Date().toISOString() });
+          await this.db.update('emails', { id }, { status: 'sent', provider: 'cloudflare-worker', sentAt: new Date().toISOString() });
           return { ...email, status: 'sent', provider: 'cloudflare-worker' };
         } else {
           const body = await resp.text().catch(()=> '');
@@ -153,10 +181,10 @@ class EmailService {
             try {
               if (this.debug) console.log('[EmailService] Worker failed; sending via SMTP…');
               const info = await this.transporter.sendMail({ from: from || this.from, to, subject, text, html, replyTo });
-              await this.db.update('emails', { id: email.id }, { status: 'sent', provider: 'smtp', providerId: info?.messageId || null, sentAt: new Date().toISOString(), error: cfError.message });
+              await this.db.update('emails', { id }, { status: 'sent', provider: 'smtp', providerId: info?.messageId || null, sentAt: new Date().toISOString(), error: cfError.message });
               return { ...email, status: 'sent', provider: 'smtp', providerId: info?.messageId || null };
             } catch (smtpErr) {
-              await this.db.update('emails', { id: email.id }, { status: 'failed', provider: 'cloudflare-worker|smtp', error: `${cfError.message} | SMTP: ${smtpErr.message}`, failedAt: new Date().toISOString() });
+              await this.db.update('emails', { id }, { status: 'failed', provider: 'cloudflare-worker|smtp', error: `${cfError.message} | SMTP: ${smtpErr.message}`, failedAt: new Date().toISOString() });
               return { ...email, status: 'failed', provider: 'cloudflare-worker|smtp', error: `${cfError.message} | SMTP: ${smtpErr.message}` };
             }
           }
@@ -170,15 +198,15 @@ class EmailService {
           try {
             if (this.debug) console.log('[EmailService] Worker call threw, sending via SMTP…', e.message);
             const info = await this.transporter.sendMail({ from: from || this.from, to, subject, text, html, replyTo });
-            await this.db.update('emails', { id: email.id }, { status: 'sent', provider: 'smtp', providerId: info?.messageId || null, sentAt: new Date().toISOString(), error: e.message });
+            await this.db.update('emails', { id }, { status: 'sent', provider: 'smtp', providerId: info?.messageId || null, sentAt: new Date().toISOString(), error: e.message });
             return { ...email, status: 'sent', provider: 'smtp', providerId: info?.messageId || null };
           } catch (smtpErr) {
-            await this.db.update('emails', { id: email.id }, { status: 'failed', provider: 'cloudflare-worker|smtp', error: `${e.message} | SMTP: ${smtpErr.message}`, failedAt: new Date().toISOString() });
+            await this.db.update('emails', { id }, { status: 'failed', provider: 'cloudflare-worker|smtp', error: `${e.message} | SMTP: ${smtpErr.message}`, failedAt: new Date().toISOString() });
             console.warn('Email send via Cloudflare then SMTP failed:', `${e.message} | SMTP: ${smtpErr.message}`);
             return { ...email, status: 'failed', provider: 'cloudflare-worker|smtp', error: `${e.message} | SMTP: ${smtpErr.message}` };
           }
         }
-        await this.db.update('emails', { id: email.id }, { status: 'failed', provider: 'cloudflare-worker', error: e.message, failedAt: new Date().toISOString() });
+        await this.db.update('emails', { id }, { status: 'failed', provider: 'cloudflare-worker', error: e.message, failedAt: new Date().toISOString() });
         console.warn('Email send via Cloudflare failed:', e.message);
         return { ...email, status: 'failed', provider: 'cloudflare-worker', error: e.message };
       }
@@ -187,13 +215,21 @@ class EmailService {
 
     try {
       const info = await this.transporter.sendMail({ from: from || this.from, to, subject, text, html, replyTo });
-      await this.db.update('emails', { id: email.id }, { status: 'sent', providerId: info?.messageId || null, sentAt: new Date().toISOString() });
+      await this.db.update('emails', { id }, { status: 'sent', providerId: info?.messageId || null, sentAt: new Date().toISOString() });
       return { ...email, status: 'sent', providerId: info?.messageId || null };
     } catch (e) {
-      await this.db.update('emails', { id: email.id }, { status: 'failed', error: e.message, failedAt: new Date().toISOString() });
+      await this.db.update('emails', { id }, { status: 'failed', error: e.message, failedAt: new Date().toISOString() });
       console.warn('Email send failed:', e.message);
       return { ...email, status: 'failed', error: e.message };
     }
+  }
+
+  // Deliver by record ID (used by retry worker)
+  async deliver(id){
+    const list = await this.db.find('emails', {});
+    const email = list.find(e => e.id === id);
+    if (!email) throw new Error('Email not found');
+    return await this.deliverExisting(email);
   }
 
   async list(){ return await this.db.findAll('emails'); }

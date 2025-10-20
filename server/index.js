@@ -981,6 +981,57 @@ function startServer(attempt = 0) {
 
 const server = startServer();
 
+// Background email retry worker: periodically attempts to deliver queued/failed emails
+try {
+  const EmailService = require('./services/EmailService');
+  const emailSvc = new EmailService();
+  const MAX_RETRIES = 6; // approx up to ~32 minutes cumulative with backoff
+  async function retryLoop(){
+    try {
+      const all = await emailSvc.list();
+      const now = Date.now();
+      const candidates = (all || []).filter(e => {
+        const status = String(e.status || '').toLowerCase();
+        if (!['queued','failed','sending'].includes(status)) return false;
+        const nextAt = e.nextAttemptAt ? Date.parse(e.nextAttemptAt) : 0;
+        return !Number.isNaN(nextAt) ? (nextAt <= now) : true;
+      }).slice(0, 10);
+      for (const rec of candidates) {
+        try {
+          const out = await emailSvc.deliver(rec.id);
+          // deliveredExisting updates status; nothing to do
+        } catch (e) {
+          // schedule next attempt with exponential backoff
+          const rc = Number(rec.retryCount || 0) + 1;
+          const backoffSec = Math.min(1800, Math.pow(2, Math.min(MAX_RETRIES, rc)) * 5); // 5s,10s,20s,… up to 30m
+          const nextAttemptAt = new Date(Date.now() + backoffSec * 1000).toISOString();
+          try {
+            await emailSvc.db.update('emails', { id: rec.id }, { status: 'failed', retryCount: rc, nextAttemptAt, lastError: e.message });
+          } catch {}
+        }
+      }
+    } catch (e) {
+      console.warn('Email retry loop error:', e?.message||e);
+    } finally {
+      setTimeout(retryLoop, 5000);
+    }
+  }
+  // Start after a short delay so server is ready
+  setTimeout(retryLoop, 3000);
+
+  // Enhance health endpoint with outbox stats
+  app.get('/health/emails', async (_req, res) => {
+    try {
+      const all = await emailSvc.list();
+      const totals = all.reduce((acc, e) => { acc[e.status||'unknown'] = (acc[e.status||'unknown']||0)+1; return acc; }, {});
+      const recent = (all || []).slice(-10).map(e => ({ id: e.id, to: e.to, subject: e.subject, status: e.status, retryCount: e.retryCount||0, nextAttemptAt: e.nextAttemptAt||null, createdAt: e.createdAt }));
+      res.json({ totals, recent });
+    } catch (e) { res.status(500).json({ error: e.message }); }
+  });
+} catch (e) {
+  console.warn('Email retry worker init failed:', e?.message||e);
+}
+
 // Graceful shutdown
 process.on('SIGINT', () => { server.close(() => process.exit(0)); });
 process.on('SIGTERM', () => { server.close(() => process.exit(0)); });
