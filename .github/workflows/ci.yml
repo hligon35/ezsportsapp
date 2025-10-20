@@ -19,15 +19,23 @@ jobs:
       - name: Install server deps
         working-directory: server
         run: npm ci || npm install
-      - name: Start server
-        working-directory: server
-        run: node index.js &
-      - name: Wait for health
+      - name: Start server and run smoke test
+        shell: bash
         run: |
-          for i in {1..20}; do
-            curl -fsS http://localhost:4242/health && exit 0 || true
+          pushd server >/dev/null
+          node index.js &
+          SERVER_PID=$!
+          echo "Server PID: $SERVER_PID"
+          for i in {1..30}; do
+            if curl -fsS http://localhost:4242/health >/dev/null; then
+              echo "Server is healthy"
+              break
+            fi
             sleep 1
           done
-          echo "Server did not become healthy in time" && exit 1
-      - name: Run smoke test
-        run: node server/scripts/smoke-test.js http://localhost:4242
+          # Final assert
+          curl -fsS http://localhost:4242/health
+          popd >/dev/null
+          node server/scripts/smoke-test.js http://localhost:4242
+          # Optional: terminate server
+          kill $SERVER_PID || true
