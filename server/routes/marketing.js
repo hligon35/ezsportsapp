@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const rateLimit = require('express-rate-limit');
 const SubscriberService = require('../services/SubscriberService');
 const CouponService = require('../services/CouponService');
 const EmailService = require('../services/EmailService');
@@ -174,7 +175,14 @@ router.get('/admin/subscribers', requireAdmin, async (req, res) => {
 // Admin: create coupon
 router.post('/admin/coupons', requireAdmin, async (req, res) => {
   try {
-    const c = await coupons.create(req.body||{});
+    const body = req.body || {};
+    // Normalize restriction fields: allow single string or array for userEmails/userIds
+    const norm = { ...body };
+    if (typeof norm.userEmails === 'string') norm.userEmails = norm.userEmails.split(',').map(s=>s.trim()).filter(Boolean);
+    if (!Array.isArray(norm.userEmails)) norm.userEmails = [];
+    if (typeof norm.userIds === 'string') norm.userIds = norm.userIds.split(',').map(s=>s.trim()).filter(Boolean);
+    if (!Array.isArray(norm.userIds)) norm.userIds = [];
+    const c = await coupons.create(norm);
     res.status(201).json(c);
   } catch (e) {
     res.status(400).json({ message: e.message });
@@ -194,11 +202,20 @@ router.post('/admin/coupons/:code/deactivate', requireAdmin, async (req, res) =>
 });
 
 // Public: validate coupon
-router.post('/validate-coupon', async (req, res) => {
+const validateLimiter = rateLimit({ windowMs: 60 * 1000, max: 30 });
+router.post('/validate-coupon', validateLimiter, async (req, res) => {
   try {
-    const { code, email } = req.body || {};
-    const result = await coupons.validate(code, email);
-    res.json(result);
+    const { code, email, userId } = req.body || {};
+    const id = userId || (req.user && req.user.id) || null;
+    const result = await coupons.validate(code, email, new Date(), id);
+    // Enhance UX: always include reason when invalid
+    if (!result.valid) {
+      if (result.reason === 'restricted') {
+        console.warn('Coupon restricted mismatch:', { code, email, userId: id });
+      }
+      return res.json({ valid:false, reason: result.reason || 'invalid' });
+    }
+    return res.json(result);
   } catch (e) {
     res.status(400).json({ message: e.message });
   }

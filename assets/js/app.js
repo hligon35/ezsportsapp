@@ -3573,8 +3573,11 @@ ensureHomeFirst() {
   renderCart() {
     const rows = this.cartDetailed.map(i => {
       const key = this.keyFor(i);
-      const variant = `${(i.size || '').trim() ? `Size: ${i.size} ` : ''}${(i.color || '').trim() ? `Color: ${i.color}` : ''}`.trim();
-  const img = i.product?.img || 'assets/img/EZSportslogo.png';
+      // For netting items, relabel second attribute as Spec instead of Color
+      const isNetting = (String(i.category||'').toLowerCase()==='netting') || (String(i.id||'').toLowerCase().startsWith('custom-net-'));
+      const variant = `${(i.size || '').trim() ? `Size: ${i.size} ` : ''}${(i.color || '').trim() ? `${isNetting ? 'Spec' : 'Color'}: ${i.color}` : ''}`.trim();
+      // Enforce default image for netting when missing
+  const img = (isNetting && !(i.product?.img)) ? 'assets/img/netting3.jpg' : (i.product?.img || 'assets/img/EZSportslogo.png');
       const title = i.product?.title || 'Item';
       const price = typeof i.product?.price === 'number' ? i.product.price : 0;
   const shipPer = (()=>{ const n = Number(i.shipAmount); if (Number.isFinite(n)) { if (n===0) return 0; if (n>0) return n; } return 100; })();
@@ -3584,6 +3587,7 @@ ensureHomeFirst() {
         <div>
           <strong>${title}</strong>
           ${variant ? `<div class=\"text-sm text-muted\">${variant}</div>` : ''}
+          <div class="text-xs muted">SKU: ${i.id}</div>
           <div class="opacity-80">Qty: <button class="icon-btn" data-dec="${key}">−</button> ${i.qty} <button class="icon-btn" data-inc="${key}">+</button></div>
           <div class="text-sm muted">Shipping: ${shipPer===0 ? 'Free' : currency.format(shipPer)} × ${i.qty}</div>
         </div>

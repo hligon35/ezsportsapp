@@ -139,6 +139,7 @@ function showSection(section, btn) {
 
   // Load data for section
   if (section === 'products') renderProducts();
+  if (section === 'netting') renderNetting();
   if (section === 'orders') renderOrders();
   if (section === 'users') renderUsers();
   if (section === 'marketing') renderMarketing();
@@ -485,6 +486,59 @@ document.addEventListener('DOMContentLoaded', () => {
   const trRefresh = document.getElementById('traffic-refresh-btn');
   if (trTf) trTf.addEventListener('change', renderTraffic);
   if (trRefresh) trRefresh.addEventListener('click', renderTraffic);
+
+  // Bulk update wiring
+  try {
+    const opSel = document.getElementById('bulk-op');
+    const rowShip = document.getElementById('bulk-row-setShipping');
+    const rowEq = document.getElementById('bulk-row-changeMapEqual');
+    const rowSku = document.getElementById('bulk-row-setMapBySku');
+    const status = document.getElementById('bulk-status');
+    const runBtn = document.getElementById('bulk-run');
+    const onOpChange = () => {
+      const v = opSel?.value || 'setShipping';
+      [rowShip,rowEq,rowSku].forEach(el=>{ if(!el) return; el.classList.add('hidden'); el.style.display='none'; });
+      if (v === 'setShipping') { rowShip.classList.remove('hidden'); rowShip.style.display=''; }
+      if (v === 'changeMapEqual') { rowEq.classList.remove('hidden'); rowEq.style.display=''; }
+      if (v === 'setMapBySku') { rowSku.classList.remove('hidden'); rowSku.style.display=''; }
+    };
+    if (opSel && !opSel.__wired) { opSel.__wired = true; opSel.addEventListener('change', onOpChange); onOpChange(); }
+    if (runBtn && !runBtn.__wired) {
+      runBtn.__wired = true;
+      runBtn.addEventListener('click', async () => {
+        try {
+          if (status) status.textContent = 'Running…';
+          const op = opSel?.value || 'setShipping';
+          const cat = document.getElementById('bulk-category')?.value || '';
+          let payload = { op: { type: op } };
+          if (cat) payload.op.category = cat;
+          if (op === 'setShipping') {
+            const v = Number(document.getElementById('bulk-ship')?.value || 0);
+            const onlyMissing = !!document.getElementById('bulk-onlymissing')?.checked;
+            payload.op.value = v; payload.op.onlyMissing = onlyMissing;
+          } else if (op === 'changeMapEqual') {
+            payload.op.from = Number(document.getElementById('bulk-map-from')?.value || NaN);
+            payload.op.to = Number(document.getElementById('bulk-map-to')?.value || NaN);
+          } else if (op === 'setMapBySku') {
+            const raw = document.getElementById('bulk-mapby')?.value || '';
+            const lines = raw.split(/\r?\n/).map(s=>s.trim()).filter(Boolean);
+            const map = {};
+            for (const line of lines) {
+              const [sku, price] = line.split(',').map(s=>s.trim());
+              if (sku && price!=null) { const num = Number(price); if (Number.isFinite(num)) map[sku] = num; }
+            }
+            payload.op.map = map;
+          }
+          const res = await fetchAdmin('/api/admin/prodlist/bulk-update', { method:'POST', body: JSON.stringify(payload) });
+          const data = await res.json().catch(()=>({}));
+          if (!res.ok) throw new Error(data.message || 'Failed');
+          if (status) status.textContent = `Done. Changed ${data.changed||0} record(s).`;
+        } catch (e) {
+          if (status) status.textContent = e.message || 'Failed';
+        }
+      });
+    }
+  } catch {}
 });
 
 // Make functions global for onclick handlers
@@ -549,13 +603,15 @@ async function renderMarketing(){
       cpStatus.textContent = 'Creating…';
       try {
         const emails = (document.getElementById('cp-emails').value||'').split(',').map(e=>e.trim()).filter(Boolean);
+        const userIds = (document.getElementById('cp-userids')?.value||'').split(',').map(e=>e.trim()).filter(Boolean);
         const body = {
           code: document.getElementById('cp-code').value,
           type: document.getElementById('cp-type').value,
           value: Number(document.getElementById('cp-value').value||0),
           expiresAt: document.getElementById('cp-expires').value || null,
           maxUses: Number(document.getElementById('cp-maxuses').value||0),
-          userEmails: emails
+          userEmails: emails,
+          userIds
         };
         const res = await fetchAdmin('/api/marketing/admin/coupons', { method:'POST', body: JSON.stringify(body) });
         const data = await res.json();
@@ -590,6 +646,7 @@ async function loadCoupons(){
           <strong>${c.code}</strong> — ${c.type==='percent'?c.value+'%':'$'+Number(c.value||0).toFixed(2)}
           <br><small>Used ${c.used||0}${c.maxUses?` / ${c.maxUses}`:''} ${c.active===false?'(inactive)':''}</small>
           ${c.expiresAt?`<br><small>Expires: ${new Date(c.expiresAt).toLocaleDateString()}</small>`:''}
+          ${(Array.isArray(c.userEmails)&&c.userEmails.length)||(Array.isArray(c.userIds)&&c.userIds.length) ? `<br><small>Restricted: ${[...(c.userEmails||[]),(c.userIds&&c.userIds.length?`${c.userIds.length} userIds`:null)].filter(Boolean).join(', ')}</small>`:''}
         </div>
         <div>
           ${c.active!==false?`<button class="btn btn-ghost" data-deact="${c.code}">Deactivate</button>`:''}
@@ -881,5 +938,99 @@ async function renderTraffic(){
     const thr = document.getElementById('cf-threats'); if (thr) thr.textContent = '—';
     const top = document.getElementById('cf-top-paths'); if (top) top.innerHTML = '<li class="muted">Unavailable</li>';
     const byc = document.getElementById('cf-by-country'); if (byc) byc.innerHTML = '<li class="muted">Unavailable</li>';
+  }
+}
+// Netting config UI
+async function renderNetting(){
+  const status = document.getElementById('net-status');
+  if (status) status.textContent = 'Loading…';
+  try {
+    const res = await fetchAdmin('/api/admin/netting-config');
+    const data = res.ok ? await res.json() : null;
+    if (!data) throw new Error('Failed to load');
+    // Fill defaults
+    const d = data.defaults || {};
+    const setVal = (id, v) => { const el = document.getElementById(id); if (el) el.value = (v!=null? v : ''); };
+    setVal('net-markup', d.markupPerSqFt);
+    setVal('net-border', d.borderSurchargePerFt);
+    setVal('net-expedite', d.expeditedFee);
+    setVal('net-ship', d.shipPerItem);
+    // Render mesh list
+    const list = document.getElementById('net-mesh-list');
+    if (list){
+      const meshes = Array.isArray(data.meshPrices) ? data.meshPrices : [];
+      if (!meshes.length) list.innerHTML = '<p class="muted">No meshes configured.</p>';
+      else list.innerHTML = meshes.map((m,idx)=>`
+        <div class="product-item" data-row="${idx}">
+          <div class="stack-05">
+            <div><strong>${m.label||m.id}</strong> <small class="muted">(${m.sport||'other'})</small></div>
+            <div class="muted">Wholesale $/sq ft: <input type="number" step="0.0001" min="0" value="${Number(m.wholesaleSqFt||0)}" data-field="wholesaleSqFt" style="width:110px"/> &nbsp; ID: <input type="text" value="${m.id||''}" data-field="id" style="width:160px"/> &nbsp; Label: <input type="text" value="${m.label||''}" data-field="label" style="width:160px"/> &nbsp; Sport: <input type="text" value="${m.sport||'other'}" data-field="sport" style="width:100px"/></div>
+          </div>
+          <div><button class="btn btn-ghost" type="button" data-del="${idx}">Remove</button></div>
+        </div>
+      `).join('');
+      // Wire remove buttons
+      list.querySelectorAll('[data-del]').forEach(btn=>{
+        btn.addEventListener('click', ()=>{
+          const row = Number(btn.getAttribute('data-del'));
+          const items = Array.from(list.querySelectorAll('[data-row]'));
+          if (row>=0 && row < items.length) {
+            items[row].remove();
+            if (status) status.textContent = 'Row removed (not saved)';
+          }
+        });
+      });
+      // Wire inline edits to mark dirty
+      list.querySelectorAll('input').forEach(inp=>{
+        inp.addEventListener('input', ()=>{ if(status) status.textContent = 'Unsaved changes'; });
+      });
+    }
+    const addBtn = document.getElementById('net-add-row');
+    if (addBtn && !addBtn.__wired){
+      addBtn.__wired = true;
+      addBtn.addEventListener('click', ()=>{
+        const list = document.getElementById('net-mesh-list');
+        const idx = list.querySelectorAll('[data-row]').length;
+        const div = document.createElement('div');
+        div.className = 'product-item';
+        div.setAttribute('data-row', String(idx));
+        div.innerHTML = `<div class="stack-05"><div><strong>New Mesh</strong></div><div class="muted">Wholesale $/sq ft: <input type="number" step="0.0001" min="0" value="0" data-field="wholesaleSqFt" style="width:110px"/> &nbsp; ID: <input type="text" value="custom-${Date.now()}" data-field="id" style="width:160px"/> &nbsp; Label: <input type="text" value="Label" data-field="label" style="width:160px"/> &nbsp; Sport: <input type="text" value="other" data-field="sport" style="width:100px"/></div></div><div><button class="btn btn-ghost" type="button" data-del="${idx}">Remove</button></div>`;
+        list.appendChild(div);
+        if (status) status.textContent = 'Unsaved changes';
+        // Wire remove
+        div.querySelector('[data-del]')?.addEventListener('click', ()=>{ div.remove(); if(status) status.textContent='Row removed (not saved)'; });
+      });
+    }
+    const saveBtn = document.getElementById('net-save');
+    if (saveBtn && !saveBtn.__wired){
+      saveBtn.__wired = true;
+      saveBtn.addEventListener('click', async ()=>{
+        try{
+          if (status) status.textContent = 'Saving…';
+          const markup = Number(document.getElementById('net-markup')?.value || 0.25) || 0;
+          const border = Number(document.getElementById('net-border')?.value || 0.35) || 0;
+          const expedite = Number(document.getElementById('net-expedite')?.value || 25) || 0;
+          const ship = Number(document.getElementById('net-ship')?.value || 100) || 0;
+          const list = document.getElementById('net-mesh-list');
+          const rows = Array.from(list.querySelectorAll('[data-row]'));
+          const meshPrices = rows.map(row => {
+            const get = (sel)=> row.querySelector(`[data-field="${sel}"]`);
+            return {
+              id: String(get('id')?.value || ''),
+              label: String(get('label')?.value || ''),
+              sport: String(get('sport')?.value || 'other'),
+              wholesaleSqFt: Number(get('wholesaleSqFt')?.value || 0) || 0
+            };
+          }).filter(m=>m.id && m.label);
+          const payload = { version: 1, defaults: { markupPerSqFt: markup, borderSurchargePerFt: border, expeditedFee: expedite, shipPerItem: ship }, meshPrices };
+          const res = await fetchAdmin('/api/admin/netting-config', { method:'PUT', body: JSON.stringify(payload) });
+          if (!res.ok) throw new Error(await res.text().catch(()=> 'Failed'));
+          if (status) status.textContent = 'Saved.';
+        } catch(e){ if (status) status.textContent = e.message || 'Failed to save'; }
+      });
+    }
+    if (status && !status.textContent) status.textContent = '';
+  } catch (e) {
+    const status = document.getElementById('net-status'); if (status) status.textContent = e.message || 'Failed to load';
   }
 }

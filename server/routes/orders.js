@@ -48,7 +48,8 @@ router.get('/summary/:id', async (req, res) => {
       items,
       subtotal: order.subtotal,
       shipping: order.shipping,
-      discount: order.discount
+      discount: order.discount,
+      tax: order.tax
     };
     res.json(out);
   } catch (err) {
@@ -100,6 +101,32 @@ router.get('/me', requireAuth, async (req, res) => {
     const userId = req.user.id;
     const orders = await orderService.getOrdersByUser(userId);
     res.json(orders);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// Public: Get orders by email (sanitized). Intended for Order History fallback when not logged in.
+// Basic spam/honeypot protection via optional `hp` param; if present, treat as bot and return empty.
+router.get('/public/by-email', async (req, res) => {
+  try {
+    const { email, hp } = req.query;
+    if (hp) return res.json([]);
+    const em = String(email || '').trim();
+    if (!em || !em.includes('@')) return res.status(400).json({ message: 'email is required' });
+    const orders = await orderService.getOrdersByEmail(em);
+    const sanitized = (orders || []).map(o => ({
+      id: o.id,
+      status: o.status,
+      createdAt: o.createdAt,
+      total: o.total,
+      subtotal: o.subtotal,
+      shipping: o.shipping,
+      discount: o.discount,
+      tax: o.tax,
+      items: (o.items||[]).map(i => ({ id: i.productId || i.id, qty: i.quantity, price: i.price }))
+    }));
+    res.json(sanitized);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

@@ -64,8 +64,9 @@ class OrderService {
             price = Number(fb.price || 0) || 0;
             productName = fb.name || String(item.id);
           } else {
-            // Last resort: allow unknown product with zero price to still create an order record
-            price = 0;
+            // Last resort: honor client-provided unit price if present so the order record is useful
+            const unit = Number(item.price || 0);
+            price = Number.isFinite(unit) && unit > 0 ? unit : 0;
             productName = String(item.id);
           }
         }
@@ -78,7 +79,9 @@ class OrderService {
           productName,
           price,
           quantity: qty,
-          subtotal: itemTotal
+          subtotal: itemTotal,
+          // Optional: store per-line shipping provided by client for future detailed invoices
+          ship: Number(item.ship || 0) || undefined
         });
       }
 
@@ -87,11 +90,17 @@ class OrderService {
         userId: orderData.userId,
         userEmail: orderData.userEmail,
         items: enrichedItems,
-        total: total,
+        total: Number.isFinite(orderData.total) ? Number(orderData.total) : total,
         status: 'pending',
         shippingAddress: orderData.shippingAddress || null,
         customerInfo: orderData.customerInfo || null,
-        paymentInfo: orderData.paymentInfo || null
+        paymentInfo: orderData.paymentInfo || null,
+        // Persist breakdown if provided by caller (compute otherwise)
+        subtotal: Number.isFinite(orderData.subtotal) ? Number(orderData.subtotal) : enrichedItems.reduce((s,i)=>s + Number(i.subtotal||0), 0),
+        shipping: Number.isFinite(orderData.shipping) ? Number(orderData.shipping) : 0,
+        discount: Number.isFinite(orderData.discount) ? Number(orderData.discount) : 0,
+        tax: (orderData.tax === null) ? null : (Number.isFinite(orderData.tax) ? Number(orderData.tax) : 0),
+        couponAudit: orderData.couponAudit || undefined
       };
 
       // Insert order

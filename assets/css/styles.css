@@ -1295,7 +1295,8 @@ nav.quick-links li a[href="careers.html"]{
 .calc-form .dims{display:grid;grid-template-columns:1fr auto 1fr auto;gap:.5rem;align-items:center}
 .calc-form input[type=number], .calc-form select{padding:.5rem .65rem;border:1px solid var(--border);border-radius:.6rem}
 .calc-form input[type=number]{ width:6ch; }
-.calc-form .dims input[type=number]{ width:6ch; }
+/* Widen ft/in fields to comfortably fit at least 3 digits */
+.calc-form .dims input[type=number]{ width:8ch; }
 .calc-form .qty input[type=number]{ width:7ch; text-align:center; }
 .calc-form .qty .icon-btn{ width:auto; min-width:32px; height:32px; }
 .calc-form .unit{opacity:.65}

@@ -4,6 +4,7 @@ _Updated: 2025-10-20_
 ## Profit summary
 - Items with profit available: 103 of 106 (includes per-foot items)
 - Average profit (dollar-priced items): $150.22
+- Average profit % (all computable): 34.4%
 - Range: $25.00 – $600.00
 - Total profit (one unit each): $15021.55
 
@@ -64,72 +65,84 @@ _Updated: 2025-10-20_
 - Wholesale: $439.00
 - Shipping: $100.00
 - Profit: $395.00
+- Profit %: 47.4%
 
 ### 21NYLON1455 — Nylon #21 12x14x55
 - MAP: $889.00
 - Wholesale: $467.00
 - Shipping: $100.00
 - Profit: $422.00
+- Profit %: 47.5%
 
 ### 21NYLON1270 — Nylon #21 12x12x70
 - MAP: $1000.00
 - Wholesale: $523.00
 - Shipping: $100.00
 - Profit: $477.00
+- Profit %: 47.7%
 
 ### 21NYLON1470 — Nylon #21 12x14x70
 - MAP: $1055.00
 - Wholesale: $556.00
 - Shipping: $100.00
 - Profit: $499.00
+- Profit %: 47.3%
 
 ### 36NYLON1255 — Nylon #36 12x12x55
 - MAP: $1112.00
 - Wholesale: $662.00
 - Shipping: $100.00
 - Profit: $450.00
+- Profit %: 40.5%
 
 ### 36NYLON1455 — Nylon #36 12x14x55
 - MAP: $1167.00
 - Wholesale: $700.00
 - Shipping: $100.00
 - Profit: $467.00
+- Profit %: 40.0%
 
 ### 36NYLON1270 — Nylon #36 12x12x70
 - MAP: $1334.00
 - Wholesale: $795.00
 - Shipping: $100.00
 - Profit: $539.00
+- Profit %: 40.4%
 
 ### 36NYLON1470 — Nylon #36 12x14x70
 - MAP: $1445.00
 - Wholesale: $845.00
 - Shipping: $100.00
 - Profit: $600.00
+- Profit %: 41.5%
 
 ### 36POLY1255 — Poly #36 12x12x55
 - MAP: $889.00
 - Wholesale: $473.00
 - Shipping: $100.00
 - Profit: $416.00
+- Profit %: 46.8%
 
 ### 36POLY1455 — Poly #36 12x14x55
 - MAP: $945.00
 - Wholesale: $505.00
 - Shipping: $100.00
 - Profit: $440.00
+- Profit %: 46.6%
 
 ### 36POLY1270 — Poly #36 12x12x70
 - MAP: $1112.00
 - Wholesale: $562.00
 - Shipping: $100.00
 - Profit: $550.00
+- Profit %: 49.5%
 
 ### 36POLY1470 — Poly #36 12x14x70
 - MAP: $1167.00
 - Wholesale: $600.00
 - Shipping: $100.00
 - Profit: $567.00
+- Profit %: 48.6%
 
 ## Bullet Pad Kits
 
@@ -138,72 +151,84 @@ _Updated: 2025-10-20_
 - Wholesale: $89.95
 - Shipping: $20.00
 - Profit: $60.00
+- Profit %: 40.0%
 
 ### PK-BULLETJR — Bullet JR L Pad Kit (20')
 - MAP: $149.95
 - Wholesale: $89.95
 - Shipping: $20.00
 - Profit: $60.00
+- Profit %: 40.0%
 
 ### PK-BULLETFT — Bullet Front Toss Pad Kit (25')
 - MAP: $149.95
 - Wholesale: $89.95
 - Shipping: $20.00
 - Profit: $60.00
+- Profit %: 40.0%
 
 ### PK-BULLETCOMBO — Bullet Combo Pad Kit (25')
 - MAP: $158.95
 - Wholesale: $98.95
 - Shipping: $20.00
 - Profit: $60.00
+- Profit %: 37.7%
 
 ### PK-BULLETCOP — Bullet Overhead Protector Pad Kit (45')
 - MAP: $158.95
 - Wholesale: $98.95
 - Shipping: $20.00
 - Profit: $60.00
+- Profit %: 37.7%
 
 ### PK-BULLETLOP — Bullet Combo w/ Overhead Pad Kit (38')
 - MAP: $158.95
 - Wholesale: $98.95
 - Shipping: $20.00
 - Profit: $60.00
+- Profit %: 37.7%
 
 ### PK-BULLETFP — Bullet Combo w/ Overhead Pad Kit (25')
 - MAP: $149.95
 - Wholesale: $89.95
 - Shipping: $20.00
 - Profit: $60.00
+- Profit %: 40.0%
 
 ### PK-BULLETFPOH — Bullet Combo w/ Overhead Pad Kit (25')
 - MAP: $149.95
 - Wholesale: $89.95
 - Shipping: $20.00
 - Profit: $60.00
+- Profit %: 40.0%
 
 ### PK-7X7 PROTECTIVE — 7x7 Protective Screen Pad Kit (25')
 - MAP: $149.95
 - Wholesale: $89.95
 - Shipping: $20.00
 - Profit: $60.00
+- Profit %: 40.0%
 
 ### PK-7X7 SOCKNET — 7x7 Protective Screen w/ Socknet Pad Kit (25')
 - MAP: $149.95
 - Wholesale: $89.95
 - Shipping: $20.00
 - Profit: $60.00
+- Profit %: 40.0%
 
 ### PK-8X8 PROTECTIVE — 8x8 Protective Screen Pad Kit (26')
 - MAP: $149.95
 - Wholesale: $89.95
 - Shipping: $20.00
 - Profit: $60.00
+- Profit %: 40.0%
 
 ### PK-10X10 PROTECTIVE — 10x10 Protective Screen Pad Kit (34')
 - MAP: $172.45
 - Wholesale: $112.45
 - Shipping: $20.00
 - Profit: $60.00
+- Profit %: 34.8%
 
 ## Replacement Nets
 
@@ -212,72 +237,84 @@ _Updated: 2025-10-20_
 - Wholesale: $84.47
 - Shipping: $15.00
 - Profit: $60.00
+- Profit %: 41.5%
 
 ### RN-BULLETJR — Bullet JR Replacement Net
 - MAP: $141.22
 - Wholesale: $81.22
 - Shipping: $15.00
 - Profit: $60.00
+- Profit %: 42.5%
 
 ### RN-BULLETFT — Bullet Front Toss Replacement Net
 - MAP: $144.47
 - Wholesale: $84.47
 - Shipping: $15.00
 - Profit: $60.00
+- Profit %: 41.5%
 
 ### RN-BULLETCOMBO — Bullet Combo Replacement Net
 - MAP: $150.97
 - Wholesale: $90.97
 - Shipping: $15.00
 - Profit: $60.00
+- Profit %: 39.7%
 
 ### RN-BULLETCOP — Bullet Combo w/ Overhead Replacement Net
 - MAP: $163.97
 - Wholesale: $103.97
 - Shipping: $15.00
 - Profit: $60.00
+- Profit %: 36.6%
 
 ### RN-BULLETLOP — Bullet L w/ Overhead Replacement Net
 - MAP: $157.47
 - Wholesale: $97.47
 - Shipping: $15.00
 - Profit: $60.00
+- Profit %: 38.1%
 
 ### RN-BULLETFP — Bullet Fast Pitch Replacement Net
 - MAP: $150.97
 - Wholesale: $90.97
 - Shipping: $15.00
 - Profit: $60.00
+- Profit %: 39.7%
 
 ### RN-BULLETFPOH — Bullet Fast Pitch w/ Overhead Replacement Net
 - MAP: $121.72
 - Wholesale: $61.72
 - Shipping: $15.00
 - Profit: $60.00
+- Profit %: 49.3%
 
 ### RN-7X7 PROTECTIVE — 7x7 Protective Screen Replacement Net
 - MAP: $144.47
 - Wholesale: $84.47
 - Shipping: $15.00
 - Profit: $60.00
+- Profit %: 41.5%
 
 ### RN-7X7 SOCKNET — 7x7 Protective Screen w/ Socknet Replacement Net
 - MAP: $167.22
 - Wholesale: $107.22
 - Shipping: $15.00
 - Profit: $60.00
+- Profit %: 35.9%
 
 ### RN-8X8 PROTECTIVE — 8x8 Protective Screen Replacement Net
 - MAP: $170.47
 - Wholesale: $110.47
 - Shipping: $15.00
 - Profit: $60.00
+- Profit %: 35.2%
 
 ### RN-10X10 PROTECTIVE — 10x10 Protective Screen Replacement Net
 - MAP: $225.72
 - Wholesale: $165.72
 - Shipping: $15.00
 - Profit: $60.00
+- Profit %: 26.6%
 
 ## Accessories
 
@@ -286,114 +323,133 @@ _Updated: 2025-10-20_
 - Wholesale: $305.95
 - Shipping: $100.00
 - Profit: $100.00
+- Profit %: 24.6%
 
 ### CABLE516-1000 — 1000' of 5/16" Cable
 - MAP: $657.10
 - Wholesale: $557.10
 - Shipping: $100.00
 - Profit: $100.00
+- Profit %: 15.2%
 
 ### CABLE14-500 — 500' of 1/4" Cable
 - MAP: $279.95
 - Wholesale: $179.95
 - Shipping: $100.00
 - Profit: $100.00
+- Profit %: 35.7%
 
 ### CABLE14-1000 — 1000' of 1/4" Cable
 - MAP: $441.95
 - Wholesale: $341.95
 - Shipping: $100.00
 - Profit: $100.00
+- Profit %: 22.6%
 
 ### 5/16-TPLYSTER-xFT — 5/16" Poly Twisted Rope by the FT
 - MAP: $0.50/ft
 - Wholesale: $0.25/ft
 - Shipping: $100.00
 - Profit: $0.25/ft
+- Profit %: 50.0%
 
 ### 5/16-TPLYSTER-1270 — 5/16" 1270' Spool Poly Twisted Rope
 - MAP: $330.00
 - Wholesale: $230.00
 - Shipping: $100.00
 - Profit: $100.00
+- Profit %: 30.3%
 
 ### FT-TNHL-01801 — #21 Forever Black Twine Spool
 - MAP: $35.88
 - Wholesale: $10.88
 - Shipping: $100.00
 - Profit: $25.00
+- Profit %: 69.7%
 
 ### FT-TNHL-02101 — #30 Forever Black Twine Spool
 - MAP: $35.88
 - Wholesale: $10.88
 - Shipping: $100.00
 - Profit: $25.00
+- Profit %: 69.7%
 
 ### FT-TNHL-03601 — #36 Forever Black Twine Spool
 - MAP: $35.88
 - Wholesale: $10.88
 - Shipping: $100.00
 - Profit: $25.00
+- Profit %: 69.7%
 
 ### FT-TNHL-04201 — #42 Forever Black Twine Spool
 - MAP: $35.88
 - Wholesale: $10.88
 - Shipping: $100.00
 - Profit: $25.00
+- Profit %: 69.7%
 
 ### FT-TNHL-06001 — #60 Forever Black Twine Spool
 - MAP: $35.88
 - Wholesale: $10.88
 - Shipping: $100.00
 - Profit: $25.00
+- Profit %: 69.7%
 
 ### FT-TNHL-9601 — #92 Forever Black Twine Spool
 - MAP: $35.88
 - Wholesale: $10.88
 - Shipping: $100.00
 - Profit: $25.00
+- Profit %: 69.7%
 
 ### Screen Bulletz — Screen Bulletz Leg Caps (4-Pack)
 - MAP: $57.00
 - Wholesale: $32.00
 - Shipping: $100.00
 - Profit: $25.00
+- Profit %: 43.9%
 
 ### BWK — Bullet Wheel Kit
 - MAP: —
 - Wholesale: $75.00
 - Shipping: $100.00
 - Profit: —
+- Profit %: —
 
 ### Screen Component — Bullet Fixed Leg Kit
 - MAP: —
 - Wholesale: $35.00
 - Shipping: $100.00
 - Profit: —
+- Profit %: —
 
 ### Screen Wheel — Bullet Replacement Wheels (2-Pack)
 - MAP: —
 - Wholesale: $30.00
 - Shipping: $100.00
 - Profit: —
+- Profit %: —
 
 ### VINYL-12inchxFt — 12" Vinyl Top by the FT
 - MAP: $2.50/ft
 - Wholesale: $2.00/ft
 - Shipping: $100.00
 - Profit: $0.50/ft
+- Profit %: 20.0%
 
 ### Screen Component — Screen Padding by the FT
 - MAP: $1.50/ft
 - Wholesale: $1.00/ft
 - Shipping: $100.00
 - Profit: $0.50/ft
+- Profit %: 33.3%
 
 ### Battingmat — Pro Batting Mat
 - MAP: $575.00
 - Wholesale: $475.00
 - Shipping: Free
 - Profit: $100.00
+- Profit %: 17.4%
 _Notes: Free Shipping • Free shipping override applies_
 
 ### Armorbasket — Armor Basket Baseball Cart
@@ -401,6 +457,7 @@ _Notes: Free Shipping • Free shipping override applies_
 - Wholesale: $200.00
 - Shipping: Free
 - Profit: $100.00
+- Profit %: 33.3%
 _Notes: Free Shipping • Free shipping override applies_
 
 ### Wbasket — Bullet Wheeled Ball Basket
@@ -408,6 +465,7 @@ _Notes: Free Shipping • Free shipping override applies_
 - Wholesale: $350.00
 - Shipping: $100.00
 - Profit: $100.00
+- Profit %: 22.2%
 _Notes: LTL Freight Only_
 
 ## Pitcher's Pocket
@@ -417,12 +475,14 @@ _Notes: LTL Freight Only_
 - Wholesale: $195.00
 - Shipping: $50.00
 - Profit: $104.95
+- Profit %: 35.0%
 
 ### BBPP-PRO — Pitcher's Pocket Pro
 - MAP: $249.95
 - Wholesale: $164.00
 - Shipping: $50.00
 - Profit: $85.95
+- Profit %: 34.4%
 
 ## Baseball L-Screens
 
@@ -433,21 +493,25 @@ Variants:
   - Wholesale: $295.00
   - Shipping: $75.00
   - Profit: $104.95
+  - Profit %: 26.2%
 - Option: Padded
   - MAP: $499.95
   - Wholesale: $358.00
   - Shipping: $75.00
   - Profit: $141.95
+  - Profit %: 28.4%
 - Option: Wheeled
   - MAP: $499.95
   - Wholesale: $358.00
   - Shipping: $75.00
   - Profit: $141.95
+  - Profit %: 28.4%
 - Option: Padded w/wheels
   - MAP: $549.95
   - Wholesale: $390.00
   - Shipping: $75.00
   - Profit: $159.95
+  - Profit %: 29.1%
 
 ### BULLETJRBB — Bullet L Screen JR
 Variants:
@@ -456,21 +520,25 @@ Variants:
   - Wholesale: $258.00
   - Shipping: $75.00
   - Profit: $91.95
+  - Profit %: 26.3%
 - Option: Padded
   - MAP: $449.95
   - Wholesale: $321.00
   - Shipping: $75.00
   - Profit: $128.95
+  - Profit %: 28.7%
 - Option: Wheeled
   - MAP: $449.95
   - Wholesale: $321.00
   - Shipping: $75.00
   - Profit: $128.95
+  - Profit %: 28.7%
 - Option: Padded w/wheels
   - MAP: $499.95
   - Wholesale: $358.00
   - Shipping: $75.00
   - Profit: $141.95
+  - Profit %: 28.4%
 
 ### BULLETFT — Bullet Front Toss
 Variants:
@@ -479,21 +547,25 @@ Variants:
   - Wholesale: $295.00
   - Shipping: $75.00
   - Profit: $104.95
+  - Profit %: 26.2%
 - Option: Padded
   - MAP: $499.95
   - Wholesale: $358.00
   - Shipping: $75.00
   - Profit: $141.95
+  - Profit %: 28.4%
 - Option: Wheeled
   - MAP: $499.95
   - Wholesale: $358.00
   - Shipping: $75.00
   - Profit: $141.95
+  - Profit %: 28.4%
 - Option: Padded w/wheels
   - MAP: $549.95
   - Wholesale: $390.00
   - Shipping: $75.00
   - Profit: $159.95
+  - Profit %: 29.1%
 
 ### BULLETCOMBO — Bullet L Screen Combo
 Variants:
@@ -502,21 +574,25 @@ Variants:
   - Wholesale: $327.00
   - Shipping: $75.00
   - Profit: $122.95
+  - Profit %: 27.3%
 - Option: Padded
   - MAP: $549.95
   - Wholesale: $390.00
   - Shipping: $75.00
   - Profit: $159.95
+  - Profit %: 29.1%
 - Option: Wheeled
   - MAP: $549.95
   - Wholesale: $390.00
   - Shipping: $75.00
   - Profit: $159.95
+  - Profit %: 29.1%
 - Option: Padded w/wheels
   - MAP: $599.95
   - Wholesale: $422.00
   - Shipping: $75.00
   - Profit: $177.95
+  - Profit %: 29.7%
 
 ### BULLETCOP — Bullet L Screen Combo w/Overhead
 Variants:
@@ -525,16 +601,19 @@ Variants:
   - Wholesale: $532.00
   - Shipping: $125.00
   - Profit: $267.95
+  - Profit %: 33.5%
 - Option: Wheeled
   - MAP: $799.95
   - Wholesale: $532.00
   - Shipping: $125.00
   - Profit: $267.95
+  - Profit %: 33.5%
 - Option: Padded w/wheels
   - MAP: $849.95
   - Wholesale: $574.00
   - Shipping: $125.00
   - Profit: $275.95
+  - Profit %: 32.5%
 
 ### BULLETLOP — Bullet L Screen Baseball w/Overhead
 Variants:
@@ -543,21 +622,25 @@ Variants:
   - Wholesale: $432.00
   - Shipping: $125.00
   - Profit: $167.95
+  - Profit %: 28.0%
 - Option: Padded
   - MAP: $699.95
   - Wholesale: $474.00
   - Shipping: $125.00
   - Profit: $225.95
+  - Profit %: 32.3%
 - Option: Wheeled
   - MAP: $699.95
   - Wholesale: $474.00
   - Shipping: $125.00
   - Profit: $225.95
+  - Profit %: 32.3%
 - Option: Padded w/wheels
   - MAP: $749.95
   - Wholesale: $532.00
   - Shipping: $125.00
   - Profit: $217.95
+  - Profit %: 29.1%
 
 ### BULLETFP — Bullet Hole Fast Pitch
 Variants:
@@ -566,21 +649,25 @@ Variants:
   - Wholesale: $353.00
   - Shipping: $75.00
   - Profit: $96.95
+  - Profit %: 21.5%
 - Option: Padded
   - MAP: $499.95
   - Wholesale: $400.00
   - Shipping: $75.00
   - Profit: $99.95
+  - Profit %: 20.0%
 - Option: Wheeled
   - MAP: $499.95
   - Wholesale: $400.00
   - Shipping: $75.00
   - Profit: $99.95
+  - Profit %: 20.0%
 - Option: Padded w/wheels
   - MAP: $599.95
   - Wholesale: $490.00
   - Shipping: $75.00
   - Profit: $109.95
+  - Profit %: 18.3%
 
 ### BULLETFPOH — Bullet Fastpitch Overhead
 Variants:
@@ -589,21 +676,25 @@ Variants:
   - Wholesale: $258.00
   - Shipping: $75.00
   - Profit: $91.95
+  - Profit %: 26.3%
 - Option: Padded
   - MAP: $449.95
   - Wholesale: $321.00
   - Shipping: $75.00
   - Profit: $128.95
+  - Profit %: 28.7%
 - Option: Wheeled
   - MAP: $449.95
   - Wholesale: $321.00
   - Shipping: $75.00
   - Profit: $128.95
+  - Profit %: 28.7%
 - Option: Padded w/wheels
   - MAP: $499.95
   - Wholesale: $358.00
   - Shipping: $75.00
   - Profit: $141.95
+  - Profit %: 28.4%
 
 ### PROTECTIVE7X7 — 7x7 Protective Screen
 Variants:
@@ -612,21 +703,25 @@ Variants:
   - Wholesale: $258.00
   - Shipping: $75.00
   - Profit: $91.95
+  - Profit %: 26.3%
 - Option: Padded
   - MAP: $449.95
   - Wholesale: $321.00
   - Shipping: $75.00
   - Profit: $128.95
+  - Profit %: 28.7%
 - Option: Wheeled
   - MAP: $449.95
   - Wholesale: $321.00
   - Shipping: $75.00
   - Profit: $128.95
+  - Profit %: 28.7%
 - Option: Padded w/wheels
   - MAP: $499.95
   - Wholesale: $358.00
   - Shipping: $75.00
   - Profit: $141.95
+  - Profit %: 28.4%
 
 ### SOCKNET7X7 — 7x7 Protective Screen w/ Sock Net
 Variants:
@@ -635,21 +730,25 @@ Variants:
   - Wholesale: $311.00
   - Shipping: $75.00
   - Profit: $88.95
+  - Profit %: 22.2%
 - Option: Padded
   - MAP: $499.95
   - Wholesale: $369.00
   - Shipping: $75.00
   - Profit: $130.95
+  - Profit %: 26.2%
 - Option: Wheeled
   - MAP: $499.95
   - Wholesale: $369.00
   - Shipping: $75.00
   - Profit: $130.95
+  - Profit %: 26.2%
 - Option: Padded w/wheels
   - MAP: $549.95
   - Wholesale: $406.00
   - Shipping: $75.00
   - Profit: $143.95
+  - Profit %: 26.2%
 
 ### PROTECTIVE8X8 — 8x8 Protective Screen
 Variants:
@@ -658,21 +757,25 @@ Variants:
   - Wholesale: $367.00
   - Shipping: $100.00
   - Profit: $82.95
+  - Profit %: 18.4%
 - Option: Padded
   - MAP: $549.95
   - Wholesale: $421.00
   - Shipping: $100.00
   - Profit: $128.95
+  - Profit %: 23.4%
 - Option: Wheeled
   - MAP: $549.95
   - Wholesale: $421.00
   - Shipping: $100.00
   - Profit: $128.95
+  - Profit %: 23.4%
 - Option: Padded w/wheels
   - MAP: $599.95
   - Wholesale: $456.00
   - Shipping: $100.00
   - Profit: $143.95
+  - Profit %: 24.0%
 
 ### PROTECTIVE10X10 — 10 x 10 Protective Screen
 Variants:
@@ -681,21 +784,25 @@ Variants:
   - Wholesale: $500.00
   - Shipping: $100.00
   - Profit: $49.95
+  - Profit %: 9.1%
 - Option: Padded
   - MAP: $649.95
   - Wholesale: $548.00
   - Shipping: $100.00
   - Profit: $101.95
+  - Profit %: 15.7%
 - Option: Wheeled
   - MAP: $649.95
   - Wholesale: $548.00
   - Shipping: $100.00
   - Profit: $101.95
+  - Profit %: 15.7%
 - Option: Padded w/wheels
   - MAP: $699.95
   - Wholesale: $590.00
   - Shipping: $100.00
   - Profit: $109.95
+  - Profit %: 15.7%
 
 ---
 ## Admin dashboard — how to use

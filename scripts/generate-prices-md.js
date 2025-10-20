@@ -62,6 +62,23 @@ function profitDisplay(mapParsed, wholesaleParsed){
 	return null;
 }
 
+function profitPercent(mapParsed, wholesaleParsed){
+	// Returns a number (0-100+) or null when not computable
+	if (!mapParsed || !wholesaleParsed) return null;
+	if (mapParsed.type === 'number' && wholesaleParsed.type === 'number') {
+		const m = Number(mapParsed.value); const w = Number(wholesaleParsed.value);
+		if (!isFinite(m) || m <= 0 || !isFinite(w)) return null;
+		return ((m - w) / m) * 100;
+	}
+	if (mapParsed.type === 'per-foot' && wholesaleParsed.type === 'per-foot') {
+		const num = (v) => typeof v === 'string' ? parseFloat(String(v).split('/')[0]) : Number(v);
+		const m = num(mapParsed.value); const w = num(wholesaleParsed.value);
+		if (!isFinite(m) || m <= 0 || !isFinite(w)) return null;
+		return ((m - w) / m) * 100;
+	}
+	return null;
+}
+
 function normId(v){ return String(v||'').trim().toLowerCase(); }
 
 function isFreeShipOverride(p){
@@ -129,6 +146,7 @@ async function generate(){
 					const wholesaleParsed = (typeof v.wholesale !== 'undefined') ? parseMapPrice(v.wholesale) : null;
 					const profitNum = (toNum(mapParsed) != null && toNum(wholesaleParsed) != null) ? (toNum(mapParsed) - toNum(wholesaleParsed)) : null;
 					const profitPerFt = (toPerFootNum(mapParsed) != null && toPerFootNum(wholesaleParsed) != null) ? (toPerFootNum(mapParsed) - toPerFootNum(wholesaleParsed)) : null;
+					const profitPct = profitPercent(mapParsed, wholesaleParsed);
 								const entry = {
 						category: cat,
 						sku: p.sku || p.id || '',
@@ -137,18 +155,21 @@ async function generate(){
 						mapParsed,
 						wholesaleParsed,
 						profitNum,
-						profitPerFt
+						profitPerFt,
+						profitPct,
+						ship: effectiveShippingDollars(p, v)
 					};
 					totalEntries.push(entry);
 					if (profitNum != null) numericEntries.push(entry);
 					if (profitPerFt != null) perFootEntries.push(entry);
-								if (profitNum == null && profitPerFt == null) missingProfit.push({ ...entry, ship: effectiveShippingDollars(p, v) });
+								if (profitNum == null && profitPerFt == null) missingProfit.push({ ...entry });
 				}
 			} else {
 				const mapParsed = (typeof p.map !== 'undefined') ? parseMapPrice(p.map) : ((typeof p.price !== 'undefined') ? parseMapPrice(p.price) : null);
 				const wholesaleParsed = (typeof p.wholesale !== 'undefined') ? parseMapPrice(p.wholesale) : null;
 				const profitNum = (toNum(mapParsed) != null && toNum(wholesaleParsed) != null) ? (toNum(mapParsed) - toNum(wholesaleParsed)) : null;
 				const profitPerFt = (toPerFootNum(mapParsed) != null && toPerFootNum(wholesaleParsed) != null) ? (toPerFootNum(mapParsed) - toPerFootNum(wholesaleParsed)) : null;
+				const profitPct = profitPercent(mapParsed, wholesaleParsed);
 						const entry = {
 					category: cat,
 					sku: p.sku || p.id || '',
@@ -157,12 +178,14 @@ async function generate(){
 					mapParsed,
 					wholesaleParsed,
 					profitNum,
-					profitPerFt
+					profitPerFt,
+					profitPct,
+					ship: effectiveShippingDollars(p, null)
 				};
 				totalEntries.push(entry);
 				if (profitNum != null) numericEntries.push(entry);
 				if (profitPerFt != null) perFootEntries.push(entry);
-						if (profitNum == null && profitPerFt == null) missingProfit.push({ ...entry, ship: effectiveShippingDollars(p, null) });
+						if (profitNum == null && profitPerFt == null) missingProfit.push({ ...entry });
 			}
 		}
 	}
@@ -179,6 +202,9 @@ async function generate(){
 	const totalSku = totalEntries.length;
 	const sum = numericEntries.reduce((s,e)=> s + Number(e.profitNum||0), 0);
 	const avg = N ? (sum / N) : 0;
+	// Average profit percent across items where computable
+	const pctVals = totalEntries.map(e => e.profitPct).filter(v => typeof v === 'number' && isFinite(v));
+	const avgPct = pctVals.length ? (pctVals.reduce((a,b)=>a+b,0) / pctVals.length) : 0;
 	const sorted = [...numericEntries].sort((a,b)=> Number(b.profitNum||0) - Number(a.profitNum||0));
 	const minProfit = N ? Number(sorted[sorted.length-1].profitNum) : 0;
 	const maxProfit = N ? Number(sorted[0].profitNum) : 0;
@@ -193,6 +219,7 @@ async function generate(){
 	out.push(line('## Profit summary'));
 	out.push(line(`- Items with profit available: ${N + PF} of ${totalSku} (includes per-foot items)`));
 	out.push(line(`- Average profit (dollar-priced items): ${currency(avg)}`));
+	out.push(line(`- Average profit % (all computable): ${avgPct.toFixed(1)}%`));
 	out.push(line(`- Range: ${currency(minProfit)} – ${currency(maxProfit)}`));
 	out.push(line(`- Total profit (one unit each): ${currency(sum)}`));
 	out.push('\n');
@@ -291,7 +318,9 @@ async function generate(){
 						out.push(line(`  - Wholesale: ${wholesaleParsed ? (priceDisplay(wholesaleParsed) || '—') : '—'}`));
 						out.push(line(`  - Shipping: ${shipStr}`));
 						const profitStr = profitDisplay(vMapParsed, wholesaleParsed);
+						const pct = profitPercent(vMapParsed, wholesaleParsed);
 						out.push(line(`  - Profit: ${profitStr || '—'}`));
+						out.push(line(`  - Profit %: ${typeof pct === 'number' ? pct.toFixed(1)+'%' : '—'}`));
 				}
 			} else {
 					// Single item format
@@ -303,7 +332,9 @@ async function generate(){
 					out.push(line(`- Wholesale: ${wholesaleParsed ? (priceDisplay(wholesaleParsed) || '—') : '—'}`));
 					out.push(line(`- Shipping: ${shipStr}`));
 					const profitStr = profitDisplay(mapOnlyParsed, wholesaleParsed);
+					const pct = profitPercent(mapOnlyParsed, wholesaleParsed);
 					out.push(line(`- Profit: ${profitStr || '—'}`));
+					out.push(line(`- Profit %: ${typeof pct === 'number' ? pct.toFixed(1)+'%' : '—'}`));
 			}
 
 			// Notes (optional)
@@ -345,7 +376,28 @@ async function generate(){
 			.replace(/^---$/gm, '');         // hr
 		const outTxt = path.join(__dirname, '..', 'Prices.txt');
 		await fsp.writeFile(outTxt, plain, 'utf8');
-		console.log(`Wrote Prices.md and Prices.txt (${content.split('\n').length} lines).`);
+		// Emit a CSV export for spreadsheets and bulk editing
+		const csvHeader = ['category','sku','title','option','map','wholesale','shipping','profit','profitPct','notes'];
+		const esc = (v) => {
+			if (v == null) return '';
+			const s = String(v);
+			if (/[",\n]/.test(s)) return '"' + s.replace(/"/g,'""') + '"';
+			return s;
+		};
+		const toStr = (parsed) => parsed ? (priceDisplay(parsed) || '') : '';
+		const rows = totalEntries.map(e => {
+			const mapStr = toStr(e.mapParsed);
+			const whStr = toStr(e.wholesaleParsed);
+			const shipStr = e.ship === 0 ? 'Free' : (typeof e.ship === 'number' ? `$${Number(e.ship).toFixed(2)}` : '');
+			const profStr = (e.profitNum != null) ? `$${Number(e.profitNum).toFixed(2)}` : (e.profitPerFt != null ? `$${Number(e.profitPerFt).toFixed(2)}/ft` : '');
+			const pctStr = (typeof e.profitPct === 'number' && isFinite(e.profitPct)) ? `${e.profitPct.toFixed(1)}%` : '';
+			const notes = isFreeShipOverride({ sku: e.sku, name: e.title }) ? 'Free shipping override' : '';
+			return [e.category, e.sku, e.title, e.option || '', mapStr, whStr, shipStr, profStr, pctStr, notes].map(esc).join(',');
+		});
+		const csv = [csvHeader.join(',')].concat(rows).join('\n');
+		const outCsv = path.join(__dirname, '..', 'Prices.csv');
+		await fsp.writeFile(outCsv, csv, 'utf8');
+		console.log(`Wrote Prices.md, Prices.txt, and Prices.csv (${content.split('\n').length} lines).`);
 }
 
 generate().catch(err => {

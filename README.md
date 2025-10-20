@@ -239,6 +239,26 @@ AUTOSYNC_STRIPE=1                 # also create/update Stripe products/prices
 CORS_ORIGINS=http://localhost:4242,http://127.0.0.1:4242  # optional allowlist
 ```
 
+### Payments and Email: production tips
+
+Stripe (Live)
+
+- STRIPE_PUBLISHABLE_KEY=pk_live_… (set via host env, do not commit)
+- STRIPE_SECRET_KEY=sk_live_… (set via host env, do not commit)
+- STRIPE_WEBHOOK_SECRET=whsec_… (Dashboard → Webhooks → your Render URL)
+- STRIPE_TAX_AUTOMATIC=1 to enable Stripe automatic tax when available; server will fall back to manual state-based tax otherwise.
+
+Email sender
+
+- SENDGRID_API_KEY=… (if using SendGrid)
+- SENDGRID_FROM=<your-verified-sender@example> (must be a verified sender or domain in SendGrid)
+- MAIL_FROM_NAME=EZ Sports Netting (optional friendly display name)
+
+Notes:
+
+- The email service prefers a verified SENDGRID_FROM and classifies 550 Sender Identity errors as permanent to avoid retries. Ensure you’ve verified the from address or domain in SendGrid to enable delivery.
+- If not using SendGrid, configure SMTP_* variables (see comments in server/services/EmailService.js). The same MAIL_FROM_NAME will be applied across providers.
+
 ## Quality / Edge Cases
 
 - Price cache TTL: 60s (server) – immediate heavy change requires waiting or code invalidation.
@@ -253,6 +273,20 @@ CORS_ORIGINS=http://localhost:4242,http://127.0.0.1:4242  # optional allowlist
 - Inventory management & low-stock alerts
 - Variant / size / color pricing differentiation
 - Tax calculation & shipping zones (currently flat/free threshold)
+
+## Netting Calculator Pricing Configuration
+
+The Custom Netting Calculator sources its pricing from `assets/netting.json`.
+
+- Each `meshPrices` entry defines a `wholesaleSqFt` value (your base cost) and metadata (`id`, `label`, `sport`).
+- Display/checkout price per square foot (MAP) is computed at runtime as `wholesaleSqFt + markupPerSqFt`.
+- Global defaults live under `defaults`:
+  - `markupPerSqFt` (default 0.25)
+  - `borderSurchargePerFt` (default 0.35)
+  - `expeditedFee` (default 25)
+  - `shipPerItem` (default 100)
+
+To change calculator pricing, edit `assets/netting.json` and refresh the page. No code changes are required, and the order flow will carry the explicit per‑item shipping amount through to the server.
 
 ## Contributing
 

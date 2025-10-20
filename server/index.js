@@ -710,15 +710,18 @@ app.post('/api/create-payment-intent', async (req, res) => {
 
     // Optional: apply coupon
     let appliedCoupon = null;
+    let couponAudit = null;
     let discountCents = 0;
     if (couponCode) {
       try {
-        const v = await couponService.validate(couponCode, customer.email || '');
+        const userId = (customer && customer.userId) || (req.user && req.user.id) || null;
+        const v = await couponService.validate(couponCode, customer.email || '', new Date(), userId);
         if (v.valid) {
           appliedCoupon = v.coupon;
           const before = amount;
           amount = couponService.applyDiscount(amount, appliedCoupon);
           discountCents = Math.max(0, before - amount);
+          couponAudit = { code: v.coupon.code, restricted: !!v.restricted, matchedBy: v.matchedBy || null };
         }
       } catch (e) {
         // ignore invalid coupon; frontend can call validate endpoint for messaging
@@ -755,7 +758,14 @@ app.post('/api/create-payment-intent', async (req, res) => {
         items: normItems.map(i => ({ id: i.id, qty: i.qty })),
         shippingAddress: shipping,
         customerInfo: customer,
-        paymentInfo: { method: 'stripe' }
+        paymentInfo: { method: 'stripe' },
+        // Persist current server-side pricing snapshot for confirmation/history accuracy
+        subtotal,
+        shipping: shippingCents,
+        discount: discountCents,
+        tax: usedAutomaticTax ? null : taxCents,
+        total: amount,
+        couponAudit: couponAudit || undefined
       };
       if (existingOrderId) {
         newOrder = { id: existingOrderId };
@@ -816,7 +826,8 @@ app.post('/api/create-payment-intent', async (req, res) => {
           name: customer.name || '',
           items: normItems.map(i => `${i.id}:${i.qty}`).join('|'),
           order_id: newOrder?.id ? String(newOrder.id) : '',
-          coupon_code: appliedCoupon ? String(appliedCoupon.code) : ''
+          coupon_code: appliedCoupon ? String(appliedCoupon.code) : '',
+          coupon_user_bound: (couponAudit && couponAudit.restricted) ? 'true' : (appliedCoupon && (Array.isArray(appliedCoupon.userEmails) || Array.isArray(appliedCoupon.userIds)) ? 'true' : 'false')
         },
         automatic_payment_methods: { enabled: true },
         // Enable Stripe Automatic Tax if configured (may be rejected on older API versions)
@@ -862,7 +873,8 @@ app.post('/api/create-payment-intent', async (req, res) => {
               name: customer.name || '',
               items: normItems.map(i => `${i.id}:${i.qty}`).join('|'),
               order_id: newOrder?.id ? String(newOrder.id) : '',
-              coupon_code: appliedCoupon ? String(appliedCoupon.code) : ''
+              coupon_code: appliedCoupon ? String(appliedCoupon.code) : '',
+              coupon_user_bound: (couponAudit && couponAudit.restricted) ? 'true' : undefined
             },
             automatic_payment_methods: { enabled: true },
             receipt_email: customer.email || undefined,
@@ -892,12 +904,20 @@ app.post('/api/create-payment-intent', async (req, res) => {
         return res.status(400).json({ error: `Order total is below the minimum charge amount (${(min/100).toFixed(2)} USD). Please add another item.` });
       }
     }
+    // If we created an order above, ensure it has the latest breakdown persisted
+    if (newOrder?.id) {
+      try {
+        const patch = { subtotal, shipping: shippingCents, discount: discountCents, tax: usedAutomaticTax ? null : taxCents, total: amount, couponAudit: couponAudit || undefined };
+        await orderService.patchOrder(newOrder.id, patch);
+      } catch {}
+    }
+
     // Return client secret and linked order id so the frontend can keep them in sync
     res.json({
       clientSecret: paymentIntent.client_secret,
       amount,
       orderId: newOrder?.id || null,
-      couponApplied: appliedCoupon ? { code: appliedCoupon.code, type: appliedCoupon.type, value: appliedCoupon.value } : null,
+  couponApplied: appliedCoupon ? { code: appliedCoupon.code, type: appliedCoupon.type, value: appliedCoupon.value, restricted: !!(couponAudit && couponAudit.restricted), matchedBy: couponAudit?.matchedBy || null } : null,
       breakdown: {
         subtotal: subtotal,
         shipping: shippingCents,

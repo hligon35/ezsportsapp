@@ -59,7 +59,8 @@
     <div class="admin-container">
       <h2>Admin Panel</h2>
       <div class="admin-nav">
-    <button class="active" onclick="showSection('products', this)">Products</button>
+  <button class="active" onclick="showSection('products', this)">Products</button>
+  <button onclick="showSection('netting', this)">Netting</button>
   <button onclick="showSection('invoices', this)">Invoices</button>
     <button onclick="showSection('orders', this)">Orders</button>
     <button onclick="showSection('users', this)">Users</button>
@@ -99,6 +100,75 @@
           <button type="button" id="cancel-edit" class="btn btn-ghost hidden" onclick="cancelEdit()">Cancel</button>
         </form>
         <div id="products-list" class="product-list"></div>
+        <hr/>
+        <section class="mt-2">
+          <h4>Bulk Update (MAP / Shipping)</h4>
+          <form id="bulk-form" class="product-form">
+            <label>
+              <span>Operation</span>
+              <select id="bulk-op" aria-label="Bulk operation">
+                <option value="setShipping">Set per-item shipping (dsr)</option>
+                <option value="changeMapEqual">Change MAP where current MAP equals</option>
+                <option value="setMapBySku">Set MAP by SKU list</option>
+              </select>
+            </label>
+            <label>
+              <span>Category (optional)</span>
+              <input type="text" id="bulk-category" placeholder="Exact category match or leave blank" />
+            </label>
+            <div id="bulk-row-setShipping" class="col-span-2">
+              <div class="toolbar">
+                <label><span>Shipping $</span> <input type="number" id="bulk-ship" step="0.01" min="0" placeholder="100" /></label>
+                <label class="muted"><input type="checkbox" id="bulk-onlymissing" /> Only set when missing</label>
+              </div>
+            </div>
+            <div id="bulk-row-changeMapEqual" class="col-span-2 hidden">
+              <div class="toolbar">
+                <label><span>From $</span> <input type="number" id="bulk-map-from" step="0.01" min="0" placeholder="100.00" /></label>
+                <label><span>To $</span> <input type="number" id="bulk-map-to" step="0.01" min="0" placeholder="125.00" /></label>
+              </div>
+            </div>
+            <div id="bulk-row-setMapBySku" class="col-span-2 hidden">
+              <label class="col-span-2">
+                <span>SKU,MAP per line</span>
+                <textarea id="bulk-mapby" rows="4" placeholder="SKU1,199.99\nSKU2,249.00"></textarea>
+              </label>
+            </div>
+            <div class="col-span-2">
+              <button id="bulk-run" type="button" class="btn btn-secondary">Run</button>
+              <span id="bulk-status" class="muted ml-05"></span>
+            </div>
+          </form>
+        </section>
+      </div>
+
+      <!-- Netting Pricing Section -->
+      <div id="netting-section" class="admin-section hidden">
+        <h3>Netting Pricing (Calculator)</h3>
+        <p class="muted">Edit calculator pricing stored in <code>assets/netting.json</code>. MAP is computed as wholesale + markup.</p>
+        <form id="netting-form" class="product-form">
+          <label>
+            <span>Markup $/sq ft</span>
+            <input type="number" id="net-markup" step="0.01" min="0" placeholder="0.25" />
+          </label>
+          <label>
+            <span>Sewn border $/ft</span>
+            <input type="number" id="net-border" step="0.01" min="0" placeholder="0.35" />
+          </label>
+          <label>
+            <span>Expedited fee $</span>
+            <input type="number" id="net-expedite" step="0.01" min="0" placeholder="25" />
+          </label>
+          <label>
+            <span>Per‑panel shipping $</span>
+            <input type="number" id="net-ship" step="0.01" min="0" placeholder="100" />
+          </label>
+          <div class="col-span-2">
+            <div class="toolbar"><button id="net-add-row" type="button" class="btn btn-ghost">+ Add mesh</button><span id="net-status" class="muted"></span></div>
+            <div class="product-list" id="net-mesh-list"><p class="muted">No meshes.</p></div>
+            <div class="mt-1"><button id="net-save" type="button" class="btn btn-primary">Save</button></div>
+          </div>
+        </form>
       </div>
 
       <!-- Invoices Section -->
@@ -201,6 +271,7 @@
               <input type="date" id="cp-expires" placeholder="Expires (optional)" />
               <input type="number" id="cp-maxuses" placeholder="Max uses (0 = unlimited)" min="0" />
               <input type="text" id="cp-emails" placeholder="Restrict to emails (comma-separated, optional)" />
+              <input type="text" id="cp-userids" placeholder="Restrict to user IDs (comma-separated, optional)" />
               <button type="submit" class="btn btn-primary">Create Coupon</button>
             </form>
             <div id="coupon-status" class="muted mt-05"></div>

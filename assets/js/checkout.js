@@ -76,7 +76,8 @@ function readCart(){ try{ return JSON.parse(localStorage.getItem('cart')||'[]');
 function variantText(i){
   const parts = [];
   if ((i.size||'').trim()) parts.push(`Size ${i.size}`);
-  if ((i.color||'').trim()) parts.push(`Color ${i.color}`);
+  const isNetting = (String(i.category||'').toLowerCase()==='netting') || (String(i.id||'').toLowerCase().startsWith('custom-net-'));
+  if ((i.color||'').trim()) parts.push(`${isNetting ? 'Spec' : 'Color'} ${i.color}`);
   return parts.join(', ');
 }
 
@@ -178,22 +179,18 @@ async function initialize() {
       if (guestPrompt) guestPrompt.hidden = true;
       const nm = document.getElementById('name'); if (nm && !nm.value) nm.value = user.name || `${user.firstName||''} ${user.lastName||''}`.trim();
       const em = document.getElementById('email'); if (em && !em.value) em.value = user.email || '';
-      const base = (typeof window !== 'undefined' && window.__API_BASE) ? String(window.__API_BASE) : '';
       try {
-        const res = await fetch(`${base}/api/users/me/addresses`, { credentials: 'include' });
-        if (res.ok) {
-          const data = await res.json();
-          const list = Array.isArray(data.addresses) ? data.addresses : [];
-          const def = list.find(a=>a.isDefault) || list[0];
-          if (def) {
-            const set = (id, v) => { const el = document.getElementById(id); if (el && !el.value) el.value = v || ''; };
-            set('address1', def.address1);
-            set('address2', def.address2);
-            set('city', def.city);
-            set('state', def.state);
-            set('postal', def.postal);
-            const country = document.getElementById('country'); if (country && !country.value) country.value = def.country || 'US';
-          }
+        const data = await fetchJsonWithFallback('/api/users/me/addresses', { method: 'GET', credentials: 'include', cache: 'no-store' });
+        const list = Array.isArray(data?.addresses) ? data.addresses : [];
+        const def = list.find(a=>a.isDefault) || list[0];
+        if (def) {
+          const set = (id, v) => { const el = document.getElementById(id); if (el && !el.value) el.value = v || ''; };
+          set('address1', def.address1);
+          set('address2', def.address2);
+          set('city', def.city);
+          set('state', def.state);
+          set('postal', def.postal);
+          const country = document.getElementById('country'); if (country && !country.value) country.value = def.country || 'US';
         }
       } catch {}
     } else {
@@ -218,6 +215,7 @@ async function initialize() {
         <div>
           <strong>${title}</strong>
           ${variant ? `<div class="muted">${variant}</div>` : ''}
+          <div class="muted text-xs">SKU: ${i.id}</div>
           <div class="muted">${currencyFmt(unitCents)} × ${qty}</div>
           <div class="muted">Shipping: ${shipEach===0 ? 'Free' : currencyFmt(toCents(shipEach))} × ${qty}</div>
         </div>
@@ -253,6 +251,8 @@ async function initialize() {
   }
 
   function debounce(fn, wait){ let t; return (...args)=>{ clearTimeout(t); t = setTimeout(()=>fn(...args), wait); }; }
+  let lastClientSecret = null;
+  let lastAddrBasis = '';
 
   async function createOrUpdatePaymentIntent() {
     await getStripe();
@@ -263,7 +263,9 @@ async function initialize() {
       });
       if (DEBUG) { try { console.info('[checkout] PI response', intentResp); } catch {} }
       if (intentResp && !intentResp.error) {
-        clientSecret = intentResp.clientSecret;
+        const newSecret = intentResp.clientSecret;
+        const secretChanged = newSecret && newSecret !== clientSecret;
+        clientSecret = newSecret;
         amount = intentResp.amount;
         orderId = intentResp.orderId || orderId;
         if (intentResp.couponApplied) {
@@ -295,14 +297,17 @@ async function initialize() {
           }
         } catch {}
         const _stripe = await getStripe();
-        // Always recreate Elements for a new clientSecret to ensure correct PI binding
+        // Only recreate Elements if the clientSecret changed or Elements not initialized
         try {
-          if (elements) {
-            try { const host = document.getElementById('payment-element'); host && (host.innerHTML = ''); } catch {}
+          if (secretChanged || !elements) {
+            if (elements) {
+              try { const host = document.getElementById('payment-element'); host && (host.innerHTML = ''); } catch {}
+            }
+            elements = _stripe.elements({ clientSecret, appearance: { theme: 'stripe' } });
+            const paymentElement = elements.create('payment', { layout: 'tabs' });
+            paymentElement.mount('#payment-element');
+            lastClientSecret = clientSecret;
           }
-          elements = _stripe.elements({ clientSecret, appearance: { theme: 'stripe' } });
-          const paymentElement = elements.create('payment', { layout: 'tabs' });
-          paymentElement.mount('#payment-element');
         } catch {}
       }
       if (intentResp && intentResp.error) {
@@ -359,36 +364,61 @@ async function initialize() {
     const code = (codeInput?.value || '').trim();
     if (!code) { msg.textContent = 'Enter a code.'; return; }
     try {
-      const data = await fetchJsonWithFallback('/api/marketing/validate-coupon', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ code, email: (new FormData(form)).get('email')||'' }) });
+      const currentUser = (function(){ try { return JSON.parse(localStorage.getItem('currentUser')||'null'); } catch { return null; } })();
+      const payload = { code, email: (new FormData(form)).get('email')||'' };
+      if (currentUser?.id) payload.userId = currentUser.id;
+      const data = await fetchJsonWithFallback('/api/marketing/validate-coupon', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
       if (data.valid) {
-        appliedCoupon = data.coupon ? { code: data.coupon.code, type: data.coupon.type, value: data.coupon.value } : { code, type:'percent', value:0 };
-        document.getElementById('discount-code-label').textContent = `(${appliedCoupon.code})`;
+        appliedCoupon = data.coupon ? { code: data.coupon.code, type: data.coupon.type, value: data.coupon.value, restricted: !!data.restricted, matchedBy: data.matchedBy||null } : { code, type:'percent', value:0 };
+        const label = document.getElementById('discount-code-label');
+        if (label) {
+          label.textContent = `(${appliedCoupon.code}${appliedCoupon.restricted ? ' • account' : ''})`;
+          label.title = appliedCoupon.restricted ? 'This code is bound to your account.' : '';
+        }
         updateSummary(cart, appliedCoupon, getShippingAddress());
         await createOrUpdatePaymentIntent();
         if (amount > 0) document.getElementById('sum-total').textContent = currencyFmt(amount);
-        msg.textContent = 'Code applied.';
+        msg.textContent = appliedCoupon.restricted ? 'Code applied to your account.' : 'Code applied.';
       } else {
         appliedCoupon = null;
         updateSummary(cart, appliedCoupon, getShippingAddress());
-        msg.textContent = 'Invalid or expired code.';
+        const reason = String(data.reason||'');
+        if (reason === 'expired') msg.textContent = 'This code has expired.';
+        else if (reason === 'restricted') msg.innerHTML = 'This code is only available for a specific account. <a href="login.html">Sign in</a> and try again.';
+        else msg.textContent = 'Invalid code.';
       }
     } catch (e) {
       msg.textContent = 'Could not validate code.';
     }
   });
 
-  // Recalculate when address changes (debounced)
+  // Recalculate when address changes (debounced, with minimal completeness)
   const onAddrChange = debounce(async () => {
-    // Update local summary immediately for test mode and UX
-    updateSummary(cart, appliedCoupon, getShippingAddress());
+    const addr = getShippingAddress();
+    // Only trigger PI update when address is minimally complete
+    const postal = String(addr.postal||'').trim();
+    const state = String(addr.state||'').trim();
+    const country = String(addr.country||'').trim() || 'US';
+    const basis = JSON.stringify({ postal: postal.slice(0,5), state, country });
+    // Always update the visible summary quickly
+    updateSummary(cart, appliedCoupon, addr);
+    // If the basis hasn't changed, skip network churn
+    if (basis === lastAddrBasis) return;
+    // Require at least state + 5-digit postal for US to price tax properly
+    if ((country === 'US') && (postal.replace(/\D/g,'').length < 5 || state.length < 2)) {
+      lastAddrBasis = basis; // record to avoid repeated checks
+      return;
+    }
+    lastAddrBasis = basis;
     await createOrUpdatePaymentIntent();
     if (amount > 0) document.getElementById('sum-total').textContent = currencyFmt(amount);
-  }, 350);
-  ['address1','address2','city','state','postal','country'].forEach(id => {
-    const el = document.getElementById(id);
-    if (!el) return;
-    el.addEventListener('input', onAddrChange);
-    el.addEventListener('change', onAddrChange);
+  }, 800);
+  // Use change for long text fields to avoid per-character refresh; allow input for state/postal/country
+  ;['address1','address2','city'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.addEventListener('change', onAddrChange);
+  });
+  ;['state','postal','country'].forEach(id => {
+    const el = document.getElementById(id); if (el) { el.addEventListener('input', onAddrChange); el.addEventListener('change', onAddrChange); }
   });
 
   form.addEventListener('submit', async (e) => {
@@ -410,7 +440,7 @@ async function initialize() {
         let orderId = Date.now();
         if (respJson && respJson.orderId) { orderId = respJson.orderId; }
         // Build a local order snapshot for confirmation
-        const items = cart.map(i=>({ productName: i.title || i.id, id: i.id, quantity: i.qty, price: Number(i.price)||0, subtotal: (Number(i.price)||0) * (i.qty||0) }));
+  const items = cart.map(i=>({ productName: i.title || i.id, id: i.id, quantity: i.qty, price: Number(i.price)||0, subtotal: (Number(i.price)||0) * (i.qty||0), size: i.size||'', color: i.color||'', category: i.category||'' }));
         const order = {
           id: orderId,
           items,
@@ -436,7 +466,7 @@ async function initialize() {
     // Real Stripe flow
     // Save a lightweight snapshot for confirmation page UI
     try {
-      const items = cart.map(i=>({ productName: i.title || i.id, id: i.id, quantity: i.qty, price: Number(i.price)||0, subtotal: (Number(i.price)||0) * (i.qty||0) }));
+  const items = cart.map(i=>({ productName: i.title || i.id, id: i.id, quantity: i.qty, price: Number(i.price)||0, subtotal: (Number(i.price)||0) * (i.qty||0), size: i.size||'', color: i.color||'', category: i.category||'' }));
       const sub = calcSubtotalCents(cart);
       const ship = calcShippingCentsForCart(cart);
       const fallbackTotal = sub + ship;
@@ -509,4 +539,56 @@ async function initialize() {
   }
 }
 
-initialize();
+// Optional: Google Maps Places Autocomplete for address fields (if configured on server)
+async function initAddressAutocomplete(){
+  try {
+    // Avoid duplicate loads
+    if (window.google && window.google.maps && window.google.maps.places) return true;
+    const cfg = await fetchJsonWithFallback('/api/maps-config', { method: 'GET', cache: 'no-store' });
+    const key = cfg && cfg.googleMapsApiKey;
+    if (!key) return false;
+    // Load the script once with a bootstrap callback
+    if (window.__mapsLoading) return true;
+    window.__mapsLoading = true;
+    await new Promise((resolve) => {
+      const s = document.createElement('script');
+      s.src = `https://maps.googleapis.com/maps/api/js?key=${encodeURIComponent(key)}&libraries=places&callback=__initPlaces`;
+      s.async = true; s.defer = true;
+      window.__initPlaces = () => { resolve(true); };
+      s.onerror = () => resolve(false);
+      document.head.appendChild(s);
+    });
+    // Attach autocomplete to address line 1
+    const line1 = document.getElementById('address1');
+    if (!line1 || !(window.google && window.google.maps && window.google.maps.places)) return false;
+    const ac = new google.maps.places.Autocomplete(line1, {
+      types: ['address'],
+      componentRestrictions: { country: ['US'] },
+      fields: ['address_components']
+    });
+    ac.addListener('place_changed', () => {
+      try {
+        const place = ac.getPlace();
+        const comps = place && place.address_components ? place.address_components : [];
+        const get = (type) => {
+          const c = comps.find(x => Array.isArray(x.types) && x.types.includes(type));
+          return c ? (c.long_name || c.short_name || '') : '';
+        };
+        const street = [get('street_number'), get('route')].filter(Boolean).join(' ');
+        const city = get('locality') || get('sublocality') || get('administrative_area_level_3');
+        const state = get('administrative_area_level_1');
+        const postal = get('postal_code');
+        const country = get('country') || 'US';
+        const set = (id, v) => { const el = document.getElementById(id); if (el) { el.value = v || ''; el.dispatchEvent(new Event('input', { bubbles: true })); el.dispatchEvent(new Event('change', { bubbles: true })); } };
+        if (street) set('address1', street);
+        if (city) set('city', city);
+        if (state) set('state', state);
+        if (postal) set('postal', postal);
+        const ce = document.getElementById('country'); if (ce) ce.value = country || 'US';
+      } catch {}
+    });
+    return true;
+  } catch { return false; }
+}
+
+(async () => { try { await initialize(); } finally { initAddressAutocomplete(); } })();

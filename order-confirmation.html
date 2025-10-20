@@ -53,7 +53,17 @@
         if(order){
           document.getElementById('order-id').textContent = order.id || id || '—';
           document.getElementById('total').textContent = currency(Number(order.total||0));
-          const lines=(order.items||[]).map(i=>`<li>${i.productName||i.id} × ${i.quantity||i.qty}</li>`).join('');
+          const lines=(order.items||[]).map(i=>{
+            const name = i.productName || i.id || 'Item';
+            const isNet = String(i.category||'').toLowerCase()==='netting' || String(i.id||'').toLowerCase().startsWith('custom-net-');
+            const parts = [];
+            if ((i.size||'').trim()) parts.push(`Size ${i.size}`);
+            if ((i.color||'').trim()) parts.push(`${isNet ? 'Spec' : 'Color'} ${i.color}`);
+            const variant = parts.length ? ` <div class=\"muted text-xs\">${parts.join(', ')}</div>` : '';
+            const sku = i.id ? ` <div class=\"muted text-xs\">SKU: ${i.id}</div>` : '';
+            const qty = i.quantity || i.qty || 0;
+            return `<li><div><strong>${name}</strong>${variant}${sku}</div><div class=\"muted\">× ${qty}</div></li>`;
+          }).join('');
           document.getElementById('lines').innerHTML = lines || '<li>No items</li>';
           const extras = document.getElementById('order-extras');
           if (extras) {
