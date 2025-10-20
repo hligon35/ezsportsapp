@@ -16,7 +16,10 @@ logs/
 # Env & secrets
 .env
 .env.*
+!**/.env.example
+!render/.env.example
 server/.env
+render/.env
 
 # Build output
 dist/
