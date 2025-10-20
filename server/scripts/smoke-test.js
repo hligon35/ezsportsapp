@@ -8,7 +8,7 @@
  Usage: node server/scripts/smoke-test.js [baseUrl]
 */
 
-const base = process.argv[2] || process.env.BASE_URL || 'http://localhost:4242';
+const base = process.argv[2] || process.env.BASE_URL || 'http://127.0.0.1:4242';
 const f = (typeof fetch === 'function') ? fetch : require('undici').fetch;
 
 async function get(path, opts){
