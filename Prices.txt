@@ -641,15 +641,130 @@ Variants:
   - Profit: $109.95
 
 
-Admin dashboard — how to use
-Open admin.html in your site and sign in with an admin account. Sections available:
-- Products: Run Product Sync to import/update the local catalog (Dry run to preview; Deactivate removed to clean up in Stripe when enabled).
-- Invoices: Filter by status and refresh to view recent Stripe invoices (if using Stripe Invoicing).
-- Orders: View local orders and statuses.
-- Users: Launch the Stripe Billing Portal on behalf of a customer (enter their email).
-- Marketing: See KPIs, list coupons/subscribers, create coupons, and queue newsletters.
-- Finance: Stripe summary (Gross, Refunds, Fees, Net), balance, payouts, and invoices with timeframe filters.
-- Traffic: Cloudflare analytics overview (requests, cache hit %, bandwidth, threats), top paths, trends by day and country.
+Admin dashboard — user manual tutorial
+
+Purpose
+Use the admin.html dashboard to manage products, invoices, orders, users, marketing, finance, and traffic analytics.
+
+Before you start
+- You need an admin account.
+- Server admin routes are protected by requireAdmin.
+- If calling admin APIs directly, ensure your admin session cookie or an admin bearer token is present.
+
+Sign in
+1) Open admin.html on your site.
+2) Sign in with an admin email/password.
+3) You will see the dashboard navigation for all sections.
+
+Navigation
+- Sidebar: Products, Invoices, Orders, Users, Marketing, Finance, Traffic.
+- Filters/Actions: Most pages include filters and a Refresh/Sync button.
+
+Common best practices
+- Use Dry run for product sync before committing changes.
+- Only enable Deactivate removed when you are ready to remove items in Stripe.
+- Use timeframe filters to narrow data for Finance and Traffic.
+- Confirm you are using the correct Stripe environment (test vs live).
+
+Section guides and workflows
+
+Products
+What it does
+- Imports/updates your local catalog from your source of truth and helps keep Stripe in sync.
+
+Typical workflows
+- Preview changes (Dry run):
+  1) Open Products.
+  2) Select Dry run.
+  3) Run Product Sync to preview creates/updates/deletes without applying.
+- Apply changes:
+  1) Open Products.
+  2) Ensure Dry run is OFF.
+  3) (Optional) Enable Deactivate removed to disable products that no longer exist.
+  4) Run Product Sync and review results.
+
+Tips
+- Resolve SKU/code mismatches before applying.
+- Keep Deactivate removed off until you’ve verified the preview looks correct.
+
+Invoices (Stripe Invoicing)
+What it does
+- Lets you view recent Stripe invoices (if you use Stripe Invoicing).
+
+Typical workflows
+- Review invoices:
+  1) Open Invoices.
+  2) Set a Status filter (e.g., draft, open, paid).
+  3) Click Refresh to load matching invoices.
+
+Orders
+What it does
+- Shows local orders and their statuses.
+
+Typical workflows
+- Check order status:
+  1) Open Orders.
+  2) Locate the order.
+  3) Review its current status and details.
+
+Users
+What it does
+- Launches Stripe Billing Portal on behalf of a customer.
+
+Typical workflows
+- Open a customer’s Billing Portal:
+  1) Open Users.
+  2) Enter the customer’s email.
+  3) Click to launch the Billing Portal session.
+
+Marketing
+What it does
+- Displays KPIs, lists coupons/subscribers, creates coupons, and queues newsletters.
+
+Typical workflows
+- Review KPIs:
+  1) Open Marketing.
+  2) Review top metrics for quick health checks.
+- Manage coupons:
+  1) Open Marketing → Coupons.
+  2) List existing coupons or create a new one.
+- Queue a newsletter:
+  1) Open Marketing → Newsletters.
+  2) Draft content and schedule/queue for send.
+
+Finance
+What it does
+- Summarizes Stripe performance and cash flow.
+
+Typical workflows
+- Review Stripe summary:
+  1) Open Finance.
+  2) Set timeframe filters.
+  3) Review Gross, Refunds, Fees, Net, Balance, Payouts, and Invoices.
+
+Traffic
+What it does
+- Provides Cloudflare analytics.
+
+Typical workflows
+- Analyze traffic:
+  1) Open Traffic.
+  2) Review requests, cache hit %, bandwidth, and threats.
+  3) Check Top paths, and trends by day and country for insights.
+
+Troubleshooting
+- Access denied or 401:
+  - You are not authenticated as admin. Sign out and back in with an admin account, or attach an admin token for API calls.
+- Empty data:
+  - Adjust filters and timeframe. Confirm Stripe/Cloudflare credentials and environment.
+- Product sync errors:
+  - Fix duplicate/missing SKUs, correct pricing, and rerun with Dry run first.
+- API rate or sync issues:
+  - Retry after a short delay. Reduce the time window or batch size if available.
+
+Security notes
+- Do not share admin access or tokens.
+- Revoke unused tokens and sign out when done.
 
 Health endpoints (server):
 - GET /health — basic health check

@@ -543,7 +543,12 @@ async function calcSubtotalCents(items = []) {
   const priceMap = await loadPriceMap();
   return items.reduce((sum, it) => {
     const rec = priceMap.get(normId(it.id));
-    const cents = rec?.cents;
+    let cents = rec?.cents;
+    // Fallback: honor client-provided unit price when catalog lookup is missing
+    if (!cents) {
+      const unit = Number(it.price || 0);
+      if (Number.isFinite(unit) && unit > 0) cents = Math.round(unit * 100);
+    }
     if (!cents) return sum;
     const qty = Math.max(1, Number(it.qty) || 1);
     return sum + cents * qty;
@@ -571,9 +576,11 @@ async function calcShippingCents(items = [], _subtotalCents, _method = 'standard
         total += 0 * qty;
         continue;
       }
-      const rec = priceMap.get(normId(it.id));
-      const dsr = Number(rec?.dsr || 0);
-      const per = (Number.isFinite(dsr) && dsr > 0) ? dsr : 100;
+  const rec = priceMap.get(normId(it.id));
+  // Prefer explicit per-item ship provided by client line item when present
+  const explicit = Number(it.ship);
+  const dsr = Number.isFinite(explicit) ? explicit : Number(rec?.dsr || 0);
+  const per = (Number.isFinite(dsr) && dsr > 0) ? dsr : 100;
       const qty = Math.max(1, Number(it.qty) || 1);
       total += Math.round(per * 100) * qty;
     }

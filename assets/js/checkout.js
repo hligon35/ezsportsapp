@@ -234,7 +234,13 @@ async function initialize() {
     const customer = { name: fd.get('name'), email: fd.get('email') };
     const shipping = { address1: fd.get('address1'), address2: fd.get('address2'), city: fd.get('city'), state: fd.get('state'), postal: fd.get('postal'), country: fd.get('country') };
     // Send minimal items shape to backend
-    const items = cart.map(i=>({ id: i.id, qty: i.qty }));
+    // Include unit price and per-item shipping to help the server price variation-only items when DB/fallback lacks a product-level price
+    const items = cart.map(i=>({
+      id: i.id,
+      qty: i.qty,
+      price: Number(i.price)||0,
+      ship: (Number(i.shipAmount) || undefined)
+    }));
     return { items, customer, shipping, couponCode: appliedCoupon?.code || '', existingOrderId: orderId };
   };
 
