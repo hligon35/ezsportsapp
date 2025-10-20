@@ -6,7 +6,10 @@ class EmailService {
   constructor(){
     this.db = new DatabaseManager();
     this.transporter = null;
-    this.from = process.env.SMTP_FROM || process.env.MAIL_FROM || 'no-reply@ezsports.app';
+    // Prefer an explicitly verified sender identity when using SendGrid
+    // Order of precedence: SENDGRID_FROM -> SMTP_FROM -> MAIL_FROM -> sensible default
+    this.from = process.env.SENDGRID_FROM || process.env.SMTP_FROM || process.env.MAIL_FROM || 'no-reply@ezsports.app';
+    this.fromName = process.env.MAIL_FROM_NAME || 'EZ Sports Netting';
   this.cfUrl = process.env.CF_EMAIL_WEBHOOK_URL || '';
     this.cfApiKey = process.env.CF_EMAIL_API_KEY || '';
     this.cfAccessId = process.env.CF_ACCESS_CLIENT_ID || '';
@@ -49,8 +52,8 @@ class EmailService {
       text,
       tags,
       replyTo,
-      from: from || this.from,
-      fromName,
+  from: from || this.from,
+  fromName: fromName || this.fromName,
       status: this.transporter || this.sgKey || this.cfUrl ? 'sending' : 'queued',
       createdAt: new Date().toISOString(),
       retryCount: 0,
@@ -72,13 +75,18 @@ class EmailService {
   async deliverExisting(email){
     const { id, to, subject, html, text, tags = [], replyTo, from, fromName } = email || {};
     if (!to || !subject) throw new Error('Email record incomplete');
+    const chosenFrom = from || this.from;
+    const chosenFromName = fromName || this.fromName;
+
+    // Helper: detect permanent sender identity failures (SendGrid-specific)
+    const isSenderIdentityError = (msg = '') => /sender identity|from address does not match a verified/i.test(String(msg));
     // 1) Prefer SendGrid HTTP API if API key is configured (avoids SMTP egress issues)
     if (this.sgKey) {
       try {
         if (this.debug) console.log('[EmailService] Sending via SendGrid API…');
         const payload = {
           personalizations: [{ to: [{ email: to }] }],
-          from: { email: from || this.from, name: fromName || 'EZ Sports Netting' },
+          from: { email: chosenFrom, name: chosenFromName },
           subject,
           content: [
             { type: 'text/plain', value: text || '' },
@@ -110,7 +118,15 @@ class EmailService {
           return { ...email, status: 'sent', provider: 'sendgrid-api', providerId: msgId };
         } else {
           const body = await (resp?.text?.() || Promise.resolve(''));
-          if (this.debug) console.warn('[EmailService] SendGrid API not OK', { status: resp?.status, body: body?.slice(0,200) });
+          const summary = { status: resp?.status, body: body?.slice(0,200) };
+          if (this.debug) console.warn('[EmailService] SendGrid API not OK', summary);
+          // If this is a verified sender identity problem, mark permanent failure and stop retries
+          if (isSenderIdentityError(body)) {
+            const errorMsg = 'SendGrid: From address is not a verified Sender Identity. Configure SENDGRID_FROM and verify the sender in SendGrid.';
+            await this.db.update('emails', { id }, { status: 'permanent-failure', provider: 'sendgrid-api', error: errorMsg, failedAt: new Date().toISOString() });
+            if (this.debug) console.warn('[EmailService] Permanent failure:', errorMsg);
+            return { ...email, status: 'permanent-failure', provider: 'sendgrid-api', error: errorMsg };
+          }
           // fall through to SMTP
         }
       } catch (e) {
@@ -123,12 +139,20 @@ class EmailService {
     if (this.transporter) {
       try {
         if (this.debug) console.log('[EmailService] Sending via SMTP…');
-        const info = await this.transporter.sendMail({ from: from || this.from, to, subject, text, html, replyTo });
+        const info = await this.transporter.sendMail({ from: chosenFrom, to, subject, text, html, replyTo });
         await this.db.update('emails', { id }, { status: 'sent', provider: 'smtp', providerId: info?.messageId || null, sentAt: new Date().toISOString() });
         if (this.debug) console.log('[EmailService] SMTP sent', { id: info?.messageId || null });
         return { ...email, status: 'sent', provider: 'smtp', providerId: info?.messageId || null };
       } catch (smtpErr) {
-        if (this.debug) console.warn('[EmailService] SMTP failed, trying Worker…', smtpErr?.message||smtpErr);
+        // If we hit a known permanent failure (e.g., SendGrid 550 Sender Identity), do not retry endlessly
+        const msg = smtpErr?.message || String(smtpErr);
+        if (isSenderIdentityError(msg) || /\b550\b/.test(msg)) {
+          const errorMsg = 'SMTP: From address is not a verified Sender Identity for this provider. Set MAIL_FROM/SENDGRID_FROM to a verified sender.';
+          await this.db.update('emails', { id }, { status: 'permanent-failure', provider: 'smtp', error: errorMsg, failedAt: new Date().toISOString() });
+          if (this.debug) console.warn('[EmailService] Permanent failure (SMTP):', errorMsg);
+          return { ...email, status: 'permanent-failure', provider: 'smtp', error: errorMsg };
+        }
+        if (this.debug) console.warn('[EmailService] SMTP failed, trying Worker…', msg);
         // fall through to Worker
       }
     }
@@ -136,9 +160,9 @@ class EmailService {
     // 3) Cloudflare Worker (MailChannels)
     if (this.cfUrl) {
       try {
-        const payload = { to, subject, html, text, from: from || this.from };
+  const payload = { to, subject, html, text, from: chosenFrom };
         if (replyTo) payload.replyTo = replyTo;
-        if (fromName) payload.fromName = fromName;
+  if (chosenFromName) payload.fromName = chosenFromName;
         const headers = { 'Content-Type': 'application/json' };
         if (this.cfApiKey) headers['Authorization'] = `Bearer ${this.cfApiKey}`;
         // Optional Cloudflare Access service token support
@@ -180,7 +204,7 @@ class EmailService {
           if (this.transporter) {
             try {
               if (this.debug) console.log('[EmailService] Worker failed; sending via SMTP…');
-              const info = await this.transporter.sendMail({ from: from || this.from, to, subject, text, html, replyTo });
+              const info = await this.transporter.sendMail({ from: chosenFrom, to, subject, text, html, replyTo });
               await this.db.update('emails', { id }, { status: 'sent', provider: 'smtp', providerId: info?.messageId || null, sentAt: new Date().toISOString(), error: cfError.message });
               return { ...email, status: 'sent', provider: 'smtp', providerId: info?.messageId || null };
             } catch (smtpErr) {
@@ -197,7 +221,7 @@ class EmailService {
         if (this.transporter) {
           try {
             if (this.debug) console.log('[EmailService] Worker call threw, sending via SMTP…', e.message);
-            const info = await this.transporter.sendMail({ from: from || this.from, to, subject, text, html, replyTo });
+            const info = await this.transporter.sendMail({ from: chosenFrom, to, subject, text, html, replyTo });
             await this.db.update('emails', { id }, { status: 'sent', provider: 'smtp', providerId: info?.messageId || null, sentAt: new Date().toISOString(), error: e.message });
             return { ...email, status: 'sent', provider: 'smtp', providerId: info?.messageId || null };
           } catch (smtpErr) {
@@ -214,13 +238,20 @@ class EmailService {
     if (!this.transporter) return email;
 
     try {
-      const info = await this.transporter.sendMail({ from: from || this.from, to, subject, text, html, replyTo });
+      const info = await this.transporter.sendMail({ from: chosenFrom, to, subject, text, html, replyTo });
       await this.db.update('emails', { id }, { status: 'sent', providerId: info?.messageId || null, sentAt: new Date().toISOString() });
       return { ...email, status: 'sent', providerId: info?.messageId || null };
     } catch (e) {
-      await this.db.update('emails', { id }, { status: 'failed', error: e.message, failedAt: new Date().toISOString() });
-      console.warn('Email send failed:', e.message);
-      return { ...email, status: 'failed', error: e.message };
+      const msg = e?.message || String(e);
+      if (isSenderIdentityError(msg) || /\b550\b/.test(msg)) {
+        const errorMsg = 'SMTP: From address is not a verified Sender Identity for this provider. Set MAIL_FROM/SENDGRID_FROM to a verified sender.';
+        await this.db.update('emails', { id }, { status: 'permanent-failure', error: errorMsg, failedAt: new Date().toISOString() });
+        if (this.debug) console.warn('[EmailService] Permanent failure (final SMTP):', errorMsg);
+        return { ...email, status: 'permanent-failure', error: errorMsg };
+      }
+      await this.db.update('emails', { id }, { status: 'failed', error: msg, failedAt: new Date().toISOString() });
+      if (this.debug) console.warn('Email send failed:', msg);
+      return { ...email, status: 'failed', error: msg };
     }
   }
 

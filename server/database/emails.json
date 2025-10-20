@@ -10,11 +10,13 @@
     ],
     "replyTo": "info@ezsportsnetting.com",
     "from": "no-reply@ezsports.app",
-    "status": "queued",
+    "status": "failed",
     "createdAt": "2025-10-20T01:57:40.988Z",
     "retryCount": 0,
     "nextAttemptAt": "2025-10-20T01:57:40.980Z",
-    "updatedAt": "2025-10-20T01:57:40.988Z",
-    "id": 4
+    "updatedAt": "2025-10-20T04:20:25.737Z",
+    "id": 4,
+    "error": "Message failed: 550 The from address does not match a verified Sender Identity. Mail cannot be sent until this error is resolved. Visit https://sendgrid.com/docs/for-developers/sending-email/sender-identity/ to see the Sender Identity requirements",
+    "failedAt": "2025-10-20T04:20:25.736Z"
   }
 ]

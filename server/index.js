@@ -1000,6 +1000,8 @@ try {
       const candidates = (all || []).filter(e => {
         const status = String(e.status || '').toLowerCase();
         if (!['queued','failed','sending'].includes(status)) return false;
+        // Do not retry permanent failures (e.g., SendGrid Sender Identity 550)
+        if (status === 'permanent-failure') return false;
         const nextAt = e.nextAttemptAt ? Date.parse(e.nextAttemptAt) : 0;
         return !Number.isNaN(nextAt) ? (nextAt <= now) : true;
       }).slice(0, 10);
