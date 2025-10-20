@@ -1315,9 +1315,10 @@ nav.quick-links li a[href="careers.html"]{
 .calc-form .dims{grid-template-columns:minmax(0,1fr) auto minmax(0,1fr) auto}
 /* Prevent long labels / summary items from overflowing */
 .calc-form .form-row, .summary > div{min-width:0}
-/* Ultra narrow: stack dimension pairs (ft/in) vertically */
+/* Ultra narrow: keep ft/in on one row; tighten spacing and input width */
 @media (max-width:420px){
-  .calc-form .dims{grid-template-columns:minmax(0,1fr) auto;row-gap:.4rem}
+  .calc-form .dims{ grid-template-columns:minmax(0,1fr) auto minmax(0,1fr) auto; column-gap:.4rem; }
+  .calc-form .dims input[type=number]{ width:7ch; }
 }
 
 /* Support/help pages */
@@ -1423,6 +1424,26 @@ nav.quick-links li a[href="careers.html"]{
 .calc-grid.calc-stack{grid-template-columns:1fr !important}
 @media (max-width:540px){
   .calc-gallery li{width:64px}
+}
+
+/* Mobile sticky action bar for calculator */
+.calc-mobile-bar{
+  display:none;
+  position:fixed; left:0; right:0; bottom:0;
+  z-index:40;
+  background:#ffffff;
+  border-top:1px solid var(--border);
+  box-shadow:0 -8px 24px rgba(12,32,64,.10);
+  padding:.6rem .9rem calc(.6rem + env(safe-area-inset-bottom, 0px));
+  display:grid; grid-template-columns:1fr auto; align-items:center; gap:.8rem;
+}
+.calc-mobile-bar .total-row{ display:flex; align-items:center; justify-content:space-between; gap:.75rem; font-weight:800; }
+.calc-mobile-bar .total-row span{ color: var(--muted); font-weight:700; }
+.calc-mobile-bar .total-row strong{ font-size:1.1rem; font-weight:900; }
+@media (max-width:640px){
+  .calc-mobile-bar{ display:grid; }
+  /* Add bottom padding so the sticky bar doesn't cover content */
+  .calc-grid{ padding-bottom: 90px; }
 }
 
 /* Breadcrumbs */

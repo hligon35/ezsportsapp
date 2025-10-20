@@ -393,6 +393,37 @@ const Store = {
           }
         });
       } catch {}
+
+      // Delegate cart action clicks (inc/dec/remove) to the container once
+      try {
+        if (this.ui.items && !this.ui.items.__delegated) {
+          this.ui.items.addEventListener('click', (ev) => {
+            const btn = ev.target && (ev.target.closest('[data-inc], [data-dec], [data-remove]'));
+            if (!btn) return;
+            // Remove
+            if (btn.dataset && btn.dataset.remove) {
+              this.removeByKey(btn.dataset.remove);
+              return;
+            }
+            // Increment
+            if (btn.dataset && btn.dataset.inc) {
+              const it = this.state.cart.find(x => this.keyFor(x) === btn.dataset.inc);
+              if (it) { it.qty++; this.persist(); this.renderCart(); }
+              return;
+            }
+            // Decrement
+            if (btn.dataset && btn.dataset.dec) {
+              const it = this.state.cart.find(x => this.keyFor(x) === btn.dataset.dec);
+              if (it) {
+                it.qty = Math.max(0, it.qty - 1);
+                if (it.qty === 0) this.removeByKey(this.keyFor(it));
+                else { this.persist(); this.renderCart(); }
+              }
+            }
+          }, { passive: true });
+          this.ui.items.__delegated = true;
+        }
+      } catch {}
     } catch {}
   },
 
@@ -3588,12 +3619,12 @@ ensureHomeFirst() {
           <strong>${title}</strong>
           ${variant ? `<div class=\"text-sm text-muted\">${variant}</div>` : ''}
           <div class="text-xs muted">SKU: ${i.id}</div>
-          <div class="opacity-80">Qty: <button class="icon-btn" data-dec="${key}">−</button> ${i.qty} <button class="icon-btn" data-inc="${key}">+</button></div>
+          <div class="opacity-80">Qty: <button type="button" class="icon-btn" data-dec="${key}">−</button> ${i.qty} <button type="button" class="icon-btn" data-inc="${key}">+</button></div>
           <div class="text-sm muted">Shipping: ${shipPer===0 ? 'Free' : currency.format(shipPer)} × ${i.qty}</div>
         </div>
         <div class="text-right">
           <div>${currency.format(price * i.qty)}</div>
-          <button class="btn btn-ghost" data-remove="${key}">Remove</button>
+          <button type="button" class="btn btn-ghost" data-remove="${key}">Remove</button>
         </div>
       </div>
     `;
@@ -3626,8 +3657,8 @@ ensureHomeFirst() {
       try { window.trackEvent && window.trackEvent('view_cart', { items: this.state.cart.map(i => ({ id: i.id, price: i.price, qty: i.qty })) }); } catch {}
     }
 
-    // Bind buttons
-    if (this.ui.items) {
+    // Bind buttons if delegation wasn't set (legacy fallback)
+    if (this.ui.items && !this.ui.items.__delegated) {
       this.ui.items.querySelectorAll('[data-remove]').forEach(b => b.addEventListener('click', () => this.removeByKey(b.dataset.remove)));
       this.ui.items.querySelectorAll('[data-inc]').forEach(b => b.addEventListener('click', () => { const it = this.state.cart.find(x => this.keyFor(x) === b.dataset.inc); if (!it) return; it.qty++; this.persist(); this.renderCart(); }));
       this.ui.items.querySelectorAll('[data-dec]').forEach(b => b.addEventListener('click', () => { const it = this.state.cart.find(x => this.keyFor(x) === b.dataset.dec); if (!it) return; it.qty = Math.max(0, it.qty - 1); if (it.qty === 0) this.removeByKey(this.keyFor(it)); else { this.persist(); this.renderCart(); } }));

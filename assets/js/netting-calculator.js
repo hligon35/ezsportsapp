@@ -142,6 +142,9 @@ function updateSummary(form){
   document.getElementById('sum-perim').textContent = `${t.perim.toFixed(1)} ft`;
   document.getElementById('sum-qty').textContent = String(data.qty);
   document.getElementById('sum-total').textContent = NCurrency.format(t.total);
+  // Mirror total into mobile sticky bar if present
+  const m = document.getElementById('sum-total-mobile');
+  if (m) m.textContent = NCurrency.format(t.total);
   return t;
 }
 
@@ -247,7 +250,7 @@ function setup(){
   let totals = updateSummary(form);
 
   // Add to cart
-  document.getElementById('add-cart').addEventListener('click', ()=>{
+  function handleAdd(){
     const data = readForm(form);
     if (!data.meshId){
       alert('Please select a sport/mesh size before adding to cart.');
@@ -268,7 +271,10 @@ function setup(){
       window.Store?.add(product, { size: variantSize, color: variantColor, ship: SHIP_PER_ITEM });
     }
     window.Store?.openCart();
-  });
+  }
+  document.getElementById('add-cart').addEventListener('click', handleAdd);
+  const addMobile = document.getElementById('add-cart-mobile');
+  if (addMobile) addMobile.addEventListener('click', handleAdd);
   }); // end loadNettingConfig
 }
 

@@ -333,6 +333,14 @@
   <script type="module" src="assets/js/analytics.js"></script>
   <script type="module" src="assets/js/app.js"></script>
   <script type="module" src="assets/js/netting-calculator.js"></script>
+  <!-- Mobile sticky action bar for the calculator (visible on small screens) -->
+  <div id="calc-mobile-bar" class="calc-mobile-bar" role="region" aria-label="Netting calculator actions">
+    <div class="total-row" aria-live="polite">
+      <span>Total</span>
+      <strong id="sum-total-mobile">$0.00</strong>
+    </div>
+    <button id="add-cart-mobile" class="btn btn-primary">Add To Cart</button>
+  </div>
   <script>
     // Register SW only in production HTTPS; in dev, aggressively unregister to avoid live-reload loops
     if ('serviceWorker' in navigator) {
