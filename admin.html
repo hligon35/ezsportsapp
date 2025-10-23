@@ -67,6 +67,7 @@
     <button onclick="showSection('marketing', this)">Marketing</button>
     <button onclick="showSection('finance', this)">Finance</button>
     <button onclick="showSection('traffic', this)">Traffic</button>
+    <button onclick="showSection('diag', this)">Diagnostics</button>
   <a class="btn btn-ghost ml-auto" href="analytics.html">Analytics →</a>
       </div>
 
@@ -365,6 +366,13 @@
           <h4>By Country</h4>
           <ul id="cf-by-country" class="product-list"></ul>
         </section>
+      </div>
+
+      <!-- Diagnostics Section -->
+      <div id="diag-section" class="admin-section hidden">
+        <h3>Diagnostics</h3>
+        <p class="muted">Quick readiness check for analytics, Stripe, and Cloudflare integrations.</p>
+        <div id="diag-wrap" class="product-list"><p class="muted">Loading…</p></div>
       </div>
     </div>
   </main>

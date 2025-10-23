@@ -146,6 +146,7 @@ function showSection(section, btn) {
   if (section === 'invoices') renderInvoices();
   if (section === 'finance') renderFinance();
   if (section === 'traffic') renderTraffic();
+  if (section === 'diag') renderDiagnostics();
 }
 
 async function renderProducts() {
@@ -253,6 +254,43 @@ function renderOrders() {
     .catch((e)=>{
       list.innerHTML = `<p>Failed to load orders. ${e.message||''}</p>`;
     });
+}
+
+// Diagnostics: fetch and render readiness info
+async function renderDiagnostics(){
+  const wrap = document.getElementById('diag-wrap');
+  if (wrap) wrap.innerHTML = '<p class="muted">Loading…</p>';
+  try {
+    const res = await fetchAdmin('/api/admin/diagnostics');
+    if (!res.ok) throw new Error(await res.text().catch(()=> 'Failed to load diagnostics'));
+    const d = await res.json();
+    const rows = [];
+    const y = (v)=> v ? 'Yes' : 'No';
+    rows.push(`<div class="product-item"><div><strong>Server time</strong><br><small>${new Date(d.now).toLocaleString()}</small></div><div>Uptime: ${Number(d.uptimeSec||0)}s</div></div>`);
+    if (d.integrations) {
+      rows.push(`<div class="product-item"><div><strong>Stripe</strong></div><div>${y(d.integrations.stripe?.configured)}${!d.integrations.stripe?.configured? ' (secret missing)': ''}</div></div>`);
+      rows.push(`<div class="product-item"><div><small>Publishable key</small></div><div>${y(d.integrations.stripe?.publishableSet)}</div></div>`);
+      rows.push(`<div class="product-item"><div><small>Webhook secret</small></div><div>${y(d.integrations.stripe?.webhookSecretSet)}</div></div>`);
+      rows.push(`<div class="product-item"><div><strong>Cloudflare</strong></div><div>${y(d.integrations.cloudflare?.configured)}</div></div>`);
+    }
+    if (d.auth) {
+      rows.push(`<div class="product-item"><div><strong>JWT secret set</strong></div><div>${y(d.auth.jwtSet)}</div></div>`);
+      rows.push(`<div class="product-item"><div><small>Cookie domain</small></div><div>${d.auth.cookieDomain || '—'}</div></div>`);
+    }
+    if (d.cors) {
+      const origins = Array.isArray(d.cors.origins) && d.cors.origins.length ? d.cors.origins.join(', ') : '—';
+      rows.push(`<div class="product-item"><div><strong>CORS origins</strong></div><div>${origins}</div></div>`);
+    }
+    if (d.storage) {
+      rows.push(`<div class="product-item"><div><strong>DB counts</strong></div><div>orders: ${d.storage.ordersCount ?? '—'} • analytics: ${d.storage.analyticsCount ?? '—'} • coupons: ${d.storage.couponsCount ?? '—'} • subscribers: ${d.storage.subscribersCount ?? '—'} • emails: ${d.storage.emailsCount ?? '—'} • payouts: ${d.storage.payoutsCount ?? '—'}</div></div>`);
+    }
+    if (d.analytics) {
+      rows.push(`<div class="product-item"><div><strong>Traffic (7d)</strong></div><div>Pageviews: ${d.analytics.totalPageviews ?? 0} • Visitors: ${d.analytics.uniqueVisitors ?? 0}</div></div>`);
+    }
+    if (wrap) wrap.innerHTML = rows.join('');
+  } catch (e) {
+    if (wrap) wrap.innerHTML = `<p class="muted error-text">${e.message || 'Failed to load diagnostics'}</p>`;
+  }
 }
 
 function renderUsers() {

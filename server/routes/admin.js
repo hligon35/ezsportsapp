@@ -4,6 +4,13 @@ const { requireAdmin } = require('../middleware/auth');
 const path = require('path');
 const { spawn } = require('child_process');
 const fs = require('fs/promises');
+const DatabaseManager = require('../database/DatabaseManager');
+const AnalyticsService = require('../services/AnalyticsService');
+const OrderService = require('../services/OrderService');
+const CouponService = require('../services/CouponService');
+const SubscriberService = require('../services/SubscriberService');
+const EmailService = require('../services/EmailService');
+const PayoutService = require('../services/PayoutService');
 
 // Stripe Billing Portal for admins to open on behalf of customer
 let stripe = null;
@@ -25,6 +32,68 @@ router.post('/billing-portal', requireAdmin, async (req, res) => {
     res.json({ url: session.url });
   } catch (e) {
     res.status(500).json({ message: e.message || 'Failed to create billing portal session' });
+  }
+});
+
+// --- Admin diagnostics: surface integration readiness for dashboards ---
+router.get('/diagnostics', requireAdmin, async (req, res) => {
+  try {
+    const db = new DatabaseManager();
+    const analytics = new AnalyticsService();
+    const ordersSvc = new OrderService();
+    const couponsSvc = new CouponService();
+    const subsSvc = new SubscriberService();
+    const emailSvc = new EmailService();
+    const payoutsSvc = new PayoutService();
+
+    // Counts (tolerate failures)
+    const safeCount = async (fn) => { try { const arr = await fn(); return Array.isArray(arr) ? arr.length : (arr && arr.items ? arr.items.length : 0); } catch { return null; } };
+    const ordersCount = await safeCount(() => db.find('orders'));
+    const analyticsCount = await safeCount(() => db.find('analytics'));
+    const couponsCount = await safeCount(() => db.find('coupons'));
+    const subsCount = await safeCount(() => db.find('subscribers'));
+    const emailsCount = await safeCount(() => db.find('emails'));
+    const payoutsCount = await safeCount(() => db.find('payouts'));
+
+    // Quick traffic summary for last 7d
+    let traffic7 = null;
+    try { traffic7 = await analytics.getTrafficSummary('week'); } catch {}
+
+    // Stripe readiness
+    const stripeReady = !!process.env.STRIPE_SECRET_KEY;
+    const stripeWebhook = !!process.env.STRIPE_WEBHOOK_SECRET;
+    const stripePk = !!process.env.STRIPE_PUBLISHABLE_KEY;
+    // Cloudflare readiness
+    const cfReady = !!(process.env.CLOUDFLARE_API_TOKEN && process.env.CLOUDFLARE_ZONE_ID);
+
+    // Auth/cookies
+    const jwtSet = !!process.env.JWT_SECRET && process.env.JWT_SECRET !== 'dev_insecure_secret_change_me';
+    const cookieDomain = process.env.COOKIE_DOMAIN || null;
+
+    // CORS
+    const corsOrigins = (process.env.CORS_ORIGINS || '').split(',').map(s=>s.trim()).filter(Boolean);
+
+    res.json({
+      now: new Date().toISOString(),
+      uptimeSec: Math.round(process.uptime()),
+      integrations: {
+        stripe: { configured: stripeReady, publishableSet: stripePk, webhookSecretSet: stripeWebhook },
+        cloudflare: { configured: cfReady }
+      },
+      auth: { jwtSet, cookieDomain },
+      cors: { origins: corsOrigins },
+      storage: {
+        ordersCount, analyticsCount, couponsCount, subscribersCount: subsCount, emailsCount, payoutsCount
+      },
+      analytics: traffic7 ? {
+        timeframe: traffic7.timeframe,
+        totalPageviews: traffic7.totalPageviews,
+        uniqueVisitors: traffic7.uniqueVisitors,
+        topPages: traffic7.topPages
+      } : null
+    });
+  } catch (e) {
+    res.status(500).json({ message: e.message || 'Diagnostics failed' });
   }
 });
 
