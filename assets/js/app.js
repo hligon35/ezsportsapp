@@ -210,10 +210,27 @@ async function fetchProducts() {
       const products = prodList.categories[categoryName];
       products.forEach(product => {
         // Convert prodList format to app format
+        const detailsPrice = product.details?.price;
+        let mainPrice = 299; // fallback
+        let priceRange = null;
+        
+        // Handle price range string (e.g., "399.95 - 549.95") or variations
+        if (typeof detailsPrice === 'string' && detailsPrice.includes(' - ')) {
+          priceRange = `$${detailsPrice}`;
+          // Extract the first price as the main price for sorting/filtering
+          const firstPrice = parseFloat(detailsPrice.split(' - ')[0]);
+          if (!isNaN(firstPrice)) mainPrice = firstPrice;
+        } else if (detailsPrice && !isNaN(detailsPrice)) {
+          mainPrice = parseFloat(detailsPrice);
+        } else if (product.variations?.[0]?.map) {
+          mainPrice = product.variations[0].map;
+        }
+        
         fallbackProducts.push({
           id: product.sku,
           title: product.name || product.sku,
-          price: product.details?.price || (product.variations?.[0]?.map) || 299,
+          price: mainPrice,
+          priceRange: priceRange,
           category: 'netting',
           img: product.img || 'assets/img/EZSportslogo.png',
           images: product.images || (product.img ? [product.img] : []),
@@ -2339,7 +2356,28 @@ ensureHomeFirst() {
           // Curated Accessories navigation card: Bullet Pad Kits
           try {
             const padImg = 'assets/prodImgs/Bullet_Pad_Kit/bulletpadkit.avif';
-            const padCard = buildGroupCard({ title:'Bullet Pad Kits', items: [], href:'bullet-pad-kits.html', alt:'Bullet Pad Kits', img: padImg });
+            // Gather Bullet Pad Kits to compute a proper price range for the card
+            let padItems = [];
+            // Prefer unified catalog by category when available
+            if (Array.isArray(window.CATALOG_BY_CATEGORY?.['bullet-pad-kits']) && window.CATALOG_BY_CATEGORY['bullet-pad-kits'].length) {
+              padItems = window.CATALOG_BY_CATEGORY['bullet-pad-kits'].map(r => r.raw || r);
+            }
+            // Fallback to prodList.json category
+            if (!padItems.length && prodListData && prodListData.categories && Array.isArray(prodListData.categories['Bullet Pad Kits'])) {
+              padItems = prodListData.categories['Bullet Pad Kits'];
+            }
+            // As a resilient fallback, scan all categories for obvious pad kits
+            if (!padItems.length && prodListData && prodListData.categories && typeof prodListData.categories === 'object') {
+              for (const arr of Object.values(prodListData.categories)) {
+                if (!Array.isArray(arr)) continue;
+                arr.forEach(p => {
+                  const sku = String(p?.sku || '').toUpperCase();
+                  const name = String(p?.name || p?.title || '').toLowerCase();
+                  if (sku.startsWith('PK-') || /\bpad\s*kit\b/.test(name)) padItems.push(p);
+                });
+              }
+            }
+            const padCard = buildGroupCard({ title:'Bullet Pad Kits', items: padItems, href:'bullet-pad-kits.html', alt:'Bullet Pad Kits', img: padImg });
             if (padCard) grid.appendChild(padCard);
           } catch {}
           return; // done with custom rendering
@@ -3191,6 +3229,9 @@ ensureHomeFirst() {
       let priceDisplay;
       if (p.isTwistedRope) {
         priceDisplay = 'Price may vary';
+      } else if (p.priceRange) {
+        // Use pre-formatted price range if available
+        priceDisplay = p.priceRange;
       } else if (p.variations && p.variations.length > 1) {
         const prices = p.variations.map(v => v.map || v.price || 0).filter(price => price > 0);
         if (prices.length > 1) {
