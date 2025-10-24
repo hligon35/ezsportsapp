@@ -1112,10 +1112,14 @@ ensureHomeFirst() {
 
     const crumbs = [];
     crumbs.push({ label: 'Home', href: 'index.html' });
-  const L_SUBPAGES = new Set(['baseball-l-screens.html','protective-screens.html','pitchers-pocket.html','replacement-screens.html','bullet-pad-kits.html']);
+  const L_SUBPAGES = new Set(['baseball-l-screens.html','protective-screens.html','pitchers-pocket.html','replacement-screens.html']);
     if (L_SUBPAGES.has(base)) {
       crumbs.push({ label: 'L-Screens', href: 'l-screens.html' });
     }
+  // Reparent Bullet Pad Kits under Accessories for non-product page
+  if (base === 'bullet-pad-kits.html') {
+    crumbs.push({ label: 'Accessories', href: 'accessories.html' });
+  }
     if (base === 'product.html') {
       const params = new URLSearchParams(location.search);
       const pid = params.get('pid');
@@ -1262,7 +1266,8 @@ ensureHomeFirst() {
           "Replacement Nets": { label: 'Replacement Screens', href: 'replacement-screens.html' },
           "Accessories": { label: 'Accessories', href: 'accessories.html' },
           "Pre-Made Cages": { label: 'Pre-Made Cages', href: 'pre-made-cages.html' },
-          "Bullet Pad Kits": { label: 'Bullet Pad Kits', href: 'bullet-pad-kits.html' }
+          // Move Bullet Pad Kits under Accessories
+          "Bullet Pad Kits": { label: 'Accessories', href: 'accessories.html' }
         };
         if (catName && direct[catName]) return direct[catName];
         // Heuristics by product name/sku
@@ -1270,7 +1275,8 @@ ensureHomeFirst() {
         if (/pitcher|pocket/.test(name) || /bbpp/.test(sku)) return { label: "Pitcher's Pocket", href: 'pitchers-pocket.html' };
         if (/protective\s+screen/.test(name)) return { label: 'Protective Screens', href: 'protective-screens.html' };
         if (/l[- ]?screen/.test(name) || /^bullet/.test(name)) return { label: 'Baseball L-Screens', href: 'baseball-l-screens.html' };
-        if (/pad\s*kit/.test(name) || /^pk-/.test(sku)) return { label: 'Bullet Pad Kits', href: 'bullet-pad-kits.html' };
+        // Pad kits are now considered Accessories
+        if (/pad\s*kit/.test(name) || /^pk-/.test(sku)) return { label: 'Accessories', href: 'accessories.html' };
         return { label: 'EZ Nets', href: 'ez-nets.html' };
       };
       if (prod) {
