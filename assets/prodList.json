@@ -1273,6 +1273,11 @@
         "dsr": 0,
         "notes": "Free Shipping",
         "img": "assets/img/products/tanner-original-replacement-standard-batting-tee-stem-only-ttstem1.jpg",
+        "variations": [
+          { "id": "Battingmat-CLAY", "name": "Clay", "color": "maroon", "map": 549.95 },
+          { "id": "Battingmat-GREEN", "name": "Green", "color": "green", "map": 549.95 },
+          { "id": "Battingmat-RED", "name": "Red", "color": "red", "map": 799.95 }
+        ],
         "details": {
           "features": [
             "Fast and Reliable Shipping"
