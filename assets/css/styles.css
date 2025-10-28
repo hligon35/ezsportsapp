@@ -921,6 +921,29 @@ img[src*="/logo.svg"]{
 .btn:hover,.btn-primary:hover,.btn-ghost:hover,.btn-invert:hover,.btn-pill:hover{background:var(--gold-hover);border-color:var(--gold-hover);filter:none}
 .btn:active,.btn-primary:active,.btn-ghost:active,.btn-invert:active,.btn-pill:active{background:var(--gold-active);border-color:var(--gold-active);}
 .btn:focus-visible{outline:none;box-shadow:0 0 0 3px color-mix(in oklab, var(--gold) 65%, #fff 25%)}
+/* Disabled buttons (visual + interaction) */
+.btn[aria-disabled="true"],
+.btn:disabled,
+button[aria-disabled="true"],
+button:disabled{
+  background:#9aa0a6 !important; /* neutral gray */
+  border-color:#9aa0a6 !important;
+  color:#ffffff !important;
+  cursor:not-allowed !important;
+  opacity:.65;
+  filter:none !important;
+  box-shadow:none !important;
+  pointer-events:none; /* ensure no clicks/hover states */
+}
+.btn[aria-disabled="true"]:hover,
+.btn[aria-disabled="true"]:focus,
+.btn:disabled:hover,
+.btn:disabled:focus{
+  background:#9aa0a6 !important;
+  border-color:#9aa0a6 !important;
+  color:#ffffff !important;
+  box-shadow:none !important;
+}
 /* Preserve specialized quote button styling */
 .btn-quote{background:#000000 !important;color:#ffffff !important;border:1px solid #000000 !important;box-shadow:0 2px 6px rgba(0,0,0,.4);}
 .btn-quote:hover,.btn-quote:focus-visible{filter:brightness(1.15);outline:none;}

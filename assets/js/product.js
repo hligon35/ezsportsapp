@@ -374,6 +374,10 @@
         <div class="pd-info">
           <h1 class="pd-title">${prod.title}</h1>
           ${basePriceHtml}
+          <div class="text-sm text-muted" id="pd-expert-contact" style="display:none; margin:.15rem 0 .35rem;">
+            <div><strong>Call:</strong> <a href="tel:+13868373131" aria-label="Call EZ Sports Netting at 386-837-3131">(386) 837-3131</a></div>
+            <div><strong>Email:</strong> <a href="mailto:info@ezsportsnetting.com">info@ezsportsnetting.com</a></div>
+          </div>
           <div class="text-sm text-muted" id="pd-shipping">${initialShippingText}</div>
           <div class="stack-05" id="pd-option-block" style="margin-top:.5rem;">
             <div class="row gap-06" id="pd-select-row">
@@ -413,6 +417,17 @@
         </div>
       </div>
     `;
+    // Disable Add to Cart for Cable group pages
+    try {
+      if (isCableGroup) {
+        const addBtn = document.getElementById('pd-add');
+        if (addBtn) {
+          addBtn.disabled = true;
+          addBtn.setAttribute('aria-disabled','true');
+          // Keep label unchanged per request; styling/class can be added by CSS if desired
+        }
+      }
+    } catch {}
     const main = document.getElementById('pd-main-img');
     document.querySelectorAll('.pd-thumbs .thumb').forEach(btn=>{
       btn.addEventListener('click',()=>{
@@ -440,6 +455,7 @@
       const optSel = document.getElementById('pd-option-select');
       const feetBlock = document.getElementById('pd-footage-block');
       const feetInput = document.getElementById('pd-feet');
+  const contactEl = document.getElementById('pd-expert-contact');
       if (optSel && priceEl) {
         const calcFeet = () => {
           if (!feetInput) return 1;
@@ -458,19 +474,25 @@
             // Cable group: only when a concrete option is chosen, show CTA text; keep shipping blank
             if (optSel.value) {
               priceEl.textContent = 'Talk to an Expert';
+              if (contactEl) contactEl.style.display = '';
             } else {
               priceEl.textContent = '';
+              if (contactEl) contactEl.style.display = 'none';
             }
             if (shipEl) shipEl.textContent = '';
           } else if (p > 0) {
             const multiplier = byFoot ? calcFeet() : 1;
             priceEl.textContent = `$${(p * multiplier).toFixed(2)}`;
+            if (contactEl) contactEl.style.display = 'none';
           } else if (prod.priceMin && prod.priceMax && prod.priceMax !== prod.priceMin) {
             priceEl.textContent = `$${prod.priceMin.toFixed(2)} - $${prod.priceMax.toFixed(2)}`;
+            if (contactEl) contactEl.style.display = 'none';
           } else if (prod.price > 0) {
             priceEl.textContent = `$${prod.price.toFixed(2)}`;
+            if (contactEl) contactEl.style.display = 'none';
           } else {
             priceEl.textContent = '';
+            if (contactEl) contactEl.style.display = 'none';
           }
           // Shipping (dsr): prefer selected variation's dsr, else product-level, else keep initial/range
           if (shipEl) {
@@ -652,6 +674,11 @@
 
   document.getElementById('pd-add')?.addEventListener('click', ()=>{
       try {
+        // Guard: prevent add-to-cart on Cable group pages entirely
+        const pidKey = (new URLSearchParams(location.search)).get('pid') || (prod.id||'');
+        if (/^cable-wire$/i.test(String(pidKey))) {
+          return; // disabled behavior enforced above; double-guard here
+        }
         // Determine selected variation (if any)
         const optSel = document.getElementById('pd-option-select');
         const colorSel = document.getElementById('pd-color-select');

@@ -1876,19 +1876,8 @@ ensureHomeFirst() {
           }
         }
         if (!all.length) { this.renderEmptyState(grid); return; }
-        // Temporary allow-list filter for dropdown options
-        try {
-          const ALLOW = new Set([
-            'PK-BULLETJR',
-            'PK-BULLETFT',
-            'PK-BULLETCOMBO',
-            'PK-BULLETCOP',
-            'PK-BULLETLOP',
-            'PK-BULLETFP',
-            'PK-BULLETFPOH'
-          ].map(s=>s.toUpperCase()));
-          all = all.filter(p => ALLOW.has(String(p?.sku||'').toUpperCase()));
-        } catch {}
+        // Show all PK* pad kit SKUs (remove previous temporary allow-list)
+        // If needed in the future, business rules can refine this list.
         // De-dupe by sku/id
         const seen = new Set();
         all = all.filter(p => { const key = String(p?.sku || p?.id || p?.name || ''); if (!key) return false; if (seen.has(key)) return false; seen.add(key); return true; });
@@ -1951,6 +1940,10 @@ ensureHomeFirst() {
               <div class="pd-info">
                 <h1 class="pd-title">Bullet Pad Kits</h1>
                 <div class="price h3" id="agg-price">${rangeHtml}</div>
+                <div class="text-sm text-muted" id="agg-expert-contact" style="display:none; margin:.15rem 0 .35rem;">
+                  <div><strong>Call:</strong> <a href="tel:+13868373131" aria-label="Call EZ Sports Netting at 386-837-3131">(386) 837-3131</a></div>
+                  <div><strong>Email:</strong> <a href="mailto:info@ezsportsnetting.com">info@ezsportsnetting.com</a></div>
+                </div>
                 <div class="text-sm text-muted" id="agg-ship"></div>
                 <div class="stack-05" style="margin-top:.5rem;">
                   <label class="text-xs" for="agg-model-select" style="font-weight:700;letter-spacing:.4px;">Model</label>
@@ -1983,6 +1976,8 @@ ensureHomeFirst() {
           return 75;
         };
         const featuresEl = document.getElementById('agg-features');
+        const expertEl = document.getElementById('agg-expert-contact');
+        const addBtn = document.getElementById('agg-add');
         const renderFeatures = (arr) => {
           if (!featuresEl) return;
           const list = Array.isArray(arr) ? arr.filter(x=>typeof x === 'string' && x.trim()) : [];
@@ -2007,21 +2002,35 @@ ensureHomeFirst() {
             else window.location.href = 'accessories.html';
           } catch { window.location.href = 'accessories.html'; }
         });
-        // Dropdown change updates main image + price + label
+        // Dropdown change updates price + label and applies Talk-to-Expert flow for PK selections
         selectEl?.addEventListener('change', ()=>{
           const sku = selectEl.value;
           const m = bySku[sku];
           if (m) {
             // Keep hero static; only update price, label and features
-            priceEl.textContent = m.price>0 ? currency.format(m.price) : rangeHtml;
+            // For PK* SKUs: replace price with Talk to an Expert, blank shipping, and disable Add to Cart
+            const isPk = /^PK[-\s]?/i.test(String(sku||''));
+            if (isPk) {
+              priceEl.textContent = 'Talk to an Expert';
+              if (shipEl) shipEl.textContent = '';
+              if (expertEl) expertEl.style.display = '';
+              if (addBtn) { addBtn.disabled = true; addBtn.setAttribute('aria-disabled','true'); }
+            } else {
+              priceEl.textContent = m.price>0 ? currency.format(m.price) : rangeHtml;
+              if (expertEl) expertEl.style.display = 'none';
+              // Recompute shipping for selected model
+              if (shipEl) { const ship = shipFor(m); shipEl.textContent = ship ? `Shipping: $${ship.toFixed(2)}` : ''; }
+              if (addBtn) { addBtn.disabled = false; addBtn.removeAttribute('aria-disabled'); }
+            }
             selectedEl.textContent = m.title;
             renderFeatures(m.features);
-            if (shipEl) { const ship = shipFor(m); shipEl.textContent = ship ? `Shipping: $${ship.toFixed(2)}` : ''; }
           } else {
             priceEl.textContent = rangeHtml;
             selectedEl.textContent = '';
             renderFeatures([]);
             if (shipEl) shipEl.textContent = '';
+            if (expertEl) expertEl.style.display = 'none';
+            if (addBtn) { addBtn.disabled = false; addBtn.removeAttribute('aria-disabled'); }
           }
         });
         // Add to cart requires a model and a color selection
