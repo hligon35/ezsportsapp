@@ -375,11 +375,15 @@ app.get('/api/config', (req, res) => {
   const hasPublishable = !!process.env.STRIPE_PUBLISHABLE_KEY;
   const enabled = hasSecret && hasPublishable;
   const automaticTax = String(process.env.STRIPE_TAX_AUTOMATIC || '').toLowerCase() === 'true';
+  // Maintenance flag: enable when MAINTENANCE/COMING_SOON env is truthy (1,true,on)
+  const maintEnv = String(process.env.MAINTENANCE || process.env.COMING_SOON || '').trim().toLowerCase();
+  const maintenance = ['1','true','on','yes','y'].includes(maintEnv);
   res.json({
     pk: hasPublishable ? process.env.STRIPE_PUBLISHABLE_KEY : null,
     enabled,
     missing: { secret: !hasSecret, publishable: !hasPublishable },
-    automaticTax
+    automaticTax,
+    maintenance
   });
 });
 

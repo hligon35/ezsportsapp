@@ -24,22 +24,16 @@ try {
   try {
     const sp = new URLSearchParams(location.search);
     const path = location.pathname.replace(/^\\/,'/');
+    const isLocal = /^(localhost|127\.0\.0\.1)$/i.test(location.hostname);
     if (sp.get('gate') === 'on') localStorage.setItem('__COMING_SOON__','on');
     if (sp.get('gate') === 'off') localStorage.setItem('__COMING_SOON__','off');
     if (sp.has('unlock')) localStorage.setItem('comingSoonUnlocked', JSON.stringify({ at: Date.now() }));
-
-    // Default: gate ON for non-local hosts, OFF locally
-    const isLocal = /^(localhost|127\.0\.0\.1)$/i.test(location.hostname);
-    const defaultGate = isLocal ? 'off' : 'on';
-    const enabled = (localStorage.getItem('__COMING_SOON__') || defaultGate) === 'on';
-    if (!enabled) return;
-    if (isLocal) return; // allow local preview without gate
 
     // Avoid redirect loop on gate page & API/asset routes
     if (/coming-soon\.html$/i.test(path)) return;
     if (/^\/(api|assets|server|database)\b/.test(path)) return;
 
-    // Check 24h unlock token
+    // 24h unlock token check
     let unlocked = false;
     try {
       const raw = localStorage.getItem('comingSoonUnlocked');
@@ -49,7 +43,31 @@ try {
       }
     } catch {}
     if (unlocked) return;
-    location.replace('coming-soon.html');
+
+    // Local override via query/localStorage always wins
+    const override = String(localStorage.getItem('__COMING_SOON__') || '').toLowerCase();
+    if (override === 'on') {
+      if (!isLocal) { location.replace('coming-soon.html'); }
+      return;
+    }
+    if (override === 'off') { return; }
+
+    // Server-controlled flag via /api/config (MAINTENANCE or COMING_SOON env)
+    const controller = (window.AbortController ? new AbortController() : null);
+    const timer = controller ? setTimeout(()=>controller.abort(), 1500) : null;
+    fetch('/api/config', { cache: 'no-store', signal: controller ? controller.signal : undefined })
+      .then(res => res.ok ? res.json() : null)
+      .then(cfg => {
+        if (timer) clearTimeout(timer);
+        const remoteOn = !!(cfg && cfg.maintenance === true);
+        if (remoteOn && !isLocal) {
+          location.replace('coming-soon.html');
+        }
+      })
+      .catch(() => {
+        // On failure, default to gate OFF to avoid accidental lockout
+        // Admins can still force ON via ?gate=on
+      });
   } catch {}
 })();
 

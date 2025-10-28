@@ -1,6 +1,6 @@
 // Bumped versions to invalidate old cached assets (including social icons)
-const CORE_CACHE = 'core-v7';
-const ASSET_CACHE = 'assets-v5';
+const CORE_CACHE = 'core-v8';
+const ASSET_CACHE = 'assets-v6';
 const CORE = [
   '/index.html',
   '/coming-soon.html',
