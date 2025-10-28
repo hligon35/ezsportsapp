@@ -1876,6 +1876,19 @@ ensureHomeFirst() {
           }
         }
         if (!all.length) { this.renderEmptyState(grid); return; }
+        // Temporary allow-list filter for dropdown options
+        try {
+          const ALLOW = new Set([
+            'PK-BULLETJR',
+            'PK-BULLETFT',
+            'PK-BULLETCOMBO',
+            'PK-BULLETCOP',
+            'PK-BULLETLOP',
+            'PK-BULLETFP',
+            'PK-BULLETFPOH'
+          ].map(s=>s.toUpperCase()));
+          all = all.filter(p => ALLOW.has(String(p?.sku||'').toUpperCase()));
+        } catch {}
         // De-dupe by sku/id
         const seen = new Set();
         all = all.filter(p => { const key = String(p?.sku || p?.id || p?.name || ''); if (!key) return false; if (seen.has(key)) return false; seen.add(key); return true; });

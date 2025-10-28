@@ -290,6 +290,8 @@
     const isRopeGroup = /^rope-516-poly$/i.test(String(prod.id||'')) || /5\/16\"\s*poly\s*twisted\s*rope/i.test(String(prod.title||''));
     // Render price or price range; will update dynamically on option change
     const basePriceHtml = (() => {
+      // Cable group: hide price until a selection is made (then show Talk to an Expert)
+      if (isCableGroup) return `<div class="price h3" id="pd-price"></div>`;
       if (prod.priceMin && prod.priceMax && prod.priceMax !== prod.priceMin) {
         return `<div class="price h3" id="pd-price">$${prod.priceMin.toFixed(2)} - $${prod.priceMax.toFixed(2)}</div>`;
       } else if (prod.price && prod.price > 0) {
@@ -307,6 +309,8 @@
       .map(v => Number(v.dsr ?? 0))
       .filter(n => Number.isFinite(n) && n > 0) : [];
     const initialShippingText = (() => {
+      // Cable group: shipping blank until an option is selected
+      if (isCableGroup) return ``;
       const lid = String(prod.id||'').toLowerCase();
       const lt = String(prod.title||'').toLowerCase();
       const isFreeShip = (lid === 'battingmat' || lid === 'armorbasket') || (/\bbatting\s*mat\b/.test(lt)) || (/armor\s*(baseball)?\s*cart|armor\s*basket/.test(lt));
@@ -380,7 +384,8 @@
                     const vPrice = Number(v.map ?? v.price ?? 0) || 0;
                     const vDsr = Number(v.dsr ?? prod.dsr ?? 0) || 0;
                     const label = v.option || `Option ${i+1}`;
-                    const priceText = vPrice > 0 ? ` - $${vPrice.toFixed(2)}` : '';
+                    // For Cable group, suppress inline price text in the dropdown
+                    const priceText = (isCableGroup ? '' : (vPrice > 0 ? ` - $${vPrice.toFixed(2)}` : ''));
                     const dataImg = v.img ? ` data-img="${(v.img||'').replace(/"/g,'&quot;')}"` : '';
                     const dataSku = v.sku ? ` data-sku="${String(v.sku).replace(/"/g,'&quot;')}"` : '';
                     const dataDsr = vDsr > 0 ? ` data-dsr="${vDsr}"` : '';
@@ -449,7 +454,15 @@
           const byFoot = (opt?.dataset?.byfoot === '1') || /\bby\s*the\s*foot\b/i.test(String(optSel.value||''));
           // Toggle feet UI
           if (feetBlock) feetBlock.style.display = byFoot ? '' : 'none';
-          if (p > 0) {
+          if (isCableGroup) {
+            // Cable group: only when a concrete option is chosen, show CTA text; keep shipping blank
+            if (optSel.value) {
+              priceEl.textContent = 'Talk to an Expert';
+            } else {
+              priceEl.textContent = '';
+            }
+            if (shipEl) shipEl.textContent = '';
+          } else if (p > 0) {
             const multiplier = byFoot ? calcFeet() : 1;
             priceEl.textContent = `$${(p * multiplier).toFixed(2)}`;
           } else if (prod.priceMin && prod.priceMax && prod.priceMax !== prod.priceMin) {
@@ -461,6 +474,9 @@
           }
           // Shipping (dsr): prefer selected variation's dsr, else product-level, else keep initial/range
           if (shipEl) {
+            if (isCableGroup) {
+              shipEl.textContent = '';
+            } else {
             const lid = String(prod.id||'').toLowerCase();
             const lt = String(prod.title||'').toLowerCase();
             const isFreeShip = (lid === 'battingmat' || lid === 'armorbasket') || (/\bbatting\s*mat\b/.test(lt)) || (/armor\s*(baseball)?\s*cart|armor\s*basket/.test(lt));
@@ -486,9 +502,10 @@
                 }
               }
             }
+            }
           }
-          // Update image when option carries an image
-          if (imgSrc) {
+          // Update image when option carries an image (except Cable group, which stays on the curated cable image)
+          if (imgSrc && !isCableGroup) {
             const main = document.getElementById('pd-main-img');
             if (main) main.src = imgSrc;
           }
