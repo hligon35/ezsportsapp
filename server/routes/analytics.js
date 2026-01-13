@@ -28,8 +28,12 @@ router.post('/event', async (req, res) => {
     if (/^http:\/\/(localhost|127\.0\.0\.1):5500$/i.test(origin)) {
       return res.json({ ok: true, devSkipped: true });
     }
-    const { type, productId, visitorId, userId, ts } = req.body || {};
-    await analytics.trackEvent({ type, productId, visitorId, userId, ts });
+    const { type, productId, visitorId, userId, path, label, value, meta, ts } = req.body || {};
+    if (path || label || value !== undefined || meta) {
+      await analytics.trackRichEvent({ type, productId, visitorId, userId, path, label, value, meta, ts });
+    } else {
+      await analytics.trackEvent({ type, productId, visitorId, userId, ts });
+    }
     res.json({ ok: true });
   } catch (err) {
     res.status(400).json({ message: err.message });

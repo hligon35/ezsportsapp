@@ -182,10 +182,58 @@ Notes
 
 ## Analytics Events
 
-Client emits (console by default via `window.trackEvent`):
+Client emits (via `window.trackEvent`):
  
 - `view_item_list`, `view_item`, `add_to_cart`, `view_cart`, `begin_checkout`, `purchase`
-Extend by wiring `trackEvent` to POST `/api/analytics/event` (already scaffolded). Server has placeholder services for future persistence.
+Events are now persisted server-side (best-effort) via:
+
+- `POST /api/analytics/track` (pageviews)
+- `POST /api/analytics/event` (clicks + ecommerce events)
+
+The client also reports runtime errors to:
+
+- `POST /api/errors/report`
+
+## Error Alerts + Daily Email Reports
+
+This repo includes email-based monitoring:
+
+- **Instant error alerts** for server 5xx errors, unhandled rejections/exceptions, and client-reported runtime errors.
+- **Daily visitor activity report** emailed to a configured address (pageviews, unique visitors, tracked clicks, carts/checkout/purchase events, paid orders + revenue).
+
+### Configure Email Sending
+
+The server will use the first available email transport:
+
+1) SendGrid HTTP API (`SENDGRID_API_KEY`, `SENDGRID_FROM`)
+2) SMTP (`SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, optional `SMTP_FROM`)
+3) Cloudflare Worker (MailChannels) (`CF_EMAIL_WEBHOOK_URL`, optional `CF_EMAIL_API_KEY`)
+
+### Monitoring Env Vars
+
+Set these in Render (or local `server/.env`):
+
+- `ALERT_EMAIL_ENABLED=true` (default)
+- `ALERT_EMAIL_TO=hligon@getsparqd.com` (recipient for alerts + daily reports)
+- `ALERT_DEDUPE_MINUTES=10` (prevents duplicate alert spam)
+- `ERROR_REPORT_RATE_LIMIT_PER_MIN=30` (client error report rate limit)
+
+### Daily Report Scheduling
+
+- `DAILY_REPORT_ENABLED=true` to turn it on
+
+Timezone-aware (recommended):
+
+- `DAILY_REPORT_TZ=America/Indiana/Indianapolis`
+- `DAILY_REPORT_TIME_LOCAL=07:00` (HH:MM in that timezone)
+
+Fallback (UTC-based):
+
+- `DAILY_REPORT_TIME_UTC=09:00` (HH:MM, UTC)
+
+Manual send (admin-only):
+
+- `POST /api/admin/reports/daily/send` with JSON `{ "day": "yesterday" }` or `{ "day": "YYYY-MM-DD" }`
 
 ## Checkout Flow (Simplified)
 

@@ -11,6 +11,7 @@ const CouponService = require('../services/CouponService');
 const SubscriberService = require('../services/SubscriberService');
 const EmailService = require('../services/EmailService');
 const PayoutService = require('../services/PayoutService');
+const DailyReportService = require('../services/DailyReportService');
 
 // Stripe Billing Portal for admins to open on behalf of customer
 let stripe = null;
@@ -94,6 +95,18 @@ router.get('/diagnostics', requireAdmin, async (req, res) => {
     });
   } catch (e) {
     res.status(500).json({ message: e.message || 'Diagnostics failed' });
+  }
+});
+
+// --- Reports: send daily visitor activity email now (admin) ---
+router.post('/reports/daily/send', requireAdmin, async (req, res) => {
+  try {
+    const { day } = req.body || {}; // 'yesterday' (default) or 'YYYY-MM-DD'
+    const svc = new DailyReportService();
+    const out = await svc.sendDailyActivityReport({ day: day || 'yesterday' });
+    res.json({ ok: true, report: { dayKey: out.dayKey, start: out.start, end: out.end }, sent: out.sent });
+  } catch (e) {
+    res.status(500).json({ ok: false, message: e.message || 'Failed to send report' });
   }
 });
 

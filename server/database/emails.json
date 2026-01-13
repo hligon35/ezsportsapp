@@ -19,5 +19,26 @@
     "error": "SendGrid: From address is not a verified Sender Identity. Configure SENDGRID_FROM and verify the sender in SendGrid.",
     "failedAt": "2025-10-20T14:35:02.669Z",
     "provider": "sendgrid-api"
+  },
+  {
+    "to": "hligon@getsparqd.com",
+    "subject": "EZSports Client Error: /test",
+    "html": "\n      <h2>EZ Sports App Error Alert</h2>\n      <p><strong>When:</strong> 2026-01-13T18:38:54.746Z</p>\n      <p><strong>Source:</strong> client</p>\n      <p><strong>URL/Path:</strong> http://127.0.0.1:4244/test</p>\n      <p><strong>Message:</strong> Test client error</p>\n      <pre style=\"white-space:pre-wrap;word-break:break-word\">stack</pre>\n      <p><small>Fingerprint: 22010a533f43f181ec52956ef1b1d1591f4c67d2bad1c8bd14901cd8cdf2f498</small></p>\n    ",
+    "text": "EZ Sports App Error Alert\nWhen: 2026-01-13T18:38:54.746Z\nSource: client\nURL/Path: http://127.0.0.1:4244/test\nMessage: Test client error\n\nstack\n\nFingerprint: 22010a533f43f181ec52956ef1b1d1591f4c67d2bad1c8bd14901cd8cdf2f498",
+    "tags": [
+      "alert",
+      "error",
+      "client"
+    ],
+    "from": "no-reply@ezsports.app",
+    "fromName": "EZ Sports Netting",
+    "status": "failed",
+    "createdAt": "2026-01-13T18:38:54.755Z",
+    "retryCount": 0,
+    "nextAttemptAt": "2026-01-13T18:38:54.753Z",
+    "updatedAt": "2026-01-13T19:17:10.188Z",
+    "id": 2,
+    "error": "Invalid login: 451 Authentication failed: Maximum credits exceeded",
+    "failedAt": "2026-01-13T19:17:10.187Z"
   }
 ]

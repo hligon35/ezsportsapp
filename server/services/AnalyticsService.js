@@ -33,6 +33,23 @@ class AnalyticsService {
     return await this.db.insert('analytics', event);
   }
 
+  // Backwards-compatible richer event tracking
+  async trackRichEvent({ type, productId, visitorId, userId, path, label, value, meta, ts }) {
+    if (!type) throw new Error('Event type required');
+    const event = {
+      type,
+      productId: productId || null,
+      visitorId: visitorId || null,
+      userId: userId || null,
+      path: path || null,
+      label: label || null,
+      value: (value === undefined || value === null) ? null : value,
+      meta: (meta && typeof meta === 'object') ? meta : null,
+      timestamp: ts || new Date().toISOString(),
+    };
+    return await this.db.insert('analytics', event);
+  }
+
   _filterByTime(items, timeframe = 'all') {
     if (timeframe === 'all') return items;
     const now = new Date();

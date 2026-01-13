@@ -274,10 +274,61 @@ async function fetchProducts() {
   }
 })();
 
-// Lightweight analytics dispatcher (fallback logs) – can later POST to /api/analytics/event
+// --- Telemetry helpers (analytics + error reporting) ---
+function getVisitorId(){
+  try {
+    const key = 'visitorId';
+    let id = localStorage.getItem(key);
+    if (id && id.length > 8) return id;
+    id = (crypto && crypto.randomUUID) ? crypto.randomUUID() : ('v_' + Math.random().toString(16).slice(2) + Date.now().toString(16));
+    localStorage.setItem(key, id);
+    return id;
+  } catch {
+    return 'v_' + Math.random().toString(16).slice(2);
+  }
+}
+
+async function postToApi(path, payload){
+  const tryFetch = async (base) => {
+    const url = (base ? base.replace(/\/$/,'') : '') + path;
+    const controller = (window.AbortController ? new AbortController() : null);
+    const t = controller ? setTimeout(()=>controller.abort(), 1500) : null;
+    try {
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type':'application/json' },
+        body: JSON.stringify(payload || {}),
+        keepalive: true,
+        signal: controller ? controller.signal : undefined
+      });
+      return res && res.ok;
+    } finally {
+      if (t) clearTimeout(t);
+    }
+  };
+
+  // Same-origin first
+  try {
+    if (await tryFetch('')) return true;
+  } catch {}
+
+  // Dev fallback: frontend on Live Server (5500) but backend on 424x
+  const isDevSplit = /^(localhost|127\.0\.0\.1)$/i.test(location.hostname) && String(location.port) === '5500';
+  if (!isDevSplit) return false;
+  const bases = [
+    'http://127.0.0.1:4244','http://localhost:4244',
+    'http://127.0.0.1:4243','http://localhost:4243',
+    'http://127.0.0.1:4242','http://localhost:4242'
+  ];
+  for (const b of bases) {
+    try { if (await tryFetch(b)) return true; } catch {}
+  }
+  return false;
+}
+
+// Lightweight analytics dispatcher (now POSTs to /api/analytics/event when available)
 window.trackEvent = function(eventName, payload) {
   try {
-    const body = { event: eventName, payload, ts: Date.now() };
     console.debug('[analytics]', eventName, payload);
     // Local popularity counters (will inform FEATURED selection later)
     const raw = localStorage.getItem('analyticsCounters');
@@ -288,6 +339,20 @@ window.trackEvent = function(eventName, payload) {
       const id = payload.id || payload; counters.add_to_cart[id] = (counters.add_to_cart[id] || 0) + 1;
     }
     localStorage.setItem('analyticsCounters', JSON.stringify(counters));
+
+    // Server-side analytics (best-effort)
+    const visitorId = getVisitorId();
+    const productId = payload?.id || (typeof payload === 'string' ? payload : payload?.productId) || null;
+    const body = {
+      type: String(eventName || ''),
+      productId,
+      visitorId,
+      userId: (window.Store && window.Store.state && window.Store.state.user) ? window.Store.state.user.id : null,
+      path: location.pathname,
+      meta: (payload && typeof payload === 'object') ? payload : { value: payload },
+      ts: new Date().toISOString()
+    };
+    postToApi('/api/analytics/event', body).catch(()=>{});
   } catch {}
 };
 
@@ -399,6 +464,9 @@ const Store = {
       try { this.ensureHeroRotator(); } catch {}
       try { this.ensureTypeTileImagesMatchSku(); } catch {}
 
+      // Telemetry (analytics + error reporting)
+      try { this.ensureTelemetry(); } catch {}
+
       const toggle = document.querySelector('.menu-toggle');
       const nav = document.getElementById('primary-nav');
       if (toggle && nav) {
@@ -473,6 +541,98 @@ const Store = {
           this.ui.items.__delegated = true;
         }
       } catch {}
+    } catch {}
+  },
+
+  ensureTelemetry(){
+    try {
+      // Page view
+      const visitorId = getVisitorId();
+      const payload = {
+        path: location.pathname,
+        referrer: document.referrer || '',
+        visitorId,
+        userId: this.state.user ? this.state.user.id : null,
+        ts: new Date().toISOString()
+      };
+      postToApi('/api/analytics/track', payload).catch(()=>{});
+
+      // Click tracking (throttled, avoids extreme noise)
+      if (!document.__clickTelemetryBound) {
+        document.__clickTelemetryBound = true;
+        let lastSentAt = 0;
+        let sentCount = 0;
+        const MAX_PER_PAGE = 80;
+        document.addEventListener('click', (ev) => {
+          try {
+            if (sentCount >= MAX_PER_PAGE) return;
+            const now = Date.now();
+            if (now - lastSentAt < 250) return;
+
+            const a = ev.target && ev.target.closest && ev.target.closest('a');
+            const btn = ev.target && ev.target.closest && ev.target.closest('button');
+            const el = a || btn;
+            if (!el) return;
+            // Ignore clicks inside the error reporter itself or non-user triggers
+            if (el.hasAttribute('data-no-track')) return;
+
+            const href = a ? (a.getAttribute('href') || '') : '';
+            const label = (el.textContent || '').trim().slice(0, 80);
+            const type = a ? 'click_link' : 'click_button';
+
+            lastSentAt = now;
+            sentCount++;
+            postToApi('/api/analytics/event', {
+              type,
+              visitorId,
+              userId: this.state.user ? this.state.user.id : null,
+              path: location.pathname,
+              label,
+              meta: {
+                href,
+                id: el.id || null,
+                className: (el.className && String(el.className).slice(0, 120)) || null
+              },
+              ts: new Date().toISOString()
+            }).catch(()=>{});
+          } catch {}
+        }, { capture: true, passive: true });
+      }
+
+      // Client error reporting
+      if (!window.__errorTelemetryBound) {
+        window.__errorTelemetryBound = true;
+        const report = (kind, err, extra = {}) => {
+          try {
+            const e = (err instanceof Error) ? err : new Error(String(err || 'Unknown error'));
+            postToApi('/api/errors/report', {
+              kind,
+              severity: 'error',
+              name: e.name,
+              message: e.message,
+              stack: e.stack,
+              url: location.href,
+              path: location.pathname,
+              userAgent: navigator.userAgent,
+              visitorId,
+              userId: this.state.user ? this.state.user.id : null,
+              meta: extra,
+              ts: new Date().toISOString()
+            }).catch(()=>{});
+          } catch {}
+        };
+
+        window.addEventListener('error', (ev) => {
+          try {
+            // ev.error may be undefined for resource errors
+            if (ev && ev.error) report('window.onerror', ev.error, { filename: ev.filename, lineno: ev.lineno, colno: ev.colno });
+            else report('window.onerror', new Error(String(ev?.message || 'Script error')), { filename: ev?.filename, lineno: ev?.lineno, colno: ev?.colno });
+          } catch {}
+        });
+        window.addEventListener('unhandledrejection', (ev) => {
+          try { report('unhandledrejection', ev && ev.reason ? ev.reason : 'Unhandled promise rejection'); } catch {}
+        });
+      }
     } catch {}
   },
 

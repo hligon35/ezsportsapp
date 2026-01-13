@@ -15,7 +15,8 @@ class DatabaseManager {
   subscribers: 'subscribers.json',
   coupons: 'coupons.json',
   emails: 'emails.json',
-  payouts: 'payouts.json'
+  payouts: 'payouts.json',
+  errors: 'errors.json'
     };
   }
 
@@ -87,13 +88,15 @@ class DatabaseManager {
   // Get next auto-increment ID
   async getNextId(collection) {
     try {
-  const schema = await this.read('schema');
+  let schema = await this.read('schema');
+  // schema.json should be an object; if it’s an array or otherwise malformed, normalize it.
+  if (!schema || typeof schema !== 'object' || Array.isArray(schema)) schema = { metadata: {} };
   schema.metadata = schema.metadata || {};
   schema.metadata.autoIncrement = schema.metadata.autoIncrement || {};
   // Ensure key exists for this collection
   if (typeof schema.metadata.autoIncrement[collection] !== 'number') {
     // sensible defaults
-    const defaults = { users: 1000, products: 2000, orders: 3000, analytics: 1 };
+    const defaults = { users: 1000, products: 2000, orders: 3000, analytics: 1, subscribers: 1, coupons: 1, emails: 1, payouts: 1, errors: 1 };
     schema.metadata.autoIncrement[collection] = defaults[collection] || 1;
   }
   const currentId = schema.metadata.autoIncrement[collection] || 0;
@@ -222,7 +225,9 @@ class DatabaseManager {
                   analytics: 1,
                   subscribers: 1,
                   coupons: 1,
-                  emails: 1
+                  emails: 1,
+                  payouts: 1,
+                  errors: 1
                 },
                 inventoryThresholds: {
                   low: 10,

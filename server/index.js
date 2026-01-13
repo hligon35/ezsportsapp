@@ -81,6 +81,9 @@ const invoiceRoutes = require('./routes/invoices');
 const analyticsRoutes = require('./routes/analytics');
 const marketingRoutes = require('./routes/marketing');
 const adminRoutes = require('./routes/admin');
+const errorRoutes = require('./routes/errors');
+const AlertingService = require('./services/AlertingService');
+const alerting = new AlertingService();
 const app = express();
 // Hide Express signature
 app.disable('x-powered-by');
@@ -340,9 +343,28 @@ app.use('/api/orders', orderRoutes);
 app.use('/api/inventory', inventoryRoutes);
 app.use('/api/invoices', invoiceRoutes);
 app.use('/api/analytics', analyticsRoutes);
+app.use('/api/errors', errorRoutes);
 // Accept text/plain payloads (JSON string) for marketing endpoints to support legacy/form fallbacks
 // (marketing routes are mounted above to avoid JSON parser errors on malformed bodies)
 app.use('/api/admin', adminRoutes);
+
+// Process-level crash protection + alerting
+try {
+  process.on('unhandledRejection', (reason) => {
+    try {
+      const err = (reason instanceof Error) ? reason : new Error(String(reason));
+      const record = { source: 'server', kind: 'unhandledRejection', name: err.name, message: err.message, stack: err.stack, createdAt: new Date().toISOString() };
+      alerting.recordError(record).then(saved => alerting.sendErrorAlert({ title: 'EZSports Server unhandledRejection', errorRecord: saved })).catch(()=>{});
+    } catch {}
+  });
+  process.on('uncaughtException', (err) => {
+    try {
+      const e = (err instanceof Error) ? err : new Error(String(err));
+      const record = { source: 'server', kind: 'uncaughtException', name: e.name, message: e.message, stack: e.stack, createdAt: new Date().toISOString() };
+      alerting.recordError(record).then(saved => alerting.sendErrorAlert({ title: 'EZSports Server uncaughtException', errorRecord: saved })).catch(()=>{});
+    } catch {}
+  });
+} catch {}
 
 // Legacy redirects for removed static pages (migrated from previous hosting config)
 const redirects = [
@@ -399,8 +421,10 @@ app.post('/api/analytics/track', async (req, res) => {
 });
 app.post('/api/analytics/event', async (req, res) => {
   try {
-    const { type, productId, visitorId, userId, ts } = req.body || {};
-    const ev = await analyticsService.trackEvent({ type, productId, visitorId, userId, ts });
+    const { type, productId, visitorId, userId, path, label, value, meta, ts } = req.body || {};
+    const ev = (path || label || value !== undefined || meta)
+      ? await analyticsService.trackRichEvent({ type, productId, visitorId, userId, path, label, value, meta, ts })
+      : await analyticsService.trackEvent({ type, productId, visitorId, userId, ts });
     res.json({ ok: true, id: ev?.id });
   } catch (e) {
     res.status(400).json({ message: e.message });
@@ -490,6 +514,26 @@ app.use((req, res, next) => {
 // eslint-disable-next-line no-unused-vars
 app.use((err, req, res, next) => {
   console.error('Unhandled error:', err);
+  try {
+    const status = Number(err?.status || err?.statusCode || 500) || 500;
+    if (status >= 500) {
+      const record = {
+        source: 'server',
+        kind: 'express',
+        name: err?.name || 'Error',
+        message: err?.message || 'Internal Server Error',
+        stack: err?.stack || null,
+        path: req?.originalUrl || req?.url || null,
+        method: req?.method || null,
+        ip: req?.ip || null,
+        userAgent: req?.headers?.['user-agent'] || null,
+        createdAt: new Date().toISOString(),
+      };
+      alerting.recordError(record)
+        .then(saved => alerting.sendErrorAlert({ title: `EZSports Server 5xx: ${record.path || ''}`, errorRecord: saved }))
+        .catch(()=>{});
+    }
+  } catch {}
   res.status(err.status || 500).json({ message: err.message || 'Internal Server Error' });
 });
 
@@ -1011,6 +1055,14 @@ function startServer(attempt = 0) {
 }
 
 const server = startServer();
+
+// Daily activity report scheduler (emails visitor activity summary)
+try {
+  const { startDailyReportScheduler } = require('./jobs/dailyReportScheduler');
+  startDailyReportScheduler();
+} catch (e) {
+  console.warn('Daily report scheduler not started:', e?.message || e);
+}
 
 // Background email retry worker: periodically attempts to deliver queued/failed emails
 try {
