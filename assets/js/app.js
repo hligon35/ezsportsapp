@@ -346,6 +346,15 @@ const Store = {
       this.state.user = null;
     }
 
+    // Page classes for targeted styling
+    try {
+      const pageKey = this.getPageKey();
+      if (pageKey) document.body.classList.add(`page-${pageKey}`);
+      if (pageKey === 'l-screens') document.body.classList.add('lscreens-hub');
+      const LS_PAGES = new Set(['baseball-l-screens','baseball-l-screen','protective-screens','pitchers-pocket','replacement-screens','bullet-pad-kits']);
+      if (LS_PAGES.has(pageKey)) document.body.classList.add('lscreens-subnav');
+    } catch {}
+
     this.ui = {
       grid: document.getElementById('product-grid'),
       count: document.getElementById('cart-count'),
@@ -387,6 +396,8 @@ const Store = {
       // Page-specific enhancements (safe to call when not applicable)
       try { this.ensureNettingSubnav(); } catch {}
       try { this.ensureNettingCarousel(); } catch {}
+      try { this.ensureHeroRotator(); } catch {}
+      try { this.ensureTypeTileImagesMatchSku(); } catch {}
 
       const toggle = document.querySelector('.menu-toggle');
       const nav = document.getElementById('primary-nav');
@@ -494,7 +505,7 @@ ensureUniformFooter() {
           </div>
           <div>
             <h4>Shop</h4>
-            <a href="ez-nets.html">EZ Nets</a><br/>
+            <a href="ez-nets.html">EZ Custom Nets</a><br/>
             <a href="pre-made-cages.html">Pre-Made Cages</a><br/>
             <a href="l-screens.html">L-Screens</a><br/>
             <a href="accessories.html">Accessories</a>
@@ -932,7 +943,7 @@ ensureCoreNav() {
     const canonical = [
       { href: 'index.html', text: 'Home' },
       { href: 'about.html', text: 'About' },
-      { href: 'ez-nets.html', text: 'EZ Nets' },
+      { href: 'ez-nets.html', text: 'EZ Custom Nets' },
       { href: 'pre-made-cages.html', text: 'Pre-Made Cages' },
       { href: 'l-screens.html', text: 'L-Screens' },
       { href: 'accessories.html', text: 'Accessories' },
@@ -1087,7 +1098,7 @@ ensureHomeFirst() {
       'order-history.html': 'Order History',
       'netting-calculator.html': 'Netting Calculator',
     // Primary nav canonical set
-    'ez-nets.html': 'EZ Nets',
+    'ez-nets.html': 'EZ Custom Nets',
     'l-screens.html': 'L-Screens',
     'accessories.html': 'Accessories',
     'contactus.html': 'Contact Us',
@@ -1295,7 +1306,7 @@ ensureHomeFirst() {
         if (/l[- ]?screen/.test(name) || /^bullet/.test(name)) return { label: 'Baseball L-Screens', href: 'baseball-l-screens.html' };
         // Pad kits are now considered Accessories
         if (/pad\s*kit/.test(name) || /^pk-/.test(sku)) return { label: 'Accessories', href: 'accessories.html' };
-        return { label: 'EZ Nets', href: 'ez-nets.html' };
+        return { label: 'EZ Custom Nets', href: 'ez-nets.html' };
       };
       if (prod) {
         const catCrumb = resolveCategory(prod);
@@ -1545,9 +1556,13 @@ ensureHomeFirst() {
   // Soft cross-fade hero rotator on L-Screens hub (screen2 -> screen6, 1s interval)
   ensureHeroRotator() {
     try {
-      if (!/l-screens\.html$/i.test(location.pathname)) return;
+      const base = (location.pathname.split('/').pop() || '').toLowerCase();
+      if (base !== 'l-screens.html' && base !== 'l-screens') return;
       const rotator = document.querySelector('.hero-rotator');
       if (!rotator) return;
+      // Avoid stacking intervals on BFCache restores / repeated init
+      if (rotator.__rotating) return;
+      rotator.__rotating = true;
       const slides = [...rotator.querySelectorAll('.hr-slide')];
       if (slides.length < 2) return;
       let idx = 0;
@@ -1562,8 +1577,70 @@ ensureHomeFirst() {
     } catch(err) { console.warn('hero rotator failed', err); }
   },
 
-  // On the L-Screens hub, replace the static "Shop by Type" tile images with a random
-  // product image from the corresponding assets/prodImgs category folders.
+  // On the L-Screens hub, ensure each “Shop by Type” tile image matches its representative SKU.
+  // Tiles can declare `data-sku="SKU"` (or a comma-separated list) and we will pull the matching
+  // product image from the loaded catalog (preferred) or prodList.json (fallback).
+  async ensureTypeTileImagesMatchSku() {
+    try {
+      const page = (location.pathname.split('/').pop() || '').toLowerCase();
+      if (page !== 'l-screens.html' && page !== 'l-screens') return;
+
+      const tilesWrap = document.querySelector('.category-tiles .tiles');
+      if (!tilesWrap) return;
+
+      const tiles = Array.from(tilesWrap.querySelectorAll('.tile[data-sku]'));
+      if (!tiles.length) return;
+
+      const normalizeSku = (s) => String(s || '').trim().toUpperCase();
+      const splitSkus = (s) => String(s || '').split(',').map(v => normalizeSku(v)).filter(Boolean);
+
+      // Prefer unified catalog if present
+      const catalogRaw = Array.isArray(window.CATALOG_PRODUCTS)
+        ? window.CATALOG_PRODUCTS.map(r => r.raw || r)
+        : [];
+
+      let prodListData = null;
+      const findInProdList = (sku) => {
+        if (!prodListData || !prodListData.categories || typeof prodListData.categories !== 'object') return null;
+        for (const arr of Object.values(prodListData.categories)) {
+          if (!Array.isArray(arr)) continue;
+          const hit = arr.find(p => normalizeSku(p?.sku || p?.id) === sku);
+          if (hit) return hit;
+        }
+        return null;
+      };
+
+      for (const tile of tiles) {
+        const img = tile.querySelector('.media img');
+        if (!img) continue;
+        const skus = splitSkus(tile.getAttribute('data-sku'));
+        if (!skus.length) continue;
+
+        let matched = null;
+        for (const sku of skus) {
+          matched = catalogRaw.find(p => normalizeSku(p?.sku || p?.id) === sku) || null;
+          if (matched) break;
+          if (!prodListData) {
+            try { prodListData = await this.fetchProdList(); } catch { prodListData = null; }
+          }
+          matched = findInProdList(sku);
+          if (matched) break;
+        }
+
+        if (!matched) continue;
+        let resolvedImg = '';
+        try {
+          resolvedImg = this.normalizeProdListItem(matched)?.img || '';
+        } catch {}
+        if (!resolvedImg) resolvedImg = matched.img || (Array.isArray(matched.images) ? matched.images[0] : '') || '';
+        if (resolvedImg) img.src = resolvedImg;
+      }
+    } catch (e) {
+      console.warn('ensureTypeTileImagesMatchSku failed:', e);
+    }
+  },
+
+  // Legacy: kept for backward-compatibility; SKU-driven mapping is preferred.
   ensureRandomTypeTileImages() {
     try {
       const page = (location.pathname.split('/').pop() || '').toLowerCase();
@@ -1670,6 +1747,8 @@ ensureHomeFirst() {
         if (!key || !Array.isArray(MANIFEST[key]) || MANIFEST[key].length === 0) return;
         const img = tile.querySelector('.media img');
         if (!img) return;
+        // If a tile declares a representative SKU, do not override it randomly.
+        if (tile.hasAttribute('data-sku')) return;
         const src = pickRandom(MANIFEST[key]);
         if (src) img.src = src;
       });

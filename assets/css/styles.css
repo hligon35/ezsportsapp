@@ -354,6 +354,14 @@ a:hover, .inline-links a:hover { text-decoration:underline; }
   box-shadow:0 10px 38px -12px rgba(0,0,0,.55),0 4px 18px -6px rgba(0,0,0,.45);
 }
 
+/* L-Screens pages: keep hero copy readable on dark gradients (override `.muted`) */
+body.lscreens-hub .netting-hero .muted,
+body.lscreens-subnav .netting-hero .muted,
+body.lscreens-hub .netting-hero p,
+body.lscreens-subnav .netting-hero p {
+  color: rgba(255,255,255,.92) !important;
+}
+
 /* Sport-specific variants (kept within site palette) */
 .netting-hero--baseball,
 .nh-baseball {
