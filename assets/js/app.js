@@ -425,6 +425,9 @@ const Store = {
         });
       }
 
+      // Keep responsive nav usable across resizes (especially around breakpoints)
+      try { this.enforceResponsiveBehaviors && this.enforceResponsiveBehaviors(); } catch {}
+
       // Immediately sync cart UI on load so the header count reflects existing items
       try { this.renderCart(); } catch {}
 

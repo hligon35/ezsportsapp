@@ -677,6 +677,9 @@ img{max-width:100%;display:block}
 /* Header layout: brand left, nav center, actions right */
 .site-header .header-bar{justify-content:space-between}
 .brand{display:flex;align-items:center;gap:.6rem;color:#fff;text-decoration:none;font-weight:900;letter-spacing:.3px}
+.site-header .brand{display:flex !important;flex-direction:row !important;align-items:center !important;justify-content:flex-start !important;flex-wrap:nowrap !important;min-width:0;text-align:left}
+.site-header .brand img{flex:0 0 auto}
+.site-header .brand span{display:inline !important;white-space:nowrap;line-height:1.1}
 .brand img{filter:drop-shadow(0 4px 12px rgba(0,0,0,.25));border-radius:0.75rem;background:#ffffff;}
 
 .footer-brand-block img { border-radius: 0.75rem; background:#ffffff; }
@@ -822,14 +825,14 @@ img[src*="/logo.svg"]{
 /* Collapsible navigation applies up to large tablets (raised from 900px -> 1200px) */
 @media (max-width:1200px){
   .menu-toggle{display:inline-flex;align-items:center;justify-content:center}
-  .quick-links{flex-basis:100%;order:4;display:none;flex-direction:column;align-items:flex-start;background:#000000;padding:.6rem .6rem 1rem;border-radius:.85rem;margin-top:.55rem;box-shadow:0 4px 18px rgba(0,0,0,.25)}
-  .quick-links a{padding:.55rem .75rem;border-radius:.55rem;width:100%;}
+  .quick-links{flex-basis:100%;order:4;display:none;flex-direction:column;align-items:stretch;text-align:center;background:#000000;padding:.6rem .6rem 1rem;border-radius:.85rem;margin-top:.55rem;box-shadow:0 4px 18px rgba(0,0,0,.25)}
+  .quick-links a{padding:.55rem .75rem;border-radius:.55rem;width:100%;display:flex;justify-content:center;align-items:center;text-align:center}
   .quick-links.is-open{display:flex}
   /* Submenu stacks under its trigger on mobile */
   .quick-links .has-submenu{width:100%}
   .quick-links .nav-submenu{position:static;display:none;width:100%;margin-top:.25rem;padding:.25rem;border:none;border-radius:.5rem;background:#0a0a0a;box-shadow:none}
   .quick-links .has-submenu.open > .nav-submenu{display:block}
-  .quick-links .nav-submenu a{width:100%}
+  .quick-links .nav-submenu a{width:100%;display:flex;justify-content:center;align-items:center;text-align:center}
 
   /* For L‑Screens specifically: when mobile menu is open, show its submenu as a flyout to the left of the menu panel */
   .site-header .header-bar .quick-links .has-submenu.submenu-left > .nav-submenu{
@@ -870,8 +873,8 @@ img[src*="/logo.svg"]{
 /* Small phones/tablets: make the menu panel full-width and left-aligned for consistency */
 @media (max-width:640px){
   .site-header .header-bar .quick-links{left:0; right:0; width:100%;}
-  /* When nav has the nav-centered utility, keep items left-aligned in mobile stacked panel */
-  .site-header .header-bar .quick-links.nav-centered{justify-content:flex-start !important}
+  /* When nav has the nav-centered utility, keep items centered in mobile stacked panel */
+  .site-header .header-bar .quick-links.nav-centered{justify-content:center !important}
   /* Submenu stacks inline to avoid off-screen clipping on narrow devices */
   .site-header .header-bar .quick-links .has-submenu.submenu-left > .nav-submenu{
     position:static;
@@ -904,8 +907,8 @@ img[src*="/logo.svg"]{
   .quick-links.forced-wide{display:none !important}
 }
 
-/* Desktop ≥1000px: keep login (header-actions) and cart on top row right edge */
-@media (min-width:1000px){
+/* Desktop ≥1201px: keep login (header-actions) and cart on top row right edge */
+@media (min-width:1201px){
   .site-header .menu-toggle{display:none}
   /* Top row: brand, search (grows), actions + cart (right). Allow wrap so nav (quick-links) moves to second row. */
   .site-header .header-bar{flex-wrap:wrap}
