@@ -1,5 +1,9 @@
 // Basic Express server with Stripe integration for POS and ordering
-require('dotenv').config();
+try {
+  require('dotenv').config();
+} catch {
+  // dotenv is optional in production environments (e.g., Render) where env vars are injected.
+}
 const express = require('express');
 const path = require('path');
 const cors = require('cors');
@@ -525,6 +529,9 @@ async function calcSubtotalCents(items = []) {
 async function calcShippingCents(items = [], _subtotalCents, _method = 'standard'){
   // New policy: per-item shipping: use dsr when available; default $100 per item otherwise
   try {
+    const method = String(_method || 'standard').toLowerCase().trim();
+    const expedited = method === 'expedited';
+    const expeditedSurchargeCentsPerItem = expedited ? 10000 : 0;
     const priceMap = await loadPriceMap();
     let total = 0;
     for (const it of items) {
@@ -540,19 +547,22 @@ async function calcShippingCents(items = [], _subtotalCents, _method = 'standard
       if (isFreeShip) {
         // Free shipping per item
         const qty = Math.max(1, Number(it.qty) || 1);
-        total += 0 * qty;
+        total += expeditedSurchargeCentsPerItem * qty;
         continue;
       }
       const rec = priceMap.get(it.id);
       const dsr = Number(rec?.dsr || 0);
       const per = (Number.isFinite(dsr) && dsr > 0) ? dsr : 100;
       const qty = Math.max(1, Number(it.qty) || 1);
-      total += Math.round(per * 100) * qty;
+      total += (Math.round(per * 100) * qty) + (expeditedSurchargeCentsPerItem * qty);
     }
     return total;
   } catch {
     // Fallback: treat as $100 per item
-    return (items || []).reduce((s, it) => s + (10000 * Math.max(1, Number(it.qty)||1)), 0);
+    const method = String(_method || 'standard').toLowerCase().trim();
+    const expedited = method === 'expedited';
+    const perItemCents = expedited ? 20000 : 10000;
+    return (items || []).reduce((s, it) => s + (perItemCents * Math.max(1, Number(it.qty)||1)), 0);
   }
 }
 
@@ -614,7 +624,7 @@ function calcTaxCents(subtotalCents = 0, shippingCents = 0, discountCents = 0, s
 
 // Create payment intent with server-side calculation
 app.post('/api/create-payment-intent', async (req, res) => {
-  const { items = [], customer = {}, shipping = {}, currency = 'usd', couponCode = '', existingOrderId = null } = req.body;
+  const { items = [], customer = {}, shipping = {}, shippingMethod = 'standard', currency = 'usd', couponCode = '', existingOrderId = null } = req.body;
   try {
     if (!stripe) {
       return res.status(503).json({ error: 'Stripe is not configured on the server.' });
@@ -640,7 +650,8 @@ app.post('/api/create-payment-intent', async (req, res) => {
     }
 
     const subtotal = await calcSubtotalCents(normItems);
-    const shippingCents = await calcShippingCents(normItems, subtotal);
+    const normalizedMethod = (String(shippingMethod || 'standard').toLowerCase().trim() === 'expedited') ? 'expedited' : 'standard';
+    const shippingCents = await calcShippingCents(normItems, subtotal, normalizedMethod);
     let amount = subtotal + shippingCents; // initial base before discounts/tax
 
     // Optional: apply coupon
@@ -674,7 +685,8 @@ app.post('/api/create-payment-intent', async (req, res) => {
         items: normItems.map(i => ({ id: i.id, qty: i.qty })),
         shippingAddress: shipping,
         customerInfo: customer,
-        paymentInfo: { method: 'stripe' }
+        shippingMethod: normalizedMethod,
+        paymentInfo: { method: 'stripe', shippingMethod: normalizedMethod }
       };
       if (existingOrderId) {
         newOrder = { id: existingOrderId };
@@ -689,7 +701,7 @@ app.post('/api/create-payment-intent', async (req, res) => {
     // Provide an idempotency key to prevent duplicate PI creation on retries
     const idemKey = crypto
       .createHash('sha256')
-      .update(JSON.stringify({ normItems, email: customer.email || '', existingOrderId: newOrder?.id || existingOrderId || null }))
+      .update(JSON.stringify({ normItems, email: customer.email || '', shippingMethod: normalizedMethod, existingOrderId: newOrder?.id || existingOrderId || null }))
       .digest('hex')
       .slice(0, 64);
 
@@ -702,7 +714,8 @@ app.post('/api/create-payment-intent', async (req, res) => {
         name: customer.name || '',
         items: normItems.map(i => `${i.id}:${i.qty}`).join('|'),
         order_id: newOrder?.id ? String(newOrder.id) : '',
-        coupon_code: appliedCoupon ? String(appliedCoupon.code) : ''
+        coupon_code: appliedCoupon ? String(appliedCoupon.code) : '',
+        shipping_method: normalizedMethod
       },
       automatic_payment_methods: { enabled: true },
       receipt_email: customer.email || undefined,

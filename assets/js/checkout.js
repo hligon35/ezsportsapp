@@ -30,8 +30,16 @@ function fromCents(c){ return Math.max(0, Math.round(Number(c||0))); }
 function calcSubtotalCents(cart){
   return cart.reduce((sum,i)=> sum + (toCents(i.price||0) * (i.qty||0)), 0);
 }
-function calcShippingCentsForCart(cart){
-  // New policy: each item has its own shipping: if item has dsr (ship), use it; otherwise default $100 per item
+function normalizeShippingMethod(value) {
+  const v = String(value || '').toLowerCase().trim();
+  return (v === 'expedited') ? 'expedited' : 'standard';
+}
+
+function calcShippingCentsForCart(cart, shippingMethod = 'standard'){
+  // Base policy: per-item shipping: if item has dsr (ship), use it; otherwise default $100 per item
+  // Expedited: +$100 per item on top of standard shipping
+  const method = normalizeShippingMethod(shippingMethod);
+  const expeditedSurchargeCentsPerItem = (method === 'expedited') ? 10000 : 0;
   let total = 0;
   for (const i of cart) {
     const raw = (typeof i.ship !== 'undefined') ? i.ship : i.shipAmount;
@@ -39,7 +47,7 @@ function calcShippingCentsForCart(cart){
     // Respect explicit zero as free shipping
     const per = Number.isFinite(dsr) ? (dsr === 0 ? 0 : (dsr > 0 ? dsr : 100)) : 100; // $100 default
     const qty = Math.max(1, Number(i.qty) || 1);
-    total += Math.round(per * 100) * qty;
+    total += (Math.round(per * 100) * qty) + (expeditedSurchargeCentsPerItem * qty);
   }
   return total;
 }
@@ -55,9 +63,9 @@ function taxRateForAddress(addr){
   return 0;
 }
 
-function updateSummary(cart, applied, shippingAddr){
+function updateSummary(cart, applied, shippingAddr, shippingMethod){
   const sub = calcSubtotalCents(cart);
-  const ship = calcShippingCentsForCart(cart);
+  const ship = calcShippingCentsForCart(cart, shippingMethod);
   let discount = 0;
   if (applied && applied.type && applied.value) {
     if (applied.type === 'percent') {
@@ -115,7 +123,26 @@ async function initialize() {
   let orderId = null;
   let serverBreakdown = null; // latest server-provided breakdown
 
+  const SHIPPING_METHOD_STORAGE_KEY = 'shippingMethod';
+  const getShippingMethod = () => {
+    const el = document.getElementById('shipping-method');
+    const fromDom = el ? el.value : null;
+    if (fromDom) return normalizeShippingMethod(fromDom);
+    try { return normalizeShippingMethod(localStorage.getItem(SHIPPING_METHOD_STORAGE_KEY) || 'standard'); } catch { return 'standard'; }
+  };
+  const setShippingMethod = (method) => {
+    const norm = normalizeShippingMethod(method);
+    try { localStorage.setItem(SHIPPING_METHOD_STORAGE_KEY, norm); } catch {}
+    const el = document.getElementById('shipping-method');
+    if (el) el.value = norm;
+    return norm;
+  };
+
+  // Initialize selector state from localStorage (if present)
+  setShippingMethod(getShippingMethod());
+
   // Render order lines with price and quantity
+  const initialShippingMethod = getShippingMethod();
   const lines = cart.map(i => {
     const title = i.title || i.id;
     const unit = Number(i.price) || 0;
@@ -125,6 +152,7 @@ async function initialize() {
     const raw = (typeof i.ship !== 'undefined') ? i.ship : i.shipAmount;
     const shipPer = Number(raw);
     const shipEach = Number.isFinite(shipPer) ? (shipPer === 0 ? 0 : (shipPer > 0 ? shipPer : 100)) : 100;
+    const shipEachWithMethod = shipEach + (initialShippingMethod === 'expedited' ? 100 : 0);
     const shipCents = toCents(shipEach) * qty;
     const variant = variantText(i);
     return `
@@ -133,7 +161,7 @@ async function initialize() {
           <strong>${title}</strong>
           ${variant ? `<div class="muted">${variant}</div>` : ''}
           <div class="muted">${currencyFmt(unitCents)} × ${qty}</div>
-          <div class="muted">Shipping: ${shipEach===0 ? 'Free' : currencyFmt(toCents(shipEach))} × ${qty}</div>
+          <div class="muted">Shipping: ${shipEachWithMethod===0 ? 'Free' : currencyFmt(toCents(shipEachWithMethod))} × ${qty}${initialShippingMethod === 'expedited' ? ' (expedited)' : ''}</div>
         </div>
         <div class="text-right">
           <strong>${currencyFmt(lineCents)}</strong>
@@ -149,7 +177,7 @@ async function initialize() {
     const shipping = { address1: fd.get('address1'), address2: fd.get('address2'), city: fd.get('city'), state: fd.get('state'), postal: fd.get('postal'), country: fd.get('country') };
     // Send minimal items shape to backend
     const items = cart.map(i=>({ id: i.id, qty: i.qty }));
-    return { items, customer, shipping, couponCode: appliedCoupon?.code || '', existingOrderId: orderId };
+    return { items, customer, shipping, shippingMethod: getShippingMethod(), couponCode: appliedCoupon?.code || '', existingOrderId: orderId };
   };
 
   function getShippingAddress(){
@@ -246,6 +274,18 @@ async function initialize() {
   }
 
   // Shipping method selection removed; totals depend only on cart contents and coupon
+  // Shipping method affects shipping total only.
+
+  const shipMethodEl = document.getElementById('shipping-method');
+  if (shipMethodEl) {
+    shipMethodEl.value = getShippingMethod();
+    shipMethodEl.addEventListener('change', async () => {
+      setShippingMethod(shipMethodEl.value);
+      updateSummary(cart, appliedCoupon, getShippingAddress(), getShippingMethod());
+      await createOrUpdatePaymentIntent();
+      if (amount > 0) document.getElementById('sum-total').textContent = currencyFmt(amount);
+    });
+  }
 
   // Promo code apply handler
   const applyBtn = document.getElementById('apply-code');
@@ -260,13 +300,13 @@ async function initialize() {
       if (data.valid) {
         appliedCoupon = data.coupon ? { code: data.coupon.code, type: data.coupon.type, value: data.coupon.value } : { code, type:'percent', value:0 };
         document.getElementById('discount-code-label').textContent = `(${appliedCoupon.code})`;
-        updateSummary(cart, appliedCoupon, getShippingAddress());
+        updateSummary(cart, appliedCoupon, getShippingAddress(), getShippingMethod());
         await createOrUpdatePaymentIntent();
         if (amount > 0) document.getElementById('sum-total').textContent = currencyFmt(amount);
         msg.textContent = 'Code applied.';
       } else {
         appliedCoupon = null;
-        updateSummary(cart, appliedCoupon, getShippingAddress());
+        updateSummary(cart, appliedCoupon, getShippingAddress(), getShippingMethod());
         msg.textContent = 'Invalid or expired code.';
       }
     } catch (e) {
@@ -277,7 +317,7 @@ async function initialize() {
   // Recalculate when address changes (debounced)
   const onAddrChange = debounce(async () => {
     // Update local summary immediately for test mode and UX
-    updateSummary(cart, appliedCoupon, getShippingAddress());
+    updateSummary(cart, appliedCoupon, getShippingAddress(), getShippingMethod());
     await createOrUpdatePaymentIntent();
     if (amount > 0) document.getElementById('sum-total').textContent = currencyFmt(amount);
   }, 350);
@@ -300,7 +340,7 @@ async function initialize() {
         const resp = await fetch('/api/order', { method:'POST', headers:{'Content-Type':'application/json'}, credentials:'include', body: JSON.stringify(payload) });
         // Compute totals locally for confirmation
         const sub = calcSubtotalCents(cart);
-        const ship = calcShippingCentsForCart(cart);
+        const ship = calcShippingCentsForCart(cart, getShippingMethod());
         const discount = computeDiscountCents(sub, ship, appliedCoupon);
         const tax = Math.round(Math.max(0, sub + ship - discount) * taxRateForAddress(getShippingAddress()));
         const total = sub + ship - discount + tax;
@@ -319,7 +359,8 @@ async function initialize() {
           shipping: Math.round(ship)/100,
           discount: Math.round(discount)/100,
           tax: Math.round(tax)/100,
-          couponCode: appliedCoupon?.code || null
+          couponCode: appliedCoupon?.code || null,
+          shippingMethod: getShippingMethod()
         };
         // Save for confirmation page
         try{ sessionStorage.setItem('lastOrder', JSON.stringify(order)); }catch{}

@@ -318,6 +318,9 @@ const Store = {
       try { this.ensurePerformanceOptimizations(); } catch {}
       try { this.ensureServiceWorkerRegistered(); } catch {}
 
+      // Promo banner (must run before header/nav reveal)
+      try { this.ensurePromoBanner(); } catch {}
+
       // Header and primary navigation
       try { this.ensureHeaderLayout(); } catch {}
       try { this.ensureCoreNav(); } catch {}
@@ -413,7 +416,7 @@ ensureUniformFooter() {
           <div class="footer-brand-block">
             <img src="assets/img/EZSportslogo.png" height="36" alt="EZ Sports Netting logo"/>
             <strong>EZ Sports Netting</strong>
-            <p>Better baseball through better gear.</p>
+            <p>Built Different. Built E Z!</p>
             <div class="socials" aria-label="social links">
               <a href="https://www.facebook.com/Ezsportsnetting/" aria-label="Facebook" target="_blank" rel="noopener"><img src="assets/img/facebook.png?v=20251009" alt="Facebook"/></a>
               <a href="#" aria-label="Instagram" target="_blank" rel="noopener"><img src="assets/img/instagram.png?v=20251009" alt="Instagram"/></a>
@@ -740,6 +743,77 @@ ensureServiceWorkerRegistered() {
   } catch {}
 },
 
+// Sitewide promo banner (fixed top, attention grabbing)
+ensurePromoBanner() {
+    try {
+      const defaults = {
+        enabled: true,
+        id: 'promo-2026-01',
+        message: 'Limited-time promo: Free training facility design consult.',
+        ctaText: 'Request Quote',
+        href: 'contactus.html',
+        dismissible: true,
+      };
+      const cfg = (window.PROMO_BANNER && typeof window.PROMO_BANNER === 'object')
+        ? { ...defaults, ...window.PROMO_BANNER }
+        : defaults;
+      if (!cfg.enabled) return;
+
+      const key = `promoDismissed:${cfg.id}`;
+      try {
+        if (cfg.dismissible && localStorage.getItem(key) === '1') return;
+      } catch {}
+
+      if (document.querySelector('.promo-banner')) return;
+
+      const bar = document.createElement('div');
+      bar.className = 'promo-banner';
+      bar.setAttribute('role', 'region');
+      bar.setAttribute('aria-label', 'Promotion');
+
+      const safeMsg = String(cfg.message || '').trim();
+      const ctaText = String(cfg.ctaText || '').trim();
+      const href = String(cfg.href || '').trim();
+
+      bar.innerHTML = `
+        <div class="container promo-inner">
+          <div class="promo-left">
+            <span class="promo-text">${safeMsg}</span>
+          </div>
+          <div class="promo-right">
+            ${href ? `<a class="promo-cta" href="${href}">${ctaText || 'Learn more'}</a>` : ''}
+            ${cfg.dismissible ? `<button type="button" class="promo-close" aria-label="Dismiss promotion">×</button>` : ''}
+          </div>
+        </div>`;
+
+      try {
+        document.documentElement.classList.add('has-promo-banner');
+        document.body.classList.add('has-promo-banner');
+      } catch {}
+
+      // Keep skip-link first for accessibility if present
+      const skip = document.querySelector('a.skip');
+      if (skip && skip.parentNode) {
+        skip.insertAdjacentElement('afterend', bar);
+      } else {
+        document.body.insertBefore(bar, document.body.firstChild);
+      }
+
+      // Dismiss handling
+      const btn = bar.querySelector('.promo-close');
+      if (btn) {
+        btn.addEventListener('click', () => {
+          try { localStorage.setItem(key, '1'); } catch {}
+          try { bar.remove(); } catch {}
+          try {
+            document.documentElement.classList.remove('has-promo-banner');
+            document.body.classList.remove('has-promo-banner');
+          } catch {}
+        });
+      }
+    } catch {}
+  },
+
 ensureHeaderLayout() {
     const header = document.querySelector('.site-header .header-bar');
     if (!header) return;
@@ -842,6 +916,7 @@ ensureCoreNav() {
       { href: 'index.html', text: 'Home' },
       { href: 'about.html', text: 'About' },
       { href: 'ez-nets.html', text: 'EZ Nets' },
+      { href: 'training-facility-design.html', text: 'Training Facility Design' },
       { href: 'pre-made-cages.html', text: 'Pre-Made Cages' },
       { href: 'l-screens.html', text: 'L-Screens' },
       { href: 'accessories.html', text: 'Accessories' },
@@ -1267,7 +1342,7 @@ ensureHomeFirst() {
     } catch {}
   },
 
-  // Build a simple carousel on netting category pages using former sub‑sub page labels as slide titles
+  // Build a simple gallery grid on netting category pages (no horizontal scroll)
   ensureNettingCarousel() {
     try {
       const base = (location.pathname.split('/').pop() || '').toLowerCase();
@@ -1286,22 +1361,18 @@ ensureHomeFirst() {
       }
       if (!DATA[base] || DATA[base].length === 0) return;
       // Avoid duplicate build
-      if (document.querySelector('.net-carousel')) return;
+      if (document.querySelector('.net-gallery')) return;
       // Find hero section to insert after
       const hero = document.querySelector('.net-hero, .netting-hero');
       if (!hero) return;
       const section = document.createElement('section');
-      section.className = 'carousel-section';
+      section.className = 'net-gallery-section';
       section.innerHTML = `
-        <div class="net-carousel" data-autoplay="5500" aria-roledescription="carousel">
-          <div class="carousel-track" role="group"></div>
-          <button class="carousel-arrow prev" aria-label="Previous slide" type="button">‹</button>
-          <button class="carousel-arrow next" aria-label="Next slide" type="button">›</button>
-          <div class="carousel-dots" role="tablist"></div>
+        <div class="net-gallery" aria-label="Netting gallery">
+          <div class="net-gallery-grid" role="list"></div>
         </div>`;
       hero.insertAdjacentElement('afterend', section);
-      const track = section.querySelector('.carousel-track');
-      const dotsWrap = section.querySelector('.carousel-dots');
+      const grid = section.querySelector('.net-gallery-grid');
       const slides = DATA[base];
       // Image selection rule: Map normalized slide titles to real filenames in assets/img/eznets.
       // Normalization: lower-case, remove non-alphanumeric. Example: "Foul Ball" -> key "foulball" -> "Foul_Ball.png"
@@ -1326,80 +1397,37 @@ ensureHomeFirst() {
       const imageFor = (title) => FILES[normalize(title)] || null;
       slides.forEach((title, idx) => {
         const imgFile = imageFor(title);
-        const slide = document.createElement('div');
-        slide.className = 'carousel-slide';
-        slide.setAttribute('data-index', String(idx));
+        const item = document.createElement('div');
+        item.className = 'net-gallery-item';
+        item.setAttribute('role', 'listitem');
         // First image eager, others lazy
         const loading = idx === 0 ? 'eager' : 'lazy';
         // If no direct image match, leave placeholder styling (no <img>) with overlayed title text.
         if (imgFile) {
-          slide.innerHTML = `
-            <figure class="slide-media">
+          item.innerHTML = `
+            <figure class="gallery-media">
               <img src="${IMG_BASE + imgFile}" alt="${title} netting" loading="${loading}" width="480" height="320" />
               <figcaption class="visually-hidden">${title}</figcaption>
             </figure>
-            <h3 class="slide-title">${title}</h3>`;
+            <h3 class="gallery-title">${title}</h3>`;
           // Graceful fallback if image fails to load
-          const imgEl = slide.querySelector('img');
+          const imgEl = item.querySelector('img');
           if (imgEl) {
             imgEl.addEventListener('error', () => {
-              const fig = slide.querySelector('.slide-media');
+              const fig = item.querySelector('.gallery-media');
               if (fig) fig.innerHTML = `<span>${title}</span><figcaption class="visually-hidden">${title}</figcaption>`;
             }, { once: true });
           }
         } else {
-          slide.innerHTML = `
-            <figure class="slide-media">
+          item.innerHTML = `
+            <figure class="gallery-media">
               <span>${title}</span>
               <figcaption class="visually-hidden">${title}</figcaption>
             </figure>
-            <h3 class="slide-title">${title}</h3>`;
+            <h3 class="gallery-title">${title}</h3>`;
         }
-        track.appendChild(slide);
-        const dot = document.createElement('button');
-        dot.type = 'button';
-        dot.className = 'carousel-dot';
-        dot.setAttribute('role','tab');
-        dot.setAttribute('aria-label', `Slide ${idx+1}: ${title}`);
-        dot.dataset.index = String(idx);
-        dotsWrap.appendChild(dot);
+        grid?.appendChild(item);
       });
-
-      const carousel = section.querySelector('.net-carousel');
-      const prevBtn = section.querySelector('.carousel-arrow.prev');
-      const nextBtn = section.querySelector('.carousel-arrow.next');
-      let index = 0;
-      const total = slides.length;
-      const update = () => {
-        track.style.transform = `translateX(-${index*100}%)`;
-        dotsWrap.querySelectorAll('button').forEach(b => {
-          const active = Number(b.dataset.index) === index;
-            b.setAttribute('aria-selected', active ? 'true':'false');
-            b.classList.toggle('is-active', active);
-        });
-      };
-      const go = (i) => { index = (i+total)%total; update(); };
-      prevBtn?.addEventListener('click', ()=> go(index-1));
-      nextBtn?.addEventListener('click', ()=> go(index+1));
-      dotsWrap.addEventListener('click', (e) => {
-        const btn = e.target.closest('button');
-        if (!btn) return;
-        go(Number(btn.dataset.index));
-      });
-      // Autoplay
-      const delay = Number(carousel?.dataset.autoplay) || 0;
-      let timer = null;
-      if (delay && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-        timer = setInterval(()=> go(index+1), delay);
-        carousel.addEventListener('mouseenter', ()=> timer && clearInterval(timer));
-        carousel.addEventListener('mouseleave', ()=> { if (delay) timer = setInterval(()=> go(index+1), delay); });
-        document.addEventListener('visibilitychange', ()=>{
-          if (document.hidden) { timer && clearInterval(timer); timer=null; }
-          else if (!timer) { timer = setInterval(()=> go(index+1), delay); }
-        });
-      }
-      // Initialize
-      update();
     } catch(e) { /* silent */ }
   },
 
