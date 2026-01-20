@@ -661,9 +661,7 @@ ensureUniformFooter() {
       const html = `
         <div class="container footer-grid">
           <div class="footer-brand-block">
-            <img src="assets/img/EZSportslogo.png" height="36" alt="EZ Sports Netting logo"/>
-            <strong>EZ Sports Netting</strong>
-            <p>Built Different. Built E Z!</p>
+            <img src="assets/img/footLogo.png" height="168" alt="EZ Sports Netting logo"/>
             <div class="socials" aria-label="social links">
               <a href="https://www.facebook.com/Ezsportsnetting/" aria-label="Facebook" target="_blank" rel="noopener"><img src="assets/img/facebook.png?v=20251009" alt="Facebook"/></a>
               <a href="#" aria-label="Instagram" target="_blank" rel="noopener"><img src="assets/img/instagram.png?v=20251009" alt="Instagram"/></a>
@@ -691,15 +689,11 @@ ensureUniformFooter() {
               <button class="btn btn-primary" type="submit">Subscribe</button>
             </div>
           </form>
-        </div>
-        <div class="subfooter container">&copy; <span id="year"></span> EZ Sports Netting. All rights reserved.</div>`;
+        </div>`;
       // Replace footer content only if different to avoid layout thrash
       if (footer.innerHTML.trim() !== html.trim()) {
         footer.innerHTML = html;
       }
-      // Ensure current year
-      const y = footer.querySelector('#year');
-      if (y) y.textContent = new Date().getFullYear();
     } catch {}
 },
 
@@ -3250,18 +3244,26 @@ ensureHomeFirst() {
   // Replace placeholder logo.svg with new brand image in header & footer
   ensureBrandLogos() {
     try {
-      const BRAND_SRC = 'assets/img/EZSportslogo.png';
+      const HEADER_SRC = 'assets/img/EZSportslogo.png';
+      const FOOTER_SRC = 'assets/img/footLogo.png';
       // Only target the brand logo in header and the non-social logo image in footer.
       const headerImgs = Array.from(document.querySelectorAll('.site-header .brand img'));
       const footerImgs = Array.from(document.querySelectorAll('.footer-brand-block img')).filter(img => !img.closest('.socials'));
-      const targets = [...headerImgs, ...footerImgs];
-      targets.forEach(img => {
+      headerImgs.forEach(img => {
         const alt = (img.getAttribute('alt') || '').toLowerCase();
         const isSocial = img.closest('.socials') || /facebook|instagram|twitter|social/.test(alt);
         if (isSocial) return; // never override social icons
-        img.setAttribute('src', BRAND_SRC);
+        img.setAttribute('src', HEADER_SRC);
         img.setAttribute('alt', 'EZ Sports Netting logo');
         if (!img.getAttribute('height')) img.setAttribute('height', '40');
+      });
+      footerImgs.forEach(img => {
+        const alt = (img.getAttribute('alt') || '').toLowerCase();
+        const isSocial = img.closest('.socials') || /facebook|instagram|twitter|social/.test(alt);
+        if (isSocial) return;
+        img.setAttribute('src', FOOTER_SRC);
+        img.setAttribute('alt', 'EZ Sports Netting logo');
+        if (!img.getAttribute('height')) img.setAttribute('height', '168');
       });
     } catch {}
   },

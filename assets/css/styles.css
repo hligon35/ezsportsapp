@@ -714,7 +714,19 @@ body.has-top-banner, body.has-promo-banner{padding-top:var(--top-banner-height)}
 .site-header .brand span{display:inline !important;white-space:nowrap;line-height:1.1}
 .brand img{filter:drop-shadow(0 4px 12px rgba(0,0,0,.25));border-radius:0.75rem;background:#ffffff;}
 
-.footer-brand-block img { border-radius: 0.75rem; background:#ffffff; }
+.footer-brand-block > img {
+  border-radius: 0.75rem;
+  background:#ffffff;
+  height: 168px !important;
+  width: auto !important;
+  max-width: 520px;
+  display: block;
+  object-fit: contain;
+}
+
+@media (max-width:560px){
+  .footer-brand-block > img{height:120px !important;max-width:80vw;}
+}
 
 /* Uniform white background for all logo images across the app */
 img[alt*="logo" i],
