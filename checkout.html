@@ -107,6 +107,18 @@
                 <select id="country" name="country" autocomplete="country-name"><option value="US">United States</option></select>
               </div>
             </div>
+
+            <div class="field-row">
+              <div>
+                <label for="shipping-method">Shipping method</label>
+                <select id="shipping-method" name="shippingMethod">
+                  <option value="standard">Standard (7–10 business days total)</option>
+                  <option value="expedited">Expedited (5–7 business days total) — +$100 per item</option>
+                </select>
+                <div class="muted" style="margin-top:.35rem;">Processing time: allow 2 business days.</div>
+              </div>
+              <div class="muted" style="align-self:end;">Total time includes processing + transit.</div>
+            </div>
             <datalist id="states">
               <option value="AL">Alabama</option>
               <option value="AK">Alaska</option>
@@ -160,7 +172,7 @@
               <option value="WY">Wyoming</option>
               <option value="DC">District of Columbia</option>
             </datalist>
-            <!-- Shipping method selection removed: Shipping is per-product DSR or $100 flat default -->
+            <!-- Shipping is per-product DSR (or $100 default). Expedited adds +$100 per item. -->
           </section>
           <section class="order-card">
             <h3>Payment</h3>
@@ -200,7 +212,7 @@
           <img src="assets/img/EZSportslogo.png" alt="EZ Sports Netting logo" height="36"/>
           <span>EZ Sports Netting</span>
         </a>
-        <p class="muted">Better baseball through better gear.</p>
+        <p class="muted">Built Different. Built E Z!</p>
         <div class="socials" aria-label="social links">
           <a href="https://www.facebook.com/Ezsportsnetting/" aria-label="Facebook" target="_blank" rel="noopener">
             <img src="assets/img/facebook.png" alt="Facebook" />
