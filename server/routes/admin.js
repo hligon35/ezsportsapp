@@ -3,6 +3,15 @@ const router = express.Router();
 const { requireAdmin } = require('../middleware/auth');
 const path = require('path');
 const { spawn } = require('child_process');
+const fs = require('fs/promises');
+const DatabaseManager = require('../database/DatabaseManager');
+const AnalyticsService = require('../services/AnalyticsService');
+const OrderService = require('../services/OrderService');
+const CouponService = require('../services/CouponService');
+const SubscriberService = require('../services/SubscriberService');
+const EmailService = require('../services/EmailService');
+const PayoutService = require('../services/PayoutService');
+const DailyReportService = require('../services/DailyReportService');
 
 // Stripe Billing Portal for admins to open on behalf of customer
 let stripe = null;
@@ -24,6 +33,80 @@ router.post('/billing-portal', requireAdmin, async (req, res) => {
     res.json({ url: session.url });
   } catch (e) {
     res.status(500).json({ message: e.message || 'Failed to create billing portal session' });
+  }
+});
+
+// --- Admin diagnostics: surface integration readiness for dashboards ---
+router.get('/diagnostics', requireAdmin, async (req, res) => {
+  try {
+    const db = new DatabaseManager();
+    const analytics = new AnalyticsService();
+    const ordersSvc = new OrderService();
+    const couponsSvc = new CouponService();
+    const subsSvc = new SubscriberService();
+    const emailSvc = new EmailService();
+    const payoutsSvc = new PayoutService();
+
+    // Counts (tolerate failures)
+    const safeCount = async (fn) => { try { const arr = await fn(); return Array.isArray(arr) ? arr.length : (arr && arr.items ? arr.items.length : 0); } catch { return null; } };
+    const ordersCount = await safeCount(() => db.find('orders'));
+    const analyticsCount = await safeCount(() => db.find('analytics'));
+    const couponsCount = await safeCount(() => db.find('coupons'));
+    const subsCount = await safeCount(() => db.find('subscribers'));
+    const emailsCount = await safeCount(() => db.find('emails'));
+    const payoutsCount = await safeCount(() => db.find('payouts'));
+
+    // Quick traffic summary for last 7d
+    let traffic7 = null;
+    try { traffic7 = await analytics.getTrafficSummary('week'); } catch {}
+
+    // Stripe readiness
+    const stripeReady = !!process.env.STRIPE_SECRET_KEY;
+    const stripeWebhook = !!process.env.STRIPE_WEBHOOK_SECRET;
+    const stripePk = !!process.env.STRIPE_PUBLISHABLE_KEY;
+    // Cloudflare readiness
+    const cfReady = !!(process.env.CLOUDFLARE_API_TOKEN && process.env.CLOUDFLARE_ZONE_ID);
+
+    // Auth/cookies
+    const jwtSet = !!process.env.JWT_SECRET && process.env.JWT_SECRET !== 'dev_insecure_secret_change_me';
+    const cookieDomain = process.env.COOKIE_DOMAIN || null;
+
+    // CORS
+    const corsOrigins = (process.env.CORS_ORIGINS || '').split(',').map(s=>s.trim()).filter(Boolean);
+
+    res.json({
+      now: new Date().toISOString(),
+      uptimeSec: Math.round(process.uptime()),
+      integrations: {
+        stripe: { configured: stripeReady, publishableSet: stripePk, webhookSecretSet: stripeWebhook },
+        cloudflare: { configured: cfReady }
+      },
+      auth: { jwtSet, cookieDomain },
+      cors: { origins: corsOrigins },
+      storage: {
+        ordersCount, analyticsCount, couponsCount, subscribersCount: subsCount, emailsCount, payoutsCount
+      },
+      analytics: traffic7 ? {
+        timeframe: traffic7.timeframe,
+        totalPageviews: traffic7.totalPageviews,
+        uniqueVisitors: traffic7.uniqueVisitors,
+        topPages: traffic7.topPages
+      } : null
+    });
+  } catch (e) {
+    res.status(500).json({ message: e.message || 'Diagnostics failed' });
+  }
+});
+
+// --- Reports: send daily visitor activity email now (admin) ---
+router.post('/reports/daily/send', requireAdmin, async (req, res) => {
+  try {
+    const { day } = req.body || {}; // 'yesterday' (default) or 'YYYY-MM-DD'
+    const svc = new DailyReportService();
+    const out = await svc.sendDailyActivityReport({ day: day || 'yesterday' });
+    res.json({ ok: true, report: { dayKey: out.dayKey, start: out.start, end: out.end }, sent: out.sent });
+  } catch (e) {
+    res.status(500).json({ ok: false, message: e.message || 'Failed to send report' });
   }
 });
 
@@ -275,5 +358,155 @@ router.post('/products/sync', requireAdmin, async (req, res) => {
     });
   } catch (e) {
     res.status(500).json({ ok: false, message: e.message });
+  }
+});
+
+// --- Netting calculator config (assets/netting.json) ---
+// GET current netting config
+router.get('/netting-config', requireAdmin, async (req, res) => {
+  try {
+    const path = require('path');
+    const file = path.join(__dirname, '..', '..', 'assets', 'netting.json');
+    let json;
+    try {
+      const raw = await fs.readFile(file, 'utf8');
+      json = JSON.parse(raw);
+    } catch (_) {
+      // Provide a sensible default if file missing
+      json = {
+        version: 1,
+        updated: new Date().toISOString(),
+        defaults: { markupPerSqFt: 0.25, borderSurchargePerFt: 0.35, expeditedFee: 25, shipPerItem: 100 },
+        meshPrices: []
+      };
+    }
+    res.json(json);
+  } catch (e) {
+    res.status(500).json({ message: e.message || 'Failed to read netting config' });
+  }
+});
+
+// PUT update netting config (full replace)
+router.put('/netting-config', requireAdmin, async (req, res) => {
+  try {
+    const body = req.body || {};
+    // Basic validation/sanitization
+    const out = {
+      version: Number(body.version || 1),
+      updated: new Date().toISOString(),
+      defaults: {
+        markupPerSqFt: Number(body?.defaults?.markupPerSqFt ?? 0.25) || 0,
+        borderSurchargePerFt: Number(body?.defaults?.borderSurchargePerFt ?? 0.35) || 0,
+        expeditedFee: Number(body?.defaults?.expeditedFee ?? 25) || 0,
+        shipPerItem: Number(body?.defaults?.shipPerItem ?? 100) || 0
+      },
+      meshPrices: Array.isArray(body.meshPrices) ? body.meshPrices.map(m => ({
+        id: String(m.id || ''),
+        label: String(m.label || ''),
+        sport: String(m.sport || 'other'),
+        wholesaleSqFt: Number(m.wholesaleSqFt || 0) || 0
+      })) : []
+    };
+    const path = require('path');
+    const file = path.join(__dirname, '..', '..', 'assets', 'netting.json');
+    await fs.writeFile(file, JSON.stringify(out, null, 2), 'utf8');
+    res.json(out);
+  } catch (e) {
+    res.status(500).json({ message: e.message || 'Failed to write netting config' });
+  }
+});
+
+// --- Bulk updates to assets/prodList.json for MAP/Shipping ---
+router.post('/prodlist/bulk-update', requireAdmin, async (req, res) => {
+  try {
+    const path = require('path');
+    const file = path.join(__dirname, '..', '..', 'assets', 'prodList.json');
+    const raw = await fs.readFile(file, 'utf8');
+    const json = JSON.parse(raw);
+    const categories = json && json.categories && typeof json.categories === 'object' ? json.categories : {};
+    const { op } = req.body || {};
+
+    if (!op || typeof op !== 'object') {
+      return res.status(400).json({ message: 'Missing op payload' });
+    }
+
+    let changed = 0;
+    const applyForItem = (item, catName) => {
+      // Helper to match by optional category
+      const catOk = !op.category || String(catName) === String(op.category);
+      if (!catOk) return false;
+      let touched = false;
+      // Operation: set shipping (dsr)
+      if (op.type === 'setShipping') {
+        const onlyMissing = !!op.onlyMissing;
+        const val = Number(op.value);
+        if (Number.isFinite(val) && val >= 0) {
+          const has = Number(item.dsr || (item.details && item.details.dsr));
+          if (!onlyMissing || !(Number.isFinite(has) && has > 0)) {
+            item.dsr = val;
+            if (item.details && typeof item.details === 'object') {
+              item.details.dsr = val;
+            }
+            touched = true;
+          }
+        }
+      }
+      // Operation: change MAP where current MAP equals from
+      if (op.type === 'changeMapEqual') {
+        const from = Number(op.from);
+        const to = Number(op.to);
+        if (Number.isFinite(from) && Number.isFinite(to)) {
+          const setIfEqual = (obj) => {
+            const cur = Number(obj.map ?? obj.price ?? 0);
+            if (Number.isFinite(cur) && cur === from) {
+              obj.map = to;
+              touched = true;
+            }
+          };
+          // Item or its variations
+          if (Array.isArray(item.variations) && item.variations.length) {
+            item.variations.forEach(v => setIfEqual(v));
+          } else {
+            setIfEqual(item);
+          }
+        }
+      }
+      // Operation: set MAP directly by SKU map { sku: price }
+      if (op.type === 'setMapBySku') {
+        const mp = op.map || {};
+        const val = mp[item.sku];
+        if (val != null) {
+          const num = Number(val);
+          if (Number.isFinite(num)) {
+            if (Array.isArray(item.variations) && item.variations.length) {
+              // apply to base (if present), else to all variations
+              item.map = num;
+              item.variations.forEach(v => { v.map = num; });
+            } else {
+              item.map = num;
+            }
+            touched = true;
+          }
+        }
+      }
+      return touched;
+    };
+
+    for (const [catName, arr] of Object.entries(categories)) {
+      if (!Array.isArray(arr)) continue;
+      arr.forEach(item => {
+        if (applyForItem(item, catName)) changed++;
+      });
+    }
+
+    if (!changed) {
+      return res.json({ ok: true, changed: 0 });
+    }
+
+    json.updatedAt = new Date().toISOString();
+    await fs.writeFile(file, JSON.stringify(json, null, 2), 'utf8');
+    res.json({ ok: true, changed });
+  } catch (e) {
+    res.status(500).json({ message: e.message || 'Bulk update failed' });
   }
 });

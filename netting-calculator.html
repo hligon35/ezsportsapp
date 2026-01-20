@@ -244,18 +244,7 @@
             </div>
           </label>
 
-          <!-- Fabrication Time -->
-          <fieldset class="form-row">
-            <legend>Estimated Fabrication Time</legend>
-            <label class="radio">
-              <input type="radio" name="fab" value="standard" checked />
-              <span>7–10 Days (FREE)</span>
-            </label>
-            <label class="radio">
-              <input type="radio" name="fab" value="expedited" />
-              <span>3–6 Days (Expedited) <strong>+$25</strong></span>
-            </label>
-          </fieldset>
+          
 
           <!-- Summary -->
           <div class="summary" aria-live="polite">
@@ -268,7 +257,7 @@
           </div>
 
           <div class="actions">
-            <button id="add-cart" type="button" class="btn btn-primary btn-block">Add Configured Net To Cart</button>
+            <button id="add-cart" type="button" class="btn btn-primary btn-block">Add To Cart</button>
           </div>
         </form>
       </section>
@@ -344,6 +333,14 @@
   <script type="module" src="assets/js/analytics.js"></script>
   <script type="module" src="assets/js/app.js"></script>
   <script type="module" src="assets/js/netting-calculator.js"></script>
+  <!-- Mobile sticky action bar for the calculator (visible on small screens) -->
+  <div id="calc-mobile-bar" class="calc-mobile-bar" role="region" aria-label="Netting calculator actions">
+    <div class="total-row" aria-live="polite">
+      <span>Total</span>
+      <strong id="sum-total-mobile">$0.00</strong>
+    </div>
+    <button id="add-cart-mobile" class="btn btn-primary">Add To Cart</button>
+  </div>
   <script>
     // Register SW only in production HTTPS; in dev, aggressively unregister to avoid live-reload loops
     if ('serviceWorker' in navigator) {

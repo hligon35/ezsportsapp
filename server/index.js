@@ -34,7 +34,10 @@ try {
 let stripe = null;
 try {
   if (process.env.STRIPE_SECRET_KEY) {
-    stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+    // Pin a modern API version to ensure features like automatic_tax are supported
+    stripe = require('stripe')(process.env.STRIPE_SECRET_KEY, {
+      apiVersion: process.env.STRIPE_API_VERSION || '2022-11-15'
+    });
   }
 } catch (e) {
   console.warn('Stripe SDK failed to initialize:', e.message);
@@ -82,6 +85,9 @@ const invoiceRoutes = require('./routes/invoices');
 const analyticsRoutes = require('./routes/analytics');
 const marketingRoutes = require('./routes/marketing');
 const adminRoutes = require('./routes/admin');
+const errorRoutes = require('./routes/errors');
+const AlertingService = require('./services/AlertingService');
+const alerting = new AlertingService();
 const app = express();
 // Hide Express signature
 app.disable('x-powered-by');
@@ -126,7 +132,14 @@ if (String(process.env.FORCE_HTTPS || '').toLowerCase() === 'true') {
 
 // CORS with optional allowlist and credentials for cookie-based auth
 const envOrigins = (process.env.CORS_ORIGINS || '').split(',').map(s => s.trim()).filter(Boolean);
-const devOrigins = ['http://127.0.0.1:5500', 'http://localhost:5500', 'http://localhost:4242'];
+const devOrigins = [
+  'http://127.0.0.1:5500',
+  'http://localhost:5500',
+  'http://localhost:4242',
+  // Common production domains for the static site (adjust if your domain changes)
+  'https://www.ezsportsnetting.com',
+  'https://ezsportsnetting.com'
+];
 const allowList = envOrigins.length ? envOrigins : devOrigins;
 const corsOptions = {
   origin: (origin, cb) => {
@@ -142,8 +155,12 @@ const corsOptions = {
 app.use(cors(corsOptions));
 // Ensure preflight is handled for any route
 app.options('*', cors(corsOptions));
+// Helmet security headers (CSP disabled for now). Also disable COEP/COOP here
+// because we handle them manually to ensure third-party scripts like Stripe.js work.
 app.use(helmet({
-  contentSecurityPolicy: false // Keep disabled for now to avoid breaking inline scripts/styles; tighten later
+  contentSecurityPolicy: false, // Keep disabled for now to avoid breaking inline scripts/styles; tighten later
+  crossOriginEmbedderPolicy: false,
+  crossOriginOpenerPolicy: false
 }));
 // Add HSTS explicitly (works when behind proxy with trust proxy enabled)
 try {
@@ -308,18 +325,8 @@ app.post('/webhook/stripe', express.raw({ type: 'application/json' }), async (re
   }
 });
 
-// JSON parser AFTER webhook route
-app.use(express.json({ limit: '100kb' }));
-
-// API routes
-app.use('/api/products', productRoutes);
-app.use('/api/users', userRoutes);
-app.use('/api/orders', orderRoutes);
-app.use('/api/inventory', inventoryRoutes);
-app.use('/api/invoices', invoiceRoutes);
-app.use('/api/analytics', analyticsRoutes);
-// Accept text/plain payloads (JSON string) for marketing endpoints to support legacy/form fallbacks
-app.use('/api/marketing', express.text({ type: ['text/plain', 'text/*'], limit: '100kb' }), (req, _res, next) => {
+// Marketing endpoints: accept lax bodies (any content-type) and try JSON parse before the global JSON parser
+app.use('/api/marketing', express.text({ type: '*/*', limit: '100kb' }), (req, _res, next) => {
   if (typeof req.body === 'string') {
     const s = req.body.trim();
     if (s.startsWith('{') && s.endsWith('}')) {
@@ -329,7 +336,39 @@ app.use('/api/marketing', express.text({ type: ['text/plain', 'text/*'], limit: 
   next();
 });
 app.use('/api/marketing', marketingRoutes);
+
+// JSON parser AFTER webhook route (and after marketing special-case)
+app.use(express.json({ limit: '100kb' }));
+
+// API routes
+app.use('/api/products', productRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api/orders', orderRoutes);
+app.use('/api/inventory', inventoryRoutes);
+app.use('/api/invoices', invoiceRoutes);
+app.use('/api/analytics', analyticsRoutes);
+app.use('/api/errors', errorRoutes);
+// Accept text/plain payloads (JSON string) for marketing endpoints to support legacy/form fallbacks
+// (marketing routes are mounted above to avoid JSON parser errors on malformed bodies)
 app.use('/api/admin', adminRoutes);
+
+// Process-level crash protection + alerting
+try {
+  process.on('unhandledRejection', (reason) => {
+    try {
+      const err = (reason instanceof Error) ? reason : new Error(String(reason));
+      const record = { source: 'server', kind: 'unhandledRejection', name: err.name, message: err.message, stack: err.stack, createdAt: new Date().toISOString() };
+      alerting.recordError(record).then(saved => alerting.sendErrorAlert({ title: 'EZSports Server unhandledRejection', errorRecord: saved })).catch(()=>{});
+    } catch {}
+  });
+  process.on('uncaughtException', (err) => {
+    try {
+      const e = (err instanceof Error) ? err : new Error(String(err));
+      const record = { source: 'server', kind: 'uncaughtException', name: e.name, message: e.message, stack: e.stack, createdAt: new Date().toISOString() };
+      alerting.recordError(record).then(saved => alerting.sendErrorAlert({ title: 'EZSports Server uncaughtException', errorRecord: saved })).catch(()=>{});
+    } catch {}
+  });
+} catch {}
 
 // Legacy redirects for removed static pages (migrated from previous hosting config)
 const redirects = [
@@ -356,13 +395,21 @@ redirects.forEach(([source, dest]) => {
 
 // Lightweight config endpoint for frontend checkout/test mode
 app.get('/api/config', (req, res) => {
+  // Ensure clients do not cache this; stale 304 can break Stripe detection on the frontend
+  try { res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate'); } catch {}
   const hasSecret = !!process.env.STRIPE_SECRET_KEY;
   const hasPublishable = !!process.env.STRIPE_PUBLISHABLE_KEY;
   const enabled = hasSecret && hasPublishable;
+  const automaticTax = String(process.env.STRIPE_TAX_AUTOMATIC || '').toLowerCase() === 'true';
+  // Maintenance flag: enable when MAINTENANCE/COMING_SOON env is truthy (1,true,on)
+  const maintEnv = String(process.env.MAINTENANCE || process.env.COMING_SOON || '').trim().toLowerCase();
+  const maintenance = ['1','true','on','yes','y'].includes(maintEnv);
   res.json({
     pk: hasPublishable ? process.env.STRIPE_PUBLISHABLE_KEY : null,
     enabled,
-    missing: { secret: !hasSecret, publishable: !hasPublishable }
+    missing: { secret: !hasSecret, publishable: !hasPublishable },
+    automaticTax,
+    maintenance
   });
 });
 
@@ -378,8 +425,10 @@ app.post('/api/analytics/track', async (req, res) => {
 });
 app.post('/api/analytics/event', async (req, res) => {
   try {
-    const { type, productId, visitorId, userId, ts } = req.body || {};
-    const ev = await analyticsService.trackEvent({ type, productId, visitorId, userId, ts });
+    const { type, productId, visitorId, userId, path, label, value, meta, ts } = req.body || {};
+    const ev = (path || label || value !== undefined || meta)
+      ? await analyticsService.trackRichEvent({ type, productId, visitorId, userId, path, label, value, meta, ts })
+      : await analyticsService.trackEvent({ type, productId, visitorId, userId, ts });
     res.json({ ok: true, id: ev?.id });
   } catch (e) {
     res.status(400).json({ message: e.message });
@@ -431,6 +480,20 @@ app.use((req, res, next) => {
   next();
 });
 
+// Global headers for static and API responses (must run BEFORE express.static for HTML/JS/CSS)
+app.use((req, res, next) => {
+  // Cache rules applied later as well, but we set security headers early so static files get them
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  res.setHeader('X-Frame-Options', 'SAMEORIGIN');
+  res.setHeader('Permissions-Policy', 'geolocation=(), microphone=(), camera=()');
+  // IMPORTANT: Do not enable cross-origin isolation on pages that load third-party scripts like Stripe.js.
+  // Some hosts or middleware may default these; we explicitly relax them to avoid blocking https://js.stripe.com/v3/.
+  // See error: net::ERR_BLOCKED_BY_RESPONSE.NotSameOriginAfterDefaultedToSameOriginByCoep
+  res.setHeader('Cross-Origin-Embedder-Policy', 'unsafe-none');
+  res.setHeader('Cross-Origin-Opener-Policy', 'same-origin-allow-popups');
+  next();
+});
+
 app.use(express.static(path.join(__dirname, '..')));
 
 // Static assets caching (1 year for immutable, 1 hour for html)
@@ -440,15 +503,7 @@ app.use((req, res, next) => {
   } else if (/\.(?:html)$/i.test(req.url)) {
     res.setHeader('Cache-Control', 'public, max-age=3600');
   }
-  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
-  res.setHeader('X-Frame-Options', 'SAMEORIGIN');
-  res.setHeader('Permissions-Policy', 'geolocation=(), microphone=(), camera=()');
   next();
-});
-
-// 404 for unknown API routes
-app.use('/api', (req, res) => {
-  res.status(404).json({ message: 'Not Found' });
 });
 
 // Fallback static 404 logger for assets (after express.static)
@@ -463,11 +518,32 @@ app.use((req, res, next) => {
 // eslint-disable-next-line no-unused-vars
 app.use((err, req, res, next) => {
   console.error('Unhandled error:', err);
+  try {
+    const status = Number(err?.status || err?.statusCode || 500) || 500;
+    if (status >= 500) {
+      const record = {
+        source: 'server',
+        kind: 'express',
+        name: err?.name || 'Error',
+        message: err?.message || 'Internal Server Error',
+        stack: err?.stack || null,
+        path: req?.originalUrl || req?.url || null,
+        method: req?.method || null,
+        ip: req?.ip || null,
+        userAgent: req?.headers?.['user-agent'] || null,
+        createdAt: new Date().toISOString(),
+      };
+      alerting.recordError(record)
+        .then(saved => alerting.sendErrorAlert({ title: `EZSports Server 5xx: ${record.path || ''}`, errorRecord: saved }))
+        .catch(()=>{});
+    }
+  } catch {}
   res.status(err.status || 500).json({ message: err.message || 'Internal Server Error' });
 });
 
 // Dynamic pricing sourced from products DB (cached briefly in-memory)
 let priceCache = { ts: 0, map: new Map() };
+const normId = (v) => String(v || '').trim().toLowerCase();
 async function loadFallbackPriceMap() {
   try {
     const file = path.join(__dirname, '..', 'assets', 'prodList.json');
@@ -478,7 +554,7 @@ async function loadFallbackPriceMap() {
       for (const arr of Object.values(json.categories)) {
         if (!Array.isArray(arr)) continue;
         arr.forEach(p => {
-          const id = String(p.sku || p.id || p.name || '').trim();
+          const id = normId(p.sku || p.id || p.name || '');
           if (!id) return;
           const price = Number(p.map ?? p.price ?? p.wholesale ?? 0) || 0;
           const cents = Math.round(price * 100);
@@ -501,7 +577,7 @@ async function loadPriceMap() {
   all.forEach(p => {
     if (p.isActive === false) return;
     const cents = (typeof p.price === 'number' && isFinite(p.price)) ? Math.round(p.price * 100) : 0;
-    map.set(p.id, { cents, dsr: Number(p.dsr || 0) || 0 });
+    map.set(normId(p.id), { cents, dsr: Number(p.dsr || 0) || 0 });
   });
   // Merge fallback prodList prices for SKUs not present in DB
   try {
@@ -518,8 +594,13 @@ async function loadPriceMap() {
 async function calcSubtotalCents(items = []) {
   const priceMap = await loadPriceMap();
   return items.reduce((sum, it) => {
-    const rec = priceMap.get(it.id);
-    const cents = rec?.cents;
+    const rec = priceMap.get(normId(it.id));
+    let cents = rec?.cents;
+    // Fallback: honor client-provided unit price when catalog lookup is missing
+    if (!cents) {
+      const unit = Number(it.price || 0);
+      if (Number.isFinite(unit) && unit > 0) cents = Math.round(unit * 100);
+    }
     if (!cents) return sum;
     const qty = Math.max(1, Number(it.qty) || 1);
     return sum + cents * qty;
@@ -550,9 +631,11 @@ async function calcShippingCents(items = [], _subtotalCents, _method = 'standard
         total += expeditedSurchargeCentsPerItem * qty;
         continue;
       }
-      const rec = priceMap.get(it.id);
-      const dsr = Number(rec?.dsr || 0);
-      const per = (Number.isFinite(dsr) && dsr > 0) ? dsr : 100;
+  const rec = priceMap.get(normId(it.id));
+  // Prefer explicit per-item ship provided by client line item when present
+  const explicit = Number(it.ship);
+  const dsr = Number.isFinite(explicit) ? explicit : Number(rec?.dsr || 0);
+  const per = (Number.isFinite(dsr) && dsr > 0) ? dsr : 100;
       const qty = Math.max(1, Number(it.qty) || 1);
       total += (Math.round(per * 100) * qty) + (expeditedSurchargeCentsPerItem * qty);
     }
@@ -574,12 +657,14 @@ async function calcShippingCents(items = [], _subtotalCents, _method = 'standard
 function loadTaxRates() {
   // Defaults: collect in GA at 7% unless overridden
   const defaults = { US: { GA: 0.07 } };
+  // 1) Highest precedence: TAX_RATES_JSON env (stringified object like { "US": { "GA": 0.07 } })
   try {
     if (process.env.TAX_RATES_JSON) {
       const parsed = JSON.parse(process.env.TAX_RATES_JSON);
       if (parsed && typeof parsed === 'object') return parsed;
     }
   } catch {}
+  // 2) Next: TAX_RATES env (CSV like GA:0.07,FL:0.06)
   try {
     if (process.env.TAX_RATES) {
       const parts = String(process.env.TAX_RATES).split(',').map(s=>s.trim()).filter(Boolean);
@@ -591,6 +676,34 @@ function loadTaxRates() {
         if (key && Number.isFinite(r) && r >= 0) out.US[key] = r;
       }
       if (Object.keys(out.US).length) return out;
+    }
+  } catch {}
+  // 3) Finally: try reading a repo-provided JSON file at assets/js/taxRates.json with full state names
+  try {
+    const filePath = path.join(__dirname, '..', 'assets', 'js', 'taxRates.json');
+    if (fsSync.existsSync(filePath)) {
+      const raw = fsSync.readFileSync(filePath, 'utf8');
+      const byName = JSON.parse(raw);
+      if (byName && typeof byName === 'object') {
+        // Map full state names to USPS abbreviations
+        const NAME_TO_ABBR = {
+          'ALABAMA':'AL','ALASKA':'AK','ARIZONA':'AZ','ARKANSAS':'AR','CALIFORNIA':'CA','COLORADO':'CO','CONNECTICUT':'CT','DELAWARE':'DE','DISTRICT OF COLUMBIA':'DC','FLORIDA':'FL','GEORGIA':'GA','HAWAII':'HI','IDAHO':'ID','ILLINOIS':'IL','INDIANA':'IN','IOWA':'IA','KANSAS':'KS','KENTUCKY':'KY','LOUISIANA':'LA','MAINE':'ME','MARYLAND':'MD','MASSACHUSETTS':'MA','MICHIGAN':'MI','MINNESOTA':'MN','MISSISSIPPI':'MS','MISSOURI':'MO','MONTANA':'MT','NEBRASKA':'NE','NEVADA':'NV','NEW HAMPSHIRE':'NH','NEW JERSEY':'NJ','NEW MEXICO':'NM','NEW YORK':'NY','NORTH CAROLINA':'NC','NORTH DAKOTA':'ND','OHIO':'OH','OKLAHOMA':'OK','OREGON':'OR','PENNSYLVANIA':'PA','RHODE ISLAND':'RI','SOUTH CAROLINA':'SC','SOUTH DAKOTA':'SD','TENNESSEE':'TN','TEXAS':'TX','UTAH':'UT','VERMONT':'VT','VIRGINIA':'VA','WASHINGTON':'WA','WEST VIRGINIA':'WV','WISCONSIN':'WI','WYOMING':'WY'
+        };
+        const out = { US: {} };
+        for (const [key, val] of Object.entries(byName)) {
+          const rate = Number(val);
+          if (!Number.isFinite(rate) || rate < 0) continue;
+          const k = String(key||'').trim();
+          let abbr = '';
+          if (k.length === 2 && /^[A-Za-z]{2}$/.test(k)) {
+            abbr = k.toUpperCase();
+          } else {
+            abbr = NAME_TO_ABBR[k.toUpperCase()] || '';
+          }
+          if (abbr) out.US[abbr] = rate;
+        }
+        if (Object.keys(out.US).length) return out;
+      }
     }
   } catch {}
   return defaults;
@@ -656,24 +769,43 @@ app.post('/api/create-payment-intent', async (req, res) => {
 
     // Optional: apply coupon
     let appliedCoupon = null;
+    let couponAudit = null;
     let discountCents = 0;
     if (couponCode) {
       try {
-        const v = await couponService.validate(couponCode, customer.email || '');
+        const userId = (customer && customer.userId) || (req.user && req.user.id) || null;
+        const v = await couponService.validate(couponCode, customer.email || '', new Date(), userId);
         if (v.valid) {
           appliedCoupon = v.coupon;
           const before = amount;
           amount = couponService.applyDiscount(amount, appliedCoupon);
           discountCents = Math.max(0, before - amount);
+          couponAudit = { code: v.coupon.code, restricted: !!v.restricted, matchedBy: v.matchedBy || null };
         }
       } catch (e) {
         // ignore invalid coupon; frontend can call validate endpoint for messaging
       }
     }
 
-    // Compute taxes based on shipping address and post-discount amount
-  const taxCents = calcTaxCents(subtotal, shippingCents, discountCents, normalizedShipping);
-  amount = Math.max(0, subtotal + shippingCents - discountCents + taxCents);
+    // Compute taxes (manual fallback) or delegate to Stripe Tax when enabled
+    const useAutomaticTaxEnv = String(process.env.STRIPE_TAX_AUTOMATIC || '').toLowerCase() === 'true';
+    let taxCents = 0;
+    let usedAutomaticTax = false;
+    if (useAutomaticTaxEnv) {
+      // When Automatic Tax is enabled on the PaymentIntent, Stripe computes the tax
+      // amount based on your account tax registrations and the provided address.
+      // We set the amount to the pre-tax total and let Stripe add tax at confirmation.
+      amount = Math.max(0, subtotal + shippingCents - discountCents);
+      usedAutomaticTax = true;
+    } else {
+      taxCents = calcTaxCents(subtotal, shippingCents, discountCents, normalizedShipping);
+      amount = Math.max(0, subtotal + shippingCents - discountCents + taxCents);
+    }
+
+    // Guard: ensure we actually priced the items
+    if (!Number.isFinite(subtotal) || subtotal <= 0) {
+      return res.status(400).json({ error: 'No priced items found for your cart. Please refresh your cart and try again.', details: { items: normItems.map(i => i.id) } });
+    }
 
     const description = `EZ Sports order — ${items.map(i => `${i.id}x${i.qty}`).join(', ')}`;
     // Create a local order first for analytics/visibility
@@ -685,8 +817,14 @@ app.post('/api/create-payment-intent', async (req, res) => {
         items: normItems.map(i => ({ id: i.id, qty: i.qty })),
         shippingAddress: shipping,
         customerInfo: customer,
-        shippingMethod: normalizedMethod,
-        paymentInfo: { method: 'stripe', shippingMethod: normalizedMethod }
+        paymentInfo: { method: 'stripe' },
+        // Persist current server-side pricing snapshot for confirmation/history accuracy
+        subtotal,
+        shipping: shippingCents,
+        discount: discountCents,
+        tax: usedAutomaticTax ? null : taxCents,
+        total: amount,
+        couponAudit: couponAudit || undefined
       };
       if (existingOrderId) {
         newOrder = { id: existingOrderId };
@@ -698,52 +836,155 @@ app.post('/api/create-payment-intent', async (req, res) => {
       newOrder = null;
     }
 
-    // Provide an idempotency key to prevent duplicate PI creation on retries
-    const idemKey = crypto
-      .createHash('sha256')
-      .update(JSON.stringify({ normItems, email: customer.email || '', shippingMethod: normalizedMethod, existingOrderId: newOrder?.id || existingOrderId || null }))
-      .digest('hex')
-      .slice(0, 64);
-
-    const paymentIntent = await stripe.paymentIntents.create({
-      amount,
-      currency: safeCurrency,
-      description,
-      metadata: {
-        email: customer.email || '',
-        name: customer.name || '',
-        items: normItems.map(i => `${i.id}:${i.qty}`).join('|'),
-        order_id: newOrder?.id ? String(newOrder.id) : '',
-        coupon_code: appliedCoupon ? String(appliedCoupon.code) : '',
-        shipping_method: normalizedMethod
-      },
-      automatic_payment_methods: { enabled: true },
-      receipt_email: customer.email || undefined,
+    // Provide an idempotency key to prevent duplicate PI creation on retries.
+    // IMPORTANT: Include all pricing-affecting inputs so that changing shipping, coupon,
+    // tax mode, or totals generates a new key and avoids Stripe idempotency collisions.
+    const makeIdemKey = (basis) =>
+      crypto.createHash('sha256').update(JSON.stringify(basis)).digest('hex').slice(0, 64);
+    const baseContext = {
+      items: normItems.map(i => ({ id: i.id, qty: i.qty })),
+      email: customer.email || '',
       shipping: {
-        name: customer.name || 'Customer',
-        address: {
-          line1: normalizedShipping.address1 || '',
-          line2: normalizedShipping.address2 || undefined,
-          city: normalizedShipping.city || '',
-          state: normalizedShipping.state || '',
-          postal_code: normalizedShipping.postal || '',
-          country: normalizedShipping.country || 'US',
+        line1: normalizedShipping.address1 || '',
+        line2: normalizedShipping.address2 || '',
+        city: normalizedShipping.city || '',
+        state: normalizedShipping.state || '',
+        postal: normalizedShipping.postal || '',
+        country: normalizedShipping.country || 'US'
+      },
+      currency: safeCurrency,
+      couponCode: appliedCoupon ? String(appliedCoupon.code) : String(couponCode || ''),
+      // Include the server-derived breakdown to ensure the PI key changes when math changes
+      subtotal,
+      shippingCents,
+      // discountCents may be 0 when no coupon is applied
+      discountCents,
+      usedAutomaticTax,
+      // For auto tax we don't know tax yet; keep as null to differentiate
+      taxCents: usedAutomaticTax ? null : taxCents,
+      amount
+    };
+    let idemKey = makeIdemKey(baseContext);
+
+    // Enforce Stripe minimum amounts by currency
+    const minByCurrency = { usd: 50 };
+    const ensureMin = (amt, curr) => {
+      const key = String(curr || '').toLowerCase();
+      const min = minByCurrency[key] ?? 0;
+      return { belowMin: amt < min, min };
+    };
+
+    let paymentIntent;
+    try {
+      paymentIntent = await stripe.paymentIntents.create({
+        amount,
+        currency: safeCurrency,
+        description,
+        metadata: {
+          email: customer.email || '',
+          name: customer.name || '',
+          items: normItems.map(i => `${i.id}:${i.qty}`).join('|'),
+          order_id: newOrder?.id ? String(newOrder.id) : '',
+          coupon_code: appliedCoupon ? String(appliedCoupon.code) : '',
+          coupon_user_bound: (couponAudit && couponAudit.restricted) ? 'true' : (appliedCoupon && (Array.isArray(appliedCoupon.userEmails) || Array.isArray(appliedCoupon.userIds)) ? 'true' : 'false')
+        },
+        automatic_payment_methods: { enabled: true },
+        // Enable Stripe Automatic Tax if configured (may be rejected on older API versions)
+        ...(usedAutomaticTax ? { automatic_tax: { enabled: true } } : {}),
+        receipt_email: customer.email || undefined,
+        shipping: {
+          name: customer.name || 'Customer',
+          address: {
+            line1: normalizedShipping.address1 || '',
+            line2: normalizedShipping.address2 || undefined,
+            city: normalizedShipping.city || '',
+            state: normalizedShipping.state || '',
+            postal_code: normalizedShipping.postal || '',
+            country: normalizedShipping.country || 'US',
+          }
         }
+      }, { idempotencyKey: idemKey });
+    } catch (err) {
+      // Fallback: If the account/API version rejects automatic_tax, retry with manual tax
+      const msg = String(err?.message || '');
+      const code = String(err?.code || '');
+      const param = String(err?.raw?.param || '');
+      const unknownAutoTax = usedAutomaticTax && (msg.includes('automatic_tax') || code === 'parameter_unknown' || param === 'automatic_tax');
+      if (unknownAutoTax) {
+        try {
+          // Compute manual tax and retry without automatic_tax
+          taxCents = calcTaxCents(subtotal, shippingCents, discountCents, normalizedShipping);
+          amount = Math.max(0, subtotal + shippingCents - discountCents + taxCents);
+          // Recompute idempotency key for manual-tax attempt to reflect new totals and mode
+          const manualCtx = { ...baseContext, usedAutomaticTax: false, taxCents, amount };
+          idemKey = makeIdemKey(manualCtx);
+          const { belowMin, min } = ensureMin(amount, safeCurrency);
+          if (belowMin) {
+            return res.status(400).json({ error: `Order total is below the minimum charge amount (${(min/100).toFixed(2)} USD). Please add another item.` });
+          }
+          usedAutomaticTax = false;
+          paymentIntent = await stripe.paymentIntents.create({
+            amount,
+            currency: safeCurrency,
+            description,
+            metadata: {
+              email: customer.email || '',
+              name: customer.name || '',
+              items: normItems.map(i => `${i.id}:${i.qty}`).join('|'),
+              order_id: newOrder?.id ? String(newOrder.id) : '',
+              coupon_code: appliedCoupon ? String(appliedCoupon.code) : '',
+              coupon_user_bound: (couponAudit && couponAudit.restricted) ? 'true' : undefined
+            },
+            automatic_payment_methods: { enabled: true },
+            receipt_email: customer.email || undefined,
+            shipping: {
+              name: customer.name || 'Customer',
+              address: {
+                line1: normalizedShipping.address1 || '',
+                line2: normalizedShipping.address2 || undefined,
+                city: normalizedShipping.city || '',
+                state: normalizedShipping.state || '',
+                postal_code: normalizedShipping.postal || '',
+                country: normalizedShipping.country || 'US',
+              }
+            }
+          }, { idempotencyKey: idemKey });
+        } catch (e2) {
+          throw e2;
+        }
+      } else {
+        throw err;
       }
-    }, { idempotencyKey: idemKey });
+    }
+    // Final guard: if amount still under Stripe minimum, return a friendly message
+    {
+      const { belowMin, min } = ensureMin(amount, safeCurrency);
+      if (belowMin) {
+        return res.status(400).json({ error: `Order total is below the minimum charge amount (${(min/100).toFixed(2)} USD). Please add another item.` });
+      }
+    }
+    // If we created an order above, ensure it has the latest breakdown persisted
+    if (newOrder?.id) {
+      try {
+        const patch = { subtotal, shipping: shippingCents, discount: discountCents, tax: usedAutomaticTax ? null : taxCents, total: amount, couponAudit: couponAudit || undefined };
+        await orderService.patchOrder(newOrder.id, patch);
+      } catch {}
+    }
+
     // Return client secret and linked order id so the frontend can keep them in sync
     res.json({
       clientSecret: paymentIntent.client_secret,
       amount,
       orderId: newOrder?.id || null,
-      couponApplied: appliedCoupon ? { code: appliedCoupon.code, type: appliedCoupon.type, value: appliedCoupon.value } : null,
+  couponApplied: appliedCoupon ? { code: appliedCoupon.code, type: appliedCoupon.type, value: appliedCoupon.value, restricted: !!(couponAudit && couponAudit.restricted), matchedBy: couponAudit?.matchedBy || null } : null,
       breakdown: {
         subtotal: subtotal,
         shipping: shippingCents,
         discount: discountCents,
-        tax: taxCents,
+        tax: usedAutomaticTax ? null : taxCents,
         total: amount
-      }
+      },
+      notes: usedAutomaticTax ? undefined : 'Automatic Tax unavailable for this account/API version; using manual tax fallback.'
     });
   } catch (err) {
     console.error(err);
@@ -825,6 +1066,67 @@ function startServer(attempt = 0) {
 }
 
 const server = startServer();
+
+// Daily activity report scheduler (emails visitor activity summary)
+try {
+  const { startDailyReportScheduler } = require('./jobs/dailyReportScheduler');
+  startDailyReportScheduler();
+} catch (e) {
+  console.warn('Daily report scheduler not started:', e?.message || e);
+}
+
+// Background email retry worker: periodically attempts to deliver queued/failed emails
+try {
+  const EmailService = require('./services/EmailService');
+  const emailSvc = new EmailService();
+  const MAX_RETRIES = 6; // approx up to ~32 minutes cumulative with backoff
+  async function retryLoop(){
+    try {
+      const all = await emailSvc.list();
+      const now = Date.now();
+      const candidates = (all || []).filter(e => {
+        const status = String(e.status || '').toLowerCase();
+        if (!['queued','failed','sending'].includes(status)) return false;
+        // Do not retry permanent failures (e.g., SendGrid Sender Identity 550)
+        if (status === 'permanent-failure') return false;
+        const nextAt = e.nextAttemptAt ? Date.parse(e.nextAttemptAt) : 0;
+        return !Number.isNaN(nextAt) ? (nextAt <= now) : true;
+      }).slice(0, 10);
+      for (const rec of candidates) {
+        try {
+          const out = await emailSvc.deliver(rec.id);
+          // deliveredExisting updates status; nothing to do
+        } catch (e) {
+          // schedule next attempt with exponential backoff
+          const rc = Number(rec.retryCount || 0) + 1;
+          const backoffSec = Math.min(1800, Math.pow(2, Math.min(MAX_RETRIES, rc)) * 5); // 5s,10s,20s,… up to 30m
+          const nextAttemptAt = new Date(Date.now() + backoffSec * 1000).toISOString();
+          try {
+            await emailSvc.db.update('emails', { id: rec.id }, { status: 'failed', retryCount: rc, nextAttemptAt, lastError: e.message });
+          } catch {}
+        }
+      }
+    } catch (e) {
+      console.warn('Email retry loop error:', e?.message||e);
+    } finally {
+      setTimeout(retryLoop, 5000);
+    }
+  }
+  // Start after a short delay so server is ready
+  setTimeout(retryLoop, 3000);
+
+  // Enhance health endpoint with outbox stats
+  app.get('/health/emails', async (_req, res) => {
+    try {
+      const all = await emailSvc.list();
+      const totals = all.reduce((acc, e) => { acc[e.status||'unknown'] = (acc[e.status||'unknown']||0)+1; return acc; }, {});
+      const recent = (all || []).slice(-10).map(e => ({ id: e.id, to: e.to, subject: e.subject, status: e.status, retryCount: e.retryCount||0, nextAttemptAt: e.nextAttemptAt||null, createdAt: e.createdAt }));
+      res.json({ totals, recent });
+    } catch (e) { res.status(500).json({ error: e.message }); }
+  });
+} catch (e) {
+  console.warn('Email retry worker init failed:', e?.message||e);
+}
 
 // Graceful shutdown
 process.on('SIGINT', () => { server.close(() => process.exit(0)); });

@@ -182,10 +182,58 @@ Notes
 
 ## Analytics Events
 
-Client emits (console by default via `window.trackEvent`):
+Client emits (via `window.trackEvent`):
  
 - `view_item_list`, `view_item`, `add_to_cart`, `view_cart`, `begin_checkout`, `purchase`
-Extend by wiring `trackEvent` to POST `/api/analytics/event` (already scaffolded). Server has placeholder services for future persistence.
+Events are now persisted server-side (best-effort) via:
+
+- `POST /api/analytics/track` (pageviews)
+- `POST /api/analytics/event` (clicks + ecommerce events)
+
+The client also reports runtime errors to:
+
+- `POST /api/errors/report`
+
+## Error Alerts + Daily Email Reports
+
+This repo includes email-based monitoring:
+
+- **Instant error alerts** for server 5xx errors, unhandled rejections/exceptions, and client-reported runtime errors.
+- **Daily visitor activity report** emailed to a configured address (pageviews, unique visitors, tracked clicks, carts/checkout/purchase events, paid orders + revenue).
+
+### Configure Email Sending
+
+The server will use the first available email transport:
+
+1) SendGrid HTTP API (`SENDGRID_API_KEY`, `SENDGRID_FROM`)
+2) SMTP (`SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, optional `SMTP_FROM`)
+3) Cloudflare Worker (MailChannels) (`CF_EMAIL_WEBHOOK_URL`, optional `CF_EMAIL_API_KEY`)
+
+### Monitoring Env Vars
+
+Set these in Render (or local `server/.env`):
+
+- `ALERT_EMAIL_ENABLED=true` (default)
+- `ALERT_EMAIL_TO=hligon@getsparqd.com` (recipient for alerts + daily reports)
+- `ALERT_DEDUPE_MINUTES=10` (prevents duplicate alert spam)
+- `ERROR_REPORT_RATE_LIMIT_PER_MIN=30` (client error report rate limit)
+
+### Daily Report Scheduling
+
+- `DAILY_REPORT_ENABLED=true` to turn it on
+
+Timezone-aware (recommended):
+
+- `DAILY_REPORT_TZ=America/Indiana/Indianapolis`
+- `DAILY_REPORT_TIME_LOCAL=07:00` (HH:MM in that timezone)
+
+Fallback (UTC-based):
+
+- `DAILY_REPORT_TIME_UTC=09:00` (HH:MM, UTC)
+
+Manual send (admin-only):
+
+- `POST /api/admin/reports/daily/send` with JSON `{ "day": "yesterday" }` or `{ "day": "YYYY-MM-DD" }`
 
 ## Checkout Flow (Simplified)
 
@@ -239,6 +287,26 @@ AUTOSYNC_STRIPE=1                 # also create/update Stripe products/prices
 CORS_ORIGINS=http://localhost:4242,http://127.0.0.1:4242  # optional allowlist
 ```
 
+### Payments and Email: production tips
+
+Stripe (Live)
+
+- STRIPE_PUBLISHABLE_KEY=pk_live_… (set via host env, do not commit)
+- STRIPE_SECRET_KEY=sk_live_… (set via host env, do not commit)
+- STRIPE_WEBHOOK_SECRET=whsec_… (Dashboard → Webhooks → your Render URL)
+- STRIPE_TAX_AUTOMATIC=1 to enable Stripe automatic tax when available; server will fall back to manual state-based tax otherwise.
+
+Email sender
+
+- SENDGRID_API_KEY=… (if using SendGrid)
+- SENDGRID_FROM=<your-verified-sender@example> (must be a verified sender or domain in SendGrid)
+- MAIL_FROM_NAME=EZ Sports Netting (optional friendly display name)
+
+Notes:
+
+- The email service prefers a verified SENDGRID_FROM and classifies 550 Sender Identity errors as permanent to avoid retries. Ensure you’ve verified the from address or domain in SendGrid to enable delivery.
+- If not using SendGrid, configure SMTP_* variables (see comments in server/services/EmailService.js). The same MAIL_FROM_NAME will be applied across providers.
+
 ## Quality / Edge Cases
 
 - Price cache TTL: 60s (server) – immediate heavy change requires waiting or code invalidation.
@@ -253,6 +321,20 @@ CORS_ORIGINS=http://localhost:4242,http://127.0.0.1:4242  # optional allowlist
 - Inventory management & low-stock alerts
 - Variant / size / color pricing differentiation
 - Tax calculation & shipping zones (currently flat/free threshold)
+
+## Netting Calculator Pricing Configuration
+
+The Custom Netting Calculator sources its pricing from `assets/netting.json`.
+
+- Each `meshPrices` entry defines a `wholesaleSqFt` value (your base cost) and metadata (`id`, `label`, `sport`).
+- Display/checkout price per square foot (MAP) is computed at runtime as `wholesaleSqFt + markupPerSqFt`.
+- Global defaults live under `defaults`:
+  - `markupPerSqFt` (default 0.25)
+  - `borderSurchargePerFt` (default 0.35)
+  - `expeditedFee` (default 25)
+  - `shipPerItem` (default 100)
+
+To change calculator pricing, edit `assets/netting.json` and refresh the page. No code changes are required, and the order flow will carry the explicit per‑item shipping amount through to the server.
 
 ## Contributing
 

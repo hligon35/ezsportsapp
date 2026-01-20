@@ -15,7 +15,8 @@ class DatabaseManager {
   subscribers: 'subscribers.json',
   coupons: 'coupons.json',
   emails: 'emails.json',
-  payouts: 'payouts.json'
+  payouts: 'payouts.json',
+  errors: 'errors.json'
     };
   }
 
@@ -29,7 +30,24 @@ class DatabaseManager {
     try {
       const filePath = path.join(this.dbPath, this.collections[collection]);
       const data = await fs.readFile(filePath, 'utf8');
-      return JSON.parse(data);
+      try {
+        return JSON.parse(data);
+      } catch (parseErr) {
+        // Attempt a minimal repair: trim BOM/whitespace and retry; otherwise back up corrupt file
+        let txt = data.replace(/^\uFEFF/, '').trim();
+        try {
+          const repaired = JSON.parse(txt);
+          // Write back the repaired JSON to keep DB healthy
+          await fs.writeFile(filePath, JSON.stringify(repaired, null, 2), 'utf8');
+          return repaired;
+        } catch (_) {
+          const bak = filePath + ".corrupt-" + new Date().toISOString().replace(/[:.]/g,'-') + ".bak";
+          await fs.writeFile(bak, data, 'utf8').catch(()=>{});
+          // Start fresh for this collection
+          await fs.writeFile(filePath, JSON.stringify([], null, 2), 'utf8');
+          return [];
+        }
+      }
     } catch (error) {
       if (error.code === 'ENOENT') {
         return [];
@@ -70,13 +88,15 @@ class DatabaseManager {
   // Get next auto-increment ID
   async getNextId(collection) {
     try {
-  const schema = await this.read('schema');
+  let schema = await this.read('schema');
+  // schema.json should be an object; if it’s an array or otherwise malformed, normalize it.
+  if (!schema || typeof schema !== 'object' || Array.isArray(schema)) schema = { metadata: {} };
   schema.metadata = schema.metadata || {};
   schema.metadata.autoIncrement = schema.metadata.autoIncrement || {};
   // Ensure key exists for this collection
   if (typeof schema.metadata.autoIncrement[collection] !== 'number') {
     // sensible defaults
-    const defaults = { users: 1000, products: 2000, orders: 3000, analytics: 1 };
+    const defaults = { users: 1000, products: 2000, orders: 3000, analytics: 1, subscribers: 1, coupons: 1, emails: 1, payouts: 1, errors: 1 };
     schema.metadata.autoIncrement[collection] = defaults[collection] || 1;
   }
   const currentId = schema.metadata.autoIncrement[collection] || 0;
@@ -205,7 +225,9 @@ class DatabaseManager {
                   analytics: 1,
                   subscribers: 1,
                   coupons: 1,
-                  emails: 1
+                  emails: 1,
+                  payouts: 1,
+                  errors: 1
                 },
                 inventoryThresholds: {
                   low: 10,

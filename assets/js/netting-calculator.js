@@ -1,9 +1,11 @@
 // Netting Calculator: live pricing and add-to-cart for custom net panels
-// Pricing model (example): mesh priced per square foot; sewn border adds per linear foot; expedited adds flat fee
+// Pricing model: mesh priced per square foot (MAP = wholesale + markup from netting.json);
+// sewn border adds per linear foot; expedited adds flat fee (from netting.json defaults)
 
 const NCurrency = new Intl.NumberFormat(undefined, { style: 'currency', currency: 'USD' });
 
-const MESHES = [
+// Fallback meshes (used if assets/netting.json is missing or fails to load)
+let MESHES = [
   // Meshes (prices kept at full precision; UI displays two decimals only)
   // Baseball gauges (#xx)
   { id: 'baseball-18', label: '#18', priceSqFt: 0.2699, sport: 'baseball' },
@@ -37,8 +39,40 @@ const MESHES = [
   { id: 'dn-18', label: 'DN18', priceSqFt: 1.6, sport: 'other' }
 ];
 
-const BORDER_SURCHARGE_PER_FT = 0.35; // sewn border adds this per linear foot
-const EXPEDITED_FEE = 25; // flat
+// Runtime-configurable defaults; replaced once netting.json is loaded
+let BORDER_SURCHARGE_PER_FT = 0.35; // sewn border adds this per linear foot
+let EXPEDITED_FEE = 25; // flat
+let SHIP_PER_ITEM = 100; // per configured panel
+
+async function loadNettingConfig() {
+  try {
+    const res = await fetch('assets/netting.json', { cache: 'no-store' });
+    if (!res.ok) throw new Error('netting.json fetch failed');
+    const data = await res.json();
+    const defaults = data.defaults || {};
+    // Update defaults if provided
+    if (Number.isFinite(defaults.borderSurchargePerFt)) BORDER_SURCHARGE_PER_FT = Number(defaults.borderSurchargePerFt);
+    if (Number.isFinite(defaults.expeditedFee)) EXPEDITED_FEE = Number(defaults.expeditedFee);
+    if (Number.isFinite(defaults.shipPerItem)) SHIP_PER_ITEM = Number(defaults.shipPerItem);
+    const markup = Number(defaults.markupPerSqFt || 0.25);
+
+    if (Array.isArray(data.meshPrices) && data.meshPrices.length) {
+      // Build MESHES using MAP = wholesale + markup
+      MESHES = data.meshPrices.map(m => ({
+        id: String(m.id),
+        label: String(m.label),
+        sport: String(m.sport || 'other'),
+        // priceSqFt exposed to UI is MAP; internal calc also uses MAP
+        priceSqFt: Number(m.wholesaleSqFt || 0) + markup,
+        wholesaleSqFt: Number(m.wholesaleSqFt || 0),
+        markupPerSqFt: markup
+      }));
+    }
+  } catch (e) {
+    // Keep fallback pricing; log in dev
+    try { console.warn('Using fallback netting pricing:', e.message || e); } catch {}
+  }
+}
 
 function toFeet(ft, inches) {
   const f = Number(ft) || 0; const i = Math.min(11, Math.max(0, Number(inches) || 0));
@@ -61,17 +95,34 @@ function calcTotals({ meshId, lenFt, lenIn, widFt, widIn, border, qty, fab }) {
 
 function slugify(s){ return String(s).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,''); }
 
+// Normalize raw feet/inches to canonical integers with inch carryover
+function normalizeFeetInches(ft, inches){
+  let f = Math.max(0, Math.floor(Number(ft) || 0));
+  let i = Math.max(0, Math.floor(Number(inches) || 0));
+  if (i >= 12){ f += Math.floor(i / 12); i = i % 12; }
+  return { ft: f, in: i };
+}
+
+function buildDimsFormats(config){
+  const L = normalizeFeetInches(config.lenFt, config.lenIn);
+  const W = normalizeFeetInches(config.widFt, config.widIn);
+  const display = `${L.ft}' ${L.in}" x ${W.ft}' ${W.in}"`;
+  const key = `${L.ft}ft-${L.in}in_x_${W.ft}ft-${W.in}in`;
+  return { display, key };
+}
+
 function ensureCustomProduct(config, totals){
   // Create a unique product id per configuration so cart lines track distinct pricing
-  const dims = `${totals.L.toFixed(2)}x${totals.W.toFixed(2)}`;
-  const id = `custom-net-${slugify(config.meshId)}-${slugify(dims)}-${config.border}-${config.fab}`;
-  const title = `Custom Net ${dims} ft — ${totals.mesh.label} (${config.border} border${config.fab==='expedited'?' • Expedited':''})`;
+  const dimsFmt = buildDimsFormats(config);
+  const id = `custom-net-${slugify(config.meshId)}-${slugify(dimsFmt.key)}-${config.border}-${config.fab}`;
+  const title = `Custom Net ${dimsFmt.display} — ${totals.mesh.label} (${config.border} border${config.fab==='expedited'?' • Expedited':''})`;
   const product = {
     id,
     title,
     price: Number(totals.perPanel.toFixed(2)), // per panel price
     category: 'netting',
-    img: 'https://images.unsplash.com/photo-1551892374-5d94925ad893?q=80&w=800&auto=format&fit=crop'
+    // Default a consistent local image for all custom netting items in cart/checkout
+    img: 'assets/img/netting3.jpg'
   };
   // Make sure PRODUCTS exists and include this product for cart rendering
   if (window.PRODUCTS && !window.PRODUCTS.find(p => p.id === id)) {
@@ -83,12 +134,17 @@ function ensureCustomProduct(config, totals){
 function updateSummary(form){
   const data = readForm(form);
   const t = calcTotals(data);
+  // Show dimensions consistently in ft/in
+  const dimsFmt = buildDimsFormats(data);
   document.getElementById('sum-area').textContent = `${t.area.toFixed(1)} sq ft`;
   document.getElementById('sum-mesh').textContent = MESHES.find(m=>m.id===data.meshId)?.label || '—';
   document.getElementById('sum-border').textContent = data.border === 'sewn' ? 'Sewn' : 'Regular';
   document.getElementById('sum-perim').textContent = `${t.perim.toFixed(1)} ft`;
   document.getElementById('sum-qty').textContent = String(data.qty);
   document.getElementById('sum-total').textContent = NCurrency.format(t.total);
+  // Mirror total into mobile sticky bar if present
+  const m = document.getElementById('sum-total-mobile');
+  if (m) m.textContent = NCurrency.format(t.total);
   return t;
 }
 
@@ -102,7 +158,8 @@ function readForm(form){
     widIn: form.querySelector('#wid-in').value,
     border: form.querySelector('input[name="border"]:checked')?.value || 'regular',
     qty: Math.max(1, Number(form.querySelector('#qty').value) || 1),
-    fab: form.querySelector('input[name="fab"]:checked')?.value || 'standard'
+    // Fabrication selection removed; default to standard for backward compatibility
+    fab: 'standard'
   };
 }
 
@@ -115,6 +172,8 @@ function bindQtyControls(form){
 function setup(){
   const form = document.getElementById('net-form');
   if(!form) return;
+  // Load pricing config first, then render UI
+  loadNettingConfig().then(()=>{
   // Populate mesh options – group by inferred sport for scannability
   const sel = form.querySelector('#mesh');
   const groups = {};
@@ -191,7 +250,7 @@ function setup(){
   let totals = updateSummary(form);
 
   // Add to cart
-  document.getElementById('add-cart').addEventListener('click', ()=>{
+  function handleAdd(){
     const data = readForm(form);
     if (!data.meshId){
       alert('Please select a sport/mesh size before adding to cart.');
@@ -199,33 +258,24 @@ function setup(){
     }
     const t = calcTotals(data);
     const product = ensureCustomProduct(data, t);
-    const variantSize = `${t.L.toFixed(2)}' x ${t.W.toFixed(2)}'`;
+    const variantSize = buildDimsFormats(data).display;
   const usage = (data.usage||'').trim();
   const mesh = MESHES.find(m=>m.id===data.meshId);
   const isBaseball = !!mesh && (mesh.sport === 'baseball' || /baseball/i.test(mesh.label));
-  const variantColor = `${t.mesh.label}${(isBaseball && usage)?` • ${usage}`:''} | ${data.border}${data.fab==='expedited'?' | Expedited':''}`;
+  const variantColor = `${t.mesh.label}${(isBaseball && usage)?` • ${usage}`:''} | ${data.border}`;
 
     // Add N times for quantity
     const n = data.qty;
     for(let i=0;i<n;i++){
-      window.Store?.add(product, { size: variantSize, color: variantColor });
-    }
-    // Add expedited fee as separate line item once
-    if (data.fab === 'expedited') {
-      const feeProduct = {
-        id: 'custom-net-expedited-fee',
-        title: 'Expedited Fabrication (3–6 days)',
-        price: EXPEDITED_FEE,
-        category: 'netting',
-        img: 'https://images.unsplash.com/photo-1551892374-5d94925ad893?q=80&w=800&auto=format&fit=crop'
-      };
-      if (window.PRODUCTS && !window.PRODUCTS.find(p=>p.id==='custom-net-expedited-fee')){
-        window.PRODUCTS.push(feeProduct);
-      }
-      window.Store?.add(feeProduct, { size: '—', color: '—' });
+      // Pass explicit per-item shipping amount from config so backend honors it
+      window.Store?.add(product, { size: variantSize, color: variantColor, ship: SHIP_PER_ITEM });
     }
     window.Store?.openCart();
-  });
+  }
+  document.getElementById('add-cart').addEventListener('click', handleAdd);
+  const addMobile = document.getElementById('add-cart-mobile');
+  if (addMobile) addMobile.addEventListener('click', handleAdd);
+  }); // end loadNettingConfig
 }
 
 window.addEventListener('DOMContentLoaded', setup);

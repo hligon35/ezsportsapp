@@ -1,0 +1,37 @@
+{
+  "version": 1,
+  "updated": "2025-10-20",
+  "defaults": {
+    "markupPerSqFt": 0.25,
+    "borderSurchargePerFt": 0.35,
+    "expeditedFee": 25,
+    "shipPerItem": 100
+  },
+  "meshPrices": [
+    { "id": "baseball-18", "label": "#18", "sport": "baseball", "wholesaleSqFt": 0.2699 },
+    { "id": "baseball-21", "label": "#21", "sport": "baseball", "wholesaleSqFt": 0.3267 },
+    { "id": "baseball-30", "label": "#30", "sport": "baseball", "wholesaleSqFt": 0.4235 },
+    { "id": "baseball-36", "label": "#36", "sport": "baseball", "wholesaleSqFt": 0.4961 },
+    { "id": "baseball-42", "label": "#42", "sport": "baseball", "wholesaleSqFt": 0.5687 },
+    { "id": "baseball-60", "label": "#60", "sport": "baseball", "wholesaleSqFt": 0.847 },
+    { "id": "baseball-96", "label": "#96", "sport": "baseball", "wholesaleSqFt": 1.5125 },
+
+    { "id": "golf-golf", "label": "Golf", "sport": "golf", "wholesaleSqFt": 0.46 },
+    { "id": "golf-30", "label": "Golf 30", "sport": "golf", "wholesaleSqFt": 0.9075 },
+    { "id": "golf-ntp", "label": "NTPGolf", "sport": "golf", "wholesaleSqFt": 0.242 },
+
+    { "id": "soccer-21", "label": "Soccer 21", "sport": "soccer", "wholesaleSqFt": 0.1573 },
+    { "id": "soccer-36", "label": "Soccer 36", "sport": "soccer", "wholesaleSqFt": 0.2662 },
+
+    { "id": "lacrosse-21", "label": "Lax 21", "sport": "lacrosse", "wholesaleSqFt": 0.363 },
+    { "id": "lacrosse-30", "label": "Lax 30", "sport": "lacrosse", "wholesaleSqFt": 0.5082 },
+
+    { "id": "poly-21", "label": "Poly 21", "sport": "other", "wholesaleSqFt": 0.218405 },
+    { "id": "poly-36", "label": "Poly 36", "sport": "other", "wholesaleSqFt": 0.3267 },
+    { "id": "nova-24", "label": "NOVA24", "sport": "other", "wholesaleSqFt": 0.58212 },
+    { "id": "nova-30", "label": "NOVA30", "sport": "other", "wholesaleSqFt": 0.627 },
+    { "id": "nova-44", "label": "NOVA44", "sport": "other", "wholesaleSqFt": 0.8925 },
+    { "id": "dn-6", "label": "DN6", "sport": "other", "wholesaleSqFt": 0.6 },
+    { "id": "dn-18", "label": "DN18", "sport": "other", "wholesaleSqFt": 1.6 }
+  ]
+}

@@ -24,22 +24,16 @@ try {
   try {
     const sp = new URLSearchParams(location.search);
     const path = location.pathname.replace(/^\\/,'/');
+    const isLocal = /^(localhost|127\.0\.0\.1)$/i.test(location.hostname);
     if (sp.get('gate') === 'on') localStorage.setItem('__COMING_SOON__','on');
     if (sp.get('gate') === 'off') localStorage.setItem('__COMING_SOON__','off');
     if (sp.has('unlock')) localStorage.setItem('comingSoonUnlocked', JSON.stringify({ at: Date.now() }));
-
-    // Default: gate ON for non-local hosts, OFF locally
-    const isLocal = /^(localhost|127\.0\.0\.1)$/i.test(location.hostname);
-    const defaultGate = isLocal ? 'off' : 'on';
-    const enabled = (localStorage.getItem('__COMING_SOON__') || defaultGate) === 'on';
-    if (!enabled) return;
-    if (isLocal) return; // allow local preview without gate
 
     // Avoid redirect loop on gate page & API/asset routes
     if (/coming-soon\.html$/i.test(path)) return;
     if (/^\/(api|assets|server|database)\b/.test(path)) return;
 
-    // Check 24h unlock token
+    // 24h unlock token check
     let unlocked = false;
     try {
       const raw = localStorage.getItem('comingSoonUnlocked');
@@ -49,7 +43,31 @@ try {
       }
     } catch {}
     if (unlocked) return;
-    location.replace('coming-soon.html');
+
+    // Local override via query/localStorage always wins
+    const override = String(localStorage.getItem('__COMING_SOON__') || '').toLowerCase();
+    if (override === 'on') {
+      if (!isLocal) { location.replace('coming-soon.html'); }
+      return;
+    }
+    if (override === 'off') { return; }
+
+    // Server-controlled flag via /api/config (MAINTENANCE or COMING_SOON env)
+    const controller = (window.AbortController ? new AbortController() : null);
+    const timer = controller ? setTimeout(()=>controller.abort(), 1500) : null;
+    fetch('/api/config', { cache: 'no-store', signal: controller ? controller.signal : undefined })
+      .then(res => res.ok ? res.json() : null)
+      .then(cfg => {
+        if (timer) clearTimeout(timer);
+        const remoteOn = !!(cfg && cfg.maintenance === true);
+        if (remoteOn && !isLocal) {
+          location.replace('coming-soon.html');
+        }
+      })
+      .catch(() => {
+        // On failure, default to gate OFF to avoid accidental lockout
+        // Admins can still force ON via ?gate=on
+      });
   } catch {}
 })();
 
@@ -136,17 +154,24 @@ async function fetchProducts() {
         try {
           wid = window.turnstile.render(host, {
             sitekey: window.TURNSTILE_SITE_KEY,
-            size: 'invisible', // programmatic token; avoid auto-execute conflicts
+            // Turnstile no longer supports size "invisible"; use a valid size and keep the widget off-screen
+            size: 'compact',
+            // Auto-execute on render so we don't need to call execute() manually
+            appearance: 'execute',
             callback: (token) => { resolve(token||''); cleanup(wid); },
             'error-callback': () => { resolve(''); cleanup(wid); },
             'timeout-callback': () => { resolve(''); cleanup(wid); }
           });
         } catch(err) { resolve(''); cleanup(wid); return; }
-        try { window.turnstile.execute(wid); } catch { try { if (wid) window.turnstile.reset(wid); } catch {} resolve(''); cleanup(wid); }
         setTimeout(()=>{ resolve(''); cleanup(wid); }, 8000);
       }).finally(()=>{ window.__turnstileTokenPromise = null; });
       return await window.__turnstileTokenPromise;
     } catch { return ''; }
+  }
+
+  // Expose a single shared token getter for other modules (e.g., forms.js) to reuse
+  if (!window.getTurnstileToken) {
+    try { window.getTurnstileToken = getTurnstileToken; } catch {}
   }
 
   // Timestamp for bot timing check (added to form submissions)
@@ -203,10 +228,27 @@ async function fetchProducts() {
       const products = prodList.categories[categoryName];
       products.forEach(product => {
         // Convert prodList format to app format
+        const detailsPrice = product.details?.price;
+        let mainPrice = 299; // fallback
+        let priceRange = null;
+        
+        // Handle price range string (e.g., "399.95 - 549.95") or variations
+        if (typeof detailsPrice === 'string' && detailsPrice.includes(' - ')) {
+          priceRange = `$${detailsPrice}`;
+          // Extract the first price as the main price for sorting/filtering
+          const firstPrice = parseFloat(detailsPrice.split(' - ')[0]);
+          if (!isNaN(firstPrice)) mainPrice = firstPrice;
+        } else if (detailsPrice && !isNaN(detailsPrice)) {
+          mainPrice = parseFloat(detailsPrice);
+        } else if (product.variations?.[0]?.map) {
+          mainPrice = product.variations[0].map;
+        }
+        
         fallbackProducts.push({
           id: product.sku,
           title: product.name || product.sku,
-          price: product.details?.price || (product.variations?.[0]?.map) || 299,
+          price: mainPrice,
+          priceRange: priceRange,
           category: 'netting',
           img: product.img || 'assets/img/EZSportslogo.png',
           images: product.images || (product.img ? [product.img] : []),
@@ -232,10 +274,61 @@ async function fetchProducts() {
   }
 })();
 
-// Lightweight analytics dispatcher (fallback logs) – can later POST to /api/analytics/event
+// --- Telemetry helpers (analytics + error reporting) ---
+function getVisitorId(){
+  try {
+    const key = 'visitorId';
+    let id = localStorage.getItem(key);
+    if (id && id.length > 8) return id;
+    id = (crypto && crypto.randomUUID) ? crypto.randomUUID() : ('v_' + Math.random().toString(16).slice(2) + Date.now().toString(16));
+    localStorage.setItem(key, id);
+    return id;
+  } catch {
+    return 'v_' + Math.random().toString(16).slice(2);
+  }
+}
+
+async function postToApi(path, payload){
+  const tryFetch = async (base) => {
+    const url = (base ? base.replace(/\/$/,'') : '') + path;
+    const controller = (window.AbortController ? new AbortController() : null);
+    const t = controller ? setTimeout(()=>controller.abort(), 1500) : null;
+    try {
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type':'application/json' },
+        body: JSON.stringify(payload || {}),
+        keepalive: true,
+        signal: controller ? controller.signal : undefined
+      });
+      return res && res.ok;
+    } finally {
+      if (t) clearTimeout(t);
+    }
+  };
+
+  // Same-origin first
+  try {
+    if (await tryFetch('')) return true;
+  } catch {}
+
+  // Dev fallback: frontend on Live Server (5500) but backend on 424x
+  const isDevSplit = /^(localhost|127\.0\.0\.1)$/i.test(location.hostname) && String(location.port) === '5500';
+  if (!isDevSplit) return false;
+  const bases = [
+    'http://127.0.0.1:4244','http://localhost:4244',
+    'http://127.0.0.1:4243','http://localhost:4243',
+    'http://127.0.0.1:4242','http://localhost:4242'
+  ];
+  for (const b of bases) {
+    try { if (await tryFetch(b)) return true; } catch {}
+  }
+  return false;
+}
+
+// Lightweight analytics dispatcher (now POSTs to /api/analytics/event when available)
 window.trackEvent = function(eventName, payload) {
   try {
-    const body = { event: eventName, payload, ts: Date.now() };
     console.debug('[analytics]', eventName, payload);
     // Local popularity counters (will inform FEATURED selection later)
     const raw = localStorage.getItem('analyticsCounters');
@@ -246,6 +339,20 @@ window.trackEvent = function(eventName, payload) {
       const id = payload.id || payload; counters.add_to_cart[id] = (counters.add_to_cart[id] || 0) + 1;
     }
     localStorage.setItem('analyticsCounters', JSON.stringify(counters));
+
+    // Server-side analytics (best-effort)
+    const visitorId = getVisitorId();
+    const productId = payload?.id || (typeof payload === 'string' ? payload : payload?.productId) || null;
+    const body = {
+      type: String(eventName || ''),
+      productId,
+      visitorId,
+      userId: (window.Store && window.Store.state && window.Store.state.user) ? window.Store.state.user.id : null,
+      path: location.pathname,
+      meta: (payload && typeof payload === 'object') ? payload : { value: payload },
+      ts: new Date().toISOString()
+    };
+    postToApi('/api/analytics/event', body).catch(()=>{});
   } catch {}
 };
 
@@ -304,6 +411,15 @@ const Store = {
       this.state.user = null;
     }
 
+    // Page classes for targeted styling
+    try {
+      const pageKey = this.getPageKey();
+      if (pageKey) document.body.classList.add(`page-${pageKey}`);
+      if (pageKey === 'l-screens') document.body.classList.add('lscreens-hub');
+      const LS_PAGES = new Set(['baseball-l-screens','baseball-l-screen','protective-screens','pitchers-pocket','replacement-screens','bullet-pad-kits']);
+      if (LS_PAGES.has(pageKey)) document.body.classList.add('lscreens-subnav');
+    } catch {}
+
     this.ui = {
       grid: document.getElementById('product-grid'),
       count: document.getElementById('cart-count'),
@@ -348,6 +464,11 @@ const Store = {
       // Page-specific enhancements (safe to call when not applicable)
       try { this.ensureNettingSubnav(); } catch {}
       try { this.ensureNettingCarousel(); } catch {}
+      try { this.ensureHeroRotator(); } catch {}
+      try { this.ensureTypeTileImagesMatchSku(); } catch {}
+
+      // Telemetry (analytics + error reporting)
+      try { this.ensureTelemetry(); } catch {}
 
       const toggle = document.querySelector('.menu-toggle');
       const nav = document.getElementById('primary-nav');
@@ -375,6 +496,9 @@ const Store = {
         });
       }
 
+      // Keep responsive nav usable across resizes (especially around breakpoints)
+      try { this.enforceResponsiveBehaviors && this.enforceResponsiveBehaviors(); } catch {}
+
       // Immediately sync cart UI on load so the header count reflects existing items
       try { this.renderCart(); } catch {}
 
@@ -389,6 +513,129 @@ const Store = {
           }
         });
       } catch {}
+
+      // Delegate cart action clicks (inc/dec/remove) to the container once
+      try {
+        if (this.ui.items && !this.ui.items.__delegated) {
+          this.ui.items.addEventListener('click', (ev) => {
+            const btn = ev.target && (ev.target.closest('[data-inc], [data-dec], [data-remove]'));
+            if (!btn) return;
+            // Remove
+            if (btn.dataset && btn.dataset.remove) {
+              this.removeByKey(btn.dataset.remove);
+              return;
+            }
+            // Increment
+            if (btn.dataset && btn.dataset.inc) {
+              const it = this.state.cart.find(x => this.keyFor(x) === btn.dataset.inc);
+              if (it) { it.qty++; this.persist(); this.renderCart(); }
+              return;
+            }
+            // Decrement
+            if (btn.dataset && btn.dataset.dec) {
+              const it = this.state.cart.find(x => this.keyFor(x) === btn.dataset.dec);
+              if (it) {
+                it.qty = Math.max(0, it.qty - 1);
+                if (it.qty === 0) this.removeByKey(this.keyFor(it));
+                else { this.persist(); this.renderCart(); }
+              }
+            }
+          }, { passive: true });
+          this.ui.items.__delegated = true;
+        }
+      } catch {}
+    } catch {}
+  },
+
+  ensureTelemetry(){
+    try {
+      // Page view
+      const visitorId = getVisitorId();
+      const payload = {
+        path: location.pathname,
+        referrer: document.referrer || '',
+        visitorId,
+        userId: this.state.user ? this.state.user.id : null,
+        ts: new Date().toISOString()
+      };
+      postToApi('/api/analytics/track', payload).catch(()=>{});
+
+      // Click tracking (throttled, avoids extreme noise)
+      if (!document.__clickTelemetryBound) {
+        document.__clickTelemetryBound = true;
+        let lastSentAt = 0;
+        let sentCount = 0;
+        const MAX_PER_PAGE = 80;
+        document.addEventListener('click', (ev) => {
+          try {
+            if (sentCount >= MAX_PER_PAGE) return;
+            const now = Date.now();
+            if (now - lastSentAt < 250) return;
+
+            const a = ev.target && ev.target.closest && ev.target.closest('a');
+            const btn = ev.target && ev.target.closest && ev.target.closest('button');
+            const el = a || btn;
+            if (!el) return;
+            // Ignore clicks inside the error reporter itself or non-user triggers
+            if (el.hasAttribute('data-no-track')) return;
+
+            const href = a ? (a.getAttribute('href') || '') : '';
+            const label = (el.textContent || '').trim().slice(0, 80);
+            const type = a ? 'click_link' : 'click_button';
+
+            lastSentAt = now;
+            sentCount++;
+            postToApi('/api/analytics/event', {
+              type,
+              visitorId,
+              userId: this.state.user ? this.state.user.id : null,
+              path: location.pathname,
+              label,
+              meta: {
+                href,
+                id: el.id || null,
+                className: (el.className && String(el.className).slice(0, 120)) || null
+              },
+              ts: new Date().toISOString()
+            }).catch(()=>{});
+          } catch {}
+        }, { capture: true, passive: true });
+      }
+
+      // Client error reporting
+      if (!window.__errorTelemetryBound) {
+        window.__errorTelemetryBound = true;
+        const report = (kind, err, extra = {}) => {
+          try {
+            const e = (err instanceof Error) ? err : new Error(String(err || 'Unknown error'));
+            postToApi('/api/errors/report', {
+              kind,
+              severity: 'error',
+              name: e.name,
+              message: e.message,
+              stack: e.stack,
+              url: location.href,
+              path: location.pathname,
+              userAgent: navigator.userAgent,
+              visitorId,
+              userId: this.state.user ? this.state.user.id : null,
+              meta: extra,
+              ts: new Date().toISOString()
+            }).catch(()=>{});
+          } catch {}
+        };
+
+        window.addEventListener('error', (ev) => {
+          try {
+            // ev.error may be undefined for resource errors
+            if (ev && ev.error) report('window.onerror', ev.error, { filename: ev.filename, lineno: ev.lineno, colno: ev.colno });
+            else report('window.onerror', new Error(String(ev?.message || 'Script error')), { filename: ev?.filename, lineno: ev?.lineno, colno: ev?.colno });
+          } catch {}
+        });
+        window.addEventListener('unhandledrejection', (ev) => {
+          try { report('unhandledrejection', ev && ev.reason ? ev.reason : 'Unhandled promise rejection'); } catch {}
+        });
+      }
     } catch {}
   },
 
@@ -463,7 +710,7 @@ attachSubscribeHandlers() {
       forms.forEach((form) => {
         if (form.__wired) return; // avoid duplicate bindings
         form.__wired = true;
-        // Remove any inline onsubmit attributes added by legacy markup
+        // Remove any inline onsubmit attributes added by legacy markup to prevent alert-only behavior
         try { form.removeAttribute('onsubmit'); } catch {}
         form.addEventListener('submit', async (e) => {
           e.preventDefault();
@@ -478,16 +725,34 @@ attachSubscribeHandlers() {
           if (btn) { btn.disabled = true; btn.textContent = 'Subscribing…'; }
           try {
             const payload = { email, source: 'footer', referer: location.href, hp };
-            const res = await fetch('/api/marketing/subscribe', {
-              method: 'POST',
-              headers: { 'Content-Type': 'text/plain' },
-              body: JSON.stringify(payload),
-            });
-            if (res.ok) {
+            // Prefer calling the Render backend directly to ensure emails queue server-side
+            // Build candidate API bases similar to analytics module
+            const bases = [];
+            try { if (window.__API_BASE) bases.push(String(window.__API_BASE).replace(/\/$/, '')); } catch {}
+            try { const meta = document.querySelector('meta[name="api-base"]'); if (meta && meta.content) bases.push(String(meta.content).replace(/\/$/, '')); } catch {}
+            // Default Render base as final fallback
+            bases.push('https://ezsportsapp.onrender.com');
+
+            let lastErr = '';
+            let ok = false;
+            for (const base of bases) {
+              try {
+                const url = `${base}/api/marketing/subscribe`;
+                const res = await fetch(url, {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'text/plain' },
+                  body: JSON.stringify(payload),
+                });
+                if (res.ok) { ok = true; break; }
+                lastErr = await res.text().catch(()=>`HTTP ${res.status}`);
+              } catch (err) {
+                lastErr = err?.message || 'Network error';
+              }
+            }
+            if (ok) {
               form.innerHTML = '<h4>Thanks for subscribing!</h4><p>Check your inbox for a confirmation.</p>';
             } else {
-              const msg = await res.text().catch(()=>'');
-              alert('Subscription failed. Please try again later.' + (msg ? `\n${msg}` : ''));
+              alert('Subscription failed. Please try again later.' + (lastErr ? `\n${lastErr}` : ''));
               if (btn) { btn.disabled = false; btn.textContent = 'Subscribe'; }
             }
           } catch (err) {
@@ -1166,10 +1431,14 @@ ensureHomeFirst() {
 
     const crumbs = [];
     crumbs.push({ label: 'Home', href: 'index.html' });
-  const L_SUBPAGES = new Set(['baseball-l-screens.html','protective-screens.html','pitchers-pocket.html','replacement-screens.html','bullet-pad-kits.html']);
+  const L_SUBPAGES = new Set(['baseball-l-screens.html','protective-screens.html','pitchers-pocket.html','replacement-screens.html']);
     if (L_SUBPAGES.has(base)) {
       crumbs.push({ label: 'L-Screens', href: 'l-screens.html' });
     }
+  // Reparent Bullet Pad Kits under Accessories for non-product page
+  if (base === 'bullet-pad-kits.html') {
+    crumbs.push({ label: 'Accessories', href: 'accessories.html' });
+  }
     if (base === 'product.html') {
       const params = new URLSearchParams(location.search);
       const pid = params.get('pid');
@@ -1316,7 +1585,8 @@ ensureHomeFirst() {
           "Replacement Nets": { label: 'Replacement Screens', href: 'replacement-screens.html' },
           "Accessories": { label: 'Accessories', href: 'accessories.html' },
           "Pre-Made Cages": { label: 'Pre-Made Cages', href: 'pre-made-cages.html' },
-          "Bullet Pad Kits": { label: 'Bullet Pad Kits', href: 'bullet-pad-kits.html' }
+          // Move Bullet Pad Kits under Accessories
+          "Bullet Pad Kits": { label: 'Accessories', href: 'accessories.html' }
         };
         if (catName && direct[catName]) return direct[catName];
         // Heuristics by product name/sku
@@ -1324,7 +1594,8 @@ ensureHomeFirst() {
         if (/pitcher|pocket/.test(name) || /bbpp/.test(sku)) return { label: "Pitcher's Pocket", href: 'pitchers-pocket.html' };
         if (/protective\s+screen/.test(name)) return { label: 'Protective Screens', href: 'protective-screens.html' };
         if (/l[- ]?screen/.test(name) || /^bullet/.test(name)) return { label: 'Baseball L-Screens', href: 'baseball-l-screens.html' };
-        if (/pad\s*kit/.test(name) || /^pk-/.test(sku)) return { label: 'Bullet Pad Kits', href: 'bullet-pad-kits.html' };
+        // Pad kits are now considered Accessories
+        if (/pad\s*kit/.test(name) || /^pk-/.test(sku)) return { label: 'Accessories', href: 'accessories.html' };
         return { label: 'EZ Custom Nets', href: 'ez-nets.html' };
       };
       if (prod) {
@@ -1528,9 +1799,13 @@ ensureHomeFirst() {
   // Soft cross-fade hero rotator on L-Screens hub (screen2 -> screen6, 1s interval)
   ensureHeroRotator() {
     try {
-      if (!/l-screens\.html$/i.test(location.pathname)) return;
+      const base = (location.pathname.split('/').pop() || '').toLowerCase();
+      if (base !== 'l-screens.html' && base !== 'l-screens') return;
       const rotator = document.querySelector('.hero-rotator');
       if (!rotator) return;
+      // Avoid stacking intervals on BFCache restores / repeated init
+      if (rotator.__rotating) return;
+      rotator.__rotating = true;
       const slides = [...rotator.querySelectorAll('.hr-slide')];
       if (slides.length < 2) return;
       let idx = 0;
@@ -1545,8 +1820,70 @@ ensureHomeFirst() {
     } catch(err) { console.warn('hero rotator failed', err); }
   },
 
-  // On the L-Screens hub, replace the static "Shop by Type" tile images with a random
-  // product image from the corresponding assets/prodImgs category folders.
+  // On the L-Screens hub, ensure each “Shop by Type” tile image matches its representative SKU.
+  // Tiles can declare `data-sku="SKU"` (or a comma-separated list) and we will pull the matching
+  // product image from the loaded catalog (preferred) or prodList.json (fallback).
+  async ensureTypeTileImagesMatchSku() {
+    try {
+      const page = (location.pathname.split('/').pop() || '').toLowerCase();
+      if (page !== 'l-screens.html' && page !== 'l-screens') return;
+
+      const tilesWrap = document.querySelector('.category-tiles .tiles');
+      if (!tilesWrap) return;
+
+      const tiles = Array.from(tilesWrap.querySelectorAll('.tile[data-sku]'));
+      if (!tiles.length) return;
+
+      const normalizeSku = (s) => String(s || '').trim().toUpperCase();
+      const splitSkus = (s) => String(s || '').split(',').map(v => normalizeSku(v)).filter(Boolean);
+
+      // Prefer unified catalog if present
+      const catalogRaw = Array.isArray(window.CATALOG_PRODUCTS)
+        ? window.CATALOG_PRODUCTS.map(r => r.raw || r)
+        : [];
+
+      let prodListData = null;
+      const findInProdList = (sku) => {
+        if (!prodListData || !prodListData.categories || typeof prodListData.categories !== 'object') return null;
+        for (const arr of Object.values(prodListData.categories)) {
+          if (!Array.isArray(arr)) continue;
+          const hit = arr.find(p => normalizeSku(p?.sku || p?.id) === sku);
+          if (hit) return hit;
+        }
+        return null;
+      };
+
+      for (const tile of tiles) {
+        const img = tile.querySelector('.media img');
+        if (!img) continue;
+        const skus = splitSkus(tile.getAttribute('data-sku'));
+        if (!skus.length) continue;
+
+        let matched = null;
+        for (const sku of skus) {
+          matched = catalogRaw.find(p => normalizeSku(p?.sku || p?.id) === sku) || null;
+          if (matched) break;
+          if (!prodListData) {
+            try { prodListData = await this.fetchProdList(); } catch { prodListData = null; }
+          }
+          matched = findInProdList(sku);
+          if (matched) break;
+        }
+
+        if (!matched) continue;
+        let resolvedImg = '';
+        try {
+          resolvedImg = this.normalizeProdListItem(matched)?.img || '';
+        } catch {}
+        if (!resolvedImg) resolvedImg = matched.img || (Array.isArray(matched.images) ? matched.images[0] : '') || '';
+        if (resolvedImg) img.src = resolvedImg;
+      }
+    } catch (e) {
+      console.warn('ensureTypeTileImagesMatchSku failed:', e);
+    }
+  },
+
+  // Legacy: kept for backward-compatibility; SKU-driven mapping is preferred.
   ensureRandomTypeTileImages() {
     try {
       const page = (location.pathname.split('/').pop() || '').toLowerCase();
@@ -1653,6 +1990,8 @@ ensureHomeFirst() {
         if (!key || !Array.isArray(MANIFEST[key]) || MANIFEST[key].length === 0) return;
         const img = tile.querySelector('.media img');
         if (!img) return;
+        // If a tile declares a representative SKU, do not override it randomly.
+        if (tile.hasAttribute('data-sku')) return;
         const src = pickRandom(MANIFEST[key]);
         if (src) img.src = src;
       });
@@ -1877,6 +2216,8 @@ ensureHomeFirst() {
           }
         }
         if (!all.length) { this.renderEmptyState(grid); return; }
+        // Show all PK* pad kit SKUs (remove previous temporary allow-list)
+        // If needed in the future, business rules can refine this list.
         // De-dupe by sku/id
         const seen = new Set();
         all = all.filter(p => { const key = String(p?.sku || p?.id || p?.name || ''); if (!key) return false; if (seen.has(key)) return false; seen.add(key); return true; });
@@ -1939,6 +2280,10 @@ ensureHomeFirst() {
               <div class="pd-info">
                 <h1 class="pd-title">Bullet Pad Kits</h1>
                 <div class="price h3" id="agg-price">${rangeHtml}</div>
+                <div class="text-sm text-muted" id="agg-expert-contact" style="display:none; margin:.15rem 0 .35rem;">
+                  <div><strong>Call:</strong> <a href="tel:+13868373131" aria-label="Call EZ Sports Netting at 386-837-3131">(386) 837-3131</a></div>
+                  <div><strong>Email:</strong> <a href="mailto:info@ezsportsnetting.com">info@ezsportsnetting.com</a></div>
+                </div>
                 <div class="text-sm text-muted" id="agg-ship"></div>
                 <div class="stack-05" style="margin-top:.5rem;">
                   <label class="text-xs" for="agg-model-select" style="font-weight:700;letter-spacing:.4px;">Model</label>
@@ -1971,6 +2316,8 @@ ensureHomeFirst() {
           return 75;
         };
         const featuresEl = document.getElementById('agg-features');
+        const expertEl = document.getElementById('agg-expert-contact');
+        const addBtn = document.getElementById('agg-add');
         const renderFeatures = (arr) => {
           if (!featuresEl) return;
           const list = Array.isArray(arr) ? arr.filter(x=>typeof x === 'string' && x.trim()) : [];
@@ -1995,21 +2342,35 @@ ensureHomeFirst() {
             else window.location.href = 'accessories.html';
           } catch { window.location.href = 'accessories.html'; }
         });
-        // Dropdown change updates main image + price + label
+        // Dropdown change updates price + label and applies Talk-to-Expert flow for PK selections
         selectEl?.addEventListener('change', ()=>{
           const sku = selectEl.value;
           const m = bySku[sku];
           if (m) {
             // Keep hero static; only update price, label and features
-            priceEl.textContent = m.price>0 ? currency.format(m.price) : rangeHtml;
+            // For PK* SKUs: replace price with Talk to an Expert, blank shipping, and disable Add to Cart
+            const isPk = /^PK[-\s]?/i.test(String(sku||''));
+            if (isPk) {
+              priceEl.textContent = 'Talk to an Expert';
+              if (shipEl) shipEl.textContent = '';
+              if (expertEl) expertEl.style.display = '';
+              if (addBtn) { addBtn.disabled = true; addBtn.setAttribute('aria-disabled','true'); }
+            } else {
+              priceEl.textContent = m.price>0 ? currency.format(m.price) : rangeHtml;
+              if (expertEl) expertEl.style.display = 'none';
+              // Recompute shipping for selected model
+              if (shipEl) { const ship = shipFor(m); shipEl.textContent = ship ? `Shipping: $${ship.toFixed(2)}` : ''; }
+              if (addBtn) { addBtn.disabled = false; addBtn.removeAttribute('aria-disabled'); }
+            }
             selectedEl.textContent = m.title;
             renderFeatures(m.features);
-            if (shipEl) { const ship = shipFor(m); shipEl.textContent = ship ? `Shipping: $${ship.toFixed(2)}` : ''; }
           } else {
             priceEl.textContent = rangeHtml;
             selectedEl.textContent = '';
             renderFeatures([]);
             if (shipEl) shipEl.textContent = '';
+            if (expertEl) expertEl.style.display = 'none';
+            if (addBtn) { addBtn.disabled = false; addBtn.removeAttribute('aria-disabled'); }
           }
         });
         // Add to cart requires a model and a color selection
@@ -2363,7 +2724,28 @@ ensureHomeFirst() {
           // Curated Accessories navigation card: Bullet Pad Kits
           try {
             const padImg = 'assets/prodImgs/Bullet_Pad_Kit/bulletpadkit.avif';
-            const padCard = buildGroupCard({ title:'Bullet Pad Kits', items: [], href:'bullet-pad-kits.html', alt:'Bullet Pad Kits', img: padImg });
+            // Gather Bullet Pad Kits to compute a proper price range for the card
+            let padItems = [];
+            // Prefer unified catalog by category when available
+            if (Array.isArray(window.CATALOG_BY_CATEGORY?.['bullet-pad-kits']) && window.CATALOG_BY_CATEGORY['bullet-pad-kits'].length) {
+              padItems = window.CATALOG_BY_CATEGORY['bullet-pad-kits'].map(r => r.raw || r);
+            }
+            // Fallback to prodList.json category
+            if (!padItems.length && prodListData && prodListData.categories && Array.isArray(prodListData.categories['Bullet Pad Kits'])) {
+              padItems = prodListData.categories['Bullet Pad Kits'];
+            }
+            // As a resilient fallback, scan all categories for obvious pad kits
+            if (!padItems.length && prodListData && prodListData.categories && typeof prodListData.categories === 'object') {
+              for (const arr of Object.values(prodListData.categories)) {
+                if (!Array.isArray(arr)) continue;
+                arr.forEach(p => {
+                  const sku = String(p?.sku || '').toUpperCase();
+                  const name = String(p?.name || p?.title || '').toLowerCase();
+                  if (sku.startsWith('PK-') || /\bpad\s*kit\b/.test(name)) padItems.push(p);
+                });
+              }
+            }
+            const padCard = buildGroupCard({ title:'Bullet Pad Kits', items: padItems, href:'bullet-pad-kits.html', alt:'Bullet Pad Kits', img: padImg });
             if (padCard) grid.appendChild(padCard);
           } catch {}
           return; // done with custom rendering
@@ -2580,10 +2962,10 @@ ensureHomeFirst() {
     const imagesList = (function(){
       try {
         const all = collectAll();
-        // De-dupe and keep up to 10 for UI usage (color dots, etc.)
+        // De-dupe and keep up to 11 for UI usage (color dots, etc.)
         const seen = new Set();
         const out = [];
-        for (const s of all) { if (!seen.has(s)) { seen.add(s); out.push(s); if (out.length >= 10) break; } }
+        for (const s of all) { if (!seen.has(s)) { seen.add(s); out.push(s); if (out.length >= 11) break; } }
         return out;
       } catch { return []; }
     })();
@@ -3215,6 +3597,9 @@ ensureHomeFirst() {
       let priceDisplay;
       if (p.isTwistedRope) {
         priceDisplay = 'Price may vary';
+      } else if (p.priceRange) {
+        // Use pre-formatted price range if available
+        priceDisplay = p.priceRange;
       } else if (p.variations && p.variations.length > 1) {
         const prices = p.variations.map(v => v.map || v.price || 0).filter(price => price > 0);
         if (prices.length > 1) {
@@ -3628,8 +4013,11 @@ ensureHomeFirst() {
   renderCart() {
     const rows = this.cartDetailed.map(i => {
       const key = this.keyFor(i);
-      const variant = `${(i.size || '').trim() ? `Size: ${i.size} ` : ''}${(i.color || '').trim() ? `Color: ${i.color}` : ''}`.trim();
-  const img = i.product?.img || 'assets/img/EZSportslogo.png';
+      // For netting items, relabel second attribute as Spec instead of Color
+      const isNetting = (String(i.category||'').toLowerCase()==='netting') || (String(i.id||'').toLowerCase().startsWith('custom-net-'));
+      const variant = `${(i.size || '').trim() ? `Size: ${i.size} ` : ''}${(i.color || '').trim() ? `${isNetting ? 'Spec' : 'Color'}: ${i.color}` : ''}`.trim();
+      // Enforce default image for netting when missing
+  const img = (isNetting && !(i.product?.img)) ? 'assets/img/netting3.jpg' : (i.product?.img || 'assets/img/EZSportslogo.png');
       const title = i.product?.title || 'Item';
       const price = typeof i.product?.price === 'number' ? i.product.price : 0;
   const shipPer = (()=>{ const n = Number(i.shipAmount); if (Number.isFinite(n)) { if (n===0) return 0; if (n>0) return n; } return 100; })();
@@ -3639,12 +4027,13 @@ ensureHomeFirst() {
         <div>
           <strong>${title}</strong>
           ${variant ? `<div class=\"text-sm text-muted\">${variant}</div>` : ''}
-          <div class="opacity-80">Qty: <button class="icon-btn" data-dec="${key}">−</button> ${i.qty} <button class="icon-btn" data-inc="${key}">+</button></div>
+          <div class="text-xs muted">SKU: ${i.id}</div>
+          <div class="opacity-80">Qty: <button type="button" class="icon-btn" data-dec="${key}">−</button> ${i.qty} <button type="button" class="icon-btn" data-inc="${key}">+</button></div>
           <div class="text-sm muted">Shipping: ${shipPer===0 ? 'Free' : currency.format(shipPer)} × ${i.qty}</div>
         </div>
         <div class="text-right">
           <div>${currency.format(price * i.qty)}</div>
-          <button class="btn btn-ghost" data-remove="${key}">Remove</button>
+          <button type="button" class="btn btn-ghost" data-remove="${key}">Remove</button>
         </div>
       </div>
     `;
@@ -3677,8 +4066,8 @@ ensureHomeFirst() {
       try { window.trackEvent && window.trackEvent('view_cart', { items: this.state.cart.map(i => ({ id: i.id, price: i.price, qty: i.qty })) }); } catch {}
     }
 
-    // Bind buttons
-    if (this.ui.items) {
+    // Bind buttons if delegation wasn't set (legacy fallback)
+    if (this.ui.items && !this.ui.items.__delegated) {
       this.ui.items.querySelectorAll('[data-remove]').forEach(b => b.addEventListener('click', () => this.removeByKey(b.dataset.remove)));
       this.ui.items.querySelectorAll('[data-inc]').forEach(b => b.addEventListener('click', () => { const it = this.state.cart.find(x => this.keyFor(x) === b.dataset.inc); if (!it) return; it.qty++; this.persist(); this.renderCart(); }));
       this.ui.items.querySelectorAll('[data-dec]').forEach(b => b.addEventListener('click', () => { const it = this.state.cart.find(x => this.keyFor(x) === b.dataset.dec); if (!it) return; it.qty = Math.max(0, it.qty - 1); if (it.qty === 0) this.removeByKey(this.keyFor(it)); else { this.persist(); this.renderCart(); } }));

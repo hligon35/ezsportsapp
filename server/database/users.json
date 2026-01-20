@@ -1,6 +1,6 @@
 [
   {
-    "id": "user_mpd5k67y9",
+    "id": 1000,
     "email": "admin@ezsportsnetting.com",
     "username": "admin",
     "password": "$2b$10$oTfY/cJ4d20i0USVn9jpKe8QUZdRb5MKwLJTxhs0CDmjuOqIDcGu2",
@@ -12,17 +12,33 @@
     "updatedAt": "2025-10-18T00:26:27.281Z"
   },
   {
-    "username": "customer",
-    "email": "customer@ezsportsnetting.com",
-    "password": "$2b$10$1rUKDbLUuF.QVWV5HnahLeA3VPvJgwPf2TU1OtPoEKfjqiq5eRwCa",
-    "name": "Test Customer",
-    "isAdmin": false,
-    "createdAt": "2025-08-26T00:00:00.000Z",
-    "updatedAt": "2025-08-26T17:33:29.277Z",
     "id": 1001,
-    "lastLogin": "2025-08-26T17:33:29.276Z"
+    "email": "amercedes@ezsportsnetting.com",
+    "username": "amercedes",
+    "password": "$2b$10$Hf4eX/MGGa0/xwkOINp25OHKxW8OkDX0EqFQbC53dCYvjdAE6kLrO",
+    "name": "EZ Sports Owner",
+    "firstName": "EZ",
+    "lastName": "Sports Owner",
+    "isAdmin": true,
+    "lastLogin": null,
+    "createdAt": "2025-10-20T17:36:43.586Z",
+    "updatedAt": "2025-10-20T17:36:43.587Z"
   },
   {
+    "id": 1002,
+    "email": "emercedes@ezsportsnetting.com",
+    "username": "emercedes",
+    "password": "$2b$10$5ftKV1F1T1jw/m9fAlSQBOAfAT.ftt02XvpQCuTwlB.3/UMh2YqgW",
+    "name": "E Mercedes",
+    "firstName": "E",
+    "lastName": "Mercedes",
+    "isAdmin": true,
+    "lastLogin": null,
+    "createdAt": "2025-10-20T17:41:17.074Z",
+    "updatedAt": "2025-10-20T17:41:17.075Z"
+  },
+  {
+    "id": 1003,
     "email": "hligon35@gmail.com",
     "password": "$2b$10$zUVX/nCKy8zVKNxZbuKzAOO95YFTVp4YhN/prS2UOIVDeQhPuO02e",
     "name": "Harold Ligon",
@@ -31,19 +47,6 @@
     "isAdmin": false,
     "lastLogin": null,
     "createdAt": "2025-09-09T23:01:30.004Z",
-    "updatedAt": "2025-09-09T23:01:30.004Z",
-    "id": 1004
-  },
-  {
-    "email": "test@example.com",
-    "password": "$2b$10$fJSz6wGZJmVRjjE3de25cuJ30TavpGAovQoAjIzjyDZCasW0mY17.",
-    "name": "Test Customer",
-    "firstName": "Test",
-    "lastName": "Customer",
-    "isAdmin": false,
-    "lastLogin": null,
-    "createdAt": "2025-09-17T17:59:11.195Z",
-    "updatedAt": "2025-09-17T17:59:11.195Z",
-    "id": 1005
+    "updatedAt": "2025-09-09T23:01:30.004Z"
   }
 ]

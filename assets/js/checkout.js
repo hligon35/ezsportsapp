@@ -2,15 +2,70 @@
 // Publishable key will be provided by a config endpoint or fallback (dev)
 let stripe;
 let stripeEnabled = false;
+// Enable verbose logging with ?debug=1 or by setting window.__CHECKOUT_DEBUG = true
+const DEBUG = (() => {
+  try {
+    const qd = new URLSearchParams(window.location.search);
+    return qd.get('debug') === '1' || !!window.__CHECKOUT_DEBUG;
+  } catch { return false; }
+})();
+// API base configuration: prefer window.__API_BASE or <meta name="api-base" content="https://api.example.com">
+// Fallback guess: Render default domain from service name (adjust if your service name changes)
+const __META_API = (function(){ try{ return (document.querySelector('meta[name="api-base"]')?.content||'').trim(); }catch{ return ''; } })();
+const GUESSED_BASES = [ 'https://ezsportsapp.onrender.com' ];
+let API_BASE = (typeof window !== 'undefined' && window.__API_BASE ? String(window.__API_BASE) : __META_API).replace(/\/$/, '');
+if (DEBUG) { try { console.info('[checkout] initial API_BASE =', API_BASE || '(same-origin)'); } catch {} }
+
+async function fetchJsonWithFallback(path, options){
+  const bases = [ API_BASE || '', ...GUESSED_BASES.filter(b => b && b !== API_BASE) ];
+  let lastErr = null;
+  for (const base of bases) {
+    const url = base ? (base + path) : path;
+    try {
+      const res = await fetch(url, options);
+      // Success path
+      if (res.ok) {
+        // If we succeeded using a guessed base, persist it for subsequent calls
+        if (base && base !== API_BASE) {
+          API_BASE = base;
+          if (DEBUG) { try { console.info('[checkout] API_BASE switched to', API_BASE); } catch {} }
+        }
+        return await res.json();
+      }
+      // If 404 and we haven't tried all, continue to next base
+      if (res.status === 404) {
+        if (DEBUG) { try { console.warn('[checkout] 404 at', url, 'trying next base'); } catch {} }
+        continue;
+      }
+      // Other HTTP errors: return parsed error payload if possible
+      try { return await res.json(); } catch {
+        if (DEBUG) { try { console.error('[checkout] HTTP error', res.status, 'at', url); } catch {} }
+        return { error: `HTTP ${res.status}` };
+      }
+    } catch (e) {
+      lastErr = e;
+      if (DEBUG) { try { console.warn('[checkout] fetch failed at', url, e?.message||e); } catch {} }
+      // Try next base
+    }
+  }
+  // If everything failed, surface a generic error
+  if (lastErr) {
+    if (DEBUG) { try { console.error('[checkout] all bases failed for', path, lastErr?.message||lastErr); } catch {} }
+    return { error: lastErr.message || 'Network error' };
+  }
+  return { error: 'Request failed' };
+}
 async function getStripe() {
   if (stripe) return stripe;
   try {
-    const cfg = await fetch('/api/config').then(r=>r.ok?r.json():{ pk: 'pk_test_your_publishable_key', enabled: false });
+  const cfg = await fetchJsonWithFallback('/api/config', { method: 'GET', cache: 'no-store' });
     try { window.__stripeCfg = cfg; } catch {}
     stripeEnabled = !!cfg.enabled;
+    if (DEBUG) { try { console.info('[checkout] /api/config ->', cfg); } catch {} }
     stripe = Stripe(cfg.pk || 'pk_test_your_publishable_key');
   } catch {
     stripeEnabled = false;
+    if (DEBUG) { try { console.warn('[checkout] /api/config failed; falling back to test pk'); } catch {} }
     stripe = Stripe('pk_test_your_publishable_key');
   }
   return stripe;
@@ -21,7 +76,8 @@ function readCart(){ try{ return JSON.parse(localStorage.getItem('cart')||'[]');
 function variantText(i){
   const parts = [];
   if ((i.size||'').trim()) parts.push(`Size ${i.size}`);
-  if ((i.color||'').trim()) parts.push(`Color ${i.color}`);
+  const isNetting = (String(i.category||'').toLowerCase()==='netting') || (String(i.id||'').toLowerCase().startsWith('custom-net-'));
+  if ((i.color||'').trim()) parts.push(`${isNetting ? 'Spec' : 'Color'} ${i.color}`);
   return parts.join(', ');
 }
 
@@ -84,17 +140,17 @@ function updateSummary(cart, applied, shippingAddr, shippingMethod){
   if (el('sum-subtotal')) el('sum-subtotal').textContent = currencyFmt(fromCents(sub));
   if (el('sum-shipping')) el('sum-shipping').textContent = ship === 0 ? 'Free' : currencyFmt(fromCents(ship));
   const taxRow = document.getElementById('tax-row');
-  if (taxRow) taxRow.style.display = tax > 0 ? '' : 'none';
+  if (taxRow) taxRow.hidden = !(tax > 0);
   const taxEl = document.getElementById('sum-tax');
   if (taxEl) taxEl.textContent = currencyFmt(fromCents(tax));
   if (discount > 0) {
     const row = document.getElementById('discount-row');
-    if (row) row.style.display = '';
+    if (row) row.hidden = false;
     const dEl = document.getElementById('sum-discount');
     if (dEl) dEl.textContent = '-' + currencyFmt(fromCents(discount));
   } else {
     const row = document.getElementById('discount-row');
-    if (row) row.style.display = 'none';
+    if (row) row.hidden = true;
   }
   if (el('sum-total')) el('sum-total').textContent = currencyFmt(fromCents(total));
   return { sub, ship, discount, tax, total };
@@ -123,23 +179,32 @@ async function initialize() {
   let orderId = null;
   let serverBreakdown = null; // latest server-provided breakdown
 
-  const SHIPPING_METHOD_STORAGE_KEY = 'shippingMethod';
-  const getShippingMethod = () => {
-    const el = document.getElementById('shipping-method');
-    const fromDom = el ? el.value : null;
-    if (fromDom) return normalizeShippingMethod(fromDom);
-    try { return normalizeShippingMethod(localStorage.getItem(SHIPPING_METHOD_STORAGE_KEY) || 'standard'); } catch { return 'standard'; }
-  };
-  const setShippingMethod = (method) => {
-    const norm = normalizeShippingMethod(method);
-    try { localStorage.setItem(SHIPPING_METHOD_STORAGE_KEY, norm); } catch {}
-    const el = document.getElementById('shipping-method');
-    if (el) el.value = norm;
-    return norm;
-  };
-
-  // Initialize selector state from localStorage (if present)
-  setShippingMethod(getShippingMethod());
+  // Prefill for logged-in users: name/email + default shipping address
+  try {
+    const user = JSON.parse(localStorage.getItem('currentUser')||'null');
+    const guestPrompt = document.getElementById('guest-prompt');
+    if (user && user.id) {
+      if (guestPrompt) guestPrompt.hidden = true;
+      const nm = document.getElementById('name'); if (nm && !nm.value) nm.value = user.name || `${user.firstName||''} ${user.lastName||''}`.trim();
+      const em = document.getElementById('email'); if (em && !em.value) em.value = user.email || '';
+      try {
+        const data = await fetchJsonWithFallback('/api/users/me/addresses', { method: 'GET', credentials: 'include', cache: 'no-store' });
+        const list = Array.isArray(data?.addresses) ? data.addresses : [];
+        const def = list.find(a=>a.isDefault) || list[0];
+        if (def) {
+          const set = (id, v) => { const el = document.getElementById(id); if (el && !el.value) el.value = v || ''; };
+          set('address1', def.address1);
+          set('address2', def.address2);
+          set('city', def.city);
+          set('state', def.state);
+          set('postal', def.postal);
+          const country = document.getElementById('country'); if (country && !country.value) country.value = def.country || 'US';
+        }
+      } catch {}
+    } else {
+      if (guestPrompt) guestPrompt.hidden = false;
+    }
+  } catch {}
 
   // Render order lines with price and quantity
   const initialShippingMethod = getShippingMethod();
@@ -160,6 +225,7 @@ async function initialize() {
         <div>
           <strong>${title}</strong>
           ${variant ? `<div class="muted">${variant}</div>` : ''}
+          <div class="muted text-xs">SKU: ${i.id}</div>
           <div class="muted">${currencyFmt(unitCents)} × ${qty}</div>
           <div class="muted">Shipping: ${shipEachWithMethod===0 ? 'Free' : currencyFmt(toCents(shipEachWithMethod))} × ${qty}${initialShippingMethod === 'expedited' ? ' (expedited)' : ''}</div>
         </div>
@@ -176,8 +242,14 @@ async function initialize() {
     const customer = { name: fd.get('name'), email: fd.get('email') };
     const shipping = { address1: fd.get('address1'), address2: fd.get('address2'), city: fd.get('city'), state: fd.get('state'), postal: fd.get('postal'), country: fd.get('country') };
     // Send minimal items shape to backend
-    const items = cart.map(i=>({ id: i.id, qty: i.qty }));
-    return { items, customer, shipping, shippingMethod: getShippingMethod(), couponCode: appliedCoupon?.code || '', existingOrderId: orderId };
+    // Include unit price and per-item shipping to help the server price variation-only items when DB/fallback lacks a product-level price
+    const items = cart.map(i=>({
+      id: i.id,
+      qty: i.qty,
+      price: Number(i.price)||0,
+      ship: (Number(i.shipAmount) || undefined)
+    }));
+    return { items, customer, shipping, couponCode: appliedCoupon?.code || '', existingOrderId: orderId };
   };
 
   function getShippingAddress(){
@@ -189,16 +261,21 @@ async function initialize() {
   }
 
   function debounce(fn, wait){ let t; return (...args)=>{ clearTimeout(t); t = setTimeout(()=>fn(...args), wait); }; }
+  let lastClientSecret = null;
+  let lastAddrBasis = '';
 
   async function createOrUpdatePaymentIntent() {
     await getStripe();
     if (!stripeEnabled) return;
     try {
-      const intentResp = await fetch('/api/create-payment-intent', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(getPayload())
-      }).then(r => r.json());
+      const intentResp = await fetchJsonWithFallback('/api/create-payment-intent', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(getPayload()), cache: 'no-store'
+      });
+      if (DEBUG) { try { console.info('[checkout] PI response', intentResp); } catch {} }
       if (intentResp && !intentResp.error) {
-        clientSecret = intentResp.clientSecret;
+        const newSecret = intentResp.clientSecret;
+        const secretChanged = newSecret && newSecret !== clientSecret;
+        clientSecret = newSecret;
         amount = intentResp.amount;
         orderId = intentResp.orderId || orderId;
         if (intentResp.couponApplied) {
@@ -217,11 +294,11 @@ async function initialize() {
             const shipEl = document.getElementById('sum-shipping');
             if (shipEl) shipEl.textContent = (bd.shipping === 0) ? 'Free' : currencyFmt(fromCents(bd.shipping));
             const taxRow = document.getElementById('tax-row');
-            if (taxRow) taxRow.style.display = bd.tax && bd.tax > 0 ? '' : 'none';
+            if (taxRow) taxRow.hidden = !(bd.tax && bd.tax > 0);
             if (Number.isFinite(bd.tax)) set('sum-tax', bd.tax);
             if (bd.discount && bd.discount > 0) {
               const row = document.getElementById('discount-row');
-              if (row) row.style.display = '';
+              if (row) row.hidden = false;
               const dEl = document.getElementById('sum-discount');
               if (dEl) dEl.textContent = '-' + currencyFmt(fromCents(bd.discount));
             }
@@ -230,17 +307,21 @@ async function initialize() {
           }
         } catch {}
         const _stripe = await getStripe();
-        // Always recreate Elements for a new clientSecret to ensure correct PI binding
+        // Only recreate Elements if the clientSecret changed or Elements not initialized
         try {
-          if (elements) {
-            try { const host = document.getElementById('payment-element'); host && (host.innerHTML = ''); } catch {}
+          if (secretChanged || !elements) {
+            if (elements) {
+              try { const host = document.getElementById('payment-element'); host && (host.innerHTML = ''); } catch {}
+            }
+            elements = _stripe.elements({ clientSecret, appearance: { theme: 'stripe' } });
+            const paymentElement = elements.create('payment', { layout: 'tabs' });
+            paymentElement.mount('#payment-element');
+            lastClientSecret = clientSecret;
           }
-          elements = _stripe.elements({ clientSecret, appearance: { theme: 'stripe' } });
-          const paymentElement = elements.create('payment', { layout: 'tabs' });
-          paymentElement.mount('#payment-element');
         } catch {}
       }
       if (intentResp && intentResp.error) {
+        if (DEBUG) { try { console.error('[checkout] PI error', intentResp.error); } catch {} }
         const msg = document.getElementById('payment-message');
         if (msg) msg.textContent = intentResp.error || 'Could not initialize payment.';
       }
@@ -258,19 +339,29 @@ async function initialize() {
     document.getElementById('sum-total').textContent = currencyFmt(fromCents(computedTotal));
   }
   if (!clientSecret) {
-    // Hide payment UI in test mode without Stripe
     const pe = document.getElementById('payment-element');
-    if (pe) pe.innerHTML = '<p class="muted">Test checkout active (no card required)</p>';
     const submit = document.getElementById('submit');
-    if (submit) submit.textContent = 'Place Order';
-    // If Stripe is disabled due to server config, surface a helpful note
-    try {
-      const cfg = window.__stripeCfg;
-      if (cfg && cfg.missing && (cfg.missing.secret || cfg.missing.publishable)) {
-        const msg = document.getElementById('payment-message');
-        if (msg) msg.textContent = 'Card payments are temporarily unavailable. You can still place your order and we will follow up to complete payment.';
-      }
-    } catch {}
+    if (stripeEnabled) {
+      // Stripe is configured, but PI could not be created. Do NOT silently fall back to test checkout.
+      if (DEBUG) { try { console.warn('[checkout] Stripe enabled but no clientSecret — PI init failed, keeping real checkout disabled UI.'); } catch {} }
+      if (pe) pe.innerHTML = '<p class="muted">Card payments are temporarily unavailable. Please verify your details and try again in a moment. If the problem persists, contact support.</p>';
+      if (submit) submit.textContent = 'Try Again';
+      const msg = document.getElementById('payment-message');
+      if (msg && !msg.textContent) msg.textContent = 'Unable to initialize payment. Please retry.';
+    } else {
+      // Stripe disabled: enable explicit test checkout fallback
+      if (DEBUG) { try { console.warn('[checkout] Stripe disabled (cfg.enabled=false) — switching to test checkout fallback. API_BASE =', API_BASE||'(same-origin)'); } catch {} }
+      if (pe) pe.innerHTML = '<p class="muted">Test checkout active (no card required)</p>';
+      if (submit) submit.textContent = 'Place Order';
+      // If Stripe is disabled due to server config, surface a helpful note
+      try {
+        const cfg = window.__stripeCfg;
+        if (cfg && cfg.missing && (cfg.missing.secret || cfg.missing.publishable)) {
+          const m2 = document.getElementById('payment-message');
+          if (m2) m2.textContent = 'Card payments are temporarily unavailable. You can still place your order and we will follow up to complete payment.';
+        }
+      } catch {}
+    }
   }
 
   // Shipping method selection removed; totals depend only on cart contents and coupon
@@ -295,49 +386,73 @@ async function initialize() {
     const code = (codeInput?.value || '').trim();
     if (!code) { msg.textContent = 'Enter a code.'; return; }
     try {
-      const res = await fetch('/api/marketing/validate-coupon', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ code, email: (new FormData(form)).get('email')||'' }) });
-      const data = await res.json();
+      const currentUser = (function(){ try { return JSON.parse(localStorage.getItem('currentUser')||'null'); } catch { return null; } })();
+      const payload = { code, email: (new FormData(form)).get('email')||'' };
+      if (currentUser?.id) payload.userId = currentUser.id;
+      const data = await fetchJsonWithFallback('/api/marketing/validate-coupon', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
       if (data.valid) {
-        appliedCoupon = data.coupon ? { code: data.coupon.code, type: data.coupon.type, value: data.coupon.value } : { code, type:'percent', value:0 };
-        document.getElementById('discount-code-label').textContent = `(${appliedCoupon.code})`;
-        updateSummary(cart, appliedCoupon, getShippingAddress(), getShippingMethod());
+        appliedCoupon = data.coupon ? { code: data.coupon.code, type: data.coupon.type, value: data.coupon.value, restricted: !!data.restricted, matchedBy: data.matchedBy||null } : { code, type:'percent', value:0 };
+        const label = document.getElementById('discount-code-label');
+        if (label) {
+          label.textContent = `(${appliedCoupon.code}${appliedCoupon.restricted ? ' • account' : ''})`;
+          label.title = appliedCoupon.restricted ? 'This code is bound to your account.' : '';
+        }
+        updateSummary(cart, appliedCoupon, getShippingAddress());
         await createOrUpdatePaymentIntent();
         if (amount > 0) document.getElementById('sum-total').textContent = currencyFmt(amount);
-        msg.textContent = 'Code applied.';
+        msg.textContent = appliedCoupon.restricted ? 'Code applied to your account.' : 'Code applied.';
       } else {
         appliedCoupon = null;
-        updateSummary(cart, appliedCoupon, getShippingAddress(), getShippingMethod());
-        msg.textContent = 'Invalid or expired code.';
+        updateSummary(cart, appliedCoupon, getShippingAddress());
+        const reason = String(data.reason||'');
+        if (reason === 'expired') msg.textContent = 'This code has expired.';
+        else if (reason === 'restricted') msg.innerHTML = 'This code is only available for a specific account. <a href="login.html">Sign in</a> and try again.';
+        else msg.textContent = 'Invalid code.';
       }
     } catch (e) {
       msg.textContent = 'Could not validate code.';
     }
   });
 
-  // Recalculate when address changes (debounced)
+  // Recalculate when address changes (debounced, with minimal completeness)
   const onAddrChange = debounce(async () => {
-    // Update local summary immediately for test mode and UX
-    updateSummary(cart, appliedCoupon, getShippingAddress(), getShippingMethod());
+    const addr = getShippingAddress();
+    // Only trigger PI update when address is minimally complete
+    const postal = String(addr.postal||'').trim();
+    const state = String(addr.state||'').trim();
+    const country = String(addr.country||'').trim() || 'US';
+    const basis = JSON.stringify({ postal: postal.slice(0,5), state, country });
+    // Always update the visible summary quickly
+    updateSummary(cart, appliedCoupon, addr);
+    // If the basis hasn't changed, skip network churn
+    if (basis === lastAddrBasis) return;
+    // Require at least state + 5-digit postal for US to price tax properly
+    if ((country === 'US') && (postal.replace(/\D/g,'').length < 5 || state.length < 2)) {
+      lastAddrBasis = basis; // record to avoid repeated checks
+      return;
+    }
+    lastAddrBasis = basis;
     await createOrUpdatePaymentIntent();
     if (amount > 0) document.getElementById('sum-total').textContent = currencyFmt(amount);
-  }, 350);
-  ['address1','address2','city','state','postal','country'].forEach(id => {
-    const el = document.getElementById(id);
-    if (!el) return;
-    el.addEventListener('input', onAddrChange);
-    el.addEventListener('change', onAddrChange);
+  }, 800);
+  // Use change for long text fields to avoid per-character refresh; allow input for state/postal/country
+  ;['address1','address2','city'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.addEventListener('change', onAddrChange);
+  });
+  ;['state','postal','country'].forEach(id => {
+    const el = document.getElementById(id); if (el) { el.addEventListener('input', onAddrChange); el.addEventListener('change', onAddrChange); }
   });
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
     document.getElementById('submit').disabled = true;
-  // Decide mode: Real Stripe when we have a clientSecret; else test mode
-  const testMode = !clientSecret;
+    // Decide mode: Real Stripe when we have a clientSecret; else only allow test fallback when Stripe is disabled
+    const testMode = !clientSecret && !stripeEnabled;
     if (testMode) {
       try {
         const payload = getPayload();
         // Try to create order via backend (unauthenticated endpoint)
-        const resp = await fetch('/api/order', { method:'POST', headers:{'Content-Type':'application/json'}, credentials:'include', body: JSON.stringify(payload) });
+        const respJson = await fetchJsonWithFallback('/api/order', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
         // Compute totals locally for confirmation
         const sub = calcSubtotalCents(cart);
         const ship = calcShippingCentsForCart(cart, getShippingMethod());
@@ -345,12 +460,9 @@ async function initialize() {
         const tax = Math.round(Math.max(0, sub + ship - discount) * taxRateForAddress(getShippingAddress()));
         const total = sub + ship - discount + tax;
         let orderId = Date.now();
-        if (resp.ok) {
-          const data = await resp.json();
-          orderId = data.orderId || orderId;
-        }
+        if (respJson && respJson.orderId) { orderId = respJson.orderId; }
         // Build a local order snapshot for confirmation
-        const items = cart.map(i=>({ productName: i.title || i.id, id: i.id, quantity: i.qty, price: Number(i.price)||0, subtotal: (Number(i.price)||0) * (i.qty||0) }));
+  const items = cart.map(i=>({ productName: i.title || i.id, id: i.id, quantity: i.qty, price: Number(i.price)||0, subtotal: (Number(i.price)||0) * (i.qty||0), size: i.size||'', color: i.color||'', category: i.category||'' }));
         const order = {
           id: orderId,
           items,
@@ -377,7 +489,7 @@ async function initialize() {
     // Real Stripe flow
     // Save a lightweight snapshot for confirmation page UI
     try {
-      const items = cart.map(i=>({ productName: i.title || i.id, id: i.id, quantity: i.qty, price: Number(i.price)||0, subtotal: (Number(i.price)||0) * (i.qty||0) }));
+  const items = cart.map(i=>({ productName: i.title || i.id, id: i.id, quantity: i.qty, price: Number(i.price)||0, subtotal: (Number(i.price)||0) * (i.qty||0), size: i.size||'', color: i.color||'', category: i.category||'' }));
       const sub = calcSubtotalCents(cart);
       const ship = calcShippingCentsForCart(cart);
       const fallbackTotal = sub + ship;
@@ -450,4 +562,56 @@ async function initialize() {
   }
 }
 
-initialize();
+// Optional: Google Maps Places Autocomplete for address fields (if configured on server)
+async function initAddressAutocomplete(){
+  try {
+    // Avoid duplicate loads
+    if (window.google && window.google.maps && window.google.maps.places) return true;
+    const cfg = await fetchJsonWithFallback('/api/maps-config', { method: 'GET', cache: 'no-store' });
+    const key = cfg && cfg.googleMapsApiKey;
+    if (!key) return false;
+    // Load the script once with a bootstrap callback
+    if (window.__mapsLoading) return true;
+    window.__mapsLoading = true;
+    await new Promise((resolve) => {
+      const s = document.createElement('script');
+      s.src = `https://maps.googleapis.com/maps/api/js?key=${encodeURIComponent(key)}&libraries=places&callback=__initPlaces`;
+      s.async = true; s.defer = true;
+      window.__initPlaces = () => { resolve(true); };
+      s.onerror = () => resolve(false);
+      document.head.appendChild(s);
+    });
+    // Attach autocomplete to address line 1
+    const line1 = document.getElementById('address1');
+    if (!line1 || !(window.google && window.google.maps && window.google.maps.places)) return false;
+    const ac = new google.maps.places.Autocomplete(line1, {
+      types: ['address'],
+      componentRestrictions: { country: ['US'] },
+      fields: ['address_components']
+    });
+    ac.addListener('place_changed', () => {
+      try {
+        const place = ac.getPlace();
+        const comps = place && place.address_components ? place.address_components : [];
+        const get = (type) => {
+          const c = comps.find(x => Array.isArray(x.types) && x.types.includes(type));
+          return c ? (c.long_name || c.short_name || '') : '';
+        };
+        const street = [get('street_number'), get('route')].filter(Boolean).join(' ');
+        const city = get('locality') || get('sublocality') || get('administrative_area_level_3');
+        const state = get('administrative_area_level_1');
+        const postal = get('postal_code');
+        const country = get('country') || 'US';
+        const set = (id, v) => { const el = document.getElementById(id); if (el) { el.value = v || ''; el.dispatchEvent(new Event('input', { bubbles: true })); el.dispatchEvent(new Event('change', { bubbles: true })); } };
+        if (street) set('address1', street);
+        if (city) set('city', city);
+        if (state) set('state', state);
+        if (postal) set('postal', postal);
+        const ce = document.getElementById('country'); if (ce) ce.value = country || 'US';
+      } catch {}
+    });
+    return true;
+  } catch { return false; }
+}
+
+(async () => { try { await initialize(); } finally { initAddressAutocomplete(); } })();

@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Thank you for your order | EZ Sports Netting</title>
   <link rel="stylesheet" href="assets/css/styles.css" />
+  <!-- Point API calls to the Render backend when this page is served from a static host -->
+  <meta name="api-base" content="https://ezsportsapp.onrender.com" />
   <style>
     .confirm-card{max-width:760px;margin:2rem auto;background:#fff;border:1px solid #e6edf6;border-radius:1rem;padding:2rem;box-shadow:0 4px 24px rgba(12,32,64,.08)}
     .muted{color:#516173}
@@ -12,6 +14,28 @@
   </style>
   <script>
     function currency(n){return n.toLocaleString(undefined,{style:'currency',currency:'USD'})}
+    function getApiBase(){
+      try {
+        if (window.__API_BASE) return String(window.__API_BASE).replace(/\/$/, '');
+        const meta = document.querySelector('meta[name="api-base"]');
+        if (meta && meta.content) return String(meta.content).replace(/\/$/, '');
+      } catch {}
+      return '';
+    }
+    async function fetchJsonWithBase(path, opts){
+      const guessed = 'https://ezsportsapp.onrender.com';
+      const bases = [ getApiBase(), guessed ].filter(Boolean);
+      for (const base of bases){
+        const url = base ? (base + path) : path;
+        try {
+          const res = await fetch(url, opts);
+          if (res.ok) return await res.json();
+          // try next base on 404
+          if (res.status === 404) continue;
+        } catch {}
+      }
+      return null;
+    }
     async function load(){
       try{
         const params=new URLSearchParams(location.search);
@@ -20,8 +44,7 @@
         let order=null;
         if (id) {
           try {
-            const res = await fetch('/api/orders/summary/'+encodeURIComponent(id), { cache:'no-store' });
-            if (res.ok) order = await res.json();
+            order = await fetchJsonWithBase('/api/orders/summary/'+encodeURIComponent(id), { cache:'no-store' });
           } catch {}
         }
         if(!order){
@@ -30,7 +53,17 @@
         if(order){
           document.getElementById('order-id').textContent = order.id || id || '—';
           document.getElementById('total').textContent = currency(Number(order.total||0));
-          const lines=(order.items||[]).map(i=>`<li>${i.productName||i.id} × ${i.quantity||i.qty}</li>`).join('');
+          const lines=(order.items||[]).map(i=>{
+            const name = i.productName || i.id || 'Item';
+            const isNet = String(i.category||'').toLowerCase()==='netting' || String(i.id||'').toLowerCase().startsWith('custom-net-');
+            const parts = [];
+            if ((i.size||'').trim()) parts.push(`Size ${i.size}`);
+            if ((i.color||'').trim()) parts.push(`${isNet ? 'Spec' : 'Color'} ${i.color}`);
+            const variant = parts.length ? ` <div class=\"muted text-xs\">${parts.join(', ')}</div>` : '';
+            const sku = i.id ? ` <div class=\"muted text-xs\">SKU: ${i.id}</div>` : '';
+            const qty = i.quantity || i.qty || 0;
+            return `<li><div><strong>${name}</strong>${variant}${sku}</div><div class=\"muted\">× ${qty}</div></li>`;
+          }).join('');
           document.getElementById('lines').innerHTML = lines || '<li>No items</li>';
           const extras = document.getElementById('order-extras');
           if (extras) {

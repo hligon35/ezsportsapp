@@ -18,7 +18,9 @@ export default {
     const subject = String(body.subject || '').trim();
     const html = String(body.html || '');
     const text = String(body.text || '') || html.replace(/<[^>]+>/g, ' ');
-    const from = String(body.from || env.DEFAULT_FROM || 'no-reply@yourdomain.com');
+    const from = String(body.from || env.DEFAULT_FROM || 'no-reply@ezsportsnetting.com');
+  const replyTo = String(body.replyTo || '').trim();
+  const fromName = String(body.fromName || 'EZ Sports Netting');
     if (!to || !subject) return new Response('Missing to/subject', { status: 400 });
 
     // Minimal, privacy-safe logging
@@ -31,7 +33,7 @@ export default {
 
     const mailChannelsPayload = {
       personalizations: [{ to: [{ email: to }] }],
-      from: { email: from, name: body.fromName || 'EZ Sports Netting' },
+      from: { email: from, name: fromName },
       subject,
       content: [
         { type: 'text/plain', value: text },
@@ -41,7 +43,9 @@ export default {
       envelope: {
         from: from,
         to: [to]
-      }
+      },
+      // If provided, set Reply-To to route responses to a monitored inbox
+      ...(replyTo ? { reply_to: { email: replyTo } } : {})
     };
 
     const resp = await fetch('https://api.mailchannels.net/tx/v1/send', {

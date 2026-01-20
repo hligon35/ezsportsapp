@@ -390,7 +390,7 @@
         "sku": "PK-BULLETJR",
         "name": "Bullet JR L Pad Kit (20')",
         "wholesale": 89.95,
-        "map": 149.95,
+        "map": 114.95,
         "dsr": 20,
         "img": "assets/prodImgs/Accessories/Padding/padding.png",
         "images": [
@@ -415,7 +415,7 @@
         "sku": "PK-BULLETFT",
         "name": "Bullet Front Toss Pad Kit (25')",
         "wholesale": 89.95,
-        "map": 149.95,
+        "map": 114.95,
         "dsr": 20,
         "details": {
           "features": [
@@ -437,7 +437,7 @@
         "sku": "PK-BULLETCOMBO",
         "name": "Bullet Combo Pad Kit (25')",
         "wholesale": 98.95,
-        "map": 158.95,
+        "map": 114.95,
         "dsr": 20,
         "details": {
           "features": [
@@ -457,9 +457,9 @@
       },
       {
         "sku": "PK-BULLETCOP",
-        "name": "Bullet Overhead Protector Pad Kit (45')",
+        "name": "Bullet Combo w/ Overhead Pad Kit (45')",
         "wholesale": 98.95,
-        "map": 158.95,
+        "map": 144.95,
         "dsr": 20,
         "details": {
           "features": [
@@ -479,7 +479,7 @@
       },
       {
         "sku": "PK-BULLETLOP",
-        "name": "Bullet Combo w/ Overhead Pad Kit (38')",
+        "name": "Bullet L w/ Overhead Pad Kit (38')",
         "wholesale": 98.95,
         "map": 158.95,
         "dsr": 20,
@@ -501,9 +501,9 @@
       },
       {
         "sku": "PK-BULLETFP",
-        "name": "Bullet Combo w/ Overhead Pad Kit (25')",
+        "name": "Bullet Fast Pitch Pad Kit (25')",
         "wholesale": 89.95,
-        "map": 149.95,
+        "map": 114.95,
         "dsr": 20,
         "details": {
           "features": [
@@ -523,9 +523,9 @@
       },
       {
         "sku": "PK-BULLETFPOH",
-        "name": "Bullet Combo w/ Overhead Pad Kit (25')",
+        "name": "Bullet Fast Pitch w/ Overhead Pad Kit (25')",
         "wholesale": 89.95,
-        "map": 149.95,
+        "map": 114.95,
         "dsr": 20,
         "details": {
           "features": [
@@ -660,7 +660,7 @@
         "name": "Bullet L Replacement Net",
         "gauge": 60,
   "wholesale": 84.47,
-  "map": 144.47,
+  "map": 129.95,
   "dsr": 15,
         "details": {
           "features": [
@@ -687,7 +687,7 @@
         "name": "Bullet JR Replacement Net",
         "gauge": 60,
   "wholesale": 81.22,
-  "map": 141.22,
+  "map": 124.95,
   "dsr": 15,
         "details": {
           "features": [
@@ -714,7 +714,7 @@
         "name": "Bullet Front Toss Replacement Net",
         "gauge": 60,
   "wholesale": 84.47,
-  "map": 144.47,
+  "map": 129.95,
   "dsr": 15,
         "details": {
           "features": [
@@ -741,7 +741,7 @@
         "name": "Bullet Combo Replacement Net",
         "gauge": 60,
   "wholesale": 90.97,
-  "map": 150.97,
+  "map": 139.95,
   "dsr": 15,
         "details": {
           "features": [
@@ -768,7 +768,7 @@
         "name": "Bullet Combo w/ Overhead Replacement Net",
         "gauge": 60,
   "wholesale": 103.97,
-  "map": 163.97,
+  "map": 159.95,
   "dsr": 15,
         "details": {
           "features": [
@@ -795,7 +795,7 @@
         "name": "Bullet L w/ Overhead Replacement Net",
         "gauge": 60,
   "wholesale": 97.47,
-  "map": 157.47,
+  "map": 149.95,
   "dsr": 15,
         "details": {
           "features": [
@@ -822,7 +822,7 @@
         "name": "Bullet Fast Pitch Replacement Net",
         "gauge": 60,
   "wholesale": 90.97,
-  "map": 150.97,
+  "map": 139.95,
   "dsr": 15,
         "details": {
           "features": [
@@ -849,7 +849,7 @@
         "name": "Bullet Fast Pitch w/ Overhead Replacement Net",
         "gauge": 60,
   "wholesale": 61.72,
-  "map": 121.72,
+  "map": 124.95,
   "dsr": 15,
         "details": {
           "features": [
@@ -876,7 +876,7 @@
         "name": "7x7 Protective Screen Replacement Net",
         "gauge": 60,
   "wholesale": 84.47,
-  "map": 144.47,
+  "map": 129.95,
   "dsr": 15,
         "details": {
           "features": [
@@ -903,7 +903,7 @@
         "name": "7x7 Protective Screen w/ Socknet Replacement Net",
         "gauge": 60,
   "wholesale": 107.22,
-  "map": 167.22,
+  "map": 164.95,
   "dsr": 15,
         "details": {
           "features": [
@@ -930,7 +930,7 @@
         "name": "8x8 Protective Screen Replacement Net",
         "gauge": 60,
   "wholesale": 110.47,
-  "map": 170.47,
+  "map": 169.95,
   "dsr": 15,
         "details": {
           "features": [
@@ -957,7 +957,7 @@
         "name": "10x10 Protective Screen Replacement Net",
         "gauge": 60,
   "wholesale": 165.72,
-  "map": 225.72,
+  "map": 254.95,
   "dsr": 15,
         "details": {
           "features": [
@@ -1165,7 +1165,7 @@
         "sku": "Screen Bulletz",
         "name": "Screen Bulletz Leg Caps (4-Pack)",
         "wholesale": 32,
-        "map": 57,
+        "map": 39.95,
         "dsr": 100,
         "details": {
           "features": [
@@ -1273,6 +1273,11 @@
         "dsr": 0,
         "notes": "Free Shipping",
         "img": "assets/img/products/tanner-original-replacement-standard-batting-tee-stem-only-ttstem1.jpg",
+        "variations": [
+          { "id": "Battingmat-CLAY", "name": "Clay", "color": "maroon", "map": 549.95 },
+          { "id": "Battingmat-GREEN", "name": "Green", "color": "green", "map": 549.95 },
+          { "id": "Battingmat-RED", "name": "Red", "color": "red", "map": 799.95 }
+        ],
         "details": {
           "features": [
             "Fast and Reliable Shipping"
@@ -1284,7 +1289,7 @@
         "sku": "Armorbasket",
         "name": "Armor Basket Baseball Cart",
         "wholesale": 200,
-        "map": 300,
+        "map": 299.95,
         "dsr": 0,
         "notes": "Free Shipping",
         "img": "assets/img/products/victus-v243-powderpuff-pro-reserve-maple-wood-baseball-bat-cstmv243pp.jpg",

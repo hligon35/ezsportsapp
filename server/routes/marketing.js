@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const rateLimit = require('express-rate-limit');
 const SubscriberService = require('../services/SubscriberService');
 const CouponService = require('../services/CouponService');
 const EmailService = require('../services/EmailService');
@@ -18,50 +19,42 @@ router.post('/subscribe', async (req, res) => {
     const addr = (email || '').toString().trim();
     if (!addr) return res.status(400).json({ message: 'Email is required' });
 
+    // Save subscriber
     const s = await subs.addOrUpdate(addr, name);
 
-    // Fire-and-forget: notify internal inbox and send thank-you to subscriber
-    (async () => {
-      try {
-        const inbox = (process.env.CONTACT_INBOX || 'info@ezsportsnetting.com').trim();
-        if (inbox) {
-          const html = `
-            <h2>New Newsletter Subscriber</h2>
-            <p><strong>Email:</strong> ${addr}</p>
-            ${name ? `<p><strong>Name:</strong> ${name}</p>` : ''}
-            ${source ? `<p><strong>Source:</strong> ${source}</p>` : ''}
-            ${referer ? `<p><strong>Referrer:</strong> ${referer}</p>` : ''}
-          `;
-          await mail.queue({ to: inbox, subject: 'New subscriber', html, text: `Email: ${addr}\nName: ${name||''}\nSource: ${source||''}\nReferrer: ${referer||''}`, tags: ['subscribe','internal'] });
-        }
-      } catch (e) { /* ignore internal notify errors */ }
-
-      try {
+    // Queue emails in the background (do not await)
+    try {
+      const inbox = (process.env.CONTACT_INBOX || 'info@ezsportsnetting.com').trim();
+      if (inbox) {
         const html = `
-          <p>Thanks for subscribing to EZ Sports Netting!</p>
-          <p>We’ll send occasional deals and product updates. You can unsubscribe anytime.</p>
+          <h2>New Newsletter Subscriber</h2>
+          <p><strong>Email:</strong> ${addr}</p>
+          ${name ? `<p><strong>Name:</strong> ${name}</p>` : ''}
+          ${source ? `<p><strong>Source:</strong> ${source}</p>` : ''}
+          ${referer ? `<p><strong>Referrer:</strong> ${referer}</p>` : ''}
         `;
-        await mail.queue({ to: addr, subject: 'Thanks for subscribing to EZ Sports Netting', html, text: 'Thanks for subscribing to EZ Sports Netting! We’ll send occasional deals and product updates.', tags: ['subscribe','welcome'] });
-      } catch (e) { /* ignore welcome email errors */ }
-    })();
+        // Fire-and-forget; log errors but don't delay response
+        void mail.queue({ to: inbox, subject: 'New subscriber', html, text: `Email: ${addr}\nName: ${name||''}\nSource: ${source||''}\nReferrer: ${referer||''}`, tags: ['subscribe','internal'], replyTo: addr }).catch(err=>console.warn('Subscribe internal email failed:', err?.message||err));
+      }
+      const welcomeHtml = `
+        <p>Thanks for subscribing to EZ Sports Netting!</p>
+        <p>We’ll send occasional deals and product updates. You can unsubscribe anytime.</p>
+      `;
+      void mail.queue({ to: addr, subject: 'Thanks for subscribing to EZ Sports Netting', html: welcomeHtml, text: 'Thanks for subscribing to EZ Sports Netting! We’ll send occasional deals and product updates.', tags: ['subscribe','welcome'], replyTo: inbox }).catch(err=>console.warn('Subscribe welcome email failed:', err?.message||err));
+    } catch {}
 
-    // Optionally forward to Google Apps Script to log to Google Sheet
+    // Optional Apps Script forward (non-blocking)
     try {
       const url = (process.env.MARKETING_APPS_SCRIPT_URL || '').trim();
       if (url) {
         const payload = { type: 'subscribe', email: addr, name, source: source || '', referer: referer || '' };
         const body = JSON.stringify(payload);
-        // Use global fetch if available (Node 18+); ignore errors
-        const doFetch = (typeof fetch === 'function')
-          ? fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body })
-          : Promise.resolve(null);
-        await Promise.race([
-          doFetch.catch(()=>null),
-          new Promise(r=>setTimeout(()=>r(null), 1500)) // don't block response
-        ]);
+        const doFetch = (typeof fetch === 'function') ? fetch : null;
+        if (doFetch) { void doFetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body }).catch(()=>{}); }
       }
-    } catch {/* ignore forwarding errors */}
+    } catch {}
 
+    // Respond immediately
     res.json({ ok:true, subscriber: s });
   } catch (e) {
     res.status(400).json({ message: e.message });
@@ -79,67 +72,84 @@ router.post('/contact', async (req, res) => {
     const subject = (body.subject || '').toString().trim() || 'New Contact Form Submission';
     const turnstile = body['cf-turnstile-response'] || body.cfTurnstileToken || '';
     const honeypot = body.hp || body._honeypot || '';
+    const bypassTurnstile = ((process.env.TURNSTILE_BYPASS || process.env.CF_TURNSTILE_BYPASS || '').toLowerCase() === 'true');
 
     // Basic anti-spam: honeypot should be empty
     if (honeypot) return res.json({ ok: true, queued: false, spam: true });
 
     if (!email || !message) return res.status(400).json({ ok: false, error: 'Missing email or message' });
 
-    // Optional Cloudflare Turnstile verification (enable by setting CF_TURNSTILE_SECRET)
-    try {
-      const tsSecret = (process.env.CF_TURNSTILE_SECRET || '').trim();
-      if (tsSecret) {
-        const doFetch = (typeof fetch === 'function') ? fetch : (require('undici').fetch);
-        const resp = await doFetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-          body: new URLSearchParams({ secret: tsSecret, response: turnstile || '' }).toString()
-        }).catch(() => null);
-        const data = resp ? await resp.json().catch(()=>({})) : {};
-        if (!data || data.success !== true) {
-          return res.status(400).json({ ok:false, error: 'Captcha verification failed' });
-        }
-      }
-    } catch { /* treat as no captcha when network fails */ }
-
-    const html = `
-      <h2>Contact Form Submission</h2>
-      <p><strong>Name:</strong> ${name}</p>
-      <p><strong>Email:</strong> ${email}</p>
-      ${phone ? `<p><strong>Phone:</strong> ${phone}</p>` : ''}
-      <p><strong>Subject:</strong> ${subject}</p>
-      <p><strong>Message:</strong></p>
-      <pre style="white-space:pre-wrap">${message}</pre>
-    `;
-
-    const inbox = (process.env.CONTACT_INBOX || 'info@ezsportsnetting.com').trim();
-    await mail.queue({
-      to: inbox,
-      subject: `[Contact] ${subject}`,
-      html,
-      text: `From: ${name} <${email}>\n${phone ? `Phone: ${phone}\n` : ''}\nSubject: ${subject}\n\n${message}`,
-      tags: ['contact']
-    });
-
-    // Send an acknowledgement email to the sender (non-blocking)
-    try {
-      const ackHtml = `
-        <p>Hi ${name.replace(/</g,'&lt;')},</p>
-        <p>Thanks for contacting EZ Sports Netting! We received your message and will get back to you soon.</p>
-        <hr/>
-        <p><strong>Your message:</strong></p>
-        <pre style="white-space:pre-wrap">${message.replace(/</g,'&lt;')}</pre>
-      `;
-      await mail.queue({
-        to: email,
-        subject: 'We received your message',
-        html: ackHtml,
-        text: `Hi ${name},\n\nThanks for contacting EZ Sports Netting! We received your message and will get back to you soon.\n\n---\nYour message:\n${message}`,
-        tags: ['contact','ack']
-      });
-    } catch (_) { /* ignore ack errors */ }
-
+    // Respond immediately to keep the UI snappy
     res.json({ ok: true, queued: true });
+
+    // Continue work in background: verify Turnstile (if enabled) and send emails.
+    setImmediate(async () => {
+      try {
+        // Optional Cloudflare Turnstile verification (enable by setting CF_TURNSTILE_SECRET)
+        let captchaOk = true;
+        try {
+          const tsSecret = (process.env.CF_TURNSTILE_SECRET || '').trim();
+          if (tsSecret && !bypassTurnstile) {
+            const doFetch = (typeof fetch === 'function') ? fetch : (require('undici').fetch);
+            const resp = await doFetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+              body: new URLSearchParams({ secret: tsSecret, response: turnstile || '' }).toString()
+            }).catch(() => null);
+            const data = resp ? await resp.json().catch(()=>({})) : {};
+            captchaOk = !!(data && data.success === true);
+          }
+        } catch { /* ignore */ }
+
+        const html = `
+          <h2>Contact Form Submission</h2>
+          <p><strong>Name:</strong> ${name}</p>
+          <p><strong>Email:</strong> ${email}</p>
+          ${phone ? `<p><strong>Phone:</strong> ${phone}</p>` : ''}
+          <p><strong>Subject:</strong> ${subject}</p>
+          <p><strong>Message:</strong></p>
+          <pre style="white-space:pre-wrap">${message}</pre>
+        `;
+
+        const inbox = (process.env.CONTACT_INBOX || 'info@ezsportsnetting.com').trim();
+
+        // Always send an acknowledgement to the sender (does not depend on captcha)
+        try {
+          const ackHtml = `
+            <p>Hi ${name.replace(/</g,'&lt;')},</p>
+            <p>Thanks for contacting EZ Sports Netting! We received your message and will get back to you soon.</p>
+            <hr/>
+            <p><strong>Your message:</strong></p>
+            <pre style="white-space:pre-wrap">${message.replace(/</g,'&lt;')}</pre>
+          `;
+          void mail.queue({
+            to: email,
+            subject: 'We received your message',
+            html: ackHtml,
+            text: `Hi ${name},\n\nThanks for contacting EZ Sports Netting! We received your message and will get back to you soon.\n\n---\nYour message:\n${message}`,
+            tags: ['contact','ack'],
+            replyTo: inbox
+          }).catch(()=>{});
+        } catch { /* ignore ack failure */ }
+
+        // Send internal notification only if captcha passes or bypass is enabled
+        if (captchaOk || bypassTurnstile) {
+          try {
+            void mail.queue({
+              to: inbox,
+              subject: `[Contact] ${subject}`,
+              html,
+              text: `From: ${name} <${email}>\n${phone ? `Phone: ${phone}\n` : ''}\nSubject: ${subject}\n\n${message}`,
+              tags: ['contact'],
+              replyTo: email
+            }).catch(e=>console.warn('Contact email queue failed:', e?.message||e));
+          } catch { /* ignore internal failure */ }
+        }
+      } catch (e) {
+        // Do not throw; background errors are logged only
+        if (process.env.EMAIL_DEBUG === 'true') console.warn('Background contact handler error:', e?.message||e);
+      }
+    });
   } catch (e) {
     res.status(500).json({ ok: false, error: e.message });
   }
@@ -165,7 +175,14 @@ router.get('/admin/subscribers', requireAdmin, async (req, res) => {
 // Admin: create coupon
 router.post('/admin/coupons', requireAdmin, async (req, res) => {
   try {
-    const c = await coupons.create(req.body||{});
+    const body = req.body || {};
+    // Normalize restriction fields: allow single string or array for userEmails/userIds
+    const norm = { ...body };
+    if (typeof norm.userEmails === 'string') norm.userEmails = norm.userEmails.split(',').map(s=>s.trim()).filter(Boolean);
+    if (!Array.isArray(norm.userEmails)) norm.userEmails = [];
+    if (typeof norm.userIds === 'string') norm.userIds = norm.userIds.split(',').map(s=>s.trim()).filter(Boolean);
+    if (!Array.isArray(norm.userIds)) norm.userIds = [];
+    const c = await coupons.create(norm);
     res.status(201).json(c);
   } catch (e) {
     res.status(400).json({ message: e.message });
@@ -185,11 +202,20 @@ router.post('/admin/coupons/:code/deactivate', requireAdmin, async (req, res) =>
 });
 
 // Public: validate coupon
-router.post('/validate-coupon', async (req, res) => {
+const validateLimiter = rateLimit({ windowMs: 60 * 1000, max: 30 });
+router.post('/validate-coupon', validateLimiter, async (req, res) => {
   try {
-    const { code, email } = req.body || {};
-    const result = await coupons.validate(code, email);
-    res.json(result);
+    const { code, email, userId } = req.body || {};
+    const id = userId || (req.user && req.user.id) || null;
+    const result = await coupons.validate(code, email, new Date(), id);
+    // Enhance UX: always include reason when invalid
+    if (!result.valid) {
+      if (result.reason === 'restricted') {
+        console.warn('Coupon restricted mismatch:', { code, email, userId: id });
+      }
+      return res.json({ valid:false, reason: result.reason || 'invalid' });
+    }
+    return res.json(result);
   } catch (e) {
     res.status(400).json({ message: e.message });
   }

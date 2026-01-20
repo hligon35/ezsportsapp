@@ -290,6 +290,8 @@
     const isRopeGroup = /^rope-516-poly$/i.test(String(prod.id||'')) || /5\/16\"\s*poly\s*twisted\s*rope/i.test(String(prod.title||''));
     // Render price or price range; will update dynamically on option change
     const basePriceHtml = (() => {
+      // Cable group: hide price until a selection is made (then show Talk to an Expert)
+      if (isCableGroup) return `<div class="price h3" id="pd-price"></div>`;
       if (prod.priceMin && prod.priceMax && prod.priceMax !== prod.priceMin) {
         return `<div class="price h3" id="pd-price">$${prod.priceMin.toFixed(2)} - $${prod.priceMax.toFixed(2)}</div>`;
       } else if (prod.price && prod.price > 0) {
@@ -307,6 +309,8 @@
       .map(v => Number(v.dsr ?? 0))
       .filter(n => Number.isFinite(n) && n > 0) : [];
     const initialShippingText = (() => {
+      // Cable group: shipping blank until an option is selected
+      if (isCableGroup) return ``;
       const lid = String(prod.id||'').toLowerCase();
       const lt = String(prod.title||'').toLowerCase();
       const isFreeShip = (lid === 'battingmat' || lid === 'armorbasket') || (/\bbatting\s*mat\b/.test(lt)) || (/armor\s*(baseball)?\s*cart|armor\s*basket/.test(lt));
@@ -370,6 +374,10 @@
         <div class="pd-info">
           <h1 class="pd-title">${prod.title}</h1>
           ${basePriceHtml}
+          <div class="text-sm text-muted" id="pd-expert-contact" style="display:none; margin:.15rem 0 .35rem;">
+            <div><strong>Call:</strong> <a href="tel:+13868373131" aria-label="Call EZ Sports Netting at 386-837-3131">(386) 837-3131</a></div>
+            <div><strong>Email:</strong> <a href="mailto:info@ezsportsnetting.com">info@ezsportsnetting.com</a></div>
+          </div>
           <div class="text-sm text-muted" id="pd-shipping">${initialShippingText}</div>
           <div class="stack-05" id="pd-option-block" style="margin-top:.5rem;">
             <div class="row gap-06" id="pd-select-row">
@@ -380,7 +388,8 @@
                     const vPrice = Number(v.map ?? v.price ?? 0) || 0;
                     const vDsr = Number(v.dsr ?? prod.dsr ?? 0) || 0;
                     const label = v.option || `Option ${i+1}`;
-                    const priceText = vPrice > 0 ? ` - $${vPrice.toFixed(2)}` : '';
+                    // For Cable group, suppress inline price text in the dropdown
+                    const priceText = (isCableGroup ? '' : (vPrice > 0 ? ` - $${vPrice.toFixed(2)}` : ''));
                     const dataImg = v.img ? ` data-img="${(v.img||'').replace(/"/g,'&quot;')}"` : '';
                     const dataSku = v.sku ? ` data-sku="${String(v.sku).replace(/"/g,'&quot;')}"` : '';
                     const dataDsr = vDsr > 0 ? ` data-dsr="${vDsr}"` : '';
@@ -408,6 +417,17 @@
         </div>
       </div>
     `;
+    // Disable Add to Cart for Cable group pages
+    try {
+      if (isCableGroup) {
+        const addBtn = document.getElementById('pd-add');
+        if (addBtn) {
+          addBtn.disabled = true;
+          addBtn.setAttribute('aria-disabled','true');
+          // Keep label unchanged per request; styling/class can be added by CSS if desired
+        }
+      }
+    } catch {}
     const main = document.getElementById('pd-main-img');
     document.querySelectorAll('.pd-thumbs .thumb').forEach(btn=>{
       btn.addEventListener('click',()=>{
@@ -435,6 +455,7 @@
       const optSel = document.getElementById('pd-option-select');
       const feetBlock = document.getElementById('pd-footage-block');
       const feetInput = document.getElementById('pd-feet');
+  const contactEl = document.getElementById('pd-expert-contact');
       if (optSel && priceEl) {
         const calcFeet = () => {
           if (!feetInput) return 1;
@@ -449,18 +470,35 @@
           const byFoot = (opt?.dataset?.byfoot === '1') || /\bby\s*the\s*foot\b/i.test(String(optSel.value||''));
           // Toggle feet UI
           if (feetBlock) feetBlock.style.display = byFoot ? '' : 'none';
-          if (p > 0) {
+          if (isCableGroup) {
+            // Cable group: only when a concrete option is chosen, show CTA text; keep shipping blank
+            if (optSel.value) {
+              priceEl.textContent = 'Talk to an Expert';
+              if (contactEl) contactEl.style.display = '';
+            } else {
+              priceEl.textContent = '';
+              if (contactEl) contactEl.style.display = 'none';
+            }
+            if (shipEl) shipEl.textContent = '';
+          } else if (p > 0) {
             const multiplier = byFoot ? calcFeet() : 1;
             priceEl.textContent = `$${(p * multiplier).toFixed(2)}`;
+            if (contactEl) contactEl.style.display = 'none';
           } else if (prod.priceMin && prod.priceMax && prod.priceMax !== prod.priceMin) {
             priceEl.textContent = `$${prod.priceMin.toFixed(2)} - $${prod.priceMax.toFixed(2)}`;
+            if (contactEl) contactEl.style.display = 'none';
           } else if (prod.price > 0) {
             priceEl.textContent = `$${prod.price.toFixed(2)}`;
+            if (contactEl) contactEl.style.display = 'none';
           } else {
             priceEl.textContent = '';
+            if (contactEl) contactEl.style.display = 'none';
           }
           // Shipping (dsr): prefer selected variation's dsr, else product-level, else keep initial/range
           if (shipEl) {
+            if (isCableGroup) {
+              shipEl.textContent = '';
+            } else {
             const lid = String(prod.id||'').toLowerCase();
             const lt = String(prod.title||'').toLowerCase();
             const isFreeShip = (lid === 'battingmat' || lid === 'armorbasket') || (/\bbatting\s*mat\b/.test(lt)) || (/armor\s*(baseball)?\s*cart|armor\s*basket/.test(lt));
@@ -486,9 +524,10 @@
                 }
               }
             }
+            }
           }
-          // Update image when option carries an image
-          if (imgSrc) {
+          // Update image when option carries an image (except Cable group, which stays on the curated cable image)
+          if (imgSrc && !isCableGroup) {
             const main = document.getElementById('pd-main-img');
             if (main) main.src = imgSrc;
           }
@@ -635,6 +674,11 @@
 
   document.getElementById('pd-add')?.addEventListener('click', ()=>{
       try {
+        // Guard: prevent add-to-cart on Cable group pages entirely
+        const pidKey = (new URLSearchParams(location.search)).get('pid') || (prod.id||'');
+        if (/^cable-wire$/i.test(String(pidKey))) {
+          return; // disabled behavior enforced above; double-guard here
+        }
         // Determine selected variation (if any)
         const optSel = document.getElementById('pd-option-select');
         const colorSel = document.getElementById('pd-color-select');

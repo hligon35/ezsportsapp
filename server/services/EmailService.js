@@ -6,9 +6,16 @@ class EmailService {
   constructor(){
     this.db = new DatabaseManager();
     this.transporter = null;
-    this.from = process.env.SMTP_FROM || process.env.MAIL_FROM || 'no-reply@ezsports.app';
-    this.cfUrl = process.env.CF_EMAIL_WEBHOOK_URL || '';
+    // Prefer an explicitly verified sender identity when using SendGrid
+    // Order of precedence: SENDGRID_FROM -> SMTP_FROM -> MAIL_FROM -> sensible default
+    this.from = process.env.SENDGRID_FROM || process.env.SMTP_FROM || process.env.MAIL_FROM || 'no-reply@ezsports.app';
+    this.fromName = process.env.MAIL_FROM_NAME || 'EZ Sports Netting';
+  this.cfUrl = process.env.CF_EMAIL_WEBHOOK_URL || '';
     this.cfApiKey = process.env.CF_EMAIL_API_KEY || '';
+    this.cfAccessId = process.env.CF_ACCESS_CLIENT_ID || '';
+    this.cfAccessSecret = process.env.CF_ACCESS_CLIENT_SECRET || '';
+    this.debug = String(process.env.EMAIL_DEBUG || '').toLowerCase() === 'true';
+  this.sgKey = process.env.SENDGRID_API_KEY || '';
     // Configure SMTP transport if environment variables are present
     const hasSendgrid = !!process.env.SENDGRID_API_KEY;
     const hasSmtp = !!process.env.SMTP_HOST;
@@ -36,36 +43,172 @@ class EmailService {
     }
   }
 
-  async queue({ to, subject, html, text, tags=[] }){
+  async queue({ to, subject, html, text, tags=[], replyTo = undefined, from = undefined, fromName = undefined }){
     // Always write to outbox for auditability
-    const record = { to, subject, html, text, tags, status: this.transporter ? 'sending' : 'queued', createdAt: new Date().toISOString() };
+    const record = {
+      to,
+      subject,
+      html,
+      text,
+      tags,
+      replyTo,
+  from: from || this.from,
+  fromName: fromName || this.fromName,
+      status: this.transporter || this.sgKey || this.cfUrl ? 'sending' : 'queued',
+      createdAt: new Date().toISOString(),
+      retryCount: 0,
+      // Optional next attempt backoff scheduling (used by retry worker)
+      nextAttemptAt: new Date(Date.now()).toISOString()
+    };
     const email = await this.db.insert('emails', record);
-    // Prefer Cloudflare Worker HTTP if configured
+    // Try to deliver immediately; callers can ignore the promise for fire-and-forget
+    try {
+      return await this.deliverExisting(email);
+    } catch (e) {
+      // If delivery threw synchronously, keep it queued for the retry worker
+      if (this.debug) console.warn('[EmailService] initial deliver failed; left queued', e?.message||e);
+      return email;
+    }
+  }
+
+  // Deliver an existing record (used by queue and retry worker)
+  async deliverExisting(email){
+    const { id, to, subject, html, text, tags = [], replyTo, from, fromName } = email || {};
+    if (!to || !subject) throw new Error('Email record incomplete');
+    const chosenFrom = from || this.from;
+    const chosenFromName = fromName || this.fromName;
+
+    // Helper: detect permanent sender identity failures (SendGrid-specific)
+    const isSenderIdentityError = (msg = '') => /sender identity|from address does not match a verified/i.test(String(msg));
+    // 1) Prefer SendGrid HTTP API if API key is configured (avoids SMTP egress issues)
+    if (this.sgKey) {
+      try {
+        if (this.debug) console.log('[EmailService] Sending via SendGrid API…');
+        const payload = {
+          personalizations: [{ to: [{ email: to }] }],
+          from: { email: chosenFrom, name: chosenFromName },
+          subject,
+          content: [
+            { type: 'text/plain', value: text || '' },
+            { type: 'text/html', value: html || (text ? `<pre>${text}</pre>` : '') }
+          ]
+        };
+        if (replyTo) payload.reply_to = { email: replyTo };
+        if (Array.isArray(tags) && tags.length) payload.categories = tags.slice(0, 10).map(String);
+        let doFetch = (typeof fetch === 'function') ? fetch : null;
+        if (!doFetch) { try { doFetch = require('undici').fetch; } catch { /* no-op */ } }
+        if (!doFetch) throw new Error('fetch unavailable');
+        const controller = new AbortController();
+        const t = setTimeout(()=>controller.abort(), Number(process.env.SENDGRID_HTTP_TIMEOUT_MS||4000));
+        let resp; try {
+          resp = await doFetch('https://api.sendgrid.com/v3/mail/send', {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${this.sgKey}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(payload),
+            signal: controller.signal
+          });
+        } finally { clearTimeout(t); }
+        if (resp && (resp.status === 202 || resp.status === 200)) {
+          const msgId = resp.headers?.get?.('x-message-id') || null;
+          await this.db.update('emails', { id }, { status: 'sent', provider: 'sendgrid-api', providerId: msgId, sentAt: new Date().toISOString() });
+          if (this.debug) console.log('[EmailService] SendGrid API accepted', { messageId: msgId });
+          return { ...email, status: 'sent', provider: 'sendgrid-api', providerId: msgId };
+        } else {
+          const body = await (resp?.text?.() || Promise.resolve(''));
+          const summary = { status: resp?.status, body: body?.slice(0,200) };
+          if (this.debug) console.warn('[EmailService] SendGrid API not OK', summary);
+          // If this is a verified sender identity problem, mark permanent failure and stop retries
+          if (isSenderIdentityError(body)) {
+            const errorMsg = 'SendGrid: From address is not a verified Sender Identity. Configure SENDGRID_FROM and verify the sender in SendGrid.';
+            await this.db.update('emails', { id }, { status: 'permanent-failure', provider: 'sendgrid-api', error: errorMsg, failedAt: new Date().toISOString() });
+            if (this.debug) console.warn('[EmailService] Permanent failure:', errorMsg);
+            return { ...email, status: 'permanent-failure', provider: 'sendgrid-api', error: errorMsg };
+          }
+          // fall through to SMTP
+        }
+      } catch (e) {
+        if (this.debug) console.warn('[EmailService] SendGrid API failed', e?.message||e);
+        // fall through to SMTP
+      }
+    }
+
+    // 2) Try SMTP (SendGrid SMTP or custom SMTP)
+    if (this.transporter) {
+      try {
+        if (this.debug) console.log('[EmailService] Sending via SMTP…');
+        const info = await this.transporter.sendMail({ from: chosenFrom, to, subject, text, html, replyTo });
+        await this.db.update('emails', { id }, { status: 'sent', provider: 'smtp', providerId: info?.messageId || null, sentAt: new Date().toISOString() });
+        if (this.debug) console.log('[EmailService] SMTP sent', { id: info?.messageId || null });
+        return { ...email, status: 'sent', provider: 'smtp', providerId: info?.messageId || null };
+      } catch (smtpErr) {
+        // If we hit a known permanent failure (e.g., SendGrid 550 Sender Identity), do not retry endlessly
+        const msg = smtpErr?.message || String(smtpErr);
+        if (isSenderIdentityError(msg) || /\b550\b/.test(msg)) {
+          const errorMsg = 'SMTP: From address is not a verified Sender Identity for this provider. Set MAIL_FROM/SENDGRID_FROM to a verified sender.';
+          await this.db.update('emails', { id }, { status: 'permanent-failure', provider: 'smtp', error: errorMsg, failedAt: new Date().toISOString() });
+          if (this.debug) console.warn('[EmailService] Permanent failure (SMTP):', errorMsg);
+          return { ...email, status: 'permanent-failure', provider: 'smtp', error: errorMsg };
+        }
+        if (this.debug) console.warn('[EmailService] SMTP failed, trying Worker…', msg);
+        // fall through to Worker
+      }
+    }
+
+    // 3) Cloudflare Worker (MailChannels)
     if (this.cfUrl) {
       try {
-        const payload = { to, subject, html, text, from: this.from };
+  const payload = { to, subject, html, text, from: chosenFrom };
+        if (replyTo) payload.replyTo = replyTo;
+  if (chosenFromName) payload.fromName = chosenFromName;
         const headers = { 'Content-Type': 'application/json' };
         if (this.cfApiKey) headers['Authorization'] = `Bearer ${this.cfApiKey}`;
+        // Optional Cloudflare Access service token support
+        if (this.cfAccessId && this.cfAccessSecret) {
+          headers['CF-Access-Client-Id'] = this.cfAccessId;
+          headers['CF-Access-Client-Secret'] = this.cfAccessSecret;
+        }
+        if (this.debug) {
+          console.log('[EmailService] POST worker', {
+            url: this.cfUrl,
+            hasAuth: !!this.cfApiKey,
+            hasAccess: !!(this.cfAccessId && this.cfAccessSecret),
+            to: String(to).slice(-12),
+            subject: subject.slice(0,48)
+          });
+        }
         let doFetch = (typeof fetch === 'function') ? fetch : null;
         if (!doFetch) {
           try { doFetch = require('undici').fetch; } catch { /* no-op */ }
         }
         if (!doFetch) throw new Error('fetch is not available in this Node runtime');
-        const resp = await doFetch(this.cfUrl, { method: 'POST', headers, body: JSON.stringify(payload) });
+        // Bound Cloudflare worker call with a short timeout to avoid hanging
+        const controller = new AbortController();
+        const t = setTimeout(()=>controller.abort(), Number(process.env.EMAIL_HTTP_TIMEOUT_MS||2500));
+        let resp;
+        try {
+          resp = await doFetch(this.cfUrl, { method: 'POST', headers, body: JSON.stringify(payload), signal: controller.signal });
+        } finally { clearTimeout(t); }
         if (resp.ok) {
-          await this.db.update('emails', { id: email.id }, { status: 'sent', provider: 'cloudflare-worker', sentAt: new Date().toISOString() });
+          await this.db.update('emails', { id }, { status: 'sent', provider: 'cloudflare-worker', sentAt: new Date().toISOString() });
           return { ...email, status: 'sent', provider: 'cloudflare-worker' };
         } else {
           const body = await resp.text().catch(()=> '');
+          if (this.debug) {
+            console.warn('[EmailService] Worker response not OK', { status: resp.status, body: body?.slice(0,200) });
+          }
           const cfError = new Error(`Cloudflare email failed ${resp.status}: ${body}`);
-          // Attempt SMTP fallback if transporter is configured
+          // Attempt SMTP fallback if transporter is configured and Worker failed
           if (this.transporter) {
             try {
-              const info = await this.transporter.sendMail({ from: this.from, to, subject, text, html });
-              await this.db.update('emails', { id: email.id }, { status: 'sent', provider: 'smtp', providerId: info?.messageId || null, sentAt: new Date().toISOString(), error: cfError.message });
+              if (this.debug) console.log('[EmailService] Worker failed; sending via SMTP…');
+              const info = await this.transporter.sendMail({ from: chosenFrom, to, subject, text, html, replyTo });
+              await this.db.update('emails', { id }, { status: 'sent', provider: 'smtp', providerId: info?.messageId || null, sentAt: new Date().toISOString(), error: cfError.message });
               return { ...email, status: 'sent', provider: 'smtp', providerId: info?.messageId || null };
             } catch (smtpErr) {
-              await this.db.update('emails', { id: email.id }, { status: 'failed', provider: 'cloudflare-worker|smtp', error: `${cfError.message} | SMTP: ${smtpErr.message}`, failedAt: new Date().toISOString() });
+              await this.db.update('emails', { id }, { status: 'failed', provider: 'cloudflare-worker|smtp', error: `${cfError.message} | SMTP: ${smtpErr.message}`, failedAt: new Date().toISOString() });
               return { ...email, status: 'failed', provider: 'cloudflare-worker|smtp', error: `${cfError.message} | SMTP: ${smtpErr.message}` };
             }
           }
@@ -77,16 +220,17 @@ class EmailService {
         // Try SMTP if available
         if (this.transporter) {
           try {
-            const info = await this.transporter.sendMail({ from: this.from, to, subject, text, html });
-            await this.db.update('emails', { id: email.id }, { status: 'sent', provider: 'smtp', providerId: info?.messageId || null, sentAt: new Date().toISOString(), error: e.message });
+            if (this.debug) console.log('[EmailService] Worker call threw, sending via SMTP…', e.message);
+            const info = await this.transporter.sendMail({ from: chosenFrom, to, subject, text, html, replyTo });
+            await this.db.update('emails', { id }, { status: 'sent', provider: 'smtp', providerId: info?.messageId || null, sentAt: new Date().toISOString(), error: e.message });
             return { ...email, status: 'sent', provider: 'smtp', providerId: info?.messageId || null };
           } catch (smtpErr) {
-            await this.db.update('emails', { id: email.id }, { status: 'failed', provider: 'cloudflare-worker|smtp', error: `${e.message} | SMTP: ${smtpErr.message}`, failedAt: new Date().toISOString() });
+            await this.db.update('emails', { id }, { status: 'failed', provider: 'cloudflare-worker|smtp', error: `${e.message} | SMTP: ${smtpErr.message}`, failedAt: new Date().toISOString() });
             console.warn('Email send via Cloudflare then SMTP failed:', `${e.message} | SMTP: ${smtpErr.message}`);
             return { ...email, status: 'failed', provider: 'cloudflare-worker|smtp', error: `${e.message} | SMTP: ${smtpErr.message}` };
           }
         }
-        await this.db.update('emails', { id: email.id }, { status: 'failed', provider: 'cloudflare-worker', error: e.message, failedAt: new Date().toISOString() });
+        await this.db.update('emails', { id }, { status: 'failed', provider: 'cloudflare-worker', error: e.message, failedAt: new Date().toISOString() });
         console.warn('Email send via Cloudflare failed:', e.message);
         return { ...email, status: 'failed', provider: 'cloudflare-worker', error: e.message };
       }
@@ -94,14 +238,29 @@ class EmailService {
     if (!this.transporter) return email;
 
     try {
-      const info = await this.transporter.sendMail({ from: this.from, to, subject, text, html });
-      await this.db.update('emails', { id: email.id }, { status: 'sent', providerId: info?.messageId || null, sentAt: new Date().toISOString() });
+      const info = await this.transporter.sendMail({ from: chosenFrom, to, subject, text, html, replyTo });
+      await this.db.update('emails', { id }, { status: 'sent', providerId: info?.messageId || null, sentAt: new Date().toISOString() });
       return { ...email, status: 'sent', providerId: info?.messageId || null };
     } catch (e) {
-      await this.db.update('emails', { id: email.id }, { status: 'failed', error: e.message, failedAt: new Date().toISOString() });
-      console.warn('Email send failed:', e.message);
-      return { ...email, status: 'failed', error: e.message };
+      const msg = e?.message || String(e);
+      if (isSenderIdentityError(msg) || /\b550\b/.test(msg)) {
+        const errorMsg = 'SMTP: From address is not a verified Sender Identity for this provider. Set MAIL_FROM/SENDGRID_FROM to a verified sender.';
+        await this.db.update('emails', { id }, { status: 'permanent-failure', error: errorMsg, failedAt: new Date().toISOString() });
+        if (this.debug) console.warn('[EmailService] Permanent failure (final SMTP):', errorMsg);
+        return { ...email, status: 'permanent-failure', error: errorMsg };
+      }
+      await this.db.update('emails', { id }, { status: 'failed', error: msg, failedAt: new Date().toISOString() });
+      if (this.debug) console.warn('Email send failed:', msg);
+      return { ...email, status: 'failed', error: msg };
     }
+  }
+
+  // Deliver by record ID (used by retry worker)
+  async deliver(id){
+    const list = await this.db.find('emails', {});
+    const email = list.find(e => e.id === id);
+    if (!email) throw new Error('Email not found');
+    return await this.deliverExisting(email);
   }
 
   async list(){ return await this.db.findAll('emails'); }

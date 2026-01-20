@@ -77,7 +77,7 @@
         <summary>Saved addresses</summary>
         <div class="info-content">
           <div id="addresses-empty" class="muted">No saved addresses yet.</div>
-          <div id="addresses-list" class="stack-05"></div>
+          <div id="addresses-list" class="stack-06"></div>
           <hr/>
           <form id="address-form" class="auth-form">
             <div class="grid-2">
@@ -112,8 +112,9 @@
           <div id="pm-empty" class="muted">No saved cards.</div>
           <ul id="pm-list" class="list"></ul>
           <div id="pm-add">
-            <button id="pm-start" class="btn">Add a card</button>
+            <button id="pm-start" class="btn">Add</button>
             <div id="pm-add-area" class="stack-05" hidden>
+              <input type="text" id="pm-cardholder" placeholder="Name on card" autocomplete="cc-name" />
               <div id="card-element" class="card-element"></div>
               <div class="row gap-06">
                 <button id="pm-confirm" class="btn btn-primary" type="button">Save Card</button>
@@ -337,7 +338,7 @@
         postal: document.getElementById('addr-postal').value.trim(),
         isDefault: document.getElementById('addr-default').checked,
       });
-      const renderAddresses = (arr=[]) => {
+          const renderAddresses = (arr=[]) => {
         const wrap = document.getElementById('addresses-list');
         const empty = document.getElementById('addresses-empty');
         wrap.innerHTML='';
@@ -349,6 +350,7 @@
           const label = document.createElement('div');
           label.innerHTML = `
             <strong>${(a.name||'').replace(/</g,'&lt;')}</strong> ${a.isDefault ? '<span class="badge">Default</span>' : ''}<br/>
+            ${a.phone ? `<span class="muted text-sm">${(a.phone||'').replace(/</g,'&lt;')}</span><br/>` : ''}
             ${(a.address1||'').replace(/</g,'&lt;')} ${a.address2?('<br/>'+a.address2.replace(/</g,'&lt;')):''}<br/>
             ${(a.city||'')}, ${(a.state||'')} ${(a.postal||'')}<br/>
             ${a.country||'US'}
@@ -427,19 +429,31 @@
         try {
           const data = await fetchJSON(`${base}/api/users/me/payment-methods`);
           const list = Array.isArray(data.paymentMethods) ? data.paymentMethods : [];
+          const defaultPmId = data.defaultPaymentMethodId;
           pmList.innerHTML = '';
           if (!list.length) { pmEmpty.style.display='block'; return; }
           pmEmpty.style.display='none';
           list.forEach(pm => {
             const li = document.createElement('li');
+            li.className = 'row space-between items-center';
             const last4 = pm?.card?.last4 || '••••';
             const brand = (pm?.card?.brand || 'card').toUpperCase();
-            const exp = pm?.card ? `${pm.card.exp_month}/${String(pm.card.exp_year).slice(-2)}` : '';
+            const exp = pm?.card ? `${String(pm.card.exp_month).padStart(2,'0')}/${String(pm.card.exp_year).slice(-2)}` : '';
             const txt = document.createElement('span');
-            txt.textContent = `${brand} •••• ${last4} ${exp ? '('+exp+')':''}`;
+            txt.innerHTML = `${brand} •••• ${last4} ${exp ? `<span class="muted">(${exp})</span>`:''} ${pm.id===defaultPmId?'<span class="badge">Default</span>':''}`;
+            const actions = document.createElement('span'); actions.className = 'row gap-06';
+            if (pm.id !== defaultPmId) {
+              const mkDef = document.createElement('button'); mkDef.className='btn btn-ghost btn-sm'; mkDef.textContent='Make default';
+              mkDef.addEventListener('click', async ()=>{
+                try { await fetchJSON(`${base}/api/users/me/payment-methods/default`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ pmId: pm.id }) }); loadPMs(); }
+                catch(e){ alert(e.message||'Failed'); }
+              });
+              actions.appendChild(mkDef);
+            }
             const del = document.createElement('button'); del.className='btn btn-ghost btn-sm'; del.textContent='Remove';
             del.addEventListener('click', async ()=>{ if (confirm('Remove this card?')) { try { await fetchJSON(`${base}/api/users/me/payment-methods/${encodeURIComponent(pm.id)}`, { method:'DELETE' }); loadPMs(); } catch(e){ alert(e.message||'Failed'); } } });
-            li.append(txt, del);
+            actions.appendChild(del);
+            li.append(txt, actions);
             pmList.appendChild(li);
           });
         } catch { pmList.innerHTML=''; pmEmpty.style.display='block'; }
@@ -477,18 +491,20 @@
           pmArea.hidden = false; pmStart.disabled = true;
         } catch(e) { pmMsg.textContent = e.message || 'Unable to start card setup'; pmMsg.classList.add('text-error'); }
       });
-      pmCancel.addEventListener('click', ()=>{ pmArea.hidden=true; pmStart.disabled=false; pmMsg.textContent=''; });
+      pmCancel.addEventListener('click', ()=>{ pmArea.hidden=true; pmStart.disabled=false; pmMsg.textContent=''; const nameEl=document.getElementById('pm-cardholder'); if(nameEl) nameEl.value=''; });
       pmConfirm.addEventListener('click', async ()=>{
         pmMsg.textContent='';
         try {
           if (!stripe || !card || !setup_client_secret) throw new Error('Not ready');
           const user = JSON.parse(localStorage.getItem('currentUser')||'null') || {};
+          const nameEl = document.getElementById('pm-cardholder');
+          const cardholderName = (nameEl && nameEl.value && nameEl.value.trim()) ? nameEl.value.trim() : (user.name || user.email || 'Customer');
           const result = await stripe.confirmCardSetup(setup_client_secret, {
-            payment_method: { card, billing_details: { name: user.name || user.email || 'Customer', email: user.email || '' } }
+            payment_method: { card, billing_details: { name: cardholderName, email: user.email || '' } }
           });
           if (result.error) throw result.error;
           pmMsg.textContent = 'Card saved.';
-          pmArea.hidden = true; pmStart.disabled = false; card && card.clear && card.clear();
+          pmArea.hidden = true; pmStart.disabled = false; card && card.clear && card.clear(); const nameEl2=document.getElementById('pm-cardholder'); if(nameEl2) nameEl2.value='';
           loadPMs();
         } catch(e) { pmMsg.textContent = e.message || 'Failed to save card'; pmMsg.classList.add('text-error'); }
       });

@@ -175,6 +175,14 @@ document.addEventListener('DOMContentLoaded', () => {
     toggleMode();
   });
 
+  // If URL requests sign-up mode, switch automatically (and keep redirect param intact)
+  try {
+    const params = new URLSearchParams(window.location.search);
+    if ((params.get('mode') || '').toLowerCase() === 'signup') {
+      if (!isRegisterMode) toggleMode();
+    }
+  } catch {}
+
   if (peekBtn1) {
     const pw = document.getElementById('password');
     const toggle = () => {

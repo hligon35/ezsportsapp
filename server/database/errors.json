@@ -1,0 +1,19 @@
+[
+  {
+    "source": "client",
+    "name": "Error",
+    "message": "Test client error",
+    "stack": "stack",
+    "url": "http://127.0.0.1:4244/test",
+    "path": "/test",
+    "userAgent": null,
+    "visitorId": "test-visitor",
+    "userId": null,
+    "severity": "error",
+    "kind": "test",
+    "meta": null,
+    "createdAt": "2026-01-13T18:38:54.746Z",
+    "updatedAt": "2026-01-13T18:38:54.746Z",
+    "id": 2
+  }
+]

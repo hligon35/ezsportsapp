@@ -354,6 +354,14 @@ a:hover, .inline-links a:hover { text-decoration:underline; }
   box-shadow:0 10px 38px -12px rgba(0,0,0,.55),0 4px 18px -6px rgba(0,0,0,.45);
 }
 
+/* L-Screens pages: keep hero copy readable on dark gradients (override `.muted`) */
+body.lscreens-hub .netting-hero .muted,
+body.lscreens-subnav .netting-hero .muted,
+body.lscreens-hub .netting-hero p,
+body.lscreens-subnav .netting-hero p {
+  color: rgba(255,255,255,.92) !important;
+}
+
 /* Sport-specific variants (kept within site palette) */
 .netting-hero--baseball,
 .nh-baseball {
@@ -606,6 +614,9 @@ body{
 .hidden{ display:none !important; }
 /* Generic row utility for inline controls */
 .row{ display:flex; gap:.6rem; align-items:center; flex-wrap:wrap; }
+/* Align checkbox label text horizontally with the checkbox */
+label.checkbox{ display:inline-flex; align-items:center; gap:.45rem; line-height:1; }
+label.checkbox input[type="checkbox"]{ margin:0; position:relative; top:0; }
 /* Auth form layout */
 .auth-container{ max-width: 480px; margin: 2rem auto; background:#fff; border-radius:1.2rem; box-shadow:0 4px 24px rgba(12,32,64,.10); padding: 1.5rem; }
 .auth-form{ display:grid; grid-auto-rows:min-content; gap:.9rem; }
@@ -650,6 +661,8 @@ body{
 @media(min-width:520px){
   .auth-form .grid-2{ grid-template-columns:1fr 1fr; }
 }
+.auth-form .grid-3{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:.9rem; }
+@media (max-width:720px){ .auth-form .grid-3{ grid-template-columns:1fr; } }
 .auth-form .btn{ height: 44px; }
 img{max-width:100%;display:block}
 .container{max-width:1200px;width:100%;margin-inline:auto;padding-inline:clamp(.9rem,4vw,2rem)}
@@ -695,6 +708,9 @@ body.has-top-banner, body.has-promo-banner{padding-top:var(--top-banner-height)}
 /* Header layout: brand left, nav center, actions right */
 .site-header .header-bar{justify-content:space-between;padding:.65rem 0}
 .brand{display:flex;align-items:center;gap:.6rem;color:#fff;text-decoration:none;font-weight:900;letter-spacing:.3px}
+.site-header .brand{display:flex !important;flex-direction:row !important;align-items:center !important;justify-content:flex-start !important;flex-wrap:nowrap !important;min-width:0;text-align:left}
+.site-header .brand img{flex:0 0 auto}
+.site-header .brand span{display:inline !important;white-space:nowrap;line-height:1.1}
 .brand img{filter:drop-shadow(0 4px 12px rgba(0,0,0,.25));border-radius:0.75rem;background:#ffffff;}
 
 .footer-brand-block img { border-radius: 0.75rem; background:#ffffff; }
@@ -840,14 +856,14 @@ img[src*="/logo.svg"]{
 /* Collapsible navigation applies up to large tablets (raised from 900px -> 1200px) */
 @media (max-width:1200px){
   .menu-toggle{display:inline-flex;align-items:center;justify-content:center}
-  .quick-links{flex-basis:100%;order:4;display:none;flex-direction:column;align-items:flex-start;background:#000000;padding:.6rem .6rem 1rem;border-radius:.85rem;margin-top:.55rem;box-shadow:0 4px 18px rgba(0,0,0,.25)}
-  .quick-links a{padding:.55rem .75rem;border-radius:.55rem;width:100%;}
+  .quick-links{flex-basis:100%;order:4;display:none;flex-direction:column;align-items:stretch;text-align:center;background:#000000;padding:.6rem .6rem 1rem;border-radius:.85rem;margin-top:.55rem;box-shadow:0 4px 18px rgba(0,0,0,.25)}
+  .quick-links a{padding:.55rem .75rem;border-radius:.55rem;width:100%;display:flex;justify-content:center;align-items:center;text-align:center}
   .quick-links.is-open{display:flex}
   /* Submenu stacks under its trigger on mobile */
   .quick-links .has-submenu{width:100%}
   .quick-links .nav-submenu{position:static;display:none;width:100%;margin-top:.25rem;padding:.25rem;border:none;border-radius:.5rem;background:#0a0a0a;box-shadow:none}
   .quick-links .has-submenu.open > .nav-submenu{display:block}
-  .quick-links .nav-submenu a{width:100%}
+  .quick-links .nav-submenu a{width:100%;display:flex;justify-content:center;align-items:center;text-align:center}
 
   /* For L‑Screens specifically: when mobile menu is open, show its submenu as a flyout to the left of the menu panel */
   .site-header .header-bar .quick-links .has-submenu.submenu-left > .nav-submenu{
@@ -888,8 +904,8 @@ img[src*="/logo.svg"]{
 /* Small phones/tablets: make the menu panel full-width and left-aligned for consistency */
 @media (max-width:640px){
   .site-header .header-bar .quick-links{left:0; right:0; width:100%;}
-  /* When nav has the nav-centered utility, keep items left-aligned in mobile stacked panel */
-  .site-header .header-bar .quick-links.nav-centered{justify-content:flex-start !important}
+  /* When nav has the nav-centered utility, keep items centered in mobile stacked panel */
+  .site-header .header-bar .quick-links.nav-centered{justify-content:center !important}
   /* Submenu stacks inline to avoid off-screen clipping on narrow devices */
   .site-header .header-bar .quick-links .has-submenu.submenu-left > .nav-submenu{
     position:static;
@@ -922,8 +938,8 @@ img[src*="/logo.svg"]{
   .quick-links.forced-wide{display:none !important}
 }
 
-/* Desktop ≥1000px: keep login (header-actions) and cart on top row right edge */
-@media (min-width:1000px){
+/* Desktop ≥1201px: keep login (header-actions) and cart on top row right edge */
+@media (min-width:1201px){
   .site-header .menu-toggle{display:none}
   /* Top row: brand, search (grows), actions + cart (right). Allow wrap so nav (quick-links) moves to second row. */
   .site-header .header-bar{flex-wrap:wrap}
@@ -947,6 +963,29 @@ img[src*="/logo.svg"]{
 .btn:hover,.btn-primary:hover,.btn-ghost:hover,.btn-invert:hover,.btn-pill:hover{background:var(--gold-hover);border-color:var(--gold-hover);filter:none}
 .btn:active,.btn-primary:active,.btn-ghost:active,.btn-invert:active,.btn-pill:active{background:var(--gold-active);border-color:var(--gold-active);}
 .btn:focus-visible{outline:none;box-shadow:0 0 0 3px color-mix(in oklab, var(--gold) 65%, #fff 25%)}
+/* Disabled buttons (visual + interaction) */
+.btn[aria-disabled="true"],
+.btn:disabled,
+button[aria-disabled="true"],
+button:disabled{
+  background:#9aa0a6 !important; /* neutral gray */
+  border-color:#9aa0a6 !important;
+  color:#ffffff !important;
+  cursor:not-allowed !important;
+  opacity:.65;
+  filter:none !important;
+  box-shadow:none !important;
+  pointer-events:none; /* ensure no clicks/hover states */
+}
+.btn[aria-disabled="true"]:hover,
+.btn[aria-disabled="true"]:focus,
+.btn:disabled:hover,
+.btn:disabled:focus{
+  background:#9aa0a6 !important;
+  border-color:#9aa0a6 !important;
+  color:#ffffff !important;
+  box-shadow:none !important;
+}
 /* Preserve specialized quote button styling */
 .btn-quote{background:#000000 !important;color:#ffffff !important;border:1px solid #000000 !important;box-shadow:0 2px 6px rgba(0,0,0,.4);}
 .btn-quote:hover,.btn-quote:focus-visible{filter:brightness(1.15);outline:none;}
@@ -1181,6 +1220,11 @@ body.lscreens-subnav .card .body .actions-row.right{ justify-content:flex-end; }
 .brand--light{opacity:1}
 .subscribe .row{display:flex;gap:.5rem}
 .subscribe input{flex:0 1 auto;width:auto;min-width:16ch;max-width:100%;padding:.65rem .8rem;border-radius:.6rem;border:1px solid var(--border);background:#fff;color:var(--ink)}
+/* Payment methods: Add Card form visuals */
+#pm-add-area{ display:grid; gap:.75rem; align-content:start; justify-items:stretch; }
+.auth-container #pm-add-area input { padding:.85rem 1rem; border:1px solid var(--border); border-radius:.7rem; width:100%; max-width:100%; box-sizing:border-box; background:#fff; color:var(--ink); }
+.card-element{ padding:.85rem 1rem; border:1px solid var(--border); border-radius:.7rem; background:#fff; }
+.card-element:focus-within{ outline:none; box-shadow:var(--ring); border-color:var(--brand); }
 .site-footer a[href="careers.html"],
 .site-footer li a[href="careers.html"],
 nav.quick-links a[href="careers.html"],
@@ -1314,10 +1358,17 @@ nav.quick-links li a[href="careers.html"]{
 .calc-form{display:grid;gap:.9rem}
 .calc-form .form-row{display:grid;gap:.35rem}
 .calc-form .dims{display:grid;grid-template-columns:1fr auto 1fr auto;gap:.5rem;align-items:center}
-.calc-form input[type=number], .calc-form select{padding:.65rem .7rem;border:1px solid var(--border);border-radius:.6rem}
+.calc-form input[type=number], .calc-form select{padding:.5rem .65rem;border:1px solid var(--border);border-radius:.6rem}
+.calc-form input[type=number]{ width:6ch; }
+/* Widen ft/in fields to comfortably fit at least 3 digits */
+.calc-form .dims input[type=number]{ width:8ch; }
+.calc-form .qty input[type=number]{ width:7ch; text-align:center; }
+.calc-form .qty .icon-btn{ width:auto; min-width:32px; height:32px; }
 .calc-form .unit{opacity:.65}
 .calc-form fieldset{border:1px solid var(--border);border-radius:.75rem;padding:.65rem}
-.calc-form legend{padding:0 .25rem;font-weight:800;color:var(--ink-2)}
+.calc-form legend{padding:0 .25rem;font-weight:900;color:var(--ink-2); letter-spacing:.2px}
+/* Mesh row: make select span full width for easy scanning */
+.calc-form #mesh { width: 100%; max-width: 100%; }
 /* Mesh helper spacing */
 .mesh-help{margin:-.35rem 0 .2rem;font-size:.7rem;line-height:1.3;max-width:420px}
 /* Overflow containment & responsive tightening for calculator form */
@@ -1329,9 +1380,10 @@ nav.quick-links li a[href="careers.html"]{
 .calc-form .dims{grid-template-columns:minmax(0,1fr) auto minmax(0,1fr) auto}
 /* Prevent long labels / summary items from overflowing */
 .calc-form .form-row, .summary > div{min-width:0}
-/* Ultra narrow: stack dimension pairs (ft/in) vertically */
+/* Ultra narrow: keep ft/in on one row; tighten spacing and input width */
 @media (max-width:420px){
-  .calc-form .dims{grid-template-columns:minmax(0,1fr) auto;row-gap:.4rem}
+  .calc-form .dims{ grid-template-columns:minmax(0,1fr) auto minmax(0,1fr) auto; column-gap:.4rem; }
+  .calc-form .dims input[type=number]{ width:7ch; }
 }
 
 /* Support/help pages */
@@ -1420,20 +1472,43 @@ nav.quick-links li a[href="careers.html"]{
 .summary{display:grid;grid-template-columns:1fr auto;gap:.4rem;border-top:1px dashed var(--border);padding-top:.6rem}
 .summary > div{display:flex;justify-content:space-between;gap:1rem}
 .summary .total{font-size:1.15rem;font-weight:900}
+.summary strong{ font-weight:800 }
+.summary .total strong{ font-size:1.2rem }
 .actions{margin-top:.5rem}
 /* Netting calculator: make the Add Configured Net button fit content */
 #add-cart{ width:auto; white-space:nowrap; }
 /* Center the calculator button row only within the calculator card */
 .calc-card .actions{ display:flex; justify-content:center; }
 
-/* Desktop enhancement: only widen beyond 1100px */
+/* Desktop enhancement: fit calc card to content for improved usability */
 @media (min-width:1101px){
-  .calc-grid{grid-template-columns:1.1fr .9fr}
+  .calc-grid{grid-template-columns:minmax(0,1fr) auto; align-items:start}
+  .calc-card{ width:fit-content; max-width:min(100%, 680px); align-self:start; justify-self:start; position:sticky; top:1rem }
 }
 /* Legacy safeguard (kept harmless): if JS adds calc-stack ensure single column */
 .calc-grid.calc-stack{grid-template-columns:1fr !important}
 @media (max-width:540px){
   .calc-gallery li{width:64px}
+}
+
+/* Mobile sticky action bar for calculator */
+.calc-mobile-bar{
+  display:none;
+  position:fixed; left:0; right:0; bottom:0;
+  z-index:40;
+  background:#ffffff;
+  border-top:1px solid var(--border);
+  box-shadow:0 -8px 24px rgba(12,32,64,.10);
+  padding:.6rem .9rem calc(.6rem + env(safe-area-inset-bottom, 0px));
+  display:grid; grid-template-columns:1fr auto; align-items:center; gap:.8rem;
+}
+.calc-mobile-bar .total-row{ display:flex; align-items:center; justify-content:space-between; gap:.75rem; font-weight:800; }
+.calc-mobile-bar .total-row span{ color: var(--muted); font-weight:700; }
+.calc-mobile-bar .total-row strong{ font-size:1.1rem; font-weight:900; }
+@media (max-width:640px){
+  .calc-mobile-bar{ display:grid; }
+  /* Add bottom padding so the sticky bar doesn't cover content */
+  .calc-grid{ padding-bottom: 90px; }
 }
 
 /* Breadcrumbs */
@@ -1575,6 +1650,11 @@ nav.quick-links li a[href="careers.html"]{
 .ml-025 { margin-left: .25rem; }
 .ml-035 { margin-left: .35rem; }
 .text-sm { font-size: .8rem; }
+.text-strong { font-weight: 700; }
+.flex-1 { flex: 1 1 auto; }
+.gap-075 { gap: .75rem; }
+.stack-06{ display:grid; gap:.6rem; }
+.items-start { align-items: flex-start; }
 .text-muted { color: #555; }
 .flex-row { display: flex; }
 .gap-05 { gap: .5rem; }
@@ -1626,6 +1706,9 @@ body.lscreens-subnav .card .body .color-dots{ margin-top:.4rem; }
 .product-detail-dialog .pd-info .btn + .btn { margin-top: .5rem; }
 /* Remove vertical spacing for horizontal button rows in modal */
 .product-detail-dialog .pd-info .row .btn + .btn { margin-top: 0; }
+
+/* Checkout: keep Apply button sized to its text in order summary */
+#apply-code { width: auto; white-space: nowrap; flex: 0 0 auto; }
 
 /* Replacement aggregator card */
 .collective-card .pd-info .stack-05 { justify-items: start; align-items: start; }

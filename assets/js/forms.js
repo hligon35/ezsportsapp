@@ -2,56 +2,41 @@
 // Safe to load while main app.js is in repair. Preserves existing endpoint & Turnstile usage.
 (function(){
   const FORM_ENDPOINT = 'https://script.google.com/macros/s/AKfycbw1npuTQiIpGQqlB6LPh4AoihC9bVW8XngIq270ZYaQfZ7msW1zz5cOjmWwATkrqtmr/exec';
-  // Decide endpoint strategy:
-  // 1. If running on production domain, use relative /api proxies (hide upstream URL & enable easier header control).
-  // 2. If running on localhost AND the user created the marketing proxy functions, also use /api.
-  // 3. Fallback: direct Apps Script URL.
-  const host = location.hostname.toLowerCase();
-  const hasProxy = true; // we created /api/marketing/*
-  function endpointFor(kind){
-    const rel = kind === 'subscribe' ? '/api/marketing/subscribe' : '/api/marketing/contact';
-    if ((host.endsWith('ezsportsnetting.com') || /^(localhost|127\.0\.0\.1)$/.test(host)) && hasProxy) return rel;
-    return FORM_ENDPOINT;
+  // Prefer calling the Render backend directly so emails queue server-side; fallback to Apps Script if needed.
+  function apiBases(){
+    const bases = [];
+    try { if (window.__API_BASE) bases.push(String(window.__API_BASE).replace(/\/$/, '')); } catch {}
+    try { const meta = document.querySelector('meta[name="api-base"]'); if (meta && meta.content) bases.push(String(meta.content).replace(/\/$/, '')); } catch {}
+    // Default known backend
+    bases.push('https://ezsportsapp.onrender.com');
+    // de-dup
+    return Array.from(new Set(bases.filter(Boolean)));
   }
+  function endpointsFor(kind){
+    const path = kind === 'subscribe' ? '/api/marketing/subscribe' : '/api/marketing/contact';
+    const list = apiBases().map(b => `${b}${path}`);
+    // For subscribe, include Apps Script as an extra logging fallback; for contact, do NOT (CORS + spam/security)
+    if (kind === 'subscribe') list.push(FORM_ENDPOINT);
+    return list;
+  }
+  // Fetch with timeout to keep UI snappy
+  async function fetchWithTimeout(url, options, timeoutMs){
+    const controller = new AbortController();
+    const t = setTimeout(()=>controller.abort(), Math.max(1500, Number(timeoutMs||4000)));
+    try {
+      const res = await fetch(url, { ...(options||{}), signal: controller.signal });
+      return res;
+    } finally { clearTimeout(t); }
+  }
+  // Prefer a single shared token fetcher from app.js to avoid duplicate execute() calls
   const SITE_KEY = window.TURNSTILE_SITE_KEY || '0x4AAAAAAB5rtUiQ1MiqGIxp';
-
-  // Lightweight Turnstile loader (redeclared safely)
-  async function loadTurnstile(){
-    if (window.turnstile) return true;
-    await new Promise(res=>{
-      const s=document.createElement('script');
-      s.src='https://challenges.cloudflare.com/turnstile/v0/api.js';
-      s.async=true; s.defer=true;
-      s.onload=()=>res(true); s.onerror=()=>res(false);
-      document.head.appendChild(s);
-    });
-    await new Promise(r=>setTimeout(r,40));
-    return !!window.turnstile;
-  }
   async function getToken(){
     try {
-      const ok = await loadTurnstile();
-      if (!ok || !SITE_KEY) return '';
-      if (window.__turnstileTokenPromise) return await window.__turnstileTokenPromise;
-      window.__turnstileTokenPromise = new Promise(resolve => {
-        const host = document.createElement('div');
-        host.style.cssText='position:fixed;left:-9999px;top:-9999px;';
-        document.body.appendChild(host);
-        let wid=null; let cleaned=false;
-        const cleanup=(id)=>{ if(cleaned) return; cleaned=true; try{window.turnstile.remove(id);}catch{} try{host.remove();}catch{} };
-        try {
-          wid = window.turnstile.render(host, {
-            sitekey: SITE_KEY,
-            size: 'invisible',
-            callback: t=>{ resolve(t||''); cleanup(wid); },
-            'error-callback': ()=>{ resolve(''); cleanup(wid); },
-            'timeout-callback': ()=>{ resolve(''); cleanup(wid); }
-          });
-        } catch { resolve(''); cleanup(wid); return; }
-        try { window.turnstile.execute(wid); } catch { try{ if(wid) window.turnstile.reset(wid); }catch{} resolve(''); cleanup(wid); }
-        setTimeout(()=>{ resolve(''); cleanup(wid); }, 8000);
-      }).finally(()=>{ window.__turnstileTokenPromise=null; });
-      return await window.__turnstileTokenPromise;
+      if (typeof window.getTurnstileToken === 'function') {
+        return await window.getTurnstileToken();
+      }
+      // Fallback minimal: no token
+      return '';
     } catch { return ''; }
   }
 
@@ -86,24 +71,26 @@
             referer: document.referrer||'',
             'cf-turnstile-response': token
           };
-          // Send with fallback: try local /api first, if 404/405/network error, retry direct Apps Script
+          // Try server endpoints first (Render backend), then fallback to Apps Script
           let data = {};
-          const primaryUrl = endpointFor('subscribe');
-          try {
-            const res = await fetch(primaryUrl, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
-            if (res.ok) {
+          let ok = false;
+          for (const url of endpointsFor('subscribe')) {
+            try {
+              const res = await fetchWithTimeout(url, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) }, 4500);
               data = await res.json().catch(()=>({}));
-            } else if (res.status === 404 || res.status === 405) {
-              throw new Error('proxy-unavailable');
-            } else {
-              data = await res.json().catch(()=>({}));
-            }
-          } catch {
-            // Fallback to Apps Script
-            const res2 = await fetch(FORM_ENDPOINT, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
-            data = await res2.json().catch(()=>({}));
+              if (res.ok && data && data.ok !== false) { ok = true; break; }
+            } catch { /* try next */ }
           }
-          if (!data.ok) throw 0;
+          // Treat success only when not flagged as spam and either
+          // - proxy saved a subscriber record, or
+          // - Apps Script returned ok (no spam signal from GAS).
+          const isSpam = data && (data.spam === true);
+          const savedViaProxy = !!(data && data.ok && data.subscriber && data.subscriber.id);
+          const okViaAppsScript = !!(data && data.ok && !('subscriber' in data));
+          if (!ok || isSpam || !(savedViaProxy || okViaAppsScript)) {
+            console.debug('Subscribe: not confirmed:', { data, isSpam, savedViaProxy, okViaAppsScript });
+            throw 0;
+          }
           statusEl.textContent='Subscribed! Check your inbox for future deals.';
           if (emailInput) emailInput.value='';
         } catch { statusEl.textContent='Could not subscribe right now.'; }
@@ -136,23 +123,17 @@
           referer: document.referrer||'',
           'cf-turnstile-response': token
         };
-        // Send with fallback similar to subscribe
+        // Try server endpoints first, then fallback to Apps Script
         let data = {};
-        const primaryUrl = endpointFor('contact');
-        try {
-          const res = await fetch(primaryUrl, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
-          if (res.ok) {
+        let ok = false;
+        for (const url of endpointsFor('contact')) {
+          try {
+            const res = await fetchWithTimeout(url, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) }, 4500);
             data = await res.json().catch(()=>({}));
-          } else if (res.status === 404 || res.status === 405) {
-            throw new Error('proxy-unavailable');
-          } else {
-            data = await res.json().catch(()=>({}));
-          }
-        } catch {
-          const res2 = await fetch(FORM_ENDPOINT, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
-          data = await res2.json().catch(()=>({}));
+            if (res.ok && data && data.ok !== false) { ok = true; break; }
+          } catch { /* try next */ }
         }
-        if (!data.ok) throw 0;
+        if (!ok || !data.ok) throw 0;
         msgEl.textContent='Message sent!'; msgEl.style.color='green';
         form.reset();
       } catch { msgEl.textContent='Could not send right now.'; msgEl.style.color='red'; }
