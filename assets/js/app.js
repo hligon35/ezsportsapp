@@ -424,7 +424,7 @@ ensureUniformFooter() {
           </div>
           <div>
             <h4>Shop</h4>
-            <a href="ez-nets.html">EZ Nets</a><br/>
+            <a href="ez-nets.html">EZ Custom Nets</a><br/>
             <a href="pre-made-cages.html">Pre-Made Cages</a><br/>
             <a href="l-screens.html">L-Screens</a><br/>
             <a href="accessories.html">Accessories</a>
@@ -752,6 +752,10 @@ ensurePromoBanner() {
         message: 'Limited-time promo: Free training facility design consult.',
         ctaText: 'Request Quote',
         href: 'contactus.html',
+        postDismissText: 'Call Us Now. Start your design today!',
+        postDismissHref: 'contactus.html',
+        phoneText: '(386) 837-3131',
+        phoneHref: 'tel:+13868373131',
         dismissible: true,
       };
       const cfg = (window.PROMO_BANNER && typeof window.PROMO_BANNER === 'object')
@@ -760,36 +764,81 @@ ensurePromoBanner() {
       if (!cfg.enabled) return;
 
       const key = `promoDismissed:${cfg.id}`;
-      try {
-        if (cfg.dismissible && localStorage.getItem(key) === '1') return;
-      } catch {}
+      let dismissed = false;
+      try { dismissed = (cfg.dismissible && localStorage.getItem(key) === '1'); } catch {}
 
       if (document.querySelector('.promo-banner')) return;
 
       const bar = document.createElement('div');
       bar.className = 'promo-banner';
       bar.setAttribute('role', 'region');
-      bar.setAttribute('aria-label', 'Promotion');
 
       const safeMsg = String(cfg.message || '').trim();
       const ctaText = String(cfg.ctaText || '').trim();
       const href = String(cfg.href || '').trim();
 
-      bar.innerHTML = `
-        <div class="container promo-inner">
-          <div class="promo-left">
-            <span class="promo-text">${safeMsg}</span>
-          </div>
-          <div class="promo-right">
-            ${href ? `<a class="promo-cta" href="${href}">${ctaText || 'Learn more'}</a>` : ''}
-            ${cfg.dismissible ? `<button type="button" class="promo-close" aria-label="Dismiss promotion">×</button>` : ''}
-          </div>
-        </div>`;
+      const renderPromo = () => {
+        bar.classList.remove('is-cta');
+        bar.setAttribute('aria-label', 'Promotion');
+        bar.innerHTML = `
+          <div class="container promo-inner">
+            <div class="promo-left">
+              <span class="promo-text">${safeMsg}</span>
+            </div>
+            <div class="promo-right">
+              ${href ? `<a class="promo-cta" href="${href}">${ctaText || 'Learn more'}</a>` : ''}
+              ${cfg.dismissible ? `<button type="button" class="promo-close" aria-label="Dismiss promotion">×</button>` : ''}
+            </div>
+          </div>`;
+      };
 
-      try {
-        document.documentElement.classList.add('has-promo-banner');
-        document.body.classList.add('has-promo-banner');
-      } catch {}
+      const renderPostDismissCta = () => {
+        const postText = String(cfg.postDismissText || '').trim() || 'Call Us Now. Start your design today!';
+        const postHref = String(cfg.postDismissHref || '').trim() || 'contactus.html';
+        const phoneText = String(cfg.phoneText || '').trim() || '(386) 837-3131';
+        const phoneHref = String(cfg.phoneHref || '').trim() || 'tel:+13868373131';
+
+        bar.classList.add('is-cta');
+        bar.setAttribute('aria-label', 'Call to action');
+        bar.innerHTML = `
+          <div class="container promo-inner">
+            <div class="promo-title"><a href="${postHref}">${postText}</a></div>
+            <a class="promo-phone" href="${phoneHref}" aria-label="Call EZ Sports Netting at ${phoneText}">${phoneText}</a>
+          </div>`;
+      };
+
+      const setTopBannerOffset = () => {
+        try {
+          const h = Math.ceil(bar.getBoundingClientRect().height || 0);
+          const px = `${h}px`;
+          document.documentElement.style.setProperty('--top-banner-height', px);
+          document.body.style.setProperty('--top-banner-height', px);
+        } catch {}
+      };
+
+      const enableTopBannerLayout = () => {
+        try {
+          document.documentElement.classList.add('has-top-banner');
+          document.body.classList.add('has-top-banner');
+          // Backwards-compat for older CSS selectors
+          document.documentElement.classList.add('has-promo-banner');
+          document.body.classList.add('has-promo-banner');
+        } catch {}
+      };
+
+      const disableTopBannerLayout = () => {
+        try {
+          document.documentElement.classList.remove('has-top-banner');
+          document.body.classList.remove('has-top-banner');
+          document.documentElement.classList.remove('has-promo-banner');
+          document.body.classList.remove('has-promo-banner');
+          document.documentElement.style.removeProperty('--top-banner-height');
+          document.body.style.removeProperty('--top-banner-height');
+        } catch {}
+      };
+
+      enableTopBannerLayout();
+      dismissed ? renderPostDismissCta() : renderPromo();
 
       // Keep skip-link first for accessibility if present
       const skip = document.querySelector('a.skip');
@@ -799,16 +848,19 @@ ensurePromoBanner() {
         document.body.insertBefore(bar, document.body.firstChild);
       }
 
+      // Apply the correct top offset so the whole page shifts down (not just the header)
+      setTopBannerOffset();
+      try {
+        window.addEventListener('resize', () => setTopBannerOffset(), { passive: true });
+      } catch {}
+
       // Dismiss handling
       const btn = bar.querySelector('.promo-close');
       if (btn) {
         btn.addEventListener('click', () => {
           try { localStorage.setItem(key, '1'); } catch {}
-          try { bar.remove(); } catch {}
-          try {
-            document.documentElement.classList.remove('has-promo-banner');
-            document.body.classList.remove('has-promo-banner');
-          } catch {}
+          try { renderPostDismissCta(); } catch {}
+          try { setTopBannerOffset(); } catch {}
         });
       }
     } catch {}
@@ -915,7 +967,7 @@ ensureCoreNav() {
     const canonical = [
       { href: 'index.html', text: 'Home' },
       { href: 'about.html', text: 'About' },
-      { href: 'ez-nets.html', text: 'EZ Nets' },
+      { href: 'ez-nets.html', text: 'EZ Custom Nets' },
       { href: 'training-facility-design.html', text: 'Training Facility Design' },
       { href: 'pre-made-cages.html', text: 'Pre-Made Cages' },
       { href: 'l-screens.html', text: 'L-Screens' },
@@ -1071,7 +1123,7 @@ ensureHomeFirst() {
       'order-history.html': 'Order History',
       'netting-calculator.html': 'Netting Calculator',
     // Primary nav canonical set
-    'ez-nets.html': 'EZ Nets',
+    'ez-nets.html': 'EZ Custom Nets',
     'l-screens.html': 'L-Screens',
     'accessories.html': 'Accessories',
     'contactus.html': 'Contact Us',
@@ -1273,7 +1325,7 @@ ensureHomeFirst() {
         if (/protective\s+screen/.test(name)) return { label: 'Protective Screens', href: 'protective-screens.html' };
         if (/l[- ]?screen/.test(name) || /^bullet/.test(name)) return { label: 'Baseball L-Screens', href: 'baseball-l-screens.html' };
         if (/pad\s*kit/.test(name) || /^pk-/.test(sku)) return { label: 'Bullet Pad Kits', href: 'bullet-pad-kits.html' };
-        return { label: 'EZ Nets', href: 'ez-nets.html' };
+        return { label: 'EZ Custom Nets', href: 'ez-nets.html' };
       };
       if (prod) {
         const catCrumb = resolveCategory(prod);
@@ -1315,12 +1367,12 @@ ensureHomeFirst() {
     try { this.ensureSEO(); } catch {}
   },
 
-  // Standardize the EZ Nets sub-navigation across all netting-related pages and append Expert CTA action
+  // Standardize the EZ Custom Nets sub-navigation across all netting-related pages and append Expert CTA action
   ensureNettingSubnav() {
     try {
   const container = document.getElementById('netting-subnav');
       if (!container) return;
-      // Canonical order for EZ Nets category navigation
+      // Canonical order for EZ Custom Nets category navigation
       const TOP = [
         { label: 'Overview', href: 'ez-nets.html' },
         { label: 'Baseball', href: 'baseball-netting.html' },
@@ -1431,7 +1483,7 @@ ensureHomeFirst() {
     } catch(e) { /* silent */ }
   },
 
-  // On the EZ Nets overview page, inject images into the spec cards based on their titles
+  // On the EZ Custom Nets overview page, inject images into the spec cards based on their titles
   ensureEZNetsSpecImages() {
     try {
       const base = (location.pathname.split('/').pop() || '').toLowerCase();
@@ -2823,7 +2875,7 @@ ensureHomeFirst() {
     } catch {}
   },
 
-  // Ensure footer "Netting" link (generic category) points to EZ Nets overview, not calculator
+  // Ensure footer "Netting" link (generic category) points to EZ Custom Nets overview, not calculator
   ensureFooterNettingLink() {
     try {
       const footer = document.querySelector('footer');

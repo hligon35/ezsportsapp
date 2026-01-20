@@ -658,9 +658,11 @@ img{max-width:100%;display:block}
 .skip{position:absolute;left:-9999px;top:auto}
 .skip:focus{left:1rem;top:1rem;background:#fff;color:#111;padding:.5rem .75rem;border-radius:.5rem}
 
+:root{--top-banner-height:0px}
+
 /* Promo banner (sitewide, fixed top) */
-.promo-banner{position:fixed;top:0;left:0;right:0;z-index:120;background:linear-gradient(90deg,var(--brand),#000);color:#fff;height:25px;border-bottom:1px solid rgba(255,255,255,.15)}
-.promo-banner .promo-inner{height:25px;display:flex;align-items:center;justify-content:space-between;gap:.75rem}
+.promo-banner{position:fixed;top:0;left:0;right:0;z-index:120;background:linear-gradient(90deg,var(--brand),#000);color:#fff;min-height:50px;height:auto;border-bottom:1px solid rgba(255,255,255,.15)}
+.promo-banner .promo-inner{min-height:50px;height:auto;display:flex;align-items:center;justify-content:space-between;gap:.75rem;padding:.35rem 0}
 .promo-banner .promo-text{font-size:.78rem;font-weight:800;letter-spacing:.2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
 .promo-banner .promo-right{display:flex;align-items:center;gap:.5rem;flex:0 0 auto}
 .promo-banner .promo-cta{color:#fff;text-decoration:none;font-weight:900;font-size:.78rem;padding:.15rem .55rem;border-radius:999px;border:1px solid rgba(255,255,255,.35);background:rgba(0,0,0,.18)}
@@ -668,19 +670,30 @@ img{max-width:100%;display:block}
 .promo-banner .promo-close{all:unset;cursor:pointer;display:grid;place-items:center;width:22px;height:22px;border-radius:999px;font-size:1.05rem;line-height:1;font-weight:900;color:#fff;opacity:.9}
 .promo-banner .promo-close:hover{background:rgba(255,255,255,.14);opacity:1}
 
+/* Post-dismiss CTA banner */
+.promo-banner.is-cta{background:linear-gradient(90deg,#111827,#000)}
+.promo-banner.is-cta .promo-inner{min-height:40px;padding:.25rem 0}
+.promo-banner.is-cta .promo-text{white-space:normal;overflow:visible;text-overflow:clip}
+.promo-banner .promo-title{font-weight:900;letter-spacing:.2px}
+.promo-banner .promo-title a{color:#fff;text-decoration:none}
+.promo-banner .promo-title a:hover{text-decoration:underline}
+.promo-banner .promo-phone{margin-left:auto;color:#fff;text-decoration:none;font-weight:900;white-space:nowrap;opacity:.95}
+.promo-banner .promo-phone:hover{text-decoration:underline;opacity:1}
+
 @media (max-width:520px){
   .promo-banner .promo-text{font-size:.74rem}
   .promo-banner .promo-cta{display:none}
 }
 
-/* When promo is shown, keep sticky header below it (adds space under promo) */
-.has-promo-banner .site-header{top:25px;padding-top:0}
+/* When top banner is shown, shift the entire page down and keep sticky header below it */
+body.has-top-banner, body.has-promo-banner{padding-top:var(--top-banner-height)}
+.has-top-banner .site-header, .has-promo-banner .site-header{top:var(--top-banner-height);padding-top:0}
 
 /* Header */
-.site-header{position:sticky;top:0;z-index:30;background:#000000;color:#fff;border-bottom:1px solid rgba(255,255,255,.08);padding-top:25px}
+.site-header{position:sticky;top:0;z-index:30;background:#000000;color:#fff;border-bottom:1px solid rgba(255,255,255,.08);padding-top:0}
 .header-bar{display:flex;align-items:center;gap:1rem;min-height:51px;flex-wrap:wrap}
 /* Header layout: brand left, nav center, actions right */
-.site-header .header-bar{justify-content:space-between}
+.site-header .header-bar{justify-content:space-between;padding:.65rem 0}
 .brand{display:flex;align-items:center;gap:.6rem;color:#fff;text-decoration:none;font-weight:900;letter-spacing:.3px}
 .brand img{filter:drop-shadow(0 4px 12px rgba(0,0,0,.25));border-radius:0.75rem;background:#ffffff;}
 
@@ -780,7 +793,7 @@ img[src*="/logo.svg"]{
 */
 @media (max-width:640px){
   /* Mobile header: Row 1 brand centered; Row 2: search 60%, actions 20%, menu toggle 20% */
-  .site-header .header-bar{display:grid;grid-template-rows:auto auto;row-gap:.4rem;align-items:center;justify-items:stretch;grid-template-columns:100%;column-gap:.25rem;padding:0 .55rem .5rem}
+  .site-header .header-bar{display:grid;grid-template-rows:auto auto;row-gap:.4rem;align-items:center;justify-items:stretch;grid-template-columns:100%;column-gap:.25rem;padding:.5rem .55rem .5rem}
   .site-header .brand{grid-column:1 / -1;grid-row:1;justify-self:center;margin-inline:auto;margin-bottom:.4rem}
   /* Second row defined with fractional distribution including gap fallback */
   /* Adaptive columns: search grows, actions/menu size to content */
@@ -1219,7 +1232,7 @@ nav.quick-links li a[href="careers.html"]{
 }
 @media (max-width:640px){
   /* Stack header content */
-  .header-bar{flex-wrap:wrap;align-items:flex-start;padding:.55rem 0 .65rem}
+  .header-bar{flex-wrap:wrap;align-items:flex-start;padding:.6rem 0}
   .header-bar,.hero-inner{justify-content:center}
   .brand{flex:1 0 40%;min-width:160px}
   .quick-links{order:2;flex:1 0 auto;justify-content:center;flex-wrap:wrap;gap:.6rem}
