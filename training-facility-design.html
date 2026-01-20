@@ -7,6 +7,7 @@
   <meta name="description" content="Training facility design — coming soon." />
   <link rel="stylesheet" href="assets/css/styles.css" />
   <script type="module" src="assets/js/app.js" defer></script>
+  <script type="module" src="assets/js/facility-configurator.js" defer></script>
 </head>
 <body>
   <header class="site-header">
@@ -19,7 +20,136 @@
   </header>
 
   <main id="main" class="container">
-    <h1 class="visually-hidden">Training Facility Design</h1>
+    <section class="net-hero nh-training-facility facility-hero">
+      <div class="wrap">
+        <h1>Training Facility Design</h1>
+        <p>Configure your space, explore options, and request a custom quote. This tool provides a quick range estimate—final pricing depends on layout, mounting, and installation requirements.</p>
+        <div class="facility-hero-actions">
+          <a class="btn btn-primary btn-quote" href="#facility-configurator">Build Your Facility</a>
+          <a class="btn btn-outline btn-quote" href="contactus.html">Talk with an expert</a>
+        </div>
+      </div>
+    </section>
+
+    <section id="facility-configurator" class="wrap section-spaced">
+      <h2>Build Your Facility</h2>
+      <p class="muted facility-subtitle">Adjust dimensions, net type, and add-ons to see a live estimated price range.</p>
+
+      <div class="calc-grid facility-grid">
+        <div class="calc-card">
+          <h3 class="calc-title">Configuration</h3>
+          <form id="facility-form" class="calc-form" autocomplete="on">
+            <div class="form-row">
+              <label for="facility-length"><strong>Facility dimensions</strong></label>
+              <div class="dims" aria-label="Facility dimensions in feet">
+                <input id="facility-length" name="lengthFt" type="number" inputmode="decimal" min="10" max="400" step="1" value="60" aria-label="Length in feet" />
+                <span class="unit">ft</span>
+                <input id="facility-width" name="widthFt" type="number" inputmode="decimal" min="10" max="400" step="1" value="40" aria-label="Width in feet" />
+                <span class="unit">ft</span>
+              </div>
+              <div class="dims" aria-label="Facility height in feet">
+                <input id="facility-height" name="heightFt" type="number" inputmode="decimal" min="8" max="80" step="1" value="16" aria-label="Height in feet" />
+                <span class="unit">ft height</span>
+                <span></span><span></span>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <label for="facility-coverage"><strong>Coverage</strong></label>
+              <select id="facility-coverage" name="coverage">
+                <option value="full">Full enclosure (walls + ceiling)</option>
+                <option value="perimeter">Perimeter walls only</option>
+              </select>
+            </div>
+
+            <div class="form-row">
+              <label for="facility-net"><strong>Net type</strong></label>
+              <select id="facility-net" name="netType">
+                <option value="nylon-36">Nylon #36 (Heavy Duty)</option>
+              </select>
+              <div class="muted facility-helper">We’ll confirm mesh, twine gauge, and impact requirements during the consult.</div>
+            </div>
+
+            <fieldset>
+              <legend>Add-ons</legend>
+
+              <div class="form-row">
+                <label for="facility-dividers"><strong>Divider curtains</strong> <span class="muted facility-meta">(count)</span></label>
+                <input id="facility-dividers" name="dividerCount" type="number" min="0" max="20" step="1" value="0" />
+              </div>
+
+              <div class="form-row">
+                <label for="facility-impact"><strong>Impact panel coverage</strong> <span class="muted facility-meta">(0–100%)</span></label>
+                <input id="facility-impact" name="impactPct" type="number" min="0" max="100" step="5" value="0" />
+              </div>
+
+              <div class="form-row">
+                <label for="facility-doors"><strong>Doors / openings</strong> <span class="muted facility-meta">(count)</span></label>
+                <input id="facility-doors" name="doorCount" type="number" min="0" max="12" step="1" value="0" />
+              </div>
+
+              <label class="facility-check">
+                <input type="checkbox" name="trackSystem" />
+                <span><strong>Track / retractable system</strong></span>
+              </label>
+              <label class="facility-check">
+                <input type="checkbox" name="installation" />
+                <span><strong>Installation</strong></span>
+              </label>
+              <label class="facility-check">
+                <input type="checkbox" name="padding" />
+                <span><strong>Padding / wall protection</strong></span>
+              </label>
+            </fieldset>
+          </form>
+        </div>
+
+        <div class="calc-card">
+          <h3 class="calc-title">Estimated Range</h3>
+          <div id="facility-estimate" class="summary"></div>
+
+          <hr class="facility-divider" />
+
+          <h3 class="calc-title">Request a Custom Quote</h3>
+          <form id="facility-quote-form" class="contact-form" autocomplete="on">
+            <input type="text" name="hp" class="facility-hp" tabindex="-1" autocomplete="off" aria-label="Leave this field empty" aria-hidden="true" />
+            <label>
+              <span>Name</span>
+              <input name="name" required autocomplete="name" />
+            </label>
+            <label>
+              <span>Email</span>
+              <input name="email" type="email" required autocomplete="email" />
+            </label>
+            <label>
+              <span>Phone</span>
+              <input name="phone" type="tel" autocomplete="tel" placeholder="(386) 837-3131" />
+            </label>
+            <div class="row">
+              <label class="facility-grow">
+                <span>Company / School</span>
+                <input name="company" autocomplete="organization" />
+              </label>
+              <label class="facility-grow">
+                <span>City / State</span>
+                <input name="location" autocomplete="address-level2" />
+              </label>
+            </div>
+            <label>
+              <span>Notes</span>
+              <textarea name="notes" placeholder="How many bays? Indoor/outdoor? Ceiling obstructions? Preferred timeline?"></textarea>
+            </label>
+            <textarea id="facility-message" name="message" hidden></textarea>
+
+            <div class="row">
+              <button class="btn btn-primary" type="submit">Send Request</button>
+              <a class="btn btn-outline" href="tel:+13868373131">Call (386) 837-3131</a>
+              <div id="facility-quote-msg" class="form-msg" aria-live="polite"></div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </section>
   </main>
 
   <footer class="site-footer">

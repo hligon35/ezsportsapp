@@ -54,6 +54,7 @@
   flex-wrap: nowrap; /* force single row */
   gap: 4px;
   margin: 8px 0 6px;
+  padding-left: 12px;
   min-height: 28px;
   align-items: center;
   justify-content: flex-start;
@@ -1353,6 +1354,21 @@ nav.quick-links li a[href="careers.html"]{
 @media (max-width:640px){
   .calc-gallery{padding-bottom:.35rem}
 }
+
+/* Training facility configurator */
+@media (min-width:960px){
+  .facility-grid{grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);align-items:start}
+}
+
+.facility-hero{margin-top:1rem}
+.facility-hero-actions{display:flex;gap:.75rem;flex-wrap:wrap}
+.facility-subtitle{margin-top:-.25rem}
+.facility-helper{font-size:.8rem;line-height:1.35}
+.facility-meta{font-weight:700}
+.facility-check{display:flex;align-items:center;gap:.55rem}
+.facility-divider{border:none;border-top:1px solid var(--border);margin:1rem 0}
+.facility-hp{display:none}
+.facility-grow{flex:1 1 240px}
 .calc-card{background:#fff;border:1px solid var(--border);border-radius:1rem;box-shadow:0 8px 24px rgba(12,32,64,.06);padding:1rem}
 .calc-title{margin:0 0 .5rem}
 .calc-form{display:grid;gap:.9rem}
@@ -1484,6 +1500,12 @@ nav.quick-links li a[href="careers.html"]{
 @media (min-width:1101px){
   .calc-grid{grid-template-columns:minmax(0,1fr) auto; align-items:start}
   .calc-card{ width:fit-content; max-width:min(100%, 680px); align-self:start; justify-self:start; position:sticky; top:1rem }
+}
+
+/* Training facility configurator: opt-out of calculator sticky/fit-content desktop tweaks */
+@media (min-width:1101px){
+  .facility-grid{grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);align-items:start}
+  .facility-grid .calc-card{width:100%;max-width:none;position:static;top:auto;justify-self:stretch}
 }
 /* Legacy safeguard (kept harmless): if JS adds calc-stack ensure single column */
 .calc-grid.calc-stack{grid-template-columns:1fr !important}

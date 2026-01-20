@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>EZ Nets — Sports Netting Solutions</title>
+  <title>EZ Custom Nets — Sports Netting Solutions</title>
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <link rel="stylesheet" href="assets/css/styles.css" />
   <script type="module" src="assets/js/app.js" defer></script>
@@ -13,6 +13,43 @@
     .net-hero{background:linear-gradient(135deg,#000000 0%, var(--brand) 100%);color:#fff;padding:2.2rem 0;border-radius:1.25rem;margin-top:1rem}
     .net-hero h1{margin:0 0 .5rem;font-size:clamp(1.9rem,4.5vw,3.1rem);letter-spacing:.6px;text-transform:uppercase;font-weight:900}
     .net-hero p{margin:0 0 1rem;font-weight:600;max-width:780px}
+
+    /* EZ Nets hero layout: wider right-side calculator callout */
+    .net-hero .wrap.eznets-hero{display:grid;gap:1.25rem;align-items:start}
+    @media (min-width:980px){
+      .net-hero .wrap.eznets-hero{grid-template-columns:minmax(0,2.4fr) minmax(320px,1.1fr)}
+    }
+    .nh-eznets .netting-subnav{justify-content:center}
+    .nh-eznets .eznets-hero-actions{display:flex;justify-content:center}
+    .nh-eznets .eznets-calculator{
+      background:rgba(255,255,255,.10);
+      border:1px solid rgba(255,255,255,.18);
+      border-radius:1.15rem;
+      padding:1.1rem;
+      box-shadow:0 14px 40px rgba(0,0,0,.28);
+      backdrop-filter:saturate(120%) blur(10px);
+    }
+    .nh-eznets .eznets-calculator .calc-badge{
+      display:inline-flex;
+      align-items:center;
+      gap:.45rem;
+      padding:.3rem .6rem;
+      border-radius:999px;
+      font-weight:900;
+      font-size:.72rem;
+      letter-spacing:.3px;
+      text-transform:uppercase;
+      background:rgba(0,0,0,.35);
+      border:1px solid rgba(255,255,255,.18);
+      color:#fff;
+    }
+    .nh-eznets .eznets-calculator h2{margin:.75rem 0 .4rem;font-size:1.15rem;font-weight:900;letter-spacing:.3px;text-transform:uppercase}
+    .nh-eznets .eznets-calculator p{margin:0 0 .9rem;opacity:.95;font-weight:600;line-height:1.35;max-width:unset}
+    .nh-eznets .eznets-calculator .btn{width:100%;justify-content:center}
+    @media (max-width:979px){
+      .nh-eznets .eznets-calculator{max-width:520px;margin-inline:auto}
+    }
+
     /* Compact spec grid ~20% shorter */
     .spec-grid{display:grid;gap:.8rem;margin:1.2rem 0;grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
     .spec-card{background:#fff;border:1px solid var(--border);border-radius:1rem;padding:.8rem;box-shadow:0 4px 18px rgba(12,32,64,.06)}
@@ -40,19 +77,29 @@
     </div>
   </header>
   <main id="main" class="container">
-    <section class="net-hero">
-      <div class="wrap">
-        <h1>EZ Custom Nets</h1>
-        <p>Custom baseball, golf, lacrosse and soccer netting — designed for durability, safety and performance. Explore sport‑specific solutions, specs, and planning tools.</p>
-        <div class="netting-subnav" id="netting-subnav">
-          <a href="baseball-netting.html">Baseball</a>
-          <a href="training-facility.html">Training Facility</a>
-          <a href="golf-netting.html">Golf</a>
-          <a href="sports-netting.html">Sports</a>
-          <a href="commercial-netting.html">Commercial</a>
-          <a href="netting-calculator.html">Calculator</a>
+    <section class="net-hero nh-eznets">
+      <div class="wrap eznets-hero">
+        <div>
+          <h1>EZ Custom Nets</h1>
+          <p>Custom baseball, golf, lacrosse and soccer netting — designed for durability, safety and performance. Explore sport‑specific solutions, specs, and planning tools.</p>
+          <div class="netting-subnav" id="netting-subnav">
+            <a href="baseball-netting.html">Baseball</a>
+            <a href="training-facility.html">Training Facility</a>
+            <a href="golf-netting.html">Golf</a>
+            <a href="sports-netting.html">Sports</a>
+            <a href="commercial-netting.html">Commercial</a>
+          </div>
+          <div class="eznets-hero-actions">
+            <button class="btn btn-primary btn-quote" onclick="location.href='contactus.html'">Request Quote</button>
+          </div>
         </div>
-  <button class="btn btn-primary btn-quote" onclick="location.href='contactus.html'">Request Quote</button>
+
+        <aside class="eznets-calculator" aria-label="Netting calculator">
+          <div class="calc-badge">Planning Tool</div>
+          <h2>Netting Calculator</h2>
+          <p>Not sure where to start? Plug in your dimensions and we’ll guide you to a quick estimate for mesh, edging, and the essentials — then we’ll help you confirm the perfect setup.</p>
+          <a class="btn btn-primary btn-quote" href="netting-calculator.html">Get an estimate</a>
+        </aside>
       </div>
     </section>
 

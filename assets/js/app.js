@@ -1644,17 +1644,26 @@ ensureHomeFirst() {
   const container = document.getElementById('netting-subnav');
       if (!container) return;
       // Canonical order for EZ Custom Nets category navigation
-      const TOP = [
-        { label: 'Overview', href: 'ez-nets.html' },
-        { label: 'Baseball', href: 'baseball-netting.html' },
-        { label: 'Training Facility', href: 'training-facility.html' },
-        { label: 'Golf', href: 'golf-netting.html' },
-        { label: 'Sports', href: 'sports-netting.html' },
-        { label: 'Commercial', href: 'commercial-netting.html' },
-        { label: 'Calculator', href: 'netting-calculator.html' }
-      ];
-      // Rebuild only if markup differs from expected list
   const base = (location.pathname.split('/').pop() || '').toLowerCase();
+      // On EZ Nets overview, the calculator is promoted to a dedicated hero panel (not a sub-nav tab).
+      const TOP = (base === 'ez-nets.html')
+        ? [
+            { label: 'Baseball', href: 'baseball-netting.html' },
+            { label: 'Training Facility', href: 'training-facility.html' },
+            { label: 'Golf', href: 'golf-netting.html' },
+            { label: 'Sports', href: 'sports-netting.html' },
+            { label: 'Commercial', href: 'commercial-netting.html' }
+          ]
+        : [
+            { label: 'Overview', href: 'ez-nets.html' },
+            { label: 'Baseball', href: 'baseball-netting.html' },
+            { label: 'Training Facility', href: 'training-facility.html' },
+            { label: 'Golf', href: 'golf-netting.html' },
+            { label: 'Sports', href: 'sports-netting.html' },
+            { label: 'Commercial', href: 'commercial-netting.html' },
+            { label: 'Calculator', href: 'netting-calculator.html' }
+          ];
+      // Rebuild only if markup differs from expected list
   const html = TOP.map(i => `<a href="${i.href}">${i.label}</a>`).join('');
   container.innerHTML = html;
   container.classList.add('is-ready');
