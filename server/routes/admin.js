@@ -233,11 +233,13 @@ router.get('/cloudflare/summary', requireAdmin, async (req, res) => {
     if (!token || !zone) return res.status(503).json({ message: 'Cloudflare not configured' });
     const { timeframe = 'week' } = req.query;
     const range = getTimeframeRange(String(timeframe));
-    const fromIso = new Date((range.from||0)*1000).toISOString();
-    const toIso = new Date((range.to||Date.now()/1000)*1000).toISOString();
+    // Cloudflare's `httpRequests1dGroups` expects date filters in YYYY-MM-DD format
+    // (not full ISO timestamps). Using Date variables avoids GraphQL argument parsing errors.
+    const fromDate = new Date((range.from || 0) * 1000).toISOString().slice(0, 10);
+    const toDate = new Date((range.to || Date.now() / 1000) * 1000).toISOString().slice(0, 10);
 
     const query = `
-      query($zoneTag: String!, $from: Time!, $to: Time!) {
+      query($zoneTag: String!, $from: Date!, $to: Date!) {
         viewer {
           zones(filter: { zoneTag: $zoneTag }) {
             httpRequests1dGroups(limit: 30, filter: { date_geq: $from, date_lt: $to }) {
@@ -256,7 +258,7 @@ router.get('/cloudflare/summary', requireAdmin, async (req, res) => {
         }
       }
     `;
-    const body = { query, variables: { zoneTag: zone, from: fromIso, to: toIso } };
+    const body = { query, variables: { zoneTag: zone, from: fromDate, to: toDate } };
     const resp = await fetch('https://api.cloudflare.com/client/v4/graphql', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
