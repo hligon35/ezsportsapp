@@ -2665,7 +2665,7 @@ ensureHomeFirst() {
         if (twines.length || cables.length || ropeFt || ropeSpool) {
           grid.innerHTML = '';
           grid.classList.add('grid','grid-3','product-grid');
-          const MAX_PAGE_ITEMS = 12;
+          const MAX_PAGE_ITEMS = 24;
           const groupCount = (twines.length?1:0) + (cables.length?1:0) + ((ropeFt||ropeSpool)?1:0);
           const room = Math.max(0, MAX_PAGE_ITEMS - groupCount);
           // Render other accessories first

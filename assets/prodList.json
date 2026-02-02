@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2025-09-25",
+  "updatedAt": "2026-02-02",
   "categories": {
     "Pre-Made Cages": [
       {
@@ -1307,12 +1307,33 @@
         "map": 450,
         "dsr": 100,
         "notes": "LTL Freight Only",
-        "img": "assets/img/products/100-limited-edition-speedcraft-xs-fernando-tatis-jr-blue-topaz-mirror-lens-sungl.jpg",
+        "img": "assets/prodImgs/Accessories/Wbasket/wbasket.avif",
         "details": {
           "features": [
             "Fast and Reliable Shipping"
           ],
           "description": "High‑capacity, wheeled ball basket designed for heavy facility use. Sturdy frame and large casters roll smoothly on turf or concrete to keep batting practice moving."
+        }
+      },
+      {
+        "sku": "EZ-BKSTP",
+        "name": "Rubber Backstop",
+        "wholesale": 90,
+        "dsr": 50,
+        "map": 149.95,
+        "img": "assets/prodImgs/Accessories/Backstop/backstop.JPG",
+        "details": {
+          "features": [
+            "Material Warranty: One (1) Year Limited Warranty",
+            "Dimensions: 72\" x 48\" x 0.04\", 9lbs",
+            "Package Dimensions: 12.28\" x 11.65\" x 3.94\"",
+            "Fast and Reliable Shipping"
+          ],
+          "description": "Heavy‑duty rubber backstop engineered to extend the life of your batting cage and simplify every training session. Constructed from 1/16\" black rubber with a rugged nylon‑woven inner core, this durable panel absorbs repeated impact from both pitched and batted balls. The loose‑hanging design produces a clean, efficient thud on contact—ideal for high‑volume bullpen work, batting practice, and facility use.\n\nEquipped with reinforced grommets for easy hanging from any cage frame, the backstop keeps balls contained, reduces cleanup time, and protects your netting from premature wear. Built for residential and commercial environments alike, EZ Sports gear is trusted by training facilities, colleges, high schools, and youth programs nationwide.\n\nWARNING: Always hang from a secure cage frame. Inspect mounting points regularly to ensure safe operation.\n\nAbout this item\nPROTECTS YOUR CAGE NET – A batting cage is a big investment, and the EZ Sports Backstop is built to protect your cage for the long haul. Weighing 9 lbs, this net saver is made of 1/16\" black rubber and a rugged nylon woven inner core. This backstop is constructed for both residential and commercial use. Save your cage with EZ Sports.\nPITCHING & BATTING PRACTICE – Whether it’s your thousandth pitch or your first time up to bat, this backstop will work for you. The backstop keeps balls from cluttering the field and lengthens the life your cage and netting. It takes the hassle of cleanup out of practice, so you can stay focused on the next pitch.\nABSORBS IMPACT – This long-lasting backstop absorbs the impact of hit balls and pitches over rounds of extended practice. The backstop provides an efficient thud sound to signal your most powerful pitches. Use your batting cage for years to come with this heavy-duty EZ Sports protective backstop.\nEASY TO HANG – With durable grommets, this backstop is user-friendly and ideal for hanging. Designed to preserve your netting, these backstops should be hung from the cage frame. The backdrop hangs loose behind the batter, absorbing the hardest hit balls.\nEZ SPORTS DIFFERENCE – Constructed with the highest-quality materials available, EZ Sports gear and accessories will transform how you train. Our backstops are perfect for training facilities, colleges & universities, high schools, little league programs, and more. These products make practice efficient and convenient, so you can focus on being your best.",
+          "category_path": [
+            "Brands",
+            "EZ Sports"
+          ]
         }
       }
     ],

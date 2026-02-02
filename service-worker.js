@@ -1,6 +1,6 @@
-// Bumped versions to invalidate old cached assets (including social icons)
-const CORE_CACHE = 'core-v8';
-const ASSET_CACHE = 'assets-v6';
+// Bumped versions to invalidate old cached assets (including prodList.json)
+const CORE_CACHE = 'core-v9';
+const ASSET_CACHE = 'assets-v7';
 const CORE = [
   '/index.html',
   '/coming-soon.html',
@@ -25,6 +25,21 @@ self.addEventListener('activate', e => {
 self.addEventListener('fetch', e => {
   const url = new URL(e.request.url);
   if (e.request.method !== 'GET') return;
+
+  // Network-first for prodList.json so catalog updates appear immediately
+  if (url.pathname.endsWith('/assets/prodList.json') || url.pathname.endsWith('/prodList.json')) {
+    e.respondWith(
+      fetch(e.request)
+        .then(net => {
+          if (net && net.ok && net.type === 'basic') {
+            caches.open(ASSET_CACHE).then(cache => cache.put(e.request, net.clone())).catch(()=>{});
+          }
+          return net;
+        })
+        .catch(() => caches.match(e.request))
+    );
+    return;
+  }
 
   // Always fetch fresh copies of social icon images to avoid stale caches
   if (url.pathname.endsWith('/assets/img/facebook.png') || url.pathname.endsWith('/assets/img/instagram.png')) {
