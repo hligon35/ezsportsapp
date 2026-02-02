@@ -146,7 +146,7 @@ async function loadNetRatesFromCatalog() {
     if (nt) {
       nt.rateLow = nylon21.low;
       nt.rateHigh = nylon21.high;
-      nt.name = 'Nylon #21 (MAP-derived)';
+      nt.name = 'Nylon #21 (Standard)';
     }
   }
 
@@ -156,7 +156,7 @@ async function loadNetRatesFromCatalog() {
     if (nt) {
       nt.rateLow = nylon36.low;
       nt.rateHigh = nylon36.high;
-      nt.name = 'Nylon #36 (MAP-derived)';
+      nt.name = 'Nylon #36 (Heavy Duty)';
     }
   }
 
@@ -167,7 +167,7 @@ async function loadNetRatesFromCatalog() {
     if (nt) {
       nt.rateLow = poly36.low;
       nt.rateHigh = poly36.high;
-      nt.name = 'Poly #36 (UV / Outdoor, MAP-derived)';
+      nt.name = 'Poly / HDPE (UV / Outdoor)';
     }
   }
 
@@ -277,7 +277,7 @@ function buildMessage(estimate) {
     `Dimensions (ft): ${estimate.inputs.lengthFt} L x ${estimate.inputs.widthFt} W x ${estimate.inputs.heightFt} H`,
     `Coverage: ${estimate.coverage === 'full' ? 'Full enclosure (walls + ceiling)' : 'Perimeter walls only'}`,
     `Net type: ${estimate.net.name}`,
-    `Pricing source: ${estimate.pricingSource === 'catalog-map' ? 'Catalog MAP-derived (comparable net packages) + allowances' : 'Fallback estimate rates'}`,
+    `Pricing source: ${estimate.pricingSource === 'catalog-map' ? 'Catalog (comparable net packages) + allowances' : 'Fallback estimate rates'}`,
     '',
     `Estimated netting area: ${Math.round(a.totalSqft).toLocaleString()} sq ft`,
     `  - Walls: ${Math.round(a.wallArea).toLocaleString()} sq ft`,
@@ -304,9 +304,7 @@ function renderEstimate(container, estimate) {
         <div class="muted" style="font-weight:700;">~${totalSqft.toLocaleString()} sq ft</div>
       </div>
       <div class="muted" style="font-size:.9rem; line-height:1.35;">
-        ${estimate.pricingSource === 'catalog-map'
-          ? 'MAP-derived net pricing (from comparable pre-made net packages) + typical facility system allowances. Final quote depends on layout, mounting, and install details.'
-          : 'Quick range estimate (fallback pricing). Final quote depends on layout, mounting, and install details.'}
+        Estimated price range based on your selections. For a detailed quote, please contact our team.
       </div>
       <div style="display:grid; gap:.35rem; font-size:.92rem;">
         <div><strong>Coverage:</strong> ${estimate.coverage === 'full' ? 'Full enclosure (walls + ceiling)' : 'Perimeter walls only'}</div>
