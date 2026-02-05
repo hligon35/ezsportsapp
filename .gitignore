@@ -54,3 +54,10 @@ server/stripe_test_*
 assets/info/prodInfo/**/images/
 assets/info/prodInfo/**/downloaded_images/
 assets/info/prodInfo/**/raw/
+
+# EZSports media sources/outputs (keep optimized images/manifest, ignore raw + large videos)
+assets/content/EZSports Content/
+assets/content/ezsports-content-optimized/*.mp4
+assets/content/ezsports-content-optimized/*.MP4
+assets/content/ezsports-content-optimized/*.mov
+assets/content/ezsports-content-optimized/*.MOV

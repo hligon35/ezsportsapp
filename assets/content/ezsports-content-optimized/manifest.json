@@ -1,0 +1,160 @@
+{
+  "generatedAt": "2026-02-05T15:04:51.339Z",
+  "inputDir": "assets/content/EZSports Content",
+  "outputDir": "assets/content/ezsports-content-optimized",
+  "items": [
+    {
+      "type": "image",
+      "original": "assets/content/EZSports Content/1848DDCA-7EB8-4092-AEC6-2B94553A2494.heic",
+      "alt": "1848ddca 7eb8 4092 Aec6 2b94553a2494",
+      "width": 4032,
+      "height": 3024,
+      "sources": [
+        {
+          "src": "assets/content/ezsports-content-optimized/1848ddca-7eb8-4092-aec6-2b94553a2494-640.webp",
+          "width": 640,
+          "format": "webp",
+          "height": 480
+        },
+        {
+          "src": "assets/content/ezsports-content-optimized/1848ddca-7eb8-4092-aec6-2b94553a2494-1280.webp",
+          "width": 1280,
+          "format": "webp",
+          "height": 960
+        }
+      ]
+    },
+    {
+      "type": "image",
+      "original": "assets/content/EZSports Content/IMG_2598.HEIC",
+      "alt": "Img 2598",
+      "width": 4032,
+      "height": 3024,
+      "sources": [
+        {
+          "src": "assets/content/ezsports-content-optimized/img-2598-640.webp",
+          "width": 640,
+          "format": "webp",
+          "height": 480
+        },
+        {
+          "src": "assets/content/ezsports-content-optimized/img-2598-1280.webp",
+          "width": 1280,
+          "format": "webp",
+          "height": 960
+        }
+      ]
+    },
+    {
+      "type": "image",
+      "original": "assets/content/EZSports Content/IMG_3220.HEIC",
+      "alt": "Img 3220",
+      "width": 4032,
+      "height": 3024,
+      "sources": [
+        {
+          "src": "assets/content/ezsports-content-optimized/img-3220-640.webp",
+          "width": 640,
+          "format": "webp",
+          "height": 480
+        },
+        {
+          "src": "assets/content/ezsports-content-optimized/img-3220-1280.webp",
+          "width": 1280,
+          "format": "webp",
+          "height": 960
+        }
+      ]
+    },
+    {
+      "type": "image",
+      "original": "assets/content/EZSports Content/IMG_3222.HEIC",
+      "alt": "Img 3222",
+      "width": 4032,
+      "height": 3024,
+      "sources": [
+        {
+          "src": "assets/content/ezsports-content-optimized/img-3222-640.webp",
+          "width": 640,
+          "format": "webp",
+          "height": 480
+        },
+        {
+          "src": "assets/content/ezsports-content-optimized/img-3222-1280.webp",
+          "width": 1280,
+          "format": "webp",
+          "height": 960
+        }
+      ]
+    },
+    {
+      "type": "image",
+      "original": "assets/content/EZSports Content/IMG_3223.HEIC",
+      "alt": "Img 3223",
+      "width": 4032,
+      "height": 3024,
+      "sources": [
+        {
+          "src": "assets/content/ezsports-content-optimized/img-3223-640.webp",
+          "width": 640,
+          "format": "webp",
+          "height": 480
+        },
+        {
+          "src": "assets/content/ezsports-content-optimized/img-3223-1280.webp",
+          "width": 1280,
+          "format": "webp",
+          "height": 960
+        }
+      ]
+    },
+    {
+      "type": "video",
+      "original": "assets/content/EZSports Content/IMG_5706.MOV",
+      "src": "assets/content/ezsports-content-optimized/img-5706.mp4",
+      "optimized": true
+    },
+    {
+      "type": "image",
+      "original": "assets/content/EZSports Content/IMG_6695.HEIC",
+      "alt": "Img 6695",
+      "width": 4032,
+      "height": 3024,
+      "sources": [
+        {
+          "src": "assets/content/ezsports-content-optimized/img-6695-640.webp",
+          "width": 640,
+          "format": "webp",
+          "height": 480
+        },
+        {
+          "src": "assets/content/ezsports-content-optimized/img-6695-1280.webp",
+          "width": 1280,
+          "format": "webp",
+          "height": 960
+        }
+      ]
+    },
+    {
+      "type": "image",
+      "original": "assets/content/EZSports Content/IMG_6697.HEIC",
+      "alt": "Img 6697",
+      "width": 3024,
+      "height": 4032,
+      "sources": [
+        {
+          "src": "assets/content/ezsports-content-optimized/img-6697-640.webp",
+          "width": 640,
+          "format": "webp",
+          "height": 853
+        },
+        {
+          "src": "assets/content/ezsports-content-optimized/img-6697-1280.webp",
+          "width": 1280,
+          "format": "webp",
+          "height": 1707
+        }
+      ]
+    }
+  ]
+}
