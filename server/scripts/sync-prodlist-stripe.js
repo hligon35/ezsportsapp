@@ -134,14 +134,54 @@ function productTitle(item) {
   return String(item?.sku || 'Product');
 }
 
+function cleanDescription(raw) {
+  if (!raw) return '';
+  let txt = String(raw);
+  // Strip basic tags if present
+  txt = txt.replace(/<script[\s\S]*?<\/script>/gi, ' ').replace(/<style[\s\S]*?<\/style>/gi, ' ');
+  txt = txt.replace(/<[^>]+>/g, ' ');
+  // Normalize whitespace/newlines
+  txt = txt.replace(/\r\n/g, '\n');
+  txt = txt.replace(/\n{3,}/g, '\n\n');
+  txt = txt.replace(/\s{2,}/g, ' ').trim();
+  // Stripe product.description max length is 800
+  if (txt.length > 800) txt = txt.slice(0, 800);
+  return txt;
+}
+
+function baseUrlForImages() {
+  // Preferred: explicit public domain
+  const explicit = (process.env.PRODUCT_IMAGE_BASE_URL || '').toString().trim();
+  if (explicit) return explicit.replace(/\/$/, '');
+  // Fallback: APP_BASE_URL (Render domain)
+  const appBase = (process.env.APP_BASE_URL || '').toString().trim();
+  if (appBase) return appBase.replace(/\/$/, '');
+  return '';
+}
+
 function imageUrlFromProdList(img) {
   const raw = (img || '').toString().trim();
   if (!raw) return null;
   if (/^https?:\/\//i.test(raw)) return raw;
-  const base = (process.env.PRODUCT_IMAGE_BASE_URL || '').toString().trim().replace(/\/$/, '');
+  const base = baseUrlForImages();
   if (!base) return null;
   const rel = raw.startsWith('/') ? raw : `/${raw}`;
   return base + rel;
+}
+
+function resolveImageUrls(item) {
+  const candidates = [];
+  const push = (v) => {
+    if (!v) return;
+    if (Array.isArray(v)) { v.forEach(push); return; }
+    const u = imageUrlFromProdList(v);
+    if (!u) return;
+    if (!candidates.includes(u)) candidates.push(u);
+  };
+  push(item?.img);
+  push(item?.images);
+  // Stripe currently supports multiple images; keep it reasonable
+  return candidates.slice(0, 8);
 }
 
 async function loadProdList() {
@@ -171,7 +211,7 @@ async function ensureStripeProduct({ localId, name, description, metadata, image
     }
     prod = await stripe.products.create({
       name: name.substring(0, 255),
-      description: (description || '').substring(0, 800),
+      description: cleanDescription(description),
       active: typeof active === 'boolean' ? active : true,
       metadata: asStripeMetadata({ ...(metadata || {}), local_id: localId })
     });
@@ -181,7 +221,7 @@ async function ensureStripeProduct({ localId, name, description, metadata, image
   const nextMetadata = { ...(prod.metadata || {}), ...(metadata || {}), local_id: localId };
   const update = {
     name: name.substring(0, 255),
-    description: (description || '').substring(0, 800),
+    description: cleanDescription(description),
     metadata: asStripeMetadata(nextMetadata)
   };
   if (typeof active === 'boolean') update.active = active;
@@ -243,6 +283,13 @@ async function main() {
   console.log('prodList:', PROD_LIST_FILE);
   const mode = STRIPE_SECRET_KEY.startsWith('sk_live_') ? 'LIVE' : (STRIPE_SECRET_KEY.startsWith('sk_test_') ? 'TEST' : 'UNKNOWN');
   console.log('Stripe key mode:', mode);
+  const imgBase = baseUrlForImages();
+  if (!imgBase) {
+    console.log('Image URL base: (not set) — product images will NOT be sent to Stripe unless img is already https://');
+    console.log('Set PRODUCT_IMAGE_BASE_URL=https://yourdomain.com (preferred) or APP_BASE_URL to enable images.');
+  } else {
+    console.log('Image URL base:', imgBase);
+  }
 
   const { categories } = await loadProdList();
 
@@ -253,7 +300,7 @@ async function main() {
       const baseSku = (item?.sku || '').toString().trim();
       const baseName = productTitle(item);
       const description = (item?.details?.description || item?.description || '').toString();
-      const img = imageUrlFromProdList(item?.img || (Array.isArray(item?.images) ? item.images[0] : null));
+      const images = resolveImageUrls(item);
       const isActive = item?.active === false ? false : true;
       const commonMeta = {
         source: 'prodList',
@@ -275,7 +322,7 @@ async function main() {
             description,
             currency: 'usd',
             unitPrice: price,
-            imageUrl: img,
+            images,
             active: isActive,
             metadata: { ...commonMeta, local_id_raw: localIdRaw, variation: opt }
           });
@@ -291,7 +338,7 @@ async function main() {
           description,
           currency: 'usd',
           unitPrice: price,
-          imageUrl: img,
+          images,
           active: isActive,
           metadata: { ...commonMeta, local_id_raw: localIdRaw }
         });
@@ -323,12 +370,13 @@ async function main() {
 
   for (const p of planned) {
     try {
+      const primaryImage = Array.isArray(p.images) && p.images.length ? p.images[0] : null;
       const prodRes = await ensureStripeProduct({
         localId: p.localId,
         name: p.name,
         description: p.description,
         metadata: p.metadata,
-        imageUrl: p.imageUrl,
+        imageUrl: primaryImage,
         active: p.active
       });
       if (prodRes.created) createdProducts++;
@@ -347,6 +395,16 @@ async function main() {
       const priceRes = await ensureStripePrice({ productId, unitAmountFloat: p.unitPrice, currency: p.currency });
       if (priceRes.created) createdPrices++;
       await setDefaultPrice(productId, priceRes.id);
+
+      // If we have more than one image, update the product's images array.
+      // (We do this after we know product exists; safe idempotent update.)
+      if (!DRY_RUN && Array.isArray(p.images) && p.images.length > 1) {
+        try {
+          await stripe.products.update(productId, { images: p.images });
+        } catch (e) {
+          warnings.push(`Failed setting images for ${p.localId}: ${e.message}`);
+        }
+      }
       ok++;
       last.push({ localId: p.localId, localIdRaw: p.localIdRaw, productId, priceId: priceRes.id, priceCreated: !!priceRes.created });
     } catch (e) {
