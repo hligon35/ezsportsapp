@@ -12,6 +12,8 @@
     "db:reset": "npm --prefix server run db:reset",
     "products:sync": "node server/scripts/sync-products.js",
     "products:sync:dry": "node server/scripts/sync-products.js --dry --no-stripe",
+    "prodlist:stripe:sync": "node server/scripts/sync-prodlist-stripe.js",
+    "prodlist:stripe:sync:dry": "node server/scripts/sync-prodlist-stripe.js --dry",
     "screens:build": "node server/scripts/build-screens-catalog.js",
     "gloves:build": "node server/scripts/build-gloves-catalog.js",
     "prices:generate": "node scripts/generate-prices-md.js",

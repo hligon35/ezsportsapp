@@ -1,0 +1,328 @@
+#!/usr/bin/env node
+/**
+ * Sync assets/prodList.json -> Stripe Products & Prices
+ *
+ * Goal:
+ *  - Treat prodList.json as the source of truth for what should exist in Stripe Dashboard.
+ *  - Create/update Stripe Products keyed by metadata.local_id.
+ *  - Create Stripe Prices when missing (never mutate unit_amount).
+ *
+ * Notes:
+ *  - prodList images are often relative paths (assets/img/...). Stripe requires public URLs for product images.
+ *    If PRODUCT_IMAGE_BASE_URL is set (e.g. https://yourdomain.com), relative paths will be converted.
+ *
+ * Usage:
+ *  node server/scripts/sync-prodlist-stripe.js [--dry] [--limit=50]
+ */
+
+require('dotenv').config();
+
+const fs = require('fs/promises');
+const path = require('path');
+
+const args = process.argv.slice(2);
+const DRY_RUN = args.includes('--dry');
+
+function readArgValue(prefix) {
+  const hit = args.find(a => a.startsWith(prefix + '='));
+  if (!hit) return null;
+  return hit.slice(prefix.length + 1);
+}
+
+const LIMIT = (() => {
+  const v = readArgValue('--limit');
+  if (!v) return null;
+  const n = Number(v);
+  return Number.isFinite(n) && n > 0 ? Math.floor(n) : null;
+})();
+
+const SERVER_DIR = path.resolve(__dirname, '..');
+const REPO_ROOT = path.resolve(SERVER_DIR, '..');
+
+// Load env from both repo root and server/.env
+try { require('dotenv').config({ path: path.join(REPO_ROOT, '.env') }); } catch {}
+try { require('dotenv').config({ path: path.join(SERVER_DIR, '.env') }); } catch {}
+
+const PROD_LIST_FILE = path.join(REPO_ROOT, 'assets', 'prodList.json');
+
+const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY;
+if (!STRIPE_SECRET_KEY) {
+  console.error('Missing STRIPE_SECRET_KEY. Set it in server/.env or environment variables.');
+  process.exit(1);
+}
+
+let stripe;
+try {
+  stripe = require('stripe')(STRIPE_SECRET_KEY);
+} catch (e) {
+  console.error('Failed to init Stripe SDK:', e.message);
+  process.exit(1);
+}
+
+function slug(str) {
+  return (str || '')
+    .toString()
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)/g, '');
+}
+
+function parsePriceLike(v) {
+  if (v == null) return null;
+  if (typeof v === 'number' && Number.isFinite(v)) return v;
+  const s = String(v).trim();
+  if (!s) return null;
+  // Handle values like "$0.50/ft" or "0.50/ft" or "$2,499.99"
+  const cleaned = s
+    .replace(/\$/g, '')
+    .replace(/,/g, '')
+    .replace(/\s*\/ft\s*$/i, '')
+    .trim();
+  const n = parseFloat(cleaned);
+  return Number.isFinite(n) ? n : null;
+}
+
+function pickUnitPrice(obj) {
+  // Mirror admin.js preference: MAP -> price -> details.price -> wholesale
+  const mapVal = parsePriceLike(obj?.map);
+  if (mapVal != null) return mapVal;
+  const priceVal = parsePriceLike(obj?.price);
+  if (priceVal != null) return priceVal;
+  const detailsPriceVal = parsePriceLike(obj?.details?.price);
+  if (detailsPriceVal != null) return detailsPriceVal;
+  const wholesaleVal = parsePriceLike(obj?.wholesale);
+  if (wholesaleVal != null) return wholesaleVal;
+  return null;
+}
+
+function productTitle(item) {
+  if (item?.name) return String(item.name);
+  const parts = [];
+  if (item?.material) parts.push(String(item.material));
+  if (item?.gauge != null) parts.push(`#${String(item.gauge)}`);
+  if (item?.size) parts.push(String(item.size));
+  if (parts.length) return parts.join(' ').trim();
+  if (item?.title) return String(item.title);
+  return String(item?.sku || 'Product');
+}
+
+function imageUrlFromProdList(img) {
+  const raw = (img || '').toString().trim();
+  if (!raw) return null;
+  if (/^https?:\/\//i.test(raw)) return raw;
+  const base = (process.env.PRODUCT_IMAGE_BASE_URL || '').toString().trim().replace(/\/$/, '');
+  if (!base) return null;
+  const rel = raw.startsWith('/') ? raw : `/${raw}`;
+  return base + rel;
+}
+
+async function loadProdList() {
+  const raw = await fs.readFile(PROD_LIST_FILE, 'utf8');
+  const json = JSON.parse(raw);
+  const cats = json && json.categories && typeof json.categories === 'object' ? json.categories : null;
+  if (!cats) throw new Error('assets/prodList.json missing categories object');
+  return { json, categories: cats };
+}
+
+async function findStripeProductByLocalId(localId) {
+  // Prefer search by metadata.local_id
+  try {
+    const res = await stripe.products.search({ query: `metadata['local_id']:'${localId}'` });
+    if (res?.data?.length) return res.data[0];
+  } catch {
+    // Search might be unavailable; ignore and fall back.
+  }
+  return null;
+}
+
+async function ensureStripeProduct({ localId, name, description, metadata, imageUrl }) {
+  let prod = await findStripeProductByLocalId(localId);
+  if (!prod) {
+    if (DRY_RUN) {
+      return { id: null, created: true, updated: false };
+    }
+    prod = await stripe.products.create({
+      name: name.substring(0, 255),
+      description: (description || '').substring(0, 800),
+      metadata: { ...(metadata || {}), local_id: localId }
+    });
+  }
+
+  // Keep product fields reasonably in sync (safe, idempotent)
+  const nextMetadata = { ...(prod.metadata || {}), ...(metadata || {}), local_id: localId };
+  const update = {
+    name: name.substring(0, 255),
+    description: (description || '').substring(0, 800),
+    metadata: nextMetadata
+  };
+  if (imageUrl) update.images = [imageUrl];
+
+  if (DRY_RUN) {
+    return { id: prod.id, created: false, updated: true };
+  }
+
+  // Only call update if something likely changed
+  const needsUpdate =
+    (prod.name || '') !== update.name ||
+    (prod.description || '') !== update.description ||
+    (imageUrl ? (Array.isArray(prod.images) && prod.images[0] === imageUrl ? false : true) : false);
+
+  if (needsUpdate) {
+    await stripe.products.update(prod.id, update);
+    return { id: prod.id, created: false, updated: true };
+  }
+  return { id: prod.id, created: false, updated: false };
+}
+
+async function ensureStripePrice({ productId, unitAmountFloat, currency = 'usd' }) {
+  const unitAmount = Math.round(Number(unitAmountFloat) * 100);
+  if (!Number.isFinite(unitAmount) || unitAmount <= 0) {
+    throw new Error(`Invalid unit amount for Stripe price: ${unitAmountFloat}`);
+  }
+
+  // Find existing matching active price
+  try {
+    const prices = await stripe.prices.list({ product: productId, active: true, limit: 100 });
+    const match = prices?.data?.find(p => p.unit_amount === unitAmount && p.currency === String(currency).toLowerCase());
+    if (match) return { id: match.id, created: false };
+  } catch (e) {
+    // Continue; we'll create a new one if listing fails
+    try { console.warn('List prices failed (continuing):', e.message); } catch {}
+  }
+
+  if (DRY_RUN) return { id: null, created: true };
+  const created = await stripe.prices.create({ product: productId, unit_amount: unitAmount, currency: String(currency).toLowerCase() });
+  return { id: created.id, created: true };
+}
+
+async function setDefaultPrice(productId, priceId) {
+  if (!priceId) return;
+  if (DRY_RUN) return;
+  try {
+    await stripe.products.update(productId, { default_price: priceId });
+  } catch (e) {
+    // Not fatal
+    try { console.warn('Failed setting default_price for', productId, ':', e.message); } catch {}
+  }
+}
+
+async function main() {
+  console.log('\n=== prodList -> Stripe Sync Starting ===');
+  if (DRY_RUN) console.log('Running in DRY RUN mode – no Stripe mutations.');
+  console.log('prodList:', PROD_LIST_FILE);
+  const mode = STRIPE_SECRET_KEY.startsWith('sk_live_') ? 'LIVE' : (STRIPE_SECRET_KEY.startsWith('sk_test_') ? 'TEST' : 'UNKNOWN');
+  console.log('Stripe key mode:', mode);
+
+  const { categories } = await loadProdList();
+
+  let planned = [];
+  for (const [categoryName, items] of Object.entries(categories)) {
+    if (!Array.isArray(items)) continue;
+    for (const item of items) {
+      const baseSku = (item?.sku || '').toString().trim();
+      const baseName = productTitle(item);
+      const description = (item?.details?.description || item?.description || '').toString();
+      const img = imageUrlFromProdList(item?.img || (Array.isArray(item?.images) ? item.images[0] : null));
+      const commonMeta = {
+        source: 'prodList',
+        category: String(categoryName || ''),
+        sku: baseSku || undefined
+      };
+
+      if (Array.isArray(item?.variations) && item.variations.length) {
+        for (const v of item.variations) {
+          const opt = (v?.option || 'Option').toString();
+          const localId = baseSku ? `${baseSku}-${slug(opt || 'opt')}` : `${slug(baseName)}-${slug(opt || 'opt')}`;
+          const price = pickUnitPrice(v);
+          planned.push({
+            localId,
+            name: `${baseName} (${opt})`.substring(0, 255),
+            description,
+            currency: 'usd',
+            unitPrice: price,
+            imageUrl: img,
+            metadata: { ...commonMeta, variation: opt }
+          });
+        }
+      } else {
+        const localId = baseSku || slug(baseName) || `prod-${Date.now()}`;
+        const price = pickUnitPrice(item);
+        planned.push({
+          localId,
+          name: baseName.substring(0, 255),
+          description,
+          currency: 'usd',
+          unitPrice: price,
+          imageUrl: img,
+          metadata: commonMeta
+        });
+      }
+    }
+  }
+
+  // Filter unusable entries (no price)
+  const warnings = [];
+  planned = planned.filter(p => {
+    if (p.unitPrice == null || !Number.isFinite(Number(p.unitPrice)) || Number(p.unitPrice) <= 0) {
+      warnings.push(`Skipping ${p.localId}: missing/invalid price`);
+      return false;
+    }
+    return true;
+  });
+
+  if (LIMIT) planned = planned.slice(0, LIMIT);
+  console.log(`Planned Stripe products: ${planned.length}${LIMIT ? ` (limited to ${LIMIT})` : ''}`);
+
+  let createdProducts = 0;
+  let updatedProducts = 0;
+  let createdPrices = 0;
+  let ok = 0;
+  let fail = 0;
+
+  for (const p of planned) {
+    try {
+      const prodRes = await ensureStripeProduct({
+        localId: p.localId,
+        name: p.name,
+        description: p.description,
+        metadata: p.metadata,
+        imageUrl: p.imageUrl
+      });
+      if (prodRes.created) createdProducts++;
+      if (prodRes.updated) updatedProducts++;
+
+      const productId = prodRes.id;
+      if (!productId) {
+        // dry-run create path
+        createdPrices++;
+        ok++;
+        continue;
+      }
+
+      const priceRes = await ensureStripePrice({ productId, unitAmountFloat: p.unitPrice, currency: p.currency });
+      if (priceRes.created) createdPrices++;
+      await setDefaultPrice(productId, priceRes.id);
+      ok++;
+    } catch (e) {
+      fail++;
+      warnings.push(`Failed ${p.localId}: ${e.message || String(e)}`);
+    }
+  }
+
+  console.log('\n=== prodList -> Stripe Sync Complete ===');
+  console.log(`Products: ${createdProducts} created, ${updatedProducts} updated.`);
+  console.log(`Prices: ${createdPrices} created.`);
+  console.log(`Results: ${ok} ok, ${fail} failed.`);
+
+  if (warnings.length) {
+    console.log('\nWarnings:');
+    warnings.slice(0, 200).forEach(w => console.log(' - ' + w));
+    if (warnings.length > 200) console.log(` - ...and ${warnings.length - 200} more`);
+  }
+}
+
+main().catch(err => {
+  console.error('Fatal sync error:', err);
+  process.exit(1);
+});

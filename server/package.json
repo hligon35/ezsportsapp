@@ -12,7 +12,9 @@
     "db:backup": "node db-utils.js backup",
     "db:reset": "node db-utils.js reset",
     "products:sync": "node scripts/sync-products.js",
-    "products:sync:dry": "node scripts/sync-products.js --dry --no-stripe"
+    "products:sync:dry": "node scripts/sync-products.js --dry --no-stripe",
+    "prodlist:stripe:sync": "node scripts/sync-prodlist-stripe.js",
+    "prodlist:stripe:sync:dry": "node scripts/sync-prodlist-stripe.js --dry"
   },
   "dependencies": {
     "@sentry/node": "^8.32.1",
