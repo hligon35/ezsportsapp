@@ -47,9 +47,9 @@ try { require('dotenv').config({ path: path.join(REPO_ROOT, 'render', '.env') })
 
 const PROD_LIST_FILE = path.join(REPO_ROOT, 'assets', 'prodList.json');
 
-const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY;
+const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY || process.env.LIVE_STRIPE_SECRET_KEY;
 if (!STRIPE_SECRET_KEY) {
-  console.error('Missing STRIPE_SECRET_KEY. Set it in server/.env or environment variables.');
+  console.error('Missing STRIPE_SECRET_KEY (or LIVE_STRIPE_SECRET_KEY). Set it in server/.env or environment variables.');
   process.exit(1);
 }
 
@@ -68,6 +68,31 @@ function slug(str) {
     .trim()
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/(^-|-$)/g, '');
+}
+
+function stableIdFromRaw(raw) {
+  const base = (raw || '').toString().trim();
+  const s = slug(base);
+  if (s) return s;
+  try {
+    const crypto = require('crypto');
+    return 'prod-' + crypto.createHash('sha1').update(base || String(Date.now())).digest('hex').slice(0, 12);
+  } catch {
+    return 'prod-' + Date.now();
+  }
+}
+
+function asStripeMetadata(obj) {
+  // Stripe metadata values must be strings (or omitted)
+  const out = {};
+  for (const [k, v] of Object.entries(obj || {})) {
+    if (v == null) continue;
+    const key = String(k).slice(0, 40);
+    const val = String(v).slice(0, 500);
+    if (!key) continue;
+    out[key] = val;
+  }
+  return out;
 }
 
 function parsePriceLike(v) {
@@ -138,7 +163,7 @@ async function findStripeProductByLocalId(localId) {
   return null;
 }
 
-async function ensureStripeProduct({ localId, name, description, metadata, imageUrl }) {
+async function ensureStripeProduct({ localId, name, description, metadata, imageUrl, active }) {
   let prod = await findStripeProductByLocalId(localId);
   if (!prod) {
     if (DRY_RUN) {
@@ -147,7 +172,8 @@ async function ensureStripeProduct({ localId, name, description, metadata, image
     prod = await stripe.products.create({
       name: name.substring(0, 255),
       description: (description || '').substring(0, 800),
-      metadata: { ...(metadata || {}), local_id: localId }
+      active: typeof active === 'boolean' ? active : true,
+      metadata: asStripeMetadata({ ...(metadata || {}), local_id: localId })
     });
   }
 
@@ -156,8 +182,9 @@ async function ensureStripeProduct({ localId, name, description, metadata, image
   const update = {
     name: name.substring(0, 255),
     description: (description || '').substring(0, 800),
-    metadata: nextMetadata
+    metadata: asStripeMetadata(nextMetadata)
   };
+  if (typeof active === 'boolean') update.active = active;
   if (imageUrl) update.images = [imageUrl];
 
   if (DRY_RUN) {
@@ -168,6 +195,7 @@ async function ensureStripeProduct({ localId, name, description, metadata, image
   const needsUpdate =
     (prod.name || '') !== update.name ||
     (prod.description || '') !== update.description ||
+    (typeof update.active === 'boolean' ? (prod.active !== update.active) : false) ||
     (imageUrl ? (Array.isArray(prod.images) && prod.images[0] === imageUrl ? false : true) : false);
 
   if (needsUpdate) {
@@ -226,6 +254,7 @@ async function main() {
       const baseName = productTitle(item);
       const description = (item?.details?.description || item?.description || '').toString();
       const img = imageUrlFromProdList(item?.img || (Array.isArray(item?.images) ? item.images[0] : null));
+      const isActive = item?.active === false ? false : true;
       const commonMeta = {
         source: 'prodList',
         category: String(categoryName || ''),
@@ -234,30 +263,37 @@ async function main() {
 
       if (Array.isArray(item?.variations) && item.variations.length) {
         for (const v of item.variations) {
-          const opt = (v?.option || 'Option').toString();
-          const localId = baseSku ? `${baseSku}-${slug(opt || 'opt')}` : `${slug(baseName)}-${slug(opt || 'opt')}`;
+          const optRaw = (v?.option ?? v?.name ?? v?.id ?? 'Option');
+          const opt = String(optRaw || 'Option');
+          const localIdRaw = baseSku ? `${baseSku}-${opt}` : `${baseName}-${opt}`;
+          const localId = stableIdFromRaw(localIdRaw);
           const price = pickUnitPrice(v);
           planned.push({
             localId,
+            localIdRaw,
             name: `${baseName} (${opt})`.substring(0, 255),
             description,
             currency: 'usd',
             unitPrice: price,
             imageUrl: img,
-            metadata: { ...commonMeta, variation: opt }
+            active: isActive,
+            metadata: { ...commonMeta, local_id_raw: localIdRaw, variation: opt }
           });
         }
       } else {
-        const localId = baseSku || slug(baseName) || `prod-${Date.now()}`;
+        const localIdRaw = baseSku || baseName || `prod-${Date.now()}`;
+        const localId = stableIdFromRaw(localIdRaw);
         const price = pickUnitPrice(item);
         planned.push({
           localId,
+          localIdRaw,
           name: baseName.substring(0, 255),
           description,
           currency: 'usd',
           unitPrice: price,
           imageUrl: img,
-          metadata: commonMeta
+          active: isActive,
+          metadata: { ...commonMeta, local_id_raw: localIdRaw }
         });
       }
     }
@@ -279,8 +315,11 @@ async function main() {
   let createdProducts = 0;
   let updatedProducts = 0;
   let createdPrices = 0;
+  let matchedExistingProducts = 0;
   let ok = 0;
   let fail = 0;
+
+  const last = [];
 
   for (const p of planned) {
     try {
@@ -289,16 +328,19 @@ async function main() {
         name: p.name,
         description: p.description,
         metadata: p.metadata,
-        imageUrl: p.imageUrl
+        imageUrl: p.imageUrl,
+        active: p.active
       });
       if (prodRes.created) createdProducts++;
       if (prodRes.updated) updatedProducts++;
+      if (!prodRes.created) matchedExistingProducts++;
 
       const productId = prodRes.id;
       if (!productId) {
         // dry-run create path
         createdPrices++;
         ok++;
+        last.push({ localId: p.localId, localIdRaw: p.localIdRaw, productId: '(dry-run)', priceId: '(dry-run)', priceCreated: true });
         continue;
       }
 
@@ -306,16 +348,29 @@ async function main() {
       if (priceRes.created) createdPrices++;
       await setDefaultPrice(productId, priceRes.id);
       ok++;
+      last.push({ localId: p.localId, localIdRaw: p.localIdRaw, productId, priceId: priceRes.id, priceCreated: !!priceRes.created });
     } catch (e) {
       fail++;
       warnings.push(`Failed ${p.localId}: ${e.message || String(e)}`);
+      last.push({ localId: p.localId, localIdRaw: p.localIdRaw, productId: '(failed)', priceId: '(failed)', priceCreated: false });
     }
   }
 
   console.log('\n=== prodList -> Stripe Sync Complete ===');
-  console.log(`Products: ${createdProducts} created, ${updatedProducts} updated.`);
+  console.log(`Products: ${createdProducts} created, ${updatedProducts} updated, ${matchedExistingProducts} matched existing.`);
   console.log(`Prices: ${createdPrices} created.`);
   console.log(`Results: ${ok} ok, ${fail} failed.`);
+
+  // Print a short mapping so you can verify in Stripe Dashboard
+  const show = last.slice(-Math.min(last.length, 25));
+  if (show.length) {
+    console.log('\nRecent mappings (local -> Stripe):');
+    for (const r of show) {
+      const raw = r.localIdRaw ? ` (raw: ${String(r.localIdRaw).slice(0, 60)})` : '';
+      const pc = r.priceCreated ? 'price:new' : 'price:existing';
+      console.log(` - ${r.localId}${raw} => ${r.productId} / ${r.priceId} (${pc})`);
+    }
+  }
 
   if (warnings.length) {
     console.log('\nWarnings:');
