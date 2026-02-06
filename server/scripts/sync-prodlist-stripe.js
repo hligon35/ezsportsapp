@@ -39,9 +39,11 @@ const LIMIT = (() => {
 const SERVER_DIR = path.resolve(__dirname, '..');
 const REPO_ROOT = path.resolve(SERVER_DIR, '..');
 
-// Load env from both repo root and server/.env
+// Load env from repo root, server/.env, and render/.env (if present)
+// (Later calls don't override existing vars unless dotenv is configured to.)
 try { require('dotenv').config({ path: path.join(REPO_ROOT, '.env') }); } catch {}
 try { require('dotenv').config({ path: path.join(SERVER_DIR, '.env') }); } catch {}
+try { require('dotenv').config({ path: path.join(REPO_ROOT, 'render', '.env') }); } catch {}
 
 const PROD_LIST_FILE = path.join(REPO_ROOT, 'assets', 'prodList.json');
 
