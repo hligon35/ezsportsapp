@@ -110,6 +110,19 @@ router.post('/reports/daily/send', requireAdmin, async (req, res) => {
   }
 });
 
+// --- Reports: send daily finance email now (admin) ---
+router.post('/reports/finance/send', requireAdmin, async (req, res) => {
+  try {
+    const { day } = req.body || {}; // 'yesterday' (default) or 'YYYY-MM-DD'
+    const FinanceReportService = require('../services/FinanceReportService');
+    const svc = new FinanceReportService();
+    const out = await svc.sendDailyFinanceReport({ day: day || 'yesterday' });
+    res.json({ ok: true, report: { dayKey: out.dayKey, start: out.start, end: out.end }, sent: out.sent });
+  } catch (e) {
+    res.status(500).json({ ok: false, message: e.message || 'Failed to send finance report' });
+  }
+});
+
 // --- Stripe Admin Finance Endpoints ---
 function getTimeframeRange(tf = 'week') {
   const now = Math.floor(Date.now() / 1000);

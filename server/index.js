@@ -230,6 +230,12 @@ app.post('/webhook/stripe', express.raw({ type: 'application/json' }), async (re
                 if (bt) { fees = (bt.fee || 0) / 100; net = (bt.net || 0) / 100; }
               } catch (e) { /* ignore fee fetch errors */ }
             }
+            // Connect (destination charge) fields may be present when enabled.
+            const connectDestination = pi?.transfer_data?.destination || pi?.metadata?.connect_destination || '';
+            const appFeeCents = (typeof pi?.application_fee_amount === 'number')
+              ? pi.application_fee_amount
+              : (Number.parseInt(pi?.metadata?.platform_fee_cents || '', 10) || 0);
+            const feeBps = Number.parseInt(pi?.metadata?.platform_fee_bps || '', 10) || undefined;
             await orderService.updatePaymentInfo(orderId, {
               intentId: pi.id,
               latestChargeId,
@@ -238,23 +244,87 @@ app.post('/webhook/stripe', express.raw({ type: 'application/json' }), async (re
               fees,
               net,
               method: 'stripe',
-              paidAt: new Date().toISOString()
+              paidAt: new Date().toISOString(),
+              // Persist Connect hints for reconciliation/reporting (safe when empty)
+              connectDestination: connectDestination || undefined,
+              applicationFee: appFeeCents ? (appFeeCents / 100) : undefined,
+              platformFeeBps: feeBps
             });
+
+            // Order emails (customer + internal). Make them idempotent using paymentInfo flags.
+            try {
+              const EmailService = require('./services/EmailService');
+              const emailSvc = new EmailService();
+              const money = (v) => {
+                const n = Number(v || 0);
+                return `$${(Number.isFinite(n) ? n : 0).toFixed(2)}`;
+              };
+              const safe = (v) => String(v || '').replace(/</g, '&lt;');
+
+              const order = await orderService.getOrderById(orderId).catch(() => null);
+              const paymentInfo = order?.paymentInfo || {};
+              const customerEmail = String(pi?.receipt_email || pi?.metadata?.email || order?.userEmail || '').trim();
+              const internalTo = String(process.env.ORDER_NOTIFY_TO || process.env.CONTACT_INBOX || process.env.ALERT_EMAIL_TO || '').trim();
+
+              const itemLines = (order?.items || []).map(i => {
+                const qty = Number(i.quantity || i.qty || 1) || 1;
+                const name = safe(i.productName || i.name || i.productId || i.id || 'Item');
+                return `${qty}x ${name}`;
+              });
+
+              const ship = order?.shippingAddress || order?.customerInfo?.shipping || null;
+              const shipLines = ship ? [
+                safe(ship.address1 || ship.line1 || ''),
+                ship.address2 ? safe(ship.address2) : '',
+                `${safe(ship.city || '')}${ship.state ? ', ' + safe(ship.state) : ''} ${safe(ship.postal || ship.postal_code || '')}`.trim(),
+                safe(ship.country || 'US')
+              ].filter(Boolean) : [];
+
+              const gross = (typeof pi?.amount === 'number') ? (pi.amount / 100) : (Number(paymentInfo.amount || 0) || 0);
+              const platformFee = Number(paymentInfo.applicationFee || 0) || 0;
+
+              const html = [
+                `<p><strong>Order #${safe(orderId)}</strong></p>`,
+                `<p><strong>Paid:</strong> ${money(gross)}</p>`,
+                itemLines.length ? `<p><strong>Items</strong><br/>${itemLines.map(safe).join('<br/>')}</p>` : '',
+                shipLines.length ? `<p><strong>Ship To</strong><br/>${shipLines.join('<br/>')}</p>` : '',
+                `<p><strong>PaymentIntent:</strong> ${safe(pi.id)}</p>`,
+                connectDestination ? `<p><strong>Connect destination:</strong> ${safe(connectDestination)}</p>` : '',
+                platformFee ? `<p><strong>Platform fee:</strong> ${money(platformFee)}</p>` : ''
+              ].filter(Boolean).join('\n');
+
+              // Customer confirmation (only once)
+              if (customerEmail && !paymentInfo.customerEmailSentAt) {
+                await emailSvc.queue({
+                  to: customerEmail,
+                  subject: 'Order confirmed',
+                  html: html || '<p>Thank you for your purchase.</p>',
+                  text: `Order #${orderId}\nPaid: ${money(gross)}\n\n${itemLines.join('\n')}`,
+                  tags: ['order', 'paid', 'customer'],
+                  replyTo: internalTo || undefined
+                });
+                await orderService.updatePaymentInfo(orderId, { customerEmailSentAt: new Date().toISOString() }).catch(()=>{});
+              }
+
+              // Internal notification (only once)
+              if (internalTo && !paymentInfo.internalOrderEmailSentAt) {
+                await emailSvc.queue({
+                  to: internalTo,
+                  subject: `[Order Paid] #${orderId} — ${money(gross)}`,
+                  html,
+                  text: `Order #${orderId}\nPaid: ${money(gross)}\nPI: ${pi.id}\n\nItems:\n${itemLines.join('\n')}`,
+                  tags: ['order', 'paid', 'internal'],
+                  replyTo: customerEmail || undefined
+                });
+                await orderService.updatePaymentInfo(orderId, { internalOrderEmailSentAt: new Date().toISOString() }).catch(()=>{});
+              }
+            } catch (e) {
+              console.warn('Order email send failed:', e?.message || e);
+            }
           }
           if (couponCode) {
             try { await couponService.consume(String(couponCode)); } catch (e) { console.warn('Coupon consume failed:', e.message); }
           }
-          // Queue order confirmation email (simple DB queue for now)
-          try {
-            const EmailService = require('./services/EmailService');
-            const emailSvc = new EmailService();
-            let orderSummary = '';
-            try { const order = orderId ? await orderService.getOrderById(orderId) : null; if (order) {
-              const lines = (order.items||[]).map(i=>`${i.quantity}x ${i.productName} — $${Number(i.subtotal||0).toFixed(2)}`).join('<br/>');
-              orderSummary = `<p><strong>Order #${order.id}</strong></p><p>${lines}</p><p>Total: $${Number(order.total||0).toFixed(2)}</p>`;
-            }} catch {}
-            await emailSvc.queue({ to: pi?.receipt_email || pi?.metadata?.email || '', subject: 'Order confirmed', html: orderSummary || '<p>Thank you for your purchase.</p>' });
-          } catch (e) { console.warn('Email queue failed:', e.message); }
         } catch (e) {
           console.warn('payment_intent.succeeded handling failed:', e.message);
         }
@@ -849,7 +919,28 @@ app.post('/api/create-payment-intent', async (req, res) => {
     // tax mode, or totals generates a new key and avoids Stripe idempotency collisions.
     const makeIdemKey = (basis) =>
       crypto.createHash('sha256').update(JSON.stringify(basis)).digest('hex').slice(0, 64);
+
+    // Stripe Connect (destination charge) support.
+    // Remains dormant unless STRIPE_CONNECT_ENABLED is truthy AND a destination account is set.
+    // STRIPE_CONNECT_PREVIEW_ONLY=true will compute and report the split WITHOUT sending transfer_data/application_fee.
+    const parseBool = (v) => ['1', 'true', 'on', 'yes', 'y'].includes(String(v || '').trim().toLowerCase());
+    const connectEnabled = parseBool(process.env.STRIPE_CONNECT_ENABLED);
+    const connectPreviewOnly = parseBool(process.env.STRIPE_CONNECT_PREVIEW_ONLY);
+    const connectDestination = String(process.env.STRIPE_CONNECT_DESTINATION_ACCOUNT || '').trim();
+    const platformFeeBps = Number.parseInt(process.env.STRIPE_PLATFORM_FEE_BPS || '150', 10);
+    const connectIntended = connectEnabled && !!connectDestination;
+    const connectApply = connectIntended && !connectPreviewOnly;
+    const calcFeeCents = (amtCents, bps) => {
+      const safeAmt = Math.max(0, Number(amtCents) || 0);
+      const safeBps = Number.isFinite(bps) ? bps : 0;
+      const fee = Math.round(safeAmt * safeBps / 10000);
+      return Math.max(0, Math.min(safeAmt, fee));
+    };
     const baseContext = {
+      // Ensure Stripe idempotency key changes when the linked local order id changes.
+      // This avoids StripeIdempotencyError when a retry created a new local order
+      // but the request basis (items/shipping/etc) stayed identical.
+      orderId: (newOrder?.id ? String(newOrder.id) : (existingOrderId ? String(existingOrderId) : '')),
       items: normItems.map(i => ({ id: i.id, qty: i.qty })),
       email: customer.email || '',
       shipping: {
@@ -870,7 +961,14 @@ app.post('/api/create-payment-intent', async (req, res) => {
       usedAutomaticTax,
       // For auto tax we don't know tax yet; keep as null to differentiate
       taxCents: usedAutomaticTax ? null : taxCents,
-      amount
+      amount,
+      // Connect toggles must affect idempotency
+      connect: {
+        enabled: connectEnabled,
+        previewOnly: connectPreviewOnly,
+        destination: connectDestination || null,
+        feeBps: Number.isFinite(platformFeeBps) ? platformFeeBps : null
+      }
     };
     let idemKey = makeIdemKey(baseContext);
 
@@ -883,6 +981,8 @@ app.post('/api/create-payment-intent', async (req, res) => {
     };
 
     let paymentIntent;
+    const transferGroup = newOrder?.id ? `order_${String(newOrder.id)}` : undefined;
+    const platformFeeCents = connectIntended ? calcFeeCents(amount, platformFeeBps) : 0;
     try {
       paymentIntent = await stripe.paymentIntents.create({
         amount,
@@ -894,9 +994,22 @@ app.post('/api/create-payment-intent', async (req, res) => {
           items: normItems.map(i => `${i.id}:${i.qty}`).join('|'),
           order_id: newOrder?.id ? String(newOrder.id) : '',
           coupon_code: appliedCoupon ? String(appliedCoupon.code) : '',
-          coupon_user_bound: (couponAudit && couponAudit.restricted) ? 'true' : (appliedCoupon && (Array.isArray(appliedCoupon.userEmails) || Array.isArray(appliedCoupon.userIds)) ? 'true' : 'false')
+          coupon_user_bound: (couponAudit && couponAudit.restricted) ? 'true' : (appliedCoupon && (Array.isArray(appliedCoupon.userEmails) || Array.isArray(appliedCoupon.userIds)) ? 'true' : 'false'),
+          // Connect metadata for later webhook/reporting reconciliation
+          connect_enabled: connectIntended ? 'true' : 'false',
+          connect_preview_only: connectIntended && connectPreviewOnly ? 'true' : 'false',
+          connect_destination: connectIntended ? connectDestination : '',
+          platform_fee_bps: connectIntended ? String(platformFeeBps) : '',
+          platform_fee_cents: connectIntended ? String(platformFeeCents) : ''
         },
         automatic_payment_methods: { enabled: true },
+        // Stripe Connect destination charge fields (dormant unless enabled)
+        ...(connectApply ? {
+          application_fee_amount: platformFeeCents,
+          transfer_data: { destination: connectDestination },
+          // Reconciliation key across PI/transfer/balance transactions
+          transfer_group: transferGroup
+        } : {}),
         // Enable Stripe Automatic Tax if configured (may be rejected on older API versions)
         ...(usedAutomaticTax ? { automatic_tax: { enabled: true } } : {}),
         receipt_email: customer.email || undefined,
@@ -931,6 +1044,7 @@ app.post('/api/create-payment-intent', async (req, res) => {
             return res.status(400).json({ error: `Order total is below the minimum charge amount (${(min/100).toFixed(2)} USD). Please add another item.` });
           }
           usedAutomaticTax = false;
+          const platformFeeCents = connectIntended ? calcFeeCents(amount, platformFeeBps) : 0;
           paymentIntent = await stripe.paymentIntents.create({
             amount,
             currency: safeCurrency,
@@ -941,9 +1055,19 @@ app.post('/api/create-payment-intent', async (req, res) => {
               items: normItems.map(i => `${i.id}:${i.qty}`).join('|'),
               order_id: newOrder?.id ? String(newOrder.id) : '',
               coupon_code: appliedCoupon ? String(appliedCoupon.code) : '',
-              coupon_user_bound: (couponAudit && couponAudit.restricted) ? 'true' : undefined
+              coupon_user_bound: (couponAudit && couponAudit.restricted) ? 'true' : undefined,
+              connect_enabled: connectIntended ? 'true' : 'false',
+              connect_preview_only: connectIntended && connectPreviewOnly ? 'true' : 'false',
+              connect_destination: connectIntended ? connectDestination : '',
+              platform_fee_bps: connectIntended ? String(platformFeeBps) : '',
+              platform_fee_cents: connectIntended ? String(platformFeeCents) : ''
             },
             automatic_payment_methods: { enabled: true },
+            ...(connectApply ? {
+              application_fee_amount: platformFeeCents,
+              transfer_data: { destination: connectDestination },
+              transfer_group: transferGroup
+            } : {}),
             receipt_email: customer.email || undefined,
             shipping: {
               name: customer.name || 'Customer',
@@ -984,7 +1108,7 @@ app.post('/api/create-payment-intent', async (req, res) => {
       clientSecret: paymentIntent.client_secret,
       amount,
       orderId: newOrder?.id || null,
-  couponApplied: appliedCoupon ? { code: appliedCoupon.code, type: appliedCoupon.type, value: appliedCoupon.value, restricted: !!(couponAudit && couponAudit.restricted), matchedBy: couponAudit?.matchedBy || null } : null,
+      couponApplied: appliedCoupon ? { code: appliedCoupon.code, type: appliedCoupon.type, value: appliedCoupon.value, restricted: !!(couponAudit && couponAudit.restricted), matchedBy: couponAudit?.matchedBy || null } : null,
       breakdown: {
         subtotal: subtotal,
         shipping: shippingCents,
@@ -992,6 +1116,13 @@ app.post('/api/create-payment-intent', async (req, res) => {
         tax: usedAutomaticTax ? null : taxCents,
         total: amount
       },
+      connect: connectIntended ? {
+        mode: connectApply ? 'active' : 'preview',
+        destination: connectDestination,
+        platformFeeBps: Number.isFinite(platformFeeBps) ? platformFeeBps : null,
+        platformFeeCents: platformFeeCents,
+        transferGroup: transferGroup || null
+      } : { mode: 'off' },
       notes: usedAutomaticTax ? undefined : 'Automatic Tax unavailable for this account/API version; using manual tax fallback.'
     });
   } catch (err) {
@@ -1081,6 +1212,14 @@ try {
   startDailyReportScheduler();
 } catch (e) {
   console.warn('Daily report scheduler not started:', e?.message || e);
+}
+
+// Daily finance report scheduler (emails paid orders/fees summary)
+try {
+  const { startFinanceReportScheduler } = require('./jobs/financeReportScheduler');
+  startFinanceReportScheduler();
+} catch (e) {
+  console.warn('Finance report scheduler not started:', e?.message || e);
 }
 
 // Background email retry worker: periodically attempts to deliver queued/failed emails
