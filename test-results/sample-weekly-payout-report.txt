@@ -10,56 +10,42 @@ To: 2026-02-07 (Friday, 8:00 AM)
 
 Summary Overview
 - Total Orders: 37
-- Total MAP Sold: $21471.24
-- Total Wholesale Cost: $23510.00 (partial)
-- Total BB Shipping Amount: $2625.00
-- Total SparQ Digital Fees (1.5%): $360.25
+- Total MAP Sold: $21951.18
+- Total Wholesale Cost: $24512.88 (partial)
+- Total BB Shipping Amount: $2450.00
+- Total SparQ Digital Fees (1.5%): $359.85
 - Total Stripe Processing Fees: $0.00
-- Total EZ Sports Net Payout: $-2442.42
-- Total Amount Owed to Better Baseball: $23510.00 (partial)
+- Total EZ Sports Net Payout: $-3296.38
+- Total Amount Owed to Better Baseball: $24512.88 (partial)
 
 Product Sales Summary (Aggregated)
 This section shows the total quantity or footage sold per product across the entire week.
 
-Pitcher's Pocket 9 - All Colors
-- Total Units Sold: 31
+Pitcher's Pocket 9
+- Total Units Sold: 32
 - Total Footage (if applicable): 72
-- Total MAP Value: $10848.45
-- Total Wholesale Value: $18525.00
+- Total MAP Value: $11148.40
+- Total Wholesale Value: $18720.00
 
 
-Bullet L Screen Baseball
-- Total Units Sold: 10
+Bullet L Screen
+- Total Units Sold: 11
 - Total Footage (if applicable): 
-- Total MAP Value: $4599.50
-- Total Wholesale Value: $3580.00
+- Total MAP Value: $5099.45
+- Total Wholesale Value: $3938.00
 
 
-21NYLON1255
-- Total Units Sold: 3
+READY-2-GO 12x12x55 Batting Cage Net
+- Total Units Sold: 4
 - Total Footage (if applicable): 
-- Total MAP Value: $2502.00
-- Total Wholesale Value: $1317.00
+- Total MAP Value: $3336.00
+- Total Wholesale Value: $1756.00
 
 
 Custom Net 10' 0" x 12' 0" — #36 Nylon (Sewn Rope border)
 - Total Units Sold: 11
 - Total Footage (if applicable): 110
 - Total MAP Value: $2199.45
-- Total Wholesale Value: $0.00 (partial)
-
-
-Louisville Slugger Ghost
-- Total Units Sold: 2
-- Total Footage (if applicable): 
-- Total MAP Value: $799.90
-- Total Wholesale Value: $0.00 (partial)
-
-
-Wilson A2000 Glove
-- Total Units Sold: 1
-- Total Footage (if applicable): 
-- Total MAP Value: $299.95
 - Total Wholesale Value: $0.00 (partial)
 
 
@@ -70,30 +56,30 @@ Screen Padding by the FT
 - Total Wholesale Value: $88.00
 
 
-Rawlings Pro Helmet
+#36 Forever Black Twine Spool
 - Total Units Sold: 1
 - Total Footage (if applicable): 
-- Total MAP Value: $89.99
-- Total Wholesale Value: $0.00 (partial)
+- Total MAP Value: $35.88
+- Total Wholesale Value: $10.88
 
 
 
 Financial Distribution
 1. Better Baseball — Wholesale Amount
 Total wholesale cost for all products sold this week.
-- Amount Due to Better Baseball: $23510.00 (partial)
+- Amount Due to Better Baseball: $24512.88 (partial)
 - Send To: Better Baseball
 - Email: hligon@getsparqd.com
 
 2. SparQ Digital — Platform Fees
 SparQ Digital receives 1.5% of the cart total before taxes.
-- Total SparQ Digital Fees: $360.25
+- Total SparQ Digital Fees: $359.85
 - Formula: sum((cart_total − taxes) × 0.015)
 
 3. EZ Sports — Net Payout
 Remaining amount after wholesale, BB shipping, SparQ Digital fees, and Stripe processing fees.
-- Total EZ Sports Net Payout: $-2442.42
+- Total EZ Sports Net Payout: $-3296.38
 - Formula:
   sum(cart_total − wholesale − bb_shipping − sparq_fee − stripe_processing_fee)
 
-Note: 15 line item(s) had unknown wholesale and were excluded from wholesale totals.
+Note: 11 line item(s) had unknown wholesale and were excluded from wholesale totals.

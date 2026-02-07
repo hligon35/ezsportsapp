@@ -30,7 +30,7 @@
         const price = typeof it.map === 'number' ? it.map : (typeof it.wholesale === 'number' ? it.wholesale : 0);
   // Updated fallback image: remove dependency on legacy assets/prodImgs structure
   // Use a generic on-brand image that exists in assets/img
-  const img = it.img || 'assets/img/screen2.avif';
+  const img = it.stripeImg || (Array.isArray(it.stripeImages) && it.stripeImages[0]) || it.img || 'assets/img/screen2.avif';
         const rec = {
           id,
             title,

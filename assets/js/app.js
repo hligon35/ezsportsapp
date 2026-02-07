@@ -250,8 +250,10 @@ async function fetchProducts() {
           price: mainPrice,
           priceRange: priceRange,
           category: 'netting',
-          img: product.img || 'assets/img/EZSportslogo.png',
-          images: product.images || (product.img ? [product.img] : []),
+          img: product.stripeImg || (Array.isArray(product.stripeImages) && product.stripeImages[0]) || product.img || 'assets/img/EZSportslogo.png',
+          images: (Array.isArray(product.stripeImages) && product.stripeImages.length)
+            ? product.stripeImages.slice()
+            : (product.images || (product.img ? [product.img] : [])),
           description: sanitizeDescription(product.details?.description || ''),
           features: product.details?.features || [],
           variations: product.variations,
@@ -2957,6 +2959,7 @@ ensureHomeFirst() {
     const isUsableSrc = (s) => typeof s === 'string' && /^(https?:|\/|assets\/)/i.test(s);
     let img = null;
     // 1) Explicit fields
+    if (isUsableSrc(p.stripeImg)) img = p.stripeImg;
     if (isUsableSrc(p.img)) img = p.img;
     // 2) images object or array
     if (!img && p.images) {
@@ -2968,6 +2971,11 @@ ensureHomeFirst() {
         const cand = p.images.find(isUsableSrc);
         if (cand) img = cand;
       }
+    }
+    // 2b) stripeImages array
+    if (!img && Array.isArray(p.stripeImages)) {
+      const cand = p.stripeImages.find(isUsableSrc);
+      if (cand) img = cand;
     }
     // 3) details.images
     if (!img && p.details && p.details.images) {
@@ -3001,6 +3009,8 @@ ensureHomeFirst() {
         if (Array.isArray(p.images.all)) pushArr(p.images.all);
         if (p.images.primary && isUsableSrc(p.images.primary)) out.add(p.images.primary);
       }
+      if (Array.isArray(p.stripeImages)) pushArr(p.stripeImages);
+      if (p.stripeImg && isUsableSrc(p.stripeImg)) out.add(p.stripeImg);
       if (p.details && p.details.images) {
         const di = p.details.images;
         if (Array.isArray(di)) pushArr(di);
@@ -3401,7 +3411,8 @@ ensureHomeFirst() {
     let sources = [];
     if (Array.isArray(product.images)) sources = product.images.slice();
     else if (product.raw) {
-      if (Array.isArray(product.raw.images)) sources = product.raw.images.slice();
+      if (Array.isArray(product.raw.stripeImages)) sources = product.raw.stripeImages.slice();
+      else if (Array.isArray(product.raw.images)) sources = product.raw.images.slice();
       else if (Array.isArray(product.raw.gallery)) sources = product.raw.gallery.slice();
     }
     // Product-specific override: Wheeled Ball Basket should show standard team-color swatches even without per-color images

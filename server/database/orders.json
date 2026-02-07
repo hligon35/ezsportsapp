@@ -5,14 +5,16 @@
     "userEmail": "demo@ezsportsapp.test",
     "items": [
       {
-        "productId": "bat-ghost",
-        "productName": "Louisville Slugger Ghost",
-        "price": 399.95,
+        "productId": "PITCHERSPOCKET9",
+        "productName": "Pitcher's Pocket 9",
+        "price": 299.95,
         "quantity": 1,
-        "subtotal": 399.95
+        "subtotal": 299.95,
+        "color": "Black",
+        "category": "Pitcher's Pocket"
       }
     ],
-    "total": 44995,
+    "total": 34995,
     "status": "paid",
     "shippingAddress": {
       "name": "Demo User",
@@ -24,14 +26,14 @@
     },
     "createdAt": "2025-01-15T10:30:00.000Z",
     "updatedAt": "2026-02-07T17:25:12.670Z",
-    "subtotal": 34995,
-    "shipping": 10000,
+    "subtotal": 29995,
+    "shipping": 5000,
     "discount": 0,
     "tax": 0,
     "paymentInfo": {
       "intentId": "pi_test_1770485112574",
       "latestChargeId": "ch_test_1770485112574",
-      "amount": 399.95,
+      "amount": 349.95,
       "currency": "usd",
       "method": "stripe",
       "paidAt": "2026-02-07T17:25:12.668Z",
@@ -44,21 +46,27 @@
     "userEmail": "casey.hitter@ezsportsapp.test",
     "items": [
       {
-        "productId": "glove-a2000",
-        "productName": "Wilson A2000 Glove",
-        "price": 299.95,
+        "productId": "BULLETL",
+        "productName": "Bullet L Screen",
+        "price": 499.95,
         "quantity": 1,
-        "subtotal": 299.95
+        "subtotal": 499.95,
+        "size": "Padded",
+        "option": "Padded",
+        "color": "Black",
+        "category": "Baseball L-Screens",
+        "ship": 75
       },
       {
-        "productId": "helmet-pro",
-        "productName": "Rawlings Pro Helmet",
-        "price": 89.99,
+        "productId": "FT-TNHL-03601",
+        "productName": "#36 Forever Black Twine Spool",
+        "price": 35.88,
         "quantity": 1,
-        "subtotal": 89.99
+        "subtotal": 35.88,
+        "category": "Accessories"
       }
     ],
-    "total": 44995,
+    "total": 61083,
     "status": "paid",
     "shippingAddress": {
       "name": "Casey Hitter",
@@ -70,13 +78,13 @@
     },
     "createdAt": "2025-01-16T14:20:00.000Z",
     "updatedAt": "2026-02-07T17:04:09.919Z",
-    "subtotal": 34995,
-    "shipping": 10000,
+    "subtotal": 53583,
+    "shipping": 7500,
     "discount": 0,
     "tax": 0,
     "paymentInfo": {
       "intentId": "pi_test_1770450318373",
-      "amount": 971.36,
+      "amount": 610.83,
       "currency": "usd",
       "method": "stripe",
       "paidAt": "2026-02-07T07:45:18.390Z",
@@ -92,14 +100,15 @@
     "userEmail": "riley.catcher@ezsportsapp.test",
     "items": [
       {
-        "productId": "bat-ghost",
-        "productName": "Louisville Slugger Ghost",
-        "price": 399.95,
+        "productId": "21NYLON1255",
+        "productName": "READY-2-GO 12x12x55 Batting Cage Net",
+        "price": 834,
         "quantity": 1,
-        "subtotal": 399.95
+        "subtotal": 834,
+        "category": "Pre-Made Cages"
       }
     ],
-    "total": 44995,
+    "total": 83400,
     "status": "fulfilled",
     "shippingAddress": {
       "name": "Riley Catcher",
@@ -111,8 +120,8 @@
     },
     "createdAt": "2025-01-17T16:45:00.000Z",
     "updatedAt": "2026-02-07T17:06:42.184Z",
-    "subtotal": 34995,
-    "shipping": 10000,
+    "subtotal": 83400,
+    "shipping": 0,
     "discount": 0,
     "tax": 0
   },

@@ -101,6 +101,7 @@
     const isUsableSrc = (s) => typeof s === 'string' && /^(https?:|\/|assets\/)/i.test(s);
   let primary = null;
     // 1) explicit p.img
+    if (isUsableSrc(p.stripeImg)) primary = p.stripeImg;
     if (isUsableSrc(p.img)) primary = p.img;
     // 2) images
     if (!primary && p.images) {
@@ -112,6 +113,11 @@
         const cand = p.images.find(isUsableSrc);
         if (cand) primary = cand;
       }
+    }
+    // 2b) stripeImages
+    if (!primary && Array.isArray(p.stripeImages)) {
+      const cand = p.stripeImages.find(isUsableSrc);
+      if (cand) primary = cand;
     }
     // 3) details.images / details.image_url
     if (!primary && p.details) {
@@ -138,6 +144,7 @@
   // 1) images.all (object shape)
   if (p.images && Array.isArray(p.images.all)) gallery.push(...p.images.all.filter(isUsableSrc));
   // 2) images (plain array shape)
+  if (Array.isArray(p.stripeImages)) gallery.push(...p.stripeImages.filter(isUsableSrc));
   if (Array.isArray(p.images)) gallery.push(...p.images.filter(isUsableSrc));
     if (p.details && p.details.images && Array.isArray(p.details.images.all)) gallery.push(...p.details.images.all.filter(isUsableSrc));
     if (Array.isArray(dl)) gallery.push(...dl.filter(isUsableSrc));
