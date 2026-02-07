@@ -91,6 +91,28 @@ function normalizeShippingMethod(value) {
   return (v === 'expedited') ? 'expedited' : 'standard';
 }
 
+function getShippingMethod() {
+  try {
+    const el = document.getElementById('shipping-method');
+    if (el && el.value) return normalizeShippingMethod(el.value);
+  } catch {}
+  try {
+    const v = localStorage.getItem('shippingMethod');
+    if (v) return normalizeShippingMethod(v);
+  } catch {}
+  return 'standard';
+}
+
+function setShippingMethod(value) {
+  const v = normalizeShippingMethod(value);
+  try { localStorage.setItem('shippingMethod', v); } catch {}
+  try {
+    const el = document.getElementById('shipping-method');
+    if (el) el.value = v;
+  } catch {}
+  return v;
+}
+
 function calcShippingCentsForCart(cart, shippingMethod = 'standard'){
   // Base policy: per-item shipping: if item has dsr (ship), use it; otherwise default $100 per item
   // Expedited: +$100 per item on top of standard shipping
@@ -249,7 +271,7 @@ async function initialize() {
       price: Number(i.price)||0,
       ship: (Number(i.shipAmount) || undefined)
     }));
-    return { items, customer, shipping, couponCode: appliedCoupon?.code || '', existingOrderId: orderId };
+    return { items, customer, shipping, shippingMethod: getShippingMethod(), couponCode: appliedCoupon?.code || '', existingOrderId: orderId };
   };
 
   function getShippingAddress(){
