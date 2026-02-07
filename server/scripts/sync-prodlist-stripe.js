@@ -31,6 +31,13 @@ function readArgValue(prefix) {
   return hit.slice(prefix.length + 1);
 }
 
+const STRIPE_MODE = (() => {
+  const v = (readArgValue('--mode') || '').toString().trim().toLowerCase();
+  if (v === 'test') return 'test';
+  if (v === 'live') return 'live';
+  return null;
+})();
+
 const LIMIT = (() => {
   const v = readArgValue('--limit');
   if (!v) return null;
@@ -65,9 +72,20 @@ try { require('dotenv').config({ path: path.join(SERVER_DIR, '.env') }); } catch
 try { require('dotenv').config({ path: path.join(REPO_ROOT, 'render', '.env') }); } catch {}
 const PROD_LIST_FILE = path.join(REPO_ROOT, 'assets', 'prodList.json');
 
-const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY || process.env.LIVE_STRIPE_SECRET_KEY;
+function pickStripeSecretKey() {
+  if (STRIPE_MODE === 'test') {
+    return process.env.STRIPE_TEST_SECRET_KEY || process.env.TEST_STRIPE_SECRET_KEY || process.env.STRIPE_SECRET_KEY_TEST || null;
+  }
+  if (STRIPE_MODE === 'live') {
+    return process.env.STRIPE_SECRET_KEY || process.env.LIVE_STRIPE_SECRET_KEY;
+  }
+  // Back-compat default
+  return process.env.STRIPE_SECRET_KEY || process.env.LIVE_STRIPE_SECRET_KEY;
+}
+
+const STRIPE_SECRET_KEY = pickStripeSecretKey();
 if (!STRIPE_SECRET_KEY) {
-  console.error('Missing STRIPE_SECRET_KEY (or LIVE_STRIPE_SECRET_KEY). Set it in server/.env or environment variables.');
+  console.error('Missing Stripe secret key. Set STRIPE_SECRET_KEY (live) and/or STRIPE_TEST_SECRET_KEY (test).');
   process.exit(1);
 }
 
@@ -138,6 +156,15 @@ function pickUnitPrice(obj) {
   if (detailsPriceVal != null) return detailsPriceVal;
   const wholesaleVal = parsePriceLike(obj?.wholesale);
   if (wholesaleVal != null) return wholesaleVal;
+  return null;
+}
+
+function pickPerItemShippingUsd(obj) {
+  // prodList/admin uses dsr as per-item shipping dollars (0 allowed for free shipping)
+  const dsrVal = parsePriceLike(obj?.dsr);
+  if (dsrVal != null) return dsrVal;
+  const detailsDsrVal = parsePriceLike(obj?.details?.dsr);
+  if (detailsDsrVal != null) return detailsDsrVal;
   return null;
 }
 
@@ -351,8 +378,8 @@ async function main() {
   console.log('prodList:', PROD_LIST_FILE);
   if (CATEGORY_FILTER) console.log('Category filter:', Array.from(CATEGORY_FILTER).join(', '));
   if (START) console.log('Start offset:', START);
-  const mode = STRIPE_SECRET_KEY.startsWith('sk_live_') ? 'LIVE' : (STRIPE_SECRET_KEY.startsWith('sk_test_') ? 'TEST' : 'UNKNOWN');
-  console.log('Stripe key mode:', mode);
+  const keyMode = STRIPE_SECRET_KEY.startsWith('sk_live_') ? 'LIVE' : (STRIPE_SECRET_KEY.startsWith('sk_test_') ? 'TEST' : 'UNKNOWN');
+  console.log('Stripe key mode:', keyMode, STRIPE_MODE ? `(forced: ${STRIPE_MODE})` : '');
   const imgBase = baseUrlForImages();
   if (!imgBase) {
     console.log('Image URL base: (not set) — product images will NOT be sent to Stripe unless img is already https://');
@@ -380,10 +407,14 @@ async function main() {
       const images = resolveImageUrls(item);
       const hadAnyLocalImagePath = !!(item?.img || (Array.isArray(item?.images) && item.images.length));
       const isActive = item?.active === false ? false : true;
+      const dsrUsd = pickPerItemShippingUsd(item);
       const commonMeta = {
         source: 'prodList',
         category: String(categoryName || ''),
-        sku: baseSku || undefined
+        sku: baseSku || undefined,
+        // Per-item shipping dollars (DSR) for reference in Stripe Dashboard.
+        // NOTE: Stripe does not automatically apply this to checkout shipping.
+        dsr_usd: (dsrUsd != null && Number.isFinite(Number(dsrUsd))) ? String(dsrUsd) : undefined
       };
 
       if (Array.isArray(item?.variations) && item.variations.length) {
