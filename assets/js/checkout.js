@@ -17,12 +17,23 @@ let API_BASE = (typeof window !== 'undefined' && window.__API_BASE ? String(wind
 if (DEBUG) { try { console.info('[checkout] initial API_BASE =', API_BASE || '(same-origin)'); } catch {} }
 
 async function fetchJsonWithFallback(path, options){
-  const bases = [ API_BASE || '', ...GUESSED_BASES.filter(b => b && b !== API_BASE) ];
+  // Prefer same-origin first so local/dev/test servers don't accidentally hang on a remote API base.
+  // If same-origin isn't serving APIs, it will typically 404 quickly and we'll fall back to API_BASE.
+  const bases = [ '', API_BASE || '', ...GUESSED_BASES.filter(b => b && b !== API_BASE) ];
+  const timeoutMs = Number(window.__API_TIMEOUT_MS || 12000);
   let lastErr = null;
   for (const base of bases) {
     const url = base ? (base + path) : path;
     try {
-      const res = await fetch(url, options);
+      // Add a timeout to prevent hanging forever on an unavailable base.
+      const controller = (typeof AbortController !== 'undefined') ? new AbortController() : null;
+      const t = controller ? setTimeout(() => controller.abort(), timeoutMs) : null;
+      let res;
+      try {
+        res = await fetch(url, controller ? { ...(options||{}), signal: controller.signal } : options);
+      } finally {
+        if (t) clearTimeout(t);
+      }
       // Success path
       if (res.ok) {
         // If we succeeded using a guessed base, persist it for subsequent calls
@@ -269,7 +280,12 @@ async function initialize() {
       id: i.id,
       qty: i.qty,
       price: Number(i.price)||0,
-      ship: (Number(i.shipAmount) || undefined)
+      ship: (Number(i.shipAmount) || undefined),
+      // Variation details for confirmation/email
+      size: i.size || '',
+      color: i.color || '',
+      category: i.category || '',
+      name: i.title || ''
     }));
     return { items, customer, shipping, shippingMethod: getShippingMethod(), couponCode: appliedCoupon?.code || '', existingOrderId: orderId };
   };

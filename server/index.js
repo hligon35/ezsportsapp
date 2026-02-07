@@ -259,47 +259,693 @@ app.post('/webhook/stripe', express.raw({ type: 'application/json' }), async (re
                 const n = Number(v || 0);
                 return `$${(Number.isFinite(n) ? n : 0).toFixed(2)}`;
               };
-              const safe = (v) => String(v || '').replace(/</g, '&lt;');
+              const escapeHtml = (v) => String(v ?? '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+              const nonEmpty = (s) => String(s || '').trim();
+
+              // Match site theme tokens from assets/css/styles.css
+              const THEME = {
+                bg: '#ffffff',
+                surface: '#ffffff',
+                border: '#d3d0d7',
+                ink: '#000000',
+                muted: '#5a5a5a',
+                brand: '#241773'
+              };
+
+              const fmtDate = (isoLike) => {
+                try {
+                  const d = isoLike ? new Date(isoLike) : new Date();
+                  if (Number.isNaN(d.getTime())) return '';
+                  return d.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+                } catch {
+                  return '';
+                }
+              };
+
+              const formatVariant = (item) => {
+                const size = nonEmpty(item?.size);
+                const color = nonEmpty(item?.color);
+                const category = nonEmpty(item?.category).toLowerCase();
+                const isNet = category === 'netting' || String(item?.productId || item?.id || '').toLowerCase().startsWith('custom-net-');
+                const parseByFootFeet = (s) => {
+                  const str = String(s || '').trim();
+                  if (!str) return null;
+                  // Canonical cart encoding from assets/js/product.js
+                  let m = str.match(/\bby\s*the\s*f(?:oot|t)\s*:\s*(\d+)\s*['′]?\b/i);
+                  if (m && m[1]) return Number(m[1]);
+                  // Fallbacks
+                  m = str.match(/\b(\d+)\s*(?:ft|feet)\b/i);
+                  if (m && m[1]) return Number(m[1]);
+                  return null;
+                };
+
+                const parts = [];
+                if (isNet) {
+                  if (size) parts.push(`Dimensions ${escapeHtml(size)}`);
+                  if (color) parts.push(`Spec ${escapeHtml(color)}`);
+                } else {
+                  const feet = size ? parseByFootFeet(size) : null;
+                  if (size) {
+                    if (Number.isFinite(feet) && feet && feet > 0) parts.push(`Length ${escapeHtml(String(Math.floor(feet)))} ft`);
+                    else parts.push(`Size ${escapeHtml(size)}`);
+                  }
+                  if (color) parts.push(`Color ${escapeHtml(color)}`);
+                }
+                return parts.length ? parts.join(', ') : '';
+              };
 
               const order = await orderService.getOrderById(orderId).catch(() => null);
               const paymentInfo = order?.paymentInfo || {};
               const customerEmail = String(pi?.receipt_email || pi?.metadata?.email || order?.userEmail || '').trim();
               const internalTo = String(process.env.ORDER_NOTIFY_TO || process.env.CONTACT_INBOX || process.env.ALERT_EMAIL_TO || '').trim();
 
-              const itemLines = (order?.items || []).map(i => {
-                const qty = Number(i.quantity || i.qty || 1) || 1;
-                const name = safe(i.productName || i.name || i.productId || i.id || 'Item');
-                return `${qty}x ${name}`;
+              const lineItems = (order?.items || []).map(i => {
+                const qty = Math.max(1, Number(i.quantity || i.qty || 1) || 1);
+                const nameRaw = i.productName || i.name || i.productId || i.id || 'Item';
+                const name = escapeHtml(nameRaw);
+                const variant = formatVariant(i);
+                const skuRaw = nonEmpty(i.productId || i.id);
+                const sku = skuRaw ? escapeHtml(skuRaw) : '';
+                const unit = Number(i.price || 0) || 0;
+                const lineTotal = Number.isFinite(Number(i.subtotal)) ? Number(i.subtotal) : (unit * qty);
+                return { qty, name, variant, sku, unit, lineTotal };
               });
 
               const ship = order?.shippingAddress || order?.customerInfo?.shipping || null;
               const shipLines = ship ? [
-                safe(ship.address1 || ship.line1 || ''),
-                ship.address2 ? safe(ship.address2) : '',
-                `${safe(ship.city || '')}${ship.state ? ', ' + safe(ship.state) : ''} ${safe(ship.postal || ship.postal_code || '')}`.trim(),
-                safe(ship.country || 'US')
+                escapeHtml(ship.address1 || ship.line1 || ''),
+                ship.address2 ? escapeHtml(ship.address2) : '',
+                `${escapeHtml(ship.city || '')}${ship.state ? ', ' + escapeHtml(ship.state) : ''} ${escapeHtml(ship.postal || ship.postal_code || '')}`.trim(),
+                escapeHtml(ship.country || 'US')
               ].filter(Boolean) : [];
 
               const gross = (typeof pi?.amount === 'number') ? (pi.amount / 100) : (Number(paymentInfo.amount || 0) || 0);
               const platformFee = Number(paymentInfo.applicationFee || 0) || 0;
 
-              const html = [
-                `<p><strong>Order #${safe(orderId)}</strong></p>`,
-                `<p><strong>Paid:</strong> ${money(gross)}</p>`,
-                itemLines.length ? `<p><strong>Items</strong><br/>${itemLines.map(safe).join('<br/>')}</p>` : '',
-                shipLines.length ? `<p><strong>Ship To</strong><br/>${shipLines.join('<br/>')}</p>` : '',
-                `<p><strong>PaymentIntent:</strong> ${safe(pi.id)}</p>`,
-                connectDestination ? `<p><strong>Connect destination:</strong> ${safe(connectDestination)}</p>` : '',
-                platformFee ? `<p><strong>Platform fee:</strong> ${money(platformFee)}</p>` : ''
-              ].filter(Boolean).join('\n');
+              const parseCatalogPrice = (value) => {
+                if (value === null || value === undefined) return 0;
+                if (typeof value === 'number') return Number.isFinite(value) ? value : 0;
+                const s = String(value).trim();
+                if (!s) return 0;
+                const m = s.match(/(-?\d+(?:\.\d+)?)/);
+                if (!m) return 0;
+                const n = Number(m[1]);
+                return Number.isFinite(n) ? n : 0;
+              };
+
+              const parseByFootFeet = (s) => {
+                const str = String(s || '').trim();
+                if (!str) return null;
+                let m = str.match(/\bby\s*the\s*f(?:oot|t)\s*:\s*(\d+)\s*['′]?\b/i);
+                if (m && m[1]) {
+                  const n = Number(m[1]);
+                  return Number.isFinite(n) && n > 0 ? Math.floor(n) : null;
+                }
+                m = str.match(/\b(\d+)\s*(?:ft|feet)\b/i);
+                if (m && m[1]) {
+                  const n = Number(m[1]);
+                  return Number.isFinite(n) && n > 0 ? Math.floor(n) : null;
+                }
+                return null;
+              };
+
+              const customerName = nonEmpty(order?.customerInfo?.name || pi?.metadata?.name || '') || '';
+              const breakdown = {
+                subtotal: Number.isFinite(Number(order?.subtotal)) ? Number(order.subtotal) : null,
+                shipping: Number.isFinite(Number(order?.shipping)) ? Number(order.shipping) : null,
+                tax: (order?.tax === null) ? null : (Number.isFinite(Number(order?.tax)) ? Number(order.tax) : null),
+                discount: Number.isFinite(Number(order?.discount)) ? Number(order.discount) : null,
+                total: Number.isFinite(Number(order?.total)) ? Number(order.total) : null
+              };
+
+              const showBreakdown = (breakdown.subtotal !== null || breakdown.shipping !== null || breakdown.tax !== null || breakdown.discount !== null || breakdown.total !== null);
+              const paidAt = paymentInfo.paidAt || order?.paidAt || order?.updatedAt || order?.createdAt;
+              const orderDate = fmtDate(paidAt) || fmtDate(order?.createdAt) || '';
+              const paymentMethod = (paymentInfo.method || 'stripe') ? 'Card (Stripe)' : 'Card';
+              const txId = String(pi?.id || paymentInfo.intentId || '').trim();
+
+              const brandName = String(process.env.MAIL_FROM_NAME || 'EZ Sports Netting').trim() || 'EZ Sports Netting';
+              const supportEmail = String(process.env.CONTACT_INBOX || internalTo || 'info@ezsportsnetting.com').trim();
+              const siteUrl = String(process.env.SITE_URL || process.env.PUBLIC_SITE_URL || 'https://ezsportsnetting.com').trim();
+              const normalizedSiteUrl = siteUrl.replace(/\/+$/g, '');
+              const logoUrl = `${normalizedSiteUrl}/assets/img/EZSportslogo.png`;
+
+              const greeting = customerName ? `Hi ${escapeHtml(customerName)},` : 'Hi there,';
+              const thanks = `Thank you for choosing ${escapeHtml(brandName)}. Your order has been received and is now being processed. Below is a summary for your records.`;
+              const nextSteps = `Your order will be prepared for shipment. You’ll receive another email with tracking information as soon as it’s on the way.`;
+              const questions = `If you have any questions about your order, feel free to reply to this email or contact us anytime.`;
+
+              const rows = lineItems.map(li => {
+                const detailBits = [li.variant, li.sku ? `SKU: ${li.sku}` : ''].filter(Boolean);
+                const detail = detailBits.length
+                  ? `<div style="margin-top:2px;color:${THEME.muted};font-size:12px;line-height:16px;">${detailBits.join(' • ')}</div>`
+                  : '';
+                return `
+                  <tr>
+                    <td style="padding:10px 12px;border-bottom:1px solid ${THEME.border};vertical-align:top;">
+                      <div style="font-weight:700;color:${THEME.ink};">${li.name}</div>
+                      ${detail}
+                    </td>
+                    <td style="padding:10px 12px;border-bottom:1px solid ${THEME.border};vertical-align:top;text-align:center;color:${THEME.ink};">${li.qty}</td>
+                    <td style="padding:10px 12px;border-bottom:1px solid ${THEME.border};vertical-align:top;text-align:right;color:${THEME.ink};white-space:nowrap;">${money(li.unit)}</td>
+                    <td style="padding:10px 12px;border-bottom:1px solid ${THEME.border};vertical-align:top;text-align:right;color:${THEME.ink};white-space:nowrap;">${money(li.lineTotal)}</td>
+                  </tr>`;
+              }).join('');
+
+              const totalsRows = showBreakdown ? [
+                (breakdown.subtotal !== null ? `<tr><td style="padding:6px 0;color:${THEME.muted};">Subtotal</td><td style="padding:6px 0;text-align:right;color:${THEME.ink};white-space:nowrap;">${money(breakdown.subtotal)}</td></tr>` : ''),
+                (breakdown.shipping !== null ? `<tr><td style="padding:6px 0;color:${THEME.muted};">Shipping</td><td style="padding:6px 0;text-align:right;color:${THEME.ink};white-space:nowrap;">${breakdown.shipping === 0 ? 'Free' : money(breakdown.shipping)}</td></tr>` : ''),
+                (breakdown.tax !== null ? `<tr><td style="padding:6px 0;color:${THEME.muted};">Tax</td><td style="padding:6px 0;text-align:right;color:${THEME.ink};white-space:nowrap;">${money(breakdown.tax)}</td></tr>` : ''),
+                (breakdown.discount !== null ? `<tr><td style="padding:6px 0;color:${THEME.muted};">Discount</td><td style="padding:6px 0;text-align:right;color:${THEME.ink};white-space:nowrap;">${Number(breakdown.discount) > 0 ? '-' : ''}${money(Math.abs(breakdown.discount))}</td></tr>` : ''),
+                `<tr><td style="padding:10px 0 0;color:${THEME.ink};font-weight:800;border-top:1px solid ${THEME.border};">Total Paid</td><td style="padding:10px 0 0;text-align:right;color:${THEME.ink};font-weight:800;border-top:1px solid ${THEME.border};white-space:nowrap;">${money(gross)}</td></tr>`
+              ].filter(Boolean).join('') : '';
+
+              const shipName = nonEmpty(ship?.name || order?.customerInfo?.name || '') ? escapeHtml(ship?.name || order?.customerInfo?.name || '') : '';
+              const shipPhone = nonEmpty(ship?.phone || order?.customerInfo?.phone || '') ? escapeHtml(ship?.phone || order?.customerInfo?.phone || '') : '';
+
+              const shippingBlock = shipLines.length ? `
+                <div style="margin-top:8px;color:${THEME.ink};line-height:20px;">
+                  ${shipName ? `<div><strong>Name:</strong> ${shipName}</div>` : ''}
+                  <div><strong>Address:</strong> ${shipLines.join('<br/>')}</div>
+                  ${shipPhone ? `<div style="margin-top:4px;"><strong>Phone:</strong> ${shipPhone}</div>` : ''}
+                </div>` : '';
+
+              const html = `
+                <div style="margin:0;padding:0;background:${THEME.bg};">
+                  <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="background:${THEME.bg};padding:24px 0;">
+                    <tr>
+                      <td align="center" style="padding:0 12px;">
+                        <table role="presentation" cellpadding="0" cellspacing="0" width="600" style="width:600px;max-width:600px;border:1px solid ${THEME.border};border-radius:12px;overflow:hidden;background:${THEME.surface};">
+                          <tr>
+                            <td style="background:${THEME.brand};padding:18px 20px;">
+                              <div style="margin-bottom:12px;">
+                                <div style="display:inline-block;background:#ffffff;border-radius:12px;padding:8px 12px;">
+                                  <img src="${escapeHtml(logoUrl)}" alt="${escapeHtml(brandName)} logo" width="170" style="display:block;height:auto;max-width:170px;border:0;outline:none;text-decoration:none;" />
+                                </div>
+                              </div>
+                              <div style="color:#ffffff;font-weight:900;font-size:18px;line-height:22px;">${escapeHtml(brandName)} — Order Receipt</div>
+                              <div style="color:#ffffff;opacity:.92;font-size:13px;line-height:18px;margin-top:4px;">Order #${escapeHtml(orderId)}${orderDate ? ` • ${escapeHtml(orderDate)}` : ''}</div>
+                            </td>
+                          </tr>
+                          <tr>
+                            <td style="padding:18px 20px;color:${THEME.ink};font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;">
+                              <p style="margin:0 0 10px;">${greeting}</p>
+                              <p style="margin:0 0 16px;color:${THEME.muted};">${thanks}</p>
+
+                              <div style="margin:18px 0 10px;font-weight:800;color:${THEME.brand};">Order Details</div>
+                              <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="border:1px solid ${THEME.border};border-radius:10px;overflow:hidden;">
+                                <tr><td style="padding:10px 12px;background:#ffffff;color:${THEME.muted};width:40%;border-bottom:1px solid ${THEME.border};">Order Number</td><td style="padding:10px 12px;border-bottom:1px solid ${THEME.border};">${escapeHtml(orderId)}</td></tr>
+                                ${orderDate ? `<tr><td style="padding:10px 12px;background:#ffffff;color:${THEME.muted};width:40%;border-bottom:1px solid ${THEME.border};">Order Date</td><td style="padding:10px 12px;border-bottom:1px solid ${THEME.border};">${escapeHtml(orderDate)}</td></tr>` : ''}
+                                <tr><td style="padding:10px 12px;background:#ffffff;color:${THEME.muted};width:40%;border-bottom:1px solid ${THEME.border};">Payment Method</td><td style="padding:10px 12px;border-bottom:1px solid ${THEME.border};">${escapeHtml(paymentMethod)}</td></tr>
+                                ${txId ? `<tr><td style="padding:10px 12px;background:#ffffff;color:${THEME.muted};width:40%;">Transaction ID</td><td style="padding:10px 12px;">${escapeHtml(txId)}</td></tr>` : ''}
+                              </table>
+
+                              <div style="margin:18px 0 10px;font-weight:800;color:${THEME.brand};">Items Purchased</div>
+                              <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="border:1px solid ${THEME.border};border-radius:10px;overflow:hidden;border-collapse:separate;">
+                                <tr>
+                                  <th align="left" style="background:${THEME.brand};color:#ffffff;padding:10px 12px;font-size:13px;">Item</th>
+                                  <th align="center" style="background:${THEME.brand};color:#ffffff;padding:10px 12px;font-size:13px;">Qty</th>
+                                  <th align="right" style="background:${THEME.brand};color:#ffffff;padding:10px 12px;font-size:13px;">Unit</th>
+                                  <th align="right" style="background:${THEME.brand};color:#ffffff;padding:10px 12px;font-size:13px;">Total</th>
+                                </tr>
+                                ${rows || `<tr><td colspan="4" style="padding:10px 12px;color:${THEME.muted};">(No items found)</td></tr>`}
+                              </table>
+
+                              ${totalsRows ? `
+                                <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="margin-top:10px;">
+                                  <tr>
+                                    <td></td>
+                                    <td style="width:260px;">
+                                      <table role="presentation" cellpadding="0" cellspacing="0" width="100%">${totalsRows}</table>
+                                    </td>
+                                  </tr>
+                                </table>` : ''}
+
+                              ${shippingBlock ? `
+                                <div style="margin:18px 0 10px;font-weight:800;color:${THEME.brand};">Shipping Information</div>
+                                <div style="border:1px solid ${THEME.border};border-radius:10px;padding:12px 12px 10px;">
+                                  ${shippingBlock}
+                                </div>` : ''}
+
+                              <div style="margin:18px 0 10px;font-weight:800;color:${THEME.brand};">What Happens Next</div>
+                              <p style="margin:0 0 10px;color:${THEME.muted};">${escapeHtml(nextSteps)}</p>
+                              <p style="margin:0 0 16px;color:${THEME.muted};">${escapeHtml(questions)}</p>
+
+                              <div style="margin:18px 0 10px;font-weight:800;color:${THEME.brand};">Need Help?</div>
+                              <div style="color:${THEME.muted};line-height:20px;">
+                                <div>${escapeHtml(brandName)} Customer Support</div>
+                                ${supportEmail ? `<div>Email: <a href="mailto:${escapeHtml(supportEmail)}" style="color:${THEME.brand};text-decoration:none;">${escapeHtml(supportEmail)}</a></div>` : ''}
+                                ${siteUrl ? `<div>Web: <a href="${escapeHtml(siteUrl)}" style="color:${THEME.brand};text-decoration:none;">${escapeHtml(siteUrl)}</a></div>` : ''}
+                              </div>
+
+                              <div style="margin-top:18px;color:${THEME.muted};font-size:12px;line-height:16px;">
+                                Thank you again for your purchase and for supporting ${escapeHtml(brandName)}.<br/>
+                                — The ${escapeHtml(brandName)} Team
+                              </div>
+
+                              <div style="margin-top:14px;color:${THEME.muted};font-size:11px;line-height:15px;">Payment reference: ${escapeHtml(pi.id)}</div>
+                              ${connectDestination ? `<div style="margin-top:6px;color:${THEME.muted};font-size:11px;line-height:15px;">Connect destination: ${escapeHtml(connectDestination)}</div>` : ''}
+                              ${platformFee ? `<div style="margin-top:6px;color:${THEME.muted};font-size:11px;line-height:15px;">Platform fee: ${money(platformFee)}</div>` : ''}
+                            </td>
+                          </tr>
+                        </table>
+                      </td>
+                    </tr>
+                  </table>
+                </div>
+              `.trim();
+
+              const itemLinesText = lineItems.map(li => {
+                const parts = [
+                  `${li.qty}x ${li.name.replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&quot;/g,'"').replace(/&#39;/g,"'")}`,
+                  li.variant ? `— ${li.variant.replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&quot;/g,'"').replace(/&#39;/g,"'")}` : '',
+                  li.sku ? `(SKU: ${li.sku.replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&quot;/g,'"').replace(/&#39;/g,"'")})` : ''
+                ].filter(Boolean);
+                return parts.join(' ');
+              });
+
+              const text = [
+                customerName ? `Hi ${customerName},` : 'Hi there,',
+                '',
+                `Thank you for choosing ${brandName}. Your order has been received and is now being processed. Below is a summary for your records.`,
+                '',
+                'Order Details',
+                `Order Number: ${orderId}`,
+                orderDate ? `Order Date: ${orderDate}` : null,
+                `Payment Method: ${paymentMethod}`,
+                txId ? `Transaction ID: ${txId}` : null,
+                '',
+                'Items Purchased',
+                itemLinesText.join('\n') || '(No items found)',
+                '',
+                showBreakdown ? [
+                  `Subtotal: ${breakdown.subtotal !== null ? money(breakdown.subtotal) : ''}`,
+                  `Shipping: ${breakdown.shipping !== null ? (breakdown.shipping === 0 ? 'Free' : money(breakdown.shipping)) : ''}`,
+                  (breakdown.tax !== null ? `Tax: ${money(breakdown.tax)}` : null),
+                  (breakdown.discount !== null ? `Discount: ${Number(breakdown.discount) > 0 ? '-' : ''}${money(Math.abs(breakdown.discount))}` : null),
+                  `Total Paid: ${money(gross)}`
+                ].filter(Boolean).join('\n') : '',
+                '',
+                shipLines.length ? `Shipping Information\n${(shipName ? `Name: ${shipName.replace(/<[^>]*>/g,'')}` : '')}${shipName ? '\n' : ''}${shipLines.map(l => l.replace(/<[^>]*>/g,'')).join('\n')}${shipPhone ? `\nPhone: ${shipPhone.replace(/<[^>]*>/g,'')}` : ''}` : '',
+                '',
+                'What Happens Next',
+                nextSteps,
+                questions,
+                '',
+                'Need Help?',
+                `${brandName} Customer Support`,
+                supportEmail ? `Email: ${supportEmail}` : null,
+                siteUrl ? `Web: ${siteUrl}` : null,
+                '',
+                `Payment reference: ${pi.id}`
+              ].filter(v => v !== null && v !== undefined).join('\n');
+
+              // --- Staff/internal order summary email (template-driven layout) ---
+              const buildStaffSummary = async () => {
+                const path = require('path');
+                const fs = require('fs').promises;
+
+                // Load fallback catalog for wholesale/map metadata when DB product record is missing.
+                const fallbackCatalogPath = path.join(__dirname, '..', 'assets', 'prodList.json');
+                let fbMap = new Map();
+                try {
+                  const raw = await fs.readFile(fallbackCatalogPath, 'utf8');
+                  const json = JSON.parse(raw);
+                  if (json && json.categories && typeof json.categories === 'object') {
+                    for (const arr of Object.values(json.categories)) {
+                      if (!Array.isArray(arr)) continue;
+                      for (const p of arr) {
+                        const id = String(p?.sku || p?.id || p?.name || '').trim();
+                        if (!id) continue;
+                        fbMap.set(id, {
+                          name: String(p?.name || p?.title || id),
+                          map: parseCatalogPrice(p?.map ?? p?.price ?? 0),
+                          wholesale: parseCatalogPrice(p?.wholesale ?? 0)
+                        });
+                      }
+                    }
+                  }
+                } catch {
+                  fbMap = new Map();
+                }
+
+                const staffItems = [];
+                let mapTotal = 0;
+                let wholesaleTotal = 0;
+                let hasUnknownWholesale = false;
+
+                const orderItemsSrc = Array.isArray(order?.items) ? order.items : [];
+                const shippingMethod = nonEmpty(order?.shippingMethod || order?.shipping_method || order?.shipping?.method || order?.shipping?.shippingMethod) || 'standard';
+                let shippingLines = [];
+                try {
+                  shippingLines = await calcShippingLineItemsCents(orderItemsSrc.map(it => ({
+                    id: String(it?.productId || it?.id || '').trim(),
+                    qty: Math.max(1, Number(it?.quantity || it?.qty || 1) || 1),
+                    ship: it?.ship
+                  })), shippingMethod);
+                } catch {
+                  shippingLines = [];
+                }
+                const bbShippingAmount = shippingLines.reduce((s, l) => s + (Number(l?.lineCents) || 0), 0) / 100;
+
+                let shippingIdx = 0;
+                for (const it of orderItemsSrc) {
+                  const id = String(it.productId || it.id || '').trim();
+                  const qty = Math.max(1, Number(it.quantity || it.qty || 1) || 1);
+                  const shipLine = shippingLines[shippingIdx] || null;
+                  shippingIdx += 1;
+                  const isNet = String(it.category || '').toLowerCase() === 'netting' || id.toLowerCase().startsWith('custom-net-');
+                  const size = nonEmpty(it.size);
+                  const color = nonEmpty(it.color);
+                  const feet = parseByFootFeet(size);
+
+                  // MAP: prefer persisted order unit price; fall back to DB/catalog.
+                  let mapUnit = Number(it.price || 0) || 0;
+                  let wholesaleUnit = null;
+
+                  let product = null;
+                  try { product = id ? await orderService.productService.getProductById(id) : null; } catch {}
+
+                  if (product) {
+                    const productVariations = Array.isArray(product.variations) ? product.variations : [];
+                    if (productVariations.length) {
+                      const optOf = (v) => String(v?.option || v?.name || v?.value || '').trim();
+                      const strongOptRaw = nonEmpty(it.option || it.variationOption || it.variation || it.variant || it.style || it.type);
+                      const weakOptRaw = nonEmpty(it.size);
+                      const strongOpt = strongOptRaw ? strongOptRaw.toLowerCase() : '';
+                      const weakOpt = weakOptRaw ? weakOptRaw.toLowerCase() : '';
+
+                      const unitPaid = Number(it.price || 0) || 0;
+                      const vMapOf = (v) => parseCatalogPrice(v?.map ?? v?.price ?? v?.MAP ?? null);
+                      const vWholesaleOf = (v) => parseCatalogPrice(v?.wholesale ?? v?.cost ?? v?.wholesalePrice ?? v?.wholesale_price ?? null);
+
+                      const findByExactOpt = (needle) => {
+                        if (!needle) return null;
+                        return productVariations.find(v => optOf(v).toLowerCase() === needle) || null;
+                      };
+
+                      const findByContainsOpt = (needle) => {
+                        if (!needle) return null;
+                        return productVariations.find(v => needle.includes(optOf(v).toLowerCase())) || null;
+                      };
+
+                      let matched = null;
+                      let matchedBy = '';
+
+                      // 1) Strong option fields (explicit)
+                      matched = findByExactOpt(strongOpt) || findByContainsOpt(strongOpt);
+                      if (matched) matchedBy = 'strong';
+
+                      // 2) Weak option field (size) — exact match only
+                      if (!matched) {
+                        matched = findByExactOpt(weakOpt);
+                        if (matched) matchedBy = 'weak';
+                      }
+
+                      // 3) Closest MAP/price to the unit paid (helps prevent mixed pricing)
+                      const hasUnitPaid = Number.isFinite(unitPaid) && unitPaid > 0;
+                      if (hasUnitPaid && !matched) {
+                        let best = null;
+                        let bestDiff = Infinity;
+                        for (const v of productVariations) {
+                          const vm = vMapOf(v);
+                          if (!Number.isFinite(vm) || vm <= 0) continue;
+                          const diff = Math.abs(vm - unitPaid);
+                          if (diff < bestDiff) {
+                            bestDiff = diff;
+                            best = v;
+                          }
+                        }
+                        if (best) {
+                          matched = best;
+                          matchedBy = 'price';
+                        }
+                      }
+
+                      // 4) Single / Standard / first fallback
+                      if (!matched && productVariations.length === 1) {
+                        matched = productVariations[0];
+                        matchedBy = 'single';
+                      }
+                      if (!matched) {
+                        matched = productVariations.find(v => optOf(v).toLowerCase() === 'standard') || productVariations[0] || null;
+                        matchedBy = matched ? 'default' : '';
+                      }
+
+                      if (matched) {
+                        const vMap = vMapOf(matched);
+                        const vWholesale = vWholesaleOf(matched);
+                        if (Number.isFinite(vMap) && vMap > 0) mapUnit = vMap;
+                        if (wholesaleUnit === null && Number.isFinite(vWholesale) && vWholesale > 0) wholesaleUnit = vWholesale;
+                      }
+                    }
+
+                    // Some products store map/wholesale; others store price.
+                    const pMap = Number(product.map || product.price || 0);
+                    if (!mapUnit && Number.isFinite(pMap) && pMap > 0) mapUnit = pMap;
+                    const pWholesale = product.wholesale;
+                    if (pWholesale !== undefined && pWholesale !== null) {
+                      const w = parseCatalogPrice(pWholesale);
+                      if (wholesaleUnit === null && Number.isFinite(w) && w > 0) wholesaleUnit = w;
+                    }
+                  } else {
+                    const fb = fbMap.get(id);
+                    if (fb) {
+                      if (!mapUnit && fb.map) mapUnit = fb.map;
+                      if (fb.wholesale) wholesaleUnit = fb.wholesale;
+                    }
+                  }
+
+                  // By-the-foot: catalog wholesale is per-foot; multiply by feet when present.
+                  // Note: order MAP unit for by-the-foot may already be multiplied server-side.
+                  if (Number.isFinite(feet) && feet && feet > 0) {
+                    if (wholesaleUnit !== null) wholesaleUnit = wholesaleUnit * feet;
+                  }
+
+                  const lineMapTotal = (Number(mapUnit || 0) || 0) * qty;
+                  mapTotal += lineMapTotal;
+
+                  let lineWholesaleTotal = null;
+                  if (wholesaleUnit !== null && Number.isFinite(Number(wholesaleUnit))) {
+                    lineWholesaleTotal = Number(wholesaleUnit) * qty;
+                    wholesaleTotal += lineWholesaleTotal;
+                  } else {
+                    hasUnknownWholesale = true;
+                  }
+
+                  const variations = {};
+                  if (isNet) {
+                    if (size) variations.Dimensions = size;
+                    if (color) variations.Spec = color;
+                  } else {
+                    if (Number.isFinite(feet) && feet && feet > 0) variations.Length = `${feet} ft`;
+                    else if (size) variations.Size = size;
+                    if (color) variations.Color = color;
+                  }
+
+                  staffItems.push({
+                    name: String(it.productName || it.name || id || 'Item'),
+                    id,
+                    quantity: qty,
+                    mapUnit,
+                    wholesaleUnit,
+                    shippingUnit: shipLine ? (Number(shipLine.perUnitCents || 0) / 100) : null,
+                    lineShippingTotal: shipLine ? (Number(shipLine.lineCents || 0) / 100) : null,
+                    variations,
+                    lineMapTotal,
+                    lineWholesaleTotal
+                  });
+                }
+
+                const customerPaid = Number(paymentInfo.amount || gross || 0) || 0;
+                const tax = (breakdown.tax === null) ? 0 : (Number.isFinite(Number(breakdown.tax)) ? Number(breakdown.tax) : 0);
+                const cartBeforeTax = Number.isFinite(customerPaid - tax) ? (customerPaid - tax) : customerPaid;
+                const sdRate = 0.015;
+                const sdFee = Number((cartBeforeTax * sdRate).toFixed(2));
+                const stripeFees = Number.isFinite(Number(paymentInfo.fees)) ? Number(paymentInfo.fees) : 0;
+                const ezSportsNetPayout = Number((customerPaid - wholesaleTotal - bbShippingAmount - sdFee - stripeFees).toFixed(2));
+
+                const shippingAddressText = shipLines.length
+                  ? [shipName ? `Name: ${shipName.replace(/<[^>]*>/g,'')}` : null, ...shipLines.map(l => l.replace(/<[^>]*>/g,'')), shipPhone ? `Phone: ${shipPhone.replace(/<[^>]*>/g,'')}` : null].filter(Boolean).join('\n')
+                  : '(not provided)';
+
+                const customerPhone = nonEmpty(order?.customerInfo?.phone || ship?.phone || '');
+
+                const subject = `New Order Processed — EZ Sports — #${orderId}`;
+
+                const staffTextLines = [];
+                staffTextLines.push('New Order Processed — EZ Sports');
+                staffTextLines.push('');
+                staffTextLines.push('Customer Information');
+                staffTextLines.push(`Name: ${nonEmpty(order?.customerInfo?.name || customerName || '') || '(not provided)'}`);
+                staffTextLines.push(`Email: ${customerEmail || '(not provided)'}`);
+                staffTextLines.push(`Phone: ${customerPhone || '(not provided)'}`);
+                staffTextLines.push('Shipping Address:');
+                staffTextLines.push(shippingAddressText);
+                staffTextLines.push('');
+                staffTextLines.push('Order Details');
+                staffTextLines.push(`Order ID: ${orderId}`);
+                staffTextLines.push(orderDate ? `Order Date: ${orderDate}` : null);
+                staffTextLines.push(`Payment Intent: ${pi.id}`);
+                staffTextLines.push('');
+                staffTextLines.push('Items Ordered');
+                staffTextLines.push('Each item includes its selected variations (size, color, style, etc.).');
+                staffTextLines.push('');
+                for (const si of staffItems) {
+                  const showLineTotals = Number(si.quantity || 1) > 1;
+                  staffTextLines.push(si.name);
+                  staffTextLines.push(`- SKU: ${si.id}`);
+                  staffTextLines.push(`- Quantity: ${si.quantity}`);
+                  staffTextLines.push(`- MAP Price: ${money(si.mapUnit)}${showLineTotals ? ` (line: ${money(si.lineMapTotal)})` : ''}`);
+                  staffTextLines.push(`- Wholesale Price: ${si.wholesaleUnit === null ? '—' : money(si.wholesaleUnit)}${showLineTotals ? (si.lineWholesaleTotal === null ? '' : ` (line: ${money(si.lineWholesaleTotal)})`) : ''}`);
+                  staffTextLines.push(`- BB Shipping: ${si.shippingUnit === null ? '—' : money(si.shippingUnit)}${showLineTotals ? (si.lineShippingTotal === null ? '' : ` (line: ${money(si.lineShippingTotal)})`) : ''}`);
+                  staffTextLines.push('Variations:');
+                  const keys = Object.keys(si.variations || {});
+                  if (!keys.length) staffTextLines.push('- (none)');
+                  else keys.forEach(k => staffTextLines.push(`- ${k}: ${si.variations[k]}`));
+                  staffTextLines.push('');
+                }
+                staffTextLines.push('Financial Breakdown');
+                staffTextLines.push('Totals');
+                staffTextLines.push(`- Customer Paid (Cart Total): ${money(customerPaid)}`);
+                staffTextLines.push(`- MAP Total: ${money(mapTotal)}`);
+                staffTextLines.push(`- Wholesale Total: ${money(wholesaleTotal)}${hasUnknownWholesale ? ' (excludes items with unknown wholesale)' : ''}`);
+                staffTextLines.push(`- BB Shipping Amount: ${money(bbShippingAmount)}`);
+                staffTextLines.push('');
+                staffTextLines.push('Payout Distribution');
+                staffTextLines.push('1. Amount Owed to Better Baseball');
+                staffTextLines.push('This is the total wholesale cost for the items ordered.');
+                staffTextLines.push(`- BB Wholesale Amount: ${money(wholesaleTotal)}${hasUnknownWholesale ? ' (partial)' : ''}`);
+                staffTextLines.push('- Send To: Better Baseball');
+                staffTextLines.push('- Email: hligon@getsparqd.com');
+                staffTextLines.push('');
+                staffTextLines.push('2. SparQ Digital Platform Fee');
+                staffTextLines.push('SparQ Digital receives 1.5% of the cart total before taxes.');
+                staffTextLines.push(`- SparQ Digital Fee (1.5%): ${money(sdFee)}`);
+                staffTextLines.push(`- Formula: ${money(cartBeforeTax)} × 0.015`);
+                staffTextLines.push('');
+                staffTextLines.push('3. EZ Sports Net Payout');
+                staffTextLines.push('This is the remaining amount after wholesale, BB shipping, SparQ Digital’s fee, and Stripe fees.');
+                staffTextLines.push(`- EZ Sports Net Payout: ${money(ezSportsNetPayout)}`);
+                staffTextLines.push(`- Formula: ${money(customerPaid)} − ${money(wholesaleTotal)} − ${money(bbShippingAmount)} − ${money(sdFee)} − ${money(stripeFees)}`);
+                staffTextLines.push('');
+                staffTextLines.push('Metadata Logged');
+                staffTextLines.push(`- MAP Total: ${money(mapTotal)}`);
+                staffTextLines.push(`- Wholesale Total: ${money(wholesaleTotal)}${hasUnknownWholesale ? ' (partial)' : ''}`);
+                staffTextLines.push(`- Amount Due to BB: ${money(wholesaleTotal)}${hasUnknownWholesale ? ' (partial)' : ''}`);
+                staffTextLines.push(`- BB Shipping Amount: ${money(bbShippingAmount)}`);
+                staffTextLines.push(`- SparQ Digital Fee: ${money(sdFee)}`);
+                staffTextLines.push(`- EZ Sports Net Payout: ${money(ezSportsNetPayout)}`);
+                staffTextLines.push(`- Items JSON: ${JSON.stringify(staffItems)}`);
+
+                const staffText = staffTextLines.filter(Boolean).join('\n');
+
+                const staffHtmlItems = staffItems.map(si => {
+                  const showLineTotals = Number(si.quantity || 1) > 1;
+                  const vLines = Object.keys(si.variations || {}).length
+                    ? Object.keys(si.variations).map(k => `<li><strong>${escapeHtml(k)}:</strong> ${escapeHtml(si.variations[k])}</li>`).join('')
+                    : `<li>(none)</li>`;
+                  return `
+                    <div style="border:1px solid ${THEME.border};border-radius:10px;padding:12px 12px 10px;margin-top:10px;">
+                      <div style="font-weight:800;color:${THEME.ink};">${escapeHtml(si.name)}</div>
+                      <div style="margin-top:4px;color:${THEME.muted};font-size:12px;">SKU: ${escapeHtml(si.id)}</div>
+                      <div style="margin-top:8px;display:flex;gap:16px;flex-wrap:wrap;color:${THEME.ink};">
+                        <div><strong>Quantity:</strong> ${escapeHtml(String(si.quantity))}</div>
+                        <div><strong>MAP Price:</strong> ${money(si.mapUnit)}${showLineTotals ? ` <span style="color:${THEME.muted};font-size:12px;">(line: ${money(si.lineMapTotal)})</span>` : ''}</div>
+                        <div><strong>Wholesale Price:</strong> ${si.wholesaleUnit === null ? '—' : money(si.wholesaleUnit)}${showLineTotals ? (si.lineWholesaleTotal === null ? '' : ` <span style="color:${THEME.muted};font-size:12px;">(line: ${money(si.lineWholesaleTotal)})</span>`) : ''}</div>
+                        <div><strong>BB Shipping:</strong> ${si.shippingUnit === null ? '—' : money(si.shippingUnit)}${showLineTotals ? (si.lineShippingTotal === null ? '' : ` <span style="color:${THEME.muted};font-size:12px;">(line: ${money(si.lineShippingTotal)})</span>`) : ''}</div>
+                      </div>
+                      <div style="margin-top:10px;font-weight:700;color:${THEME.brand};">Variations</div>
+                      <ul style="margin:6px 0 0 18px;color:${THEME.ink};padding:0;">${vLines}</ul>
+                    </div>
+                  `.trim();
+                }).join('\n');
+
+                const staffHtml = `
+                  <div style="margin:0;padding:0;background:${THEME.bg};">
+                    <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="background:${THEME.bg};padding:24px 0;">
+                      <tr>
+                        <td align="center" style="padding:0 12px;">
+                          <table role="presentation" cellpadding="0" cellspacing="0" width="680" style="width:680px;max-width:680px;border:1px solid ${THEME.border};border-radius:12px;overflow:hidden;background:${THEME.surface};">
+                            <tr>
+                              <td style="background:${THEME.brand};padding:16px 18px;color:#ffffff;font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;">
+                                <div style="font-weight:900;font-size:18px;line-height:22px;">New Order Processed — EZ Sports</div>
+                                <div style="opacity:.92;font-size:13px;line-height:18px;margin-top:4px;">Order #${escapeHtml(orderId)}${orderDate ? ` • ${escapeHtml(orderDate)}` : ''}</div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td style="padding:16px 18px;color:${THEME.ink};font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;">
+                                <div style="font-weight:800;color:${THEME.brand};margin:2px 0 8px;">Customer Information</div>
+                                <div style="border:1px solid ${THEME.border};border-radius:10px;padding:12px 12px 10px;line-height:20px;">
+                                  <div><strong>Name:</strong> ${escapeHtml(nonEmpty(order?.customerInfo?.name || customerName || '') || '(not provided)')}</div>
+                                  <div><strong>Email:</strong> ${escapeHtml(customerEmail || '(not provided)')}</div>
+                                  <div><strong>Phone:</strong> ${escapeHtml(customerPhone || '(not provided)')}</div>
+                                  <div style="margin-top:6px;"><strong>Shipping Address:</strong><br/>${shipLines.length ? shipLines.join('<br/>') : '(not provided)'}${shipName ? `<br/>${shipName}` : ''}${shipPhone ? `<br/>Phone: ${shipPhone}` : ''}</div>
+                                </div>
+
+                                <div style="font-weight:800;color:${THEME.brand};margin:16px 0 8px;">Order Details</div>
+                                <div style="border:1px solid ${THEME.border};border-radius:10px;padding:12px 12px 10px;line-height:20px;">
+                                  <div><strong>Order ID:</strong> ${escapeHtml(orderId)}</div>
+                                  ${orderDate ? `<div><strong>Order Date:</strong> ${escapeHtml(orderDate)}</div>` : ''}
+                                  <div><strong>Payment Intent:</strong> ${escapeHtml(pi.id)}</div>
+                                </div>
+
+                                <div style="font-weight:800;color:${THEME.brand};margin:16px 0 8px;">Items Ordered</div>
+                                <div style="color:${THEME.muted};font-size:13px;line-height:18px;">Each item includes its selected variations (size, color, style, etc.).</div>
+                                ${staffHtmlItems || `<div style="margin-top:10px;color:${THEME.muted};">(No items found)</div>`}
+
+                                <div style="font-weight:800;color:${THEME.brand};margin:16px 0 8px;">Financial Breakdown</div>
+                                <div style="border:1px solid ${THEME.border};border-radius:10px;padding:12px 12px 10px;line-height:20px;">
+                                  <div><strong>Customer Paid (Cart Total):</strong> ${money(customerPaid)}</div>
+                                  <div><strong>MAP Total:</strong> ${money(mapTotal)}</div>
+                                  <div><strong>Wholesale Total:</strong> ${money(wholesaleTotal)}${hasUnknownWholesale ? ' <span style="color:' + THEME.muted + ';font-size:12px;">(excludes items with unknown wholesale)</span>' : ''}</div>
+                                  <div><strong>BB Shipping Amount:</strong> ${money(bbShippingAmount)}</div>
+                                </div>
+
+                                <div style="font-weight:800;color:${THEME.brand};margin:16px 0 8px;">Payout Distribution</div>
+                                <div style="border:1px solid ${THEME.border};border-radius:10px;padding:12px 12px 10px;line-height:20px;">
+                                  <div style="font-weight:800;">1. Amount Owed to Better Baseball</div>
+                                  <div style="color:${THEME.muted};">This is the total wholesale cost for the items ordered.</div>
+                                  <div><strong>BB Wholesale Amount:</strong> ${money(wholesaleTotal)}${hasUnknownWholesale ? ' (partial)' : ''}</div>
+                                  <div><strong>Send To:</strong> Better Baseball</div>
+                                  <div><strong>Email:</strong> <a href="mailto:hligon@getsparqd.com" style="color:${THEME.brand};text-decoration:none;">hligon@getsparqd.com</a></div>
+                                  <hr style="border:0;border-top:1px solid ${THEME.border};margin:12px 0;"/>
+                                  <div style="font-weight:800;">2. SparQ Digital Platform Fee</div>
+                                  <div style="color:${THEME.muted};">SparQ Digital receives 1.5% of the cart total before taxes.</div>
+                                  <div><strong>SparQ Digital Fee (1.5%):</strong> ${money(sdFee)}</div>
+                                  <div style="color:${THEME.muted};font-size:12px;">Formula: ${money(cartBeforeTax)} × 0.015</div>
+                                  <hr style="border:0;border-top:1px solid ${THEME.border};margin:12px 0;"/>
+                                  <div style="font-weight:800;">3. EZ Sports Net Payout</div>
+                                  <div style="color:${THEME.muted};">This is the remaining amount after wholesale, BB shipping, SparQ Digital’s fee, and Stripe fees.</div>
+                                  <div><strong>EZ Sports Net Payout:</strong> ${money(ezSportsNetPayout)}</div>
+                                  <div style="color:${THEME.muted};font-size:12px;">Formula: ${money(customerPaid)} − ${money(wholesaleTotal)} − ${money(bbShippingAmount)} − ${money(sdFee)} − ${money(stripeFees)}</div>
+                                </div>
+
+                                <div style="margin-top:14px;color:${THEME.muted};font-size:11px;line-height:15px;">Metadata: MAP ${money(mapTotal)} • Wholesale ${money(wholesaleTotal)} • BB Shipping ${money(bbShippingAmount)} • SparQ Digital Fee ${money(sdFee)} • Stripe Fees ${money(stripeFees)} • PI ${escapeHtml(pi.id)}</div>
+                              </td>
+                            </tr>
+                          </table>
+                        </td>
+                      </tr>
+                    </table>
+                  </div>
+                `.trim();
+
+                return { subject, html: staffHtml, text: staffText };
+              };
 
               // Customer confirmation (only once)
               if (customerEmail && !paymentInfo.customerEmailSentAt) {
                 await emailSvc.queue({
                   to: customerEmail,
-                  subject: 'Order confirmed',
+                  subject: `Your EZ Sports Netting Order Receipt — Order #${orderId}`,
                   html: html || '<p>Thank you for your purchase.</p>',
-                  text: `Order #${orderId}\nPaid: ${money(gross)}\n\n${itemLines.join('\n')}`,
+                  text,
                   tags: ['order', 'paid', 'customer'],
                   replyTo: internalTo || undefined
                 });
@@ -308,11 +954,12 @@ app.post('/webhook/stripe', express.raw({ type: 'application/json' }), async (re
 
               // Internal notification (only once)
               if (internalTo && !paymentInfo.internalOrderEmailSentAt) {
+                const staff = await buildStaffSummary().catch(() => null);
                 await emailSvc.queue({
                   to: internalTo,
-                  subject: `[Order Paid] #${orderId} — ${money(gross)}`,
-                  html,
-                  text: `Order #${orderId}\nPaid: ${money(gross)}\nPI: ${pi.id}\n\nItems:\n${itemLines.join('\n')}`,
+                  subject: staff?.subject || `[Order Paid] #${orderId} — ${money(gross)}`,
+                  html: staff?.html || html,
+                  text: staff?.text || `Order #${orderId}\nPaid: ${money(gross)}\nPI: ${pi.id}${customerEmail ? `\nCustomer: ${customerEmail}` : ''}\n\nItems:\n${(itemLinesText && itemLinesText.length ? itemLinesText.join('\n') : '(No items found)')}`,
                   tags: ['order', 'paid', 'internal'],
                   replyTo: customerEmail || undefined
                 });
@@ -688,36 +1335,8 @@ async function calcSubtotalCents(items = []) {
 async function calcShippingCents(items = [], _subtotalCents, _method = 'standard'){
   // New policy: per-item shipping: use dsr when available; default $100 per item otherwise
   try {
-    const method = String(_method || 'standard').toLowerCase().trim();
-    const expedited = method === 'expedited';
-    const expeditedSurchargeCentsPerItem = expedited ? 10000 : 0;
-    const priceMap = await loadPriceMap();
-    let total = 0;
-    for (const it of items) {
-      const lid = String(it.id || '').toLowerCase();
-      // Free shipping override for specific products
-      const isFreeShip = (() => {
-        if (!lid) return false;
-        if (lid === 'battingmat' || lid === 'armorbasket') return true;
-        if (lid.includes('batting') && lid.includes('mat')) return true;
-        if (lid.includes('armor') && (lid.includes('basket') || lid.includes('baseball') && lid.includes('cart'))) return true;
-        return false;
-      })();
-      if (isFreeShip) {
-        // Free shipping per item
-        const qty = Math.max(1, Number(it.qty) || 1);
-        total += expeditedSurchargeCentsPerItem * qty;
-        continue;
-      }
-  const rec = priceMap.get(normId(it.id));
-  // Prefer explicit per-item ship provided by client line item when present
-  const explicit = Number(it.ship);
-  const dsr = Number.isFinite(explicit) ? explicit : Number(rec?.dsr || 0);
-  const per = (Number.isFinite(dsr) && dsr > 0) ? dsr : 100;
-      const qty = Math.max(1, Number(it.qty) || 1);
-      total += (Math.round(per * 100) * qty) + (expeditedSurchargeCentsPerItem * qty);
-    }
-    return total;
+    const lines = await calcShippingLineItemsCents(items, _method);
+    return lines.reduce((s, l) => s + (Number(l.lineCents) || 0), 0);
   } catch {
     // Fallback: treat as $100 per item
     const method = String(_method || 'standard').toLowerCase().trim();
@@ -725,6 +1344,44 @@ async function calcShippingCents(items = [], _subtotalCents, _method = 'standard
     const perItemCents = expedited ? 20000 : 10000;
     return (items || []).reduce((s, it) => s + (perItemCents * Math.max(1, Number(it.qty)||1)), 0);
   }
+}
+
+async function calcShippingLineItemsCents(items = [], _method = 'standard'){
+  const method = String(_method || 'standard').toLowerCase().trim();
+  const expedited = method === 'expedited';
+  const expeditedSurchargeCentsPerItem = expedited ? 10000 : 0;
+  const priceMap = await loadPriceMap();
+
+  const out = [];
+  for (const it of (items || [])) {
+    const id = String(it?.id || '');
+    const lid = id.toLowerCase();
+    const qty = Math.max(1, Number(it?.qty) || 1);
+
+    // Free shipping override for specific products
+    const isFreeShip = (() => {
+      if (!lid) return false;
+      if (lid === 'battingmat' || lid === 'armorbasket') return true;
+      if (lid.includes('batting') && lid.includes('mat')) return true;
+      if (lid.includes('armor') && (lid.includes('basket') || (lid.includes('baseball') && lid.includes('cart')))) return true;
+      return false;
+    })();
+
+    if (isFreeShip) {
+      const perUnitCents = expeditedSurchargeCentsPerItem;
+      out.push({ id, qty, perUnitCents, lineCents: perUnitCents * qty, reason: expedited ? 'free+expedite' : 'free' });
+      continue;
+    }
+
+    const rec = priceMap.get(normId(id));
+    // Prefer explicit per-item ship provided by client line item when present
+    const explicit = Number(it?.ship);
+    const dsr = Number.isFinite(explicit) ? explicit : Number(rec?.dsr || 0);
+    const per = (Number.isFinite(dsr) && dsr > 0) ? dsr : 100;
+    const perUnitCents = Math.round(per * 100) + expeditedSurchargeCentsPerItem;
+    out.push({ id, qty, perUnitCents, lineCents: perUnitCents * qty, reason: (Number.isFinite(dsr) && dsr > 0) ? 'dsr' : 'default' });
+  }
+  return out;
 }
 
 // --- Basic tax calculation ---
@@ -822,7 +1479,15 @@ app.post('/api/create-payment-intent', async (req, res) => {
     }
     // Basic input validation and normalization
     if (!Array.isArray(items) || items.length === 0) return res.status(400).json({ error: 'Items are required' });
-    const normItems = items.map(i => ({ id: String(i.id || '').trim(), qty: Math.max(1, Math.min(20, parseInt(i.qty || 1))) }));
+    const normItems = items.map(i => ({
+      id: String(i.id || '').trim(),
+      qty: Math.max(1, Math.min(20, parseInt(i.qty || 1))),
+      // Optional variation fields (persisted on order for confirmation/email)
+      size: String(i.size || '').trim(),
+      color: String(i.color || '').trim(),
+      category: String(i.category || '').trim(),
+      name: String(i.name || '').trim()
+    }));
     const safeCurrency = (String(currency || 'usd').toLowerCase() === 'usd') ? 'usd' : 'usd';
     // Optional: validate/normalize shipping address before calculations
     let normalizedShipping = shipping;
@@ -892,7 +1557,7 @@ app.post('/api/create-payment-intent', async (req, res) => {
       const orderPayload = {
         userId: null,
         userEmail: customer.email || undefined,
-        items: normItems.map(i => ({ id: i.id, qty: i.qty })),
+        items: normItems.map(i => ({ id: i.id, qty: i.qty, size: i.size || undefined, color: i.color || undefined, category: i.category || undefined, name: i.name || undefined })),
         shippingAddress: shipping,
         customerInfo: customer,
         paymentInfo: { method: 'stripe' },
@@ -941,7 +1606,7 @@ app.post('/api/create-payment-intent', async (req, res) => {
       // This avoids StripeIdempotencyError when a retry created a new local order
       // but the request basis (items/shipping/etc) stayed identical.
       orderId: (newOrder?.id ? String(newOrder.id) : (existingOrderId ? String(existingOrderId) : '')),
-      items: normItems.map(i => ({ id: i.id, qty: i.qty })),
+      items: normItems.map(i => ({ id: i.id, qty: i.qty, size: i.size || '', color: i.color || '' })),
       email: customer.email || '',
       shipping: {
         line1: normalizedShipping.address1 || '',
@@ -991,7 +1656,8 @@ app.post('/api/create-payment-intent', async (req, res) => {
         metadata: {
           email: customer.email || '',
           name: customer.name || '',
-          items: normItems.map(i => `${i.id}:${i.qty}`).join('|'),
+          // include variations to avoid ambiguous lines with the same SKU
+          items: normItems.map(i => `${i.id}:${i.qty}:${(i.size||'').slice(0,24)}:${(i.color||'').slice(0,24)}`).join('|').slice(0, 500),
           order_id: newOrder?.id ? String(newOrder.id) : '',
           coupon_code: appliedCoupon ? String(appliedCoupon.code) : '',
           coupon_user_bound: (couponAudit && couponAudit.restricted) ? 'true' : (appliedCoupon && (Array.isArray(appliedCoupon.userEmails) || Array.isArray(appliedCoupon.userIds)) ? 'true' : 'false'),

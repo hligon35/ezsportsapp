@@ -10,6 +10,64 @@ class OrderService {
     this.productService = new ProductService();
   }
 
+  _parseCatalogPrice(value) {
+    if (value === null || value === undefined) return 0;
+    if (typeof value === 'number') return Number.isFinite(value) ? value : 0;
+    const s = String(value).trim();
+    if (!s) return 0;
+    // Support catalog encodings like "2/ft", "1.5/ft", "$2.50/ft"
+    const m = s.match(/(-?\d+(?:\.\d+)?)/);
+    if (!m) return 0;
+    const n = Number(m[1]);
+    return Number.isFinite(n) ? n : 0;
+  }
+
+  _parseByFootFeet(size) {
+    const s = String(size || '').trim();
+    if (!s) return null;
+    let m = s.match(/\bby\s*the\s*f(?:oot|t)\s*:\s*(\d+)\s*['′]?\b/i);
+    if (m && m[1]) {
+      const n = Number(m[1]);
+      return Number.isFinite(n) && n > 0 ? Math.floor(n) : null;
+    }
+    m = s.match(/\b(\d+)\s*(?:ft|feet)\b/i);
+    if (m && m[1]) {
+      const n = Number(m[1]);
+      return Number.isFinite(n) && n > 0 ? Math.floor(n) : null;
+    }
+    return null;
+  }
+
+  _normalizeDisplayName(name, { color, size } = {}) {
+    const raw = String(name || '').trim();
+    if (!raw) return raw;
+
+    let out = raw;
+
+    // Common catalog suffixes that should not appear on receipts when we show variants separately.
+    out = out.replace(/\s*[-–—]\s*all\s+colors\s*$/i, '');
+    out = out.replace(/\s*\(\s*all\s+colors\s*\)\s*$/i, '');
+    out = out.replace(/\s*[-–—]\s*all\s+sizes\s*$/i, '');
+    out = out.replace(/\s*\(\s*all\s+sizes\s*\)\s*$/i, '');
+
+    const c = String(color || '').trim();
+    if (c) {
+      const esc = c.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      out = out.replace(new RegExp(`\\s*[-–—]\\s*${esc}\\s*$`, 'i'), '');
+      out = out.replace(new RegExp(`\\s*\\(\\s*${esc}\\s*\\)\\s*$`, 'i'), '');
+    }
+
+    const s = String(size || '').trim();
+    if (s) {
+      const esc = s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      out = out.replace(new RegExp(`\\s*[-–—]\\s*${esc}\\s*$`, 'i'), '');
+      out = out.replace(new RegExp(`\\s*\\(\\s*${esc}\\s*\\)\\s*$`, 'i'), '');
+    }
+
+    out = out.trim();
+    return out || raw;
+  }
+
   // Load fallback catalog (assets/prodList.json) and build a quick lookup by SKU/id
   async _loadFallbackCatalogMap() {
     try {
@@ -24,7 +82,7 @@ class OrderService {
             const id = String(p.sku || p.id || p.name || '').trim();
             if (!id) return;
             const name = String(p.name || p.title || id);
-            const price = Number(p.map ?? p.price ?? p.wholesale ?? 0) || 0;
+            const price = this._parseCatalogPrice(p.map ?? p.price ?? p.wholesale ?? 0);
             out.set(id, { name, price });
           });
         }
@@ -44,13 +102,19 @@ class OrderService {
       const fbMap = await this._loadFallbackCatalogMap();
 
       // Calculate total
-      let total = 0;
+      let itemsSubtotal = 0;
+      let shippingFromItems = 0;
       const enrichedItems = [];
 
       for (const item of orderData.items) {
-        const qty = Math.max(1, Number(item.qty) || 1);
+        const qty = Math.max(1, Number(item.qty ?? item.quantity) || 1);
         let product = null;
         try { product = await this.productService.getProductById(item.id); } catch {}
+
+        const clientName = String(item.name || '').trim();
+        const byFootFeet = this._parseByFootFeet(item.size);
+        const selectedOptionRaw = (item.option ?? item.variationOption ?? item.variation ?? item.variant ?? item.style ?? item.type ?? item.size);
+        const selectedOption = (selectedOptionRaw !== undefined && selectedOptionRaw !== null) ? String(selectedOptionRaw).trim() : '';
 
         // Fallback lookup when product is not found in DB
         let price = 0;
@@ -58,6 +122,27 @@ class OrderService {
         if (product) {
           price = Number(product.price || 0) || 0;
           productName = product.name || String(item.id);
+
+          // If product has variations with explicit MAP pricing, choose the matching option.
+          // Note: the front-end encodes the chosen option into `size` for most variation products.
+          const variations = Array.isArray(product.variations) ? product.variations : [];
+          const isByFoot = Number.isFinite(byFootFeet) && byFootFeet && byFootFeet > 0;
+          if (variations.length && !isByFoot) {
+            const opt = String(selectedOption || '').trim();
+            const optLc = opt.toLowerCase();
+            const optOf = (v) => String(v?.option || v?.name || v?.value || '').trim();
+            let matched = null;
+            if (optLc) {
+              matched = variations.find(v => optOf(v).toLowerCase() === optLc) || null;
+            }
+            if (!matched && variations.length === 1) matched = variations[0];
+            if (!matched) matched = variations.find(v => optOf(v).toLowerCase() === 'standard') || null;
+
+            if (matched) {
+              const vMap = this._parseCatalogPrice(matched.map ?? matched.price ?? matched.MAP ?? null);
+              if (Number.isFinite(vMap) && vMap > 0) price = vMap;
+            }
+          }
         } else {
           const fb = fbMap.get(String(item.id));
           if (fb) {
@@ -67,12 +152,29 @@ class OrderService {
             // Last resort: honor client-provided unit price if present so the order record is useful
             const unit = Number(item.price || 0);
             price = Number.isFinite(unit) && unit > 0 ? unit : 0;
-            productName = String(item.id);
+            productName = clientName || String(item.id);
           }
         }
 
+        // Prefer client-provided display name for dynamic products (e.g., netting calculator),
+        // but keep catalog/DB names authoritative when we have a product record.
+        if (!product && clientName) productName = clientName;
+
+        // By-the-foot items store the chosen feet in the size field; price is per-foot in catalog.
+        // Keep qty as-is (front-end uses qty=1 for these) and multiply unit price accordingly.
+        if (Number.isFinite(price) && price > 0 && Number.isFinite(byFootFeet) && byFootFeet && byFootFeet > 0) {
+          price = price * Math.floor(byFootFeet);
+        }
+
+        // Clean up name for receipts/emails (variants are rendered separately)
+        productName = this._normalizeDisplayName(productName, { color: item.color, size: item.size });
+
         const itemTotal = price * qty;
-        total += itemTotal;
+        itemsSubtotal += itemTotal;
+
+        // Optional: item-level shipping values can be provided by the client
+        const shipVal = Number(item.ship || 0);
+        if (Number.isFinite(shipVal) && shipVal > 0) shippingFromItems += shipVal;
 
         enrichedItems.push({
           productId: item.id,
@@ -81,25 +183,45 @@ class OrderService {
           quantity: qty,
           subtotal: itemTotal,
           // Optional: store per-line shipping provided by client for future detailed invoices
-          ship: Number(item.ship || 0) || undefined
+          ship: Number(item.ship || 0) || undefined,
+          // Optional: persist variation details for confirmation/email
+          size: (item.size !== undefined && item.size !== null) ? String(item.size) : undefined,
+          option: selectedOption || undefined,
+          color: (item.color !== undefined && item.color !== null) ? String(item.color) : undefined,
+          category: (item.category !== undefined && item.category !== null) ? String(item.category) : undefined
         });
       }
+
+      const providedSubtotal = Number.isFinite(orderData.subtotal) ? Number(orderData.subtotal) : null;
+      const providedShipping = Number.isFinite(orderData.shipping) ? Number(orderData.shipping) : null;
+      const providedDiscount = Number.isFinite(orderData.discount) ? Number(orderData.discount) : null;
+      const hasTaxProp = Object.prototype.hasOwnProperty.call(orderData || {}, 'tax');
+      const providedTax = hasTaxProp
+        ? ((orderData.tax === null) ? null : (Number.isFinite(orderData.tax) ? Number(orderData.tax) : 0))
+        : 0;
+
+      const subtotal = providedSubtotal !== null ? providedSubtotal : enrichedItems.reduce((s, i) => s + Number(i.subtotal || 0), 0);
+      const shipping = providedShipping !== null ? providedShipping : shippingFromItems;
+      const discount = providedDiscount !== null ? providedDiscount : 0;
+      const tax = providedTax;
+      const taxForTotal = (tax === null) ? 0 : (Number.isFinite(Number(tax)) ? Number(tax) : 0);
+      const computedTotal = subtotal + shipping + taxForTotal - discount;
 
       // Create order object
       const newOrder = {
         userId: orderData.userId,
         userEmail: orderData.userEmail,
         items: enrichedItems,
-        total: Number.isFinite(orderData.total) ? Number(orderData.total) : total,
+        total: Number.isFinite(orderData.total) ? Number(orderData.total) : computedTotal,
         status: 'pending',
         shippingAddress: orderData.shippingAddress || null,
         customerInfo: orderData.customerInfo || null,
         paymentInfo: orderData.paymentInfo || null,
         // Persist breakdown if provided by caller (compute otherwise)
-        subtotal: Number.isFinite(orderData.subtotal) ? Number(orderData.subtotal) : enrichedItems.reduce((s,i)=>s + Number(i.subtotal||0), 0),
-        shipping: Number.isFinite(orderData.shipping) ? Number(orderData.shipping) : 0,
-        discount: Number.isFinite(orderData.discount) ? Number(orderData.discount) : 0,
-        tax: (orderData.tax === null) ? null : (Number.isFinite(orderData.tax) ? Number(orderData.tax) : 0),
+        subtotal,
+        shipping,
+        discount,
+        tax,
         couponAudit: orderData.couponAudit || undefined
       };
 

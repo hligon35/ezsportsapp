@@ -39,7 +39,11 @@ router.get('/summary/:id', async (req, res) => {
       id: i.productId || i.id,
       productName: i.productName,
       quantity: i.quantity,
-      subtotal: i.subtotal
+      subtotal: i.subtotal,
+      // Include variations so confirmation page can render the full item description
+      size: i.size,
+      color: i.color,
+      category: i.category
     })) : [];
     const out = {
       id: order.id,

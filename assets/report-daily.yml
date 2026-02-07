@@ -1,0 +1,48 @@
+Subject: Daily Payout Report — EZ Sports — {{start_date}}
+To:
+- EZ Sports Operations
+- SparQ Digital
+- Better Baseball Fulfillment — hligon@getsparqd.com
+
+Reporting Period
+From: {{start_date}} (12:00 AM)
+To: {{end_date}} (11:59 PM)
+
+Summary Overview
+- Total Orders: {{order_count}}
+- Total MAP Sold: ${{map_total_sum}}
+- Total Wholesale Cost: ${{wholesale_total_sum}}
+- Total BB Shipping Amount: ${{bb_shipping_sum}}
+- Total SparQ Digital Fees (1.5%): ${{sd_fee_sum}}
+- Total Stripe Processing Fees: ${{stripe_fee_sum}}
+- Total EZ Sports Net Payout: ${{ezs_payout_sum}}
+- Total Amount Owed to Better Baseball: ${{wholesale_total_sum}}
+
+Product Sales Summary (Aggregated)
+This section shows the total quantity or footage sold per product across the day.
+{{#each product_summary}}
+{{this.product_name}}
+- Total Units Sold: {{this.total_units}}
+- Total Footage (if applicable): {{this.total_feet}}
+- Total MAP Value: ${{this.total_map_value}}
+- Total Wholesale Value: ${{this.total_wholesale_value}}
+
+{{/each}}
+
+Financial Distribution
+1. Better Baseball — Wholesale Amount
+Total wholesale cost for all products sold today.
+- Amount Due to Better Baseball: ${{wholesale_total_sum}}
+- Send To: Better Baseball
+- Email: hligon@getsparqd.com
+
+2. SparQ Digital — Platform Fees
+SparQ Digital receives 1.5% of the cart total before taxes.
+- Total SparQ Digital Fees: ${{sd_fee_sum}}
+- Formula: sum((cart_total − taxes) × 0.015)
+
+3. EZ Sports — Net Payout
+Remaining amount after wholesale, BB shipping, SparQ Digital fees, and Stripe processing fees.
+- Total EZ Sports Net Payout: ${{ezs_payout_sum}}
+- Formula:
+  sum(cart_total − wholesale − bb_shipping − sparq_fee − stripe_processing_fee)

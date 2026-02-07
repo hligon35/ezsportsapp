@@ -1,0 +1,79 @@
+New Order Processed — EZ Sports
+Customer Information
+Name: Test Checkout
+Email: test-checkout+1770500502071@example.com
+Phone: (not provided)
+Shipping Address:
+Name: Test Checkout
+1 Peachtree St
+Atlanta, GA 30301
+US
+Order Details
+Order ID: 3024
+Order Date: February 7, 2026
+Payment Intent: pi_test_1770500502071
+Items Ordered
+Each item includes its selected variations (size, color, style, etc.).
+Pitcher's Pocket 9
+- SKU: PITCHERSPOCKET9
+- Quantity: 1
+- MAP Price: $349.95
+- Wholesale Price: —
+- BB Shipping: $50.00
+Variations:
+- Color: Black
+Bullet L Screen Baseball
+- SKU: BULLETL
+- Quantity: 2
+- MAP Price: $499.95 (line: $999.90)
+- Wholesale Price: $358.00 (line: $716.00)
+- BB Shipping: $100.00 (line: $200.00)
+Variations:
+- Size: Padded
+- Color: Black
+Screen Padding by the FT
+- SKU: Screen Component
+- Quantity: 1
+- MAP Price: $12.00
+- Wholesale Price: $8.00
+- BB Shipping: $100.00
+Variations:
+- Length: 8 ft
+- Color: Blue
+Custom Net 10' 0" x 12' 0" — #36 Nylon (Sewn Rope border)
+- SKU: custom-net-36-10x12-sewnrope
+- Quantity: 1
+- MAP Price: $199.95
+- Wholesale Price: —
+- BB Shipping: $25.00
+Variations:
+- Dimensions: 10' 0" x 12' 0"
+- Spec: #36 Nylon • Batting Cage | Sewn Rope
+Financial Breakdown
+Totals
+- Customer Paid (Cart Total): $1626.30
+- MAP Total: $1561.80
+- Wholesale Total: $724.00 (excludes items with unknown wholesale)
+- BB Shipping Amount: $375.00
+Payout Distribution
+1. Amount Owed to Better Baseball
+This is the total wholesale cost for the items ordered.
+- BB Wholesale Amount: $724.00 (partial)
+- Send To: Better Baseball
+- Email: hligon@getsparqd.com
+2. SparQ Digital Platform Fee
+SparQ Digital receives 1.5% of the cart total before taxes.
+- SparQ Digital Fee (1.5%): $24.39
+- Formula: $1626.30 × 0.015
+3. EZ Sports Net Payout
+This is the remaining amount after wholesale, BB shipping, SparQ Digital’s fee, and Stripe fees.
+- EZ Sports Net Payout: $502.91
+- Formula: $1626.30 − $724.00 − $375.00 − $24.39 − $0.00
+Metadata Logged
+- MAP Total: $1561.80
+- Wholesale Total: $724.00 (partial)
+- Amount Due to BB: $724.00 (partial)
+- BB Shipping Amount: $375.00
+- SparQ Digital Fee: $24.39
+- EZ Sports Net Payout: $502.91
+- Items JSON: [{"name":"Pitcher's Pocket 9","id":"PITCHERSPOCKET9","quantity":1,"mapUnit":349.95,"wholesaleUnit":null,"shippingUnit":50,"lineShippingTotal":50,"variations":{"Color":"Black"},"lineMapTotal":349.95,"lineWholesaleTotal":null},{"name":"Bullet L Screen Baseball","id":"BULLETL","quantity":2,"mapUnit":499.95,"wholesaleUnit":358,"shippingUnit":100,"lineShippingTotal":200,"variations":{"Size":"Padded","Color":"Black"},"lineMapTotal":999.9,"lineWholesaleTotal":716},{"name":"Screen Padding by the FT","id":"Screen Component","quantity":1,"mapUnit":12,"wholesaleUnit":8,"shippingUnit":100,"lineShippingTotal":100,"variations":{"Length":"8 ft","Color":"Blue"},"lineMapTotal":12,"lineWholesaleTotal":8},{"name":"Custom Net 10' 0\" x 12' 0\" — #36 Nylon (Sewn Rope border)","id":"custom-net-36-10x12-sewnrope","quantity":1,"mapUnit":199.95,"wholesaleUnit":null,"shippingUnit":25,"lineShippingTotal":25,"variations":{"Dimensions":"10' 0\" x 12' 0\"","Spec":"#36 Nylon • Batting Cage | Sewn Rope"},"lineMapTotal":199.95,"lineWholesaleTotal":null}]

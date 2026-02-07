@@ -12,8 +12,8 @@
         "subtotal": 399.95
       }
     ],
-    "total": 97136,
-    "status": "completed",
+    "total": 44995,
+    "status": "paid",
     "shippingAddress": {
       "name": "Demo User",
       "address1": "123 Main St",
@@ -23,11 +23,20 @@
       "country": "US"
     },
     "createdAt": "2025-01-15T10:30:00.000Z",
-    "updatedAt": "2026-02-07T07:42:57.816Z",
-    "subtotal": 83400,
+    "updatedAt": "2026-02-07T17:25:12.670Z",
+    "subtotal": 34995,
     "shipping": 10000,
     "discount": 0,
-    "tax": 3736
+    "tax": 0,
+    "paymentInfo": {
+      "intentId": "pi_test_1770485112574",
+      "latestChargeId": "ch_test_1770485112574",
+      "amount": 399.95,
+      "currency": "usd",
+      "method": "stripe",
+      "paidAt": "2026-02-07T17:25:12.668Z",
+      "customerEmailSentAt": "2026-02-07T16:59:02.569Z"
+    }
   },
   {
     "id": 3002,
@@ -49,7 +58,7 @@
         "subtotal": 89.99
       }
     ],
-    "total": 97136,
+    "total": 44995,
     "status": "paid",
     "shippingAddress": {
       "name": "Casey Hitter",
@@ -60,11 +69,11 @@
       "country": "US"
     },
     "createdAt": "2025-01-16T14:20:00.000Z",
-    "updatedAt": "2026-02-07T07:45:18.409Z",
-    "subtotal": 83400,
+    "updatedAt": "2026-02-07T17:04:09.919Z",
+    "subtotal": 34995,
     "shipping": 10000,
     "discount": 0,
-    "tax": 3736,
+    "tax": 0,
     "paymentInfo": {
       "intentId": "pi_test_1770450318373",
       "amount": 971.36,
@@ -90,7 +99,7 @@
         "subtotal": 399.95
       }
     ],
-    "total": 399.95,
+    "total": 44995,
     "status": "fulfilled",
     "shippingAddress": {
       "name": "Riley Catcher",
@@ -101,7 +110,11 @@
       "country": "US"
     },
     "createdAt": "2025-01-17T16:45:00.000Z",
-    "updatedAt": "2025-01-17T16:45:00.000Z"
+    "updatedAt": "2026-02-07T17:06:42.184Z",
+    "subtotal": 34995,
+    "shipping": 10000,
+    "discount": 0,
+    "tax": 0
   },
   {
     "userId": null,
@@ -115,8 +128,8 @@
         "subtotal": 834
       }
     ],
-    "total": 97136,
-    "status": "pending",
+    "total": 44995,
+    "status": "paid",
     "shippingAddress": {
       "address1": "123 Test St",
       "address2": "",
@@ -130,14 +143,20 @@
       "name": "Test Buyer"
     },
     "paymentInfo": {
-      "method": "stripe"
+      "intentId": "pi_test_1770485112574",
+      "latestChargeId": "ch_test_1770485112574",
+      "amount": 399.95,
+      "currency": "usd",
+      "method": "stripe",
+      "paidAt": "2026-02-07T17:25:12.668Z",
+      "customerEmailSentAt": "2026-02-07T16:59:02.569Z"
     },
-    "subtotal": 83400,
+    "subtotal": 34995,
     "shipping": 10000,
     "discount": 0,
-    "tax": 3736,
+    "tax": 0,
     "createdAt": "2026-02-07T07:42:57.318Z",
-    "updatedAt": "2026-02-07T07:42:57.816Z",
+    "updatedAt": "2026-02-07T17:25:12.670Z",
     "id": 3001
   },
   {
@@ -152,7 +171,7 @@
         "subtotal": 834
       }
     ],
-    "total": 97136,
+    "total": 44995,
     "status": "paid",
     "shippingAddress": {
       "address1": "123 Test St",
@@ -177,12 +196,12 @@
       "platformFeeBps": 150,
       "customerEmailSentAt": "2026-02-07T07:45:18.408Z"
     },
-    "subtotal": 83400,
+    "subtotal": 34995,
     "shipping": 10000,
     "discount": 0,
-    "tax": 3736,
+    "tax": 0,
     "createdAt": "2026-02-07T07:45:17.834Z",
-    "updatedAt": "2026-02-07T07:45:18.409Z",
+    "updatedAt": "2026-02-07T17:04:09.919Z",
     "id": 3002
   },
   {
@@ -197,7 +216,7 @@
         "subtotal": 834
       }
     ],
-    "total": 97136,
+    "total": 44995,
     "status": "pending",
     "shippingAddress": {
       "address1": "123 Test St",
@@ -214,12 +233,12 @@
     "paymentInfo": {
       "method": "stripe"
     },
-    "subtotal": 83400,
+    "subtotal": 34995,
     "shipping": 10000,
     "discount": 0,
-    "tax": 3736,
+    "tax": 0,
     "createdAt": "2026-02-07T07:46:04.610Z",
-    "updatedAt": "2026-02-07T07:46:04.610Z",
+    "updatedAt": "2026-02-07T17:06:42.184Z",
     "id": 3003
   },
   {
@@ -266,5 +285,1772 @@
     "createdAt": "2026-02-07T07:46:32.149Z",
     "updatedAt": "2026-02-07T07:47:15.984Z",
     "id": 3004
+  },
+  {
+    "userId": null,
+    "userEmail": "test-checkout+1770482218218@example.com",
+    "items": [
+      {
+        "productId": "PITCHERSPOCKET9",
+        "productName": "Pitcher's Pocket 9 - All Colors",
+        "price": 349.95,
+        "quantity": 1,
+        "subtotal": 349.95,
+        "ship": 50
+      }
+    ],
+    "total": 349.95,
+    "status": "paid",
+    "shippingAddress": {
+      "address1": "1 Peachtree St",
+      "address2": "",
+      "city": "Atlanta",
+      "state": "GA",
+      "postal": "30301",
+      "country": "US"
+    },
+    "customerInfo": {
+      "name": "Test Checkout",
+      "email": "test-checkout+1770482218218@example.com"
+    },
+    "paymentInfo": {
+      "method": "stripe",
+      "intentId": "pi_test_1770482218218",
+      "latestChargeId": "ch_test_1770482218218",
+      "amount": 399.95,
+      "currency": "usd",
+      "paidAt": "2026-02-07T16:36:58.348Z",
+      "customerEmailSentAt": "2026-02-07T16:36:58.366Z"
+    },
+    "subtotal": 349.95,
+    "shipping": 0,
+    "discount": 0,
+    "tax": 0,
+    "createdAt": "2026-02-07T16:36:58.312Z",
+    "updatedAt": "2026-02-07T16:36:58.368Z",
+    "id": 3005
+  },
+  {
+    "userId": null,
+    "userEmail": "test-checkout+1770483542462@example.com",
+    "items": [
+      {
+        "productId": "PITCHERSPOCKET9",
+        "productName": "Pitcher's Pocket 9 - All Colors",
+        "price": 349.95,
+        "quantity": 1,
+        "subtotal": 349.95,
+        "ship": 50
+      }
+    ],
+    "total": 44995,
+    "status": "paid",
+    "shippingAddress": {
+      "address1": "1 Peachtree St",
+      "address2": "",
+      "city": "Atlanta",
+      "state": "GA",
+      "postal": "30301",
+      "country": "US"
+    },
+    "customerInfo": {
+      "name": "Test Checkout",
+      "email": "test-checkout+1770483542462@example.com"
+    },
+    "paymentInfo": {
+      "intentId": "pi_test_1770485112574",
+      "latestChargeId": "ch_test_1770485112574",
+      "amount": 399.95,
+      "currency": "usd",
+      "method": "stripe",
+      "paidAt": "2026-02-07T17:25:12.668Z",
+      "customerEmailSentAt": "2026-02-07T16:59:02.569Z"
+    },
+    "subtotal": 34995,
+    "shipping": 10000,
+    "discount": 0,
+    "tax": 0,
+    "createdAt": "2026-02-07T16:59:02.525Z",
+    "updatedAt": "2026-02-07T17:25:12.670Z",
+    "id": 3001
+  },
+  {
+    "userId": null,
+    "items": [
+      {
+        "productId": "PITCHERSPOCKET9",
+        "productName": "Pitcher's Pocket 9 - All Colors",
+        "price": 349.95,
+        "quantity": 1,
+        "subtotal": 349.95
+      }
+    ],
+    "total": 44995,
+    "status": "paid",
+    "shippingAddress": {
+      "address1": "",
+      "address2": "",
+      "city": "",
+      "state": "",
+      "postal": "",
+      "country": "US"
+    },
+    "customerInfo": {
+      "name": "",
+      "email": ""
+    },
+    "paymentInfo": {
+      "intentId": "pi_test_1770485112574",
+      "latestChargeId": "ch_test_1770485112574",
+      "amount": 399.95,
+      "currency": "usd",
+      "method": "stripe",
+      "paidAt": "2026-02-07T17:25:12.668Z",
+      "customerEmailSentAt": "2026-02-07T16:59:02.569Z"
+    },
+    "subtotal": 34995,
+    "shipping": 10000,
+    "discount": 0,
+    "tax": 0,
+    "createdAt": "2026-02-07T16:59:47.354Z",
+    "updatedAt": "2026-02-07T17:25:12.670Z",
+    "id": 3001
+  },
+  {
+    "userId": null,
+    "items": [
+      {
+        "productId": "PITCHERSPOCKET9",
+        "productName": "Pitcher's Pocket 9 - All Colors",
+        "price": 349.95,
+        "quantity": 1,
+        "subtotal": 349.95
+      }
+    ],
+    "total": 44995,
+    "status": "paid",
+    "shippingAddress": {
+      "address1": "",
+      "address2": "",
+      "city": "",
+      "state": "",
+      "postal": "",
+      "country": "US"
+    },
+    "customerInfo": {
+      "name": "",
+      "email": ""
+    },
+    "paymentInfo": {
+      "intentId": "pi_test_1770485112574",
+      "latestChargeId": "ch_test_1770485112574",
+      "amount": 399.95,
+      "currency": "usd",
+      "method": "stripe",
+      "paidAt": "2026-02-07T17:25:12.668Z",
+      "customerEmailSentAt": "2026-02-07T16:59:02.569Z"
+    },
+    "subtotal": 34995,
+    "shipping": 10000,
+    "discount": 0,
+    "tax": 0,
+    "createdAt": "2026-02-07T16:59:47.538Z",
+    "updatedAt": "2026-02-07T17:25:12.670Z",
+    "id": 3001
+  },
+  {
+    "userId": null,
+    "items": [
+      {
+        "productId": "PITCHERSPOCKET9",
+        "productName": "Pitcher's Pocket 9 - All Colors",
+        "price": 349.95,
+        "quantity": 1,
+        "subtotal": 349.95
+      }
+    ],
+    "total": 44995,
+    "status": "paid",
+    "shippingAddress": {
+      "address1": "",
+      "address2": "",
+      "city": "",
+      "state": "",
+      "postal": "",
+      "country": "US"
+    },
+    "customerInfo": {
+      "name": "",
+      "email": ""
+    },
+    "paymentInfo": {
+      "intentId": "pi_test_1770485112574",
+      "latestChargeId": "ch_test_1770485112574",
+      "amount": 399.95,
+      "currency": "usd",
+      "method": "stripe",
+      "paidAt": "2026-02-07T17:25:12.668Z",
+      "customerEmailSentAt": "2026-02-07T16:59:02.569Z"
+    },
+    "subtotal": 34995,
+    "shipping": 10000,
+    "discount": 0,
+    "tax": 0,
+    "createdAt": "2026-02-07T17:01:53.794Z",
+    "updatedAt": "2026-02-07T17:25:12.670Z",
+    "id": 3001
+  },
+  {
+    "userId": null,
+    "items": [
+      {
+        "productId": "PITCHERSPOCKET9",
+        "productName": "Pitcher's Pocket 9 - All Colors",
+        "price": 349.95,
+        "quantity": 1,
+        "subtotal": 349.95
+      }
+    ],
+    "total": 44995,
+    "status": "paid",
+    "shippingAddress": {
+      "address1": "",
+      "address2": "",
+      "city": "",
+      "state": "",
+      "postal": "",
+      "country": "US"
+    },
+    "customerInfo": {
+      "name": "",
+      "email": ""
+    },
+    "paymentInfo": {
+      "intentId": "pi_test_1770485112574",
+      "latestChargeId": "ch_test_1770485112574",
+      "amount": 399.95,
+      "currency": "usd",
+      "method": "stripe",
+      "paidAt": "2026-02-07T17:25:12.668Z",
+      "customerEmailSentAt": "2026-02-07T16:59:02.569Z"
+    },
+    "subtotal": 34995,
+    "shipping": 10000,
+    "discount": 0,
+    "tax": 0,
+    "createdAt": "2026-02-07T17:01:54.299Z",
+    "updatedAt": "2026-02-07T17:25:12.670Z",
+    "id": 3001
+  },
+  {
+    "userId": null,
+    "items": [
+      {
+        "productId": "PITCHERSPOCKET9",
+        "productName": "Pitcher's Pocket 9 - All Colors",
+        "price": 349.95,
+        "quantity": 1,
+        "subtotal": 349.95
+      }
+    ],
+    "total": 44995,
+    "status": "paid",
+    "shippingAddress": {
+      "address1": "",
+      "address2": "",
+      "city": "",
+      "state": "",
+      "postal": "",
+      "country": "US"
+    },
+    "customerInfo": {
+      "name": "",
+      "email": ""
+    },
+    "paymentInfo": {
+      "intentId": "pi_test_1770485112574",
+      "latestChargeId": "ch_test_1770485112574",
+      "amount": 399.95,
+      "currency": "usd",
+      "method": "stripe",
+      "paidAt": "2026-02-07T17:25:12.668Z",
+      "customerEmailSentAt": "2026-02-07T16:59:02.569Z"
+    },
+    "subtotal": 34995,
+    "shipping": 10000,
+    "discount": 0,
+    "tax": 0,
+    "createdAt": "2026-02-07T17:04:08.538Z",
+    "updatedAt": "2026-02-07T17:25:12.670Z",
+    "id": 3001
+  },
+  {
+    "userId": null,
+    "items": [
+      {
+        "productId": "PITCHERSPOCKET9",
+        "productName": "Pitcher's Pocket 9 - All Colors",
+        "price": 349.95,
+        "quantity": 1,
+        "subtotal": 349.95
+      }
+    ],
+    "total": 44995,
+    "status": "pending",
+    "shippingAddress": {
+      "address1": "",
+      "address2": "",
+      "city": "",
+      "state": "",
+      "postal": "",
+      "country": "US"
+    },
+    "customerInfo": {
+      "name": "",
+      "email": ""
+    },
+    "paymentInfo": {
+      "method": "stripe"
+    },
+    "subtotal": 34995,
+    "shipping": 10000,
+    "discount": 0,
+    "tax": 0,
+    "createdAt": "2026-02-07T17:04:09.086Z",
+    "updatedAt": "2026-02-07T17:04:09.919Z",
+    "id": 3002
+  },
+  {
+    "userId": null,
+    "items": [
+      {
+        "productId": "PITCHERSPOCKET9",
+        "productName": "Pitcher's Pocket 9 - All Colors",
+        "price": 349.95,
+        "quantity": 1,
+        "subtotal": 349.95
+      }
+    ],
+    "total": 44995,
+    "status": "pending",
+    "shippingAddress": {
+      "address1": "",
+      "address2": "",
+      "city": "",
+      "state": "",
+      "postal": "",
+      "country": "US"
+    },
+    "customerInfo": {
+      "name": "",
+      "email": ""
+    },
+    "paymentInfo": {
+      "method": "stripe"
+    },
+    "subtotal": 34995,
+    "shipping": 10000,
+    "discount": 0,
+    "tax": 0,
+    "createdAt": "2026-02-07T17:06:41.024Z",
+    "updatedAt": "2026-02-07T17:06:42.184Z",
+    "id": 3003
+  },
+  {
+    "userId": null,
+    "items": [
+      {
+        "productId": "PITCHERSPOCKET9",
+        "productName": "Pitcher's Pocket 9 - All Colors",
+        "price": 349.95,
+        "quantity": 1,
+        "subtotal": 349.95
+      }
+    ],
+    "total": 44995,
+    "status": "paid",
+    "shippingAddress": {
+      "address1": "",
+      "address2": "",
+      "city": "",
+      "state": "",
+      "postal": "",
+      "country": "US"
+    },
+    "customerInfo": {
+      "name": "",
+      "email": ""
+    },
+    "paymentInfo": {
+      "intentId": "pi_test_1770485112574",
+      "latestChargeId": "ch_test_1770485112574",
+      "amount": 399.95,
+      "currency": "usd",
+      "method": "stripe",
+      "paidAt": "2026-02-07T17:25:12.668Z",
+      "customerEmailSentAt": "2026-02-07T16:59:02.569Z"
+    },
+    "subtotal": 34995,
+    "shipping": 10000,
+    "discount": 0,
+    "tax": 0,
+    "createdAt": "2026-02-07T17:06:41.694Z",
+    "updatedAt": "2026-02-07T17:25:12.670Z",
+    "id": 3001
+  },
+  {
+    "userId": null,
+    "items": [
+      {
+        "productId": "PITCHERSPOCKET9",
+        "productName": "Pitcher's Pocket 9 - All Colors",
+        "price": 349.95,
+        "quantity": 1,
+        "subtotal": 349.95
+      }
+    ],
+    "total": 44995,
+    "status": "paid",
+    "shippingAddress": {
+      "address1": "",
+      "address2": "",
+      "city": "",
+      "state": "",
+      "postal": "",
+      "country": "US"
+    },
+    "customerInfo": {
+      "name": "",
+      "email": ""
+    },
+    "paymentInfo": {
+      "intentId": "pi_test_1770485112574",
+      "latestChargeId": "ch_test_1770485112574",
+      "amount": 399.95,
+      "currency": "usd",
+      "method": "stripe",
+      "paidAt": "2026-02-07T17:25:12.668Z",
+      "customerEmailSentAt": "2026-02-07T16:59:02.569Z"
+    },
+    "subtotal": 34995,
+    "shipping": 10000,
+    "discount": 0,
+    "tax": 0,
+    "createdAt": "2026-02-07T17:08:13.311Z",
+    "updatedAt": "2026-02-07T17:25:12.670Z",
+    "id": 3001
+  },
+  {
+    "userId": null,
+    "items": [
+      {
+        "productId": "PITCHERSPOCKET9",
+        "productName": "Pitcher's Pocket 9 - All Colors",
+        "price": 349.95,
+        "quantity": 1,
+        "subtotal": 349.95
+      }
+    ],
+    "total": 44995,
+    "status": "paid",
+    "shippingAddress": {
+      "address1": "",
+      "address2": "",
+      "city": "",
+      "state": "",
+      "postal": "",
+      "country": "US"
+    },
+    "customerInfo": {
+      "name": "",
+      "email": ""
+    },
+    "paymentInfo": {
+      "intentId": "pi_test_1770485112574",
+      "latestChargeId": "ch_test_1770485112574",
+      "amount": 399.95,
+      "currency": "usd",
+      "method": "stripe",
+      "paidAt": "2026-02-07T17:25:12.668Z",
+      "customerEmailSentAt": "2026-02-07T16:59:02.569Z"
+    },
+    "subtotal": 34995,
+    "shipping": 10000,
+    "discount": 0,
+    "tax": 0,
+    "createdAt": "2026-02-07T17:08:14.135Z",
+    "updatedAt": "2026-02-07T17:25:12.670Z",
+    "id": 3001
+  },
+  {
+    "userId": null,
+    "userEmail": "browser+1770484509509@example.com",
+    "items": [
+      {
+        "productId": "PITCHERSPOCKET9",
+        "productName": "Pitcher's Pocket 9 - All Colors",
+        "price": 349.95,
+        "quantity": 1,
+        "subtotal": 349.95,
+        "size": "",
+        "color": "",
+        "category": ""
+      }
+    ],
+    "total": 349.95,
+    "status": "paid",
+    "shippingAddress": {
+      "address1": "1 Peachtree St",
+      "address2": "",
+      "city": "Atlanta",
+      "state": "GA",
+      "postal": "30301",
+      "country": "US"
+    },
+    "customerInfo": {
+      "name": "Browser E2E",
+      "email": "browser+1770484509509@example.com"
+    },
+    "paymentInfo": {
+      "intentId": "pi_test_1770485112574",
+      "latestChargeId": "ch_test_1770485112574",
+      "amount": 399.95,
+      "currency": "usd",
+      "method": "stripe",
+      "paidAt": "2026-02-07T17:25:12.668Z",
+      "customerEmailSentAt": "2026-02-07T16:59:02.569Z"
+    },
+    "subtotal": 349.95,
+    "shipping": 0,
+    "discount": 0,
+    "tax": 0,
+    "createdAt": "2026-02-07T17:15:15.706Z",
+    "updatedAt": "2026-02-07T17:25:12.670Z",
+    "id": 3001
+  },
+  {
+    "userId": null,
+    "userEmail": "test-checkout+1770485112574@example.com",
+    "items": [
+      {
+        "productId": "PITCHERSPOCKET9",
+        "productName": "Pitcher's Pocket 9 - All Colors",
+        "price": 349.95,
+        "quantity": 1,
+        "subtotal": 349.95,
+        "ship": 50,
+        "size": "9 ft",
+        "color": "Black",
+        "category": "Training"
+      }
+    ],
+    "total": 349.95,
+    "status": "paid",
+    "shippingAddress": {
+      "address1": "1 Peachtree St",
+      "address2": "",
+      "city": "Atlanta",
+      "state": "GA",
+      "postal": "30301",
+      "country": "US"
+    },
+    "customerInfo": {
+      "name": "Test Checkout",
+      "email": "test-checkout+1770485112574@example.com"
+    },
+    "paymentInfo": {
+      "intentId": "pi_test_1770485112574",
+      "latestChargeId": "ch_test_1770485112574",
+      "amount": 399.95,
+      "currency": "usd",
+      "method": "stripe",
+      "paidAt": "2026-02-07T17:25:12.668Z",
+      "customerEmailSentAt": "2026-02-07T16:59:02.569Z"
+    },
+    "subtotal": 349.95,
+    "shipping": 0,
+    "discount": 0,
+    "tax": 0,
+    "createdAt": "2026-02-07T17:25:12.639Z",
+    "updatedAt": "2026-02-07T17:25:12.670Z",
+    "id": 3001
+  },
+  {
+    "userId": null,
+    "userEmail": "test-checkout+1770485214896@example.com",
+    "items": [
+      {
+        "productId": "PITCHERSPOCKET9",
+        "productName": "Pitcher's Pocket 9 - All Colors",
+        "price": 349.95,
+        "quantity": 1,
+        "subtotal": 349.95,
+        "ship": 50,
+        "size": "9 ft",
+        "color": "Black",
+        "category": "Training"
+      }
+    ],
+    "total": 349.95,
+    "status": "paid",
+    "shippingAddress": {
+      "address1": "1 Peachtree St",
+      "address2": "",
+      "city": "Atlanta",
+      "state": "GA",
+      "postal": "30301",
+      "country": "US"
+    },
+    "customerInfo": {
+      "name": "Test Checkout",
+      "email": "test-checkout+1770485214896@example.com"
+    },
+    "paymentInfo": {
+      "method": "stripe",
+      "intentId": "pi_test_1770485214896",
+      "latestChargeId": "ch_test_1770485214896",
+      "amount": 399.95,
+      "currency": "usd",
+      "paidAt": "2026-02-07T17:26:54.986Z",
+      "customerEmailSentAt": "2026-02-07T17:26:55.003Z"
+    },
+    "subtotal": 349.95,
+    "shipping": 0,
+    "discount": 0,
+    "tax": 0,
+    "createdAt": "2026-02-07T17:26:54.961Z",
+    "updatedAt": "2026-02-07T17:26:55.005Z",
+    "id": 3006
+  },
+  {
+    "userId": null,
+    "userEmail": "test-checkout+1770485998782@example.com",
+    "items": [
+      {
+        "productId": "PITCHERSPOCKET9",
+        "productName": "Pitcher's Pocket 9 - All Colors",
+        "price": 349.95,
+        "quantity": 1,
+        "subtotal": 349.95,
+        "ship": 50,
+        "size": "9 ft",
+        "color": "Black",
+        "category": "Training"
+      }
+    ],
+    "total": 349.95,
+    "status": "paid",
+    "shippingAddress": {
+      "address1": "1 Peachtree St",
+      "address2": "",
+      "city": "Atlanta",
+      "state": "GA",
+      "postal": "30301",
+      "country": "US"
+    },
+    "customerInfo": {
+      "name": "Test Checkout",
+      "email": "test-checkout+1770485998782@example.com"
+    },
+    "paymentInfo": {
+      "method": "stripe",
+      "intentId": "pi_test_1770485998782",
+      "latestChargeId": "ch_test_1770485998782",
+      "amount": 399.95,
+      "currency": "usd",
+      "paidAt": "2026-02-07T17:39:58.869Z",
+      "customerEmailSentAt": "2026-02-07T17:39:58.920Z"
+    },
+    "subtotal": 349.95,
+    "shipping": 0,
+    "discount": 0,
+    "tax": 0,
+    "createdAt": "2026-02-07T17:39:58.843Z",
+    "updatedAt": "2026-02-07T17:39:58.922Z",
+    "id": 3007
+  },
+  {
+    "userId": null,
+    "userEmail": "test-checkout+1770486198239@example.com",
+    "items": [
+      {
+        "productId": "PITCHERSPOCKET9",
+        "productName": "Pitcher's Pocket 9 - All Colors",
+        "price": 349.95,
+        "quantity": 1,
+        "subtotal": 349.95,
+        "ship": 50,
+        "size": "9 ft",
+        "color": "Black",
+        "category": "Training"
+      }
+    ],
+    "total": 399.95,
+    "status": "paid",
+    "shippingAddress": {
+      "address1": "1 Peachtree St",
+      "address2": "",
+      "city": "Atlanta",
+      "state": "GA",
+      "postal": "30301",
+      "country": "US"
+    },
+    "customerInfo": {
+      "name": "Test Checkout",
+      "email": "test-checkout+1770486198239@example.com"
+    },
+    "paymentInfo": {
+      "method": "stripe",
+      "intentId": "pi_test_1770486198239",
+      "latestChargeId": "ch_test_1770486198239",
+      "amount": 399.95,
+      "currency": "usd",
+      "paidAt": "2026-02-07T17:43:18.344Z",
+      "customerEmailSentAt": "2026-02-07T17:43:18.387Z"
+    },
+    "subtotal": 349.95,
+    "shipping": 50,
+    "discount": 0,
+    "tax": null,
+    "createdAt": "2026-02-07T17:43:18.314Z",
+    "updatedAt": "2026-02-07T17:43:18.389Z",
+    "id": 3008
+  },
+  {
+    "userId": null,
+    "userEmail": "test-checkout+1770486279787@example.com",
+    "items": [
+      {
+        "productId": "PITCHERSPOCKET9",
+        "productName": "Pitcher's Pocket 9 - All Colors",
+        "price": 349.95,
+        "quantity": 1,
+        "subtotal": 349.95,
+        "ship": 50,
+        "size": "9 ft",
+        "color": "Black",
+        "category": "Training"
+      }
+    ],
+    "total": 399.95,
+    "status": "paid",
+    "shippingAddress": {
+      "address1": "1 Peachtree St",
+      "address2": "",
+      "city": "Atlanta",
+      "state": "GA",
+      "postal": "30301",
+      "country": "US"
+    },
+    "customerInfo": {
+      "name": "Test Checkout",
+      "email": "test-checkout+1770486279787@example.com"
+    },
+    "paymentInfo": {
+      "method": "stripe",
+      "intentId": "pi_test_1770486279787",
+      "latestChargeId": "ch_test_1770486279787",
+      "amount": 399.95,
+      "currency": "usd",
+      "paidAt": "2026-02-07T17:44:39.893Z",
+      "customerEmailSentAt": "2026-02-07T17:44:39.935Z"
+    },
+    "subtotal": 349.95,
+    "shipping": 50,
+    "discount": 0,
+    "tax": 0,
+    "createdAt": "2026-02-07T17:44:39.856Z",
+    "updatedAt": "2026-02-07T17:44:39.937Z",
+    "id": 3009
+  },
+  {
+    "userId": null,
+    "userEmail": "test-checkout+1770486761052@example.com",
+    "items": [
+      {
+        "productId": "PITCHERSPOCKET9",
+        "productName": "Pitcher's Pocket 9 - All Colors",
+        "price": 349.95,
+        "quantity": 1,
+        "subtotal": 349.95,
+        "ship": 50,
+        "size": "9 ft",
+        "color": "Black",
+        "category": "Training"
+      }
+    ],
+    "total": 399.95,
+    "status": "paid",
+    "shippingAddress": {
+      "address1": "1 Peachtree St",
+      "address2": "",
+      "city": "Atlanta",
+      "state": "GA",
+      "postal": "30301",
+      "country": "US"
+    },
+    "customerInfo": {
+      "name": "Test Checkout",
+      "email": "test-checkout+1770486761052@example.com"
+    },
+    "paymentInfo": {
+      "method": "stripe",
+      "intentId": "pi_test_1770486761052",
+      "latestChargeId": "ch_test_1770486761052",
+      "amount": 399.95,
+      "currency": "usd",
+      "paidAt": "2026-02-07T17:52:41.177Z",
+      "customerEmailSentAt": "2026-02-07T17:52:41.232Z"
+    },
+    "subtotal": 349.95,
+    "shipping": 50,
+    "discount": 0,
+    "tax": 0,
+    "createdAt": "2026-02-07T17:52:41.134Z",
+    "updatedAt": "2026-02-07T17:52:41.236Z",
+    "id": 3010
+  },
+  {
+    "userId": null,
+    "userEmail": "test-checkout+1770486787143@example.com",
+    "items": [
+      {
+        "productId": "PITCHERSPOCKET9",
+        "productName": "Pitcher's Pocket 9 - All Colors",
+        "price": 349.95,
+        "quantity": 1,
+        "subtotal": 349.95,
+        "ship": 50,
+        "size": "9 ft",
+        "color": "Black",
+        "category": "Training"
+      }
+    ],
+    "total": 399.95,
+    "status": "paid",
+    "shippingAddress": {
+      "address1": "1 Peachtree St",
+      "address2": "",
+      "city": "Atlanta",
+      "state": "GA",
+      "postal": "30301",
+      "country": "US"
+    },
+    "customerInfo": {
+      "name": "Test Checkout",
+      "email": "test-checkout+1770486787143@example.com"
+    },
+    "paymentInfo": {
+      "method": "stripe",
+      "intentId": "pi_test_1770486787143",
+      "latestChargeId": "ch_test_1770486787143",
+      "amount": 399.95,
+      "currency": "usd",
+      "paidAt": "2026-02-07T17:53:07.249Z",
+      "customerEmailSentAt": "2026-02-07T17:53:07.296Z"
+    },
+    "subtotal": 349.95,
+    "shipping": 50,
+    "discount": 0,
+    "tax": 0,
+    "createdAt": "2026-02-07T17:53:07.218Z",
+    "updatedAt": "2026-02-07T17:53:07.297Z",
+    "id": 3011
+  },
+  {
+    "userId": null,
+    "userEmail": "test-checkout+1770489673333@example.com",
+    "items": [
+      {
+        "productId": "PITCHERSPOCKET9",
+        "productName": "Pitcher's Pocket 9",
+        "price": 349.95,
+        "quantity": 1,
+        "subtotal": 349.95,
+        "ship": 50,
+        "size": "9 ft",
+        "color": "Black",
+        "category": "Training"
+      }
+    ],
+    "total": 399.95,
+    "status": "paid",
+    "shippingAddress": {
+      "address1": "1 Peachtree St",
+      "address2": "",
+      "city": "Atlanta",
+      "state": "GA",
+      "postal": "30301",
+      "country": "US"
+    },
+    "customerInfo": {
+      "name": "Test Checkout",
+      "email": "test-checkout+1770489673333@example.com"
+    },
+    "paymentInfo": {
+      "method": "stripe",
+      "intentId": "pi_test_1770489673333",
+      "latestChargeId": "ch_test_1770489673333",
+      "amount": 399.95,
+      "currency": "usd",
+      "paidAt": "2026-02-07T18:41:13.462Z",
+      "customerEmailSentAt": "2026-02-07T18:41:13.514Z"
+    },
+    "subtotal": 349.95,
+    "shipping": 50,
+    "discount": 0,
+    "tax": 0,
+    "createdAt": "2026-02-07T18:41:13.425Z",
+    "updatedAt": "2026-02-07T18:41:13.515Z",
+    "id": 3012
+  },
+  {
+    "userId": null,
+    "userEmail": "test-checkout+1770491024565@example.com",
+    "items": [
+      {
+        "productId": "PITCHERSPOCKET9",
+        "productName": "Pitcher's Pocket 9",
+        "price": 349.95,
+        "quantity": 1,
+        "subtotal": 349.95,
+        "ship": 50,
+        "color": "Black",
+        "category": "Training"
+      }
+    ],
+    "total": 399.95,
+    "status": "paid",
+    "shippingAddress": {
+      "address1": "1 Peachtree St",
+      "address2": "",
+      "city": "Atlanta",
+      "state": "GA",
+      "postal": "30301",
+      "country": "US"
+    },
+    "customerInfo": {
+      "name": "Test Checkout",
+      "email": "test-checkout+1770491024565@example.com"
+    },
+    "paymentInfo": {
+      "method": "stripe",
+      "intentId": "pi_test_1770491024565",
+      "latestChargeId": "ch_test_1770491024565",
+      "amount": 399.95,
+      "currency": "usd",
+      "paidAt": "2026-02-07T19:03:44.661Z",
+      "customerEmailSentAt": "2026-02-07T19:03:44.706Z"
+    },
+    "subtotal": 349.95,
+    "shipping": 50,
+    "discount": 0,
+    "tax": 0,
+    "createdAt": "2026-02-07T19:03:44.632Z",
+    "updatedAt": "2026-02-07T19:03:44.707Z",
+    "id": 3013
+  },
+  {
+    "userId": null,
+    "userEmail": "test-checkout+1770493877684@example.com",
+    "items": [
+      {
+        "productId": "PITCHERSPOCKET9",
+        "productName": "Pitcher's Pocket 9",
+        "price": 349.95,
+        "quantity": 1,
+        "subtotal": 349.95,
+        "ship": 50,
+        "color": "Black",
+        "category": "Training"
+      },
+      {
+        "productId": "Screen Component",
+        "productName": "Screen Padding by the FT",
+        "price": 12,
+        "quantity": 1,
+        "subtotal": 12,
+        "size": "By the Foot: 8'",
+        "color": "Blue",
+        "category": "Accessories"
+      },
+      {
+        "productId": "custom-net-36-10x12-sewnrope",
+        "productName": "Custom Net 10' 0\" x 12' 0\" — #36 Nylon (Sewn Rope border)",
+        "price": 199.95,
+        "quantity": 1,
+        "subtotal": 199.95,
+        "ship": 25,
+        "size": "10' 0\" x 12' 0\"",
+        "color": "#36 Nylon • Batting Cage | Sewn Rope",
+        "category": "netting"
+      }
+    ],
+    "total": 636.9,
+    "status": "paid",
+    "shippingAddress": {
+      "address1": "1 Peachtree St",
+      "address2": "",
+      "city": "Atlanta",
+      "state": "GA",
+      "postal": "30301",
+      "country": "US"
+    },
+    "customerInfo": {
+      "name": "Test Checkout",
+      "email": "test-checkout+1770493877684@example.com"
+    },
+    "paymentInfo": {
+      "method": "stripe",
+      "intentId": "pi_test_1770493877684",
+      "latestChargeId": "ch_test_1770493877684",
+      "amount": 626.4,
+      "currency": "usd",
+      "paidAt": "2026-02-07T19:51:17.863Z",
+      "customerEmailSentAt": "2026-02-07T19:51:17.912Z"
+    },
+    "subtotal": 561.9,
+    "shipping": 75,
+    "discount": 0,
+    "tax": 0,
+    "createdAt": "2026-02-07T19:51:17.834Z",
+    "updatedAt": "2026-02-07T19:51:17.914Z",
+    "id": 3014
+  },
+  {
+    "userId": null,
+    "userEmail": "test-checkout+1770494135596@example.com",
+    "items": [
+      {
+        "productId": "PITCHERSPOCKET9",
+        "productName": "Pitcher's Pocket 9",
+        "price": 349.95,
+        "quantity": 1,
+        "subtotal": 349.95,
+        "ship": 50,
+        "color": "Black",
+        "category": "Training"
+      },
+      {
+        "productId": "Screen Component",
+        "productName": "Screen Padding by the FT",
+        "price": 12,
+        "quantity": 1,
+        "subtotal": 12,
+        "size": "By the Foot: 8'",
+        "color": "Blue",
+        "category": "Accessories"
+      },
+      {
+        "productId": "custom-net-36-10x12-sewnrope",
+        "productName": "Custom Net 10' 0\" x 12' 0\" — #36 Nylon (Sewn Rope border)",
+        "price": 199.95,
+        "quantity": 1,
+        "subtotal": 199.95,
+        "ship": 25,
+        "size": "10' 0\" x 12' 0\"",
+        "color": "#36 Nylon • Batting Cage | Sewn Rope",
+        "category": "netting"
+      }
+    ],
+    "total": 636.9,
+    "status": "paid",
+    "shippingAddress": {
+      "address1": "1 Peachtree St",
+      "address2": "",
+      "city": "Atlanta",
+      "state": "GA",
+      "postal": "30301",
+      "country": "US"
+    },
+    "customerInfo": {
+      "name": "Test Checkout",
+      "email": "test-checkout+1770494135596@example.com"
+    },
+    "paymentInfo": {
+      "method": "stripe",
+      "intentId": "pi_test_1770494135596",
+      "latestChargeId": "ch_test_1770494135596",
+      "amount": 626.4,
+      "currency": "usd",
+      "paidAt": "2026-02-07T19:55:35.775Z",
+      "customerEmailSentAt": "2026-02-07T19:55:35.816Z"
+    },
+    "subtotal": 561.9,
+    "shipping": 75,
+    "discount": 0,
+    "tax": 0,
+    "createdAt": "2026-02-07T19:55:35.745Z",
+    "updatedAt": "2026-02-07T19:55:35.818Z",
+    "id": 3015
+  },
+  {
+    "userId": null,
+    "userEmail": "test-checkout+1770495287498@example.com",
+    "items": [
+      {
+        "productId": "PITCHERSPOCKET9",
+        "productName": "Pitcher's Pocket 9",
+        "price": 349.95,
+        "quantity": 1,
+        "subtotal": 349.95,
+        "ship": 50,
+        "color": "Black",
+        "category": "Training"
+      },
+      {
+        "productId": "Screen Component",
+        "productName": "Screen Padding by the FT",
+        "price": 12,
+        "quantity": 1,
+        "subtotal": 12,
+        "size": "By the Foot: 8'",
+        "color": "Blue",
+        "category": "Accessories"
+      },
+      {
+        "productId": "custom-net-36-10x12-sewnrope",
+        "productName": "Custom Net 10' 0\" x 12' 0\" — #36 Nylon (Sewn Rope border)",
+        "price": 199.95,
+        "quantity": 1,
+        "subtotal": 199.95,
+        "ship": 25,
+        "size": "10' 0\" x 12' 0\"",
+        "color": "#36 Nylon • Batting Cage | Sewn Rope",
+        "category": "netting"
+      }
+    ],
+    "total": 636.9,
+    "status": "paid",
+    "shippingAddress": {
+      "address1": "1 Peachtree St",
+      "address2": "",
+      "city": "Atlanta",
+      "state": "GA",
+      "postal": "30301",
+      "country": "US"
+    },
+    "customerInfo": {
+      "name": "Test Checkout",
+      "email": "test-checkout+1770495287498@example.com"
+    },
+    "paymentInfo": {
+      "method": "stripe",
+      "intentId": "pi_test_1770495287498",
+      "latestChargeId": "ch_test_1770495287498",
+      "amount": 626.4,
+      "currency": "usd",
+      "paidAt": "2026-02-07T20:14:47.693Z",
+      "customerEmailSentAt": "2026-02-07T20:14:47.740Z"
+    },
+    "subtotal": 561.9,
+    "shipping": 75,
+    "discount": 0,
+    "tax": 0,
+    "createdAt": "2026-02-07T20:14:47.660Z",
+    "updatedAt": "2026-02-07T20:14:47.742Z",
+    "id": 3016
+  },
+  {
+    "userId": null,
+    "userEmail": "test-checkout+1770495327794@example.com",
+    "items": [
+      {
+        "productId": "PITCHERSPOCKET9",
+        "productName": "Pitcher's Pocket 9",
+        "price": 349.95,
+        "quantity": 1,
+        "subtotal": 349.95,
+        "ship": 50,
+        "color": "Black",
+        "category": "Training"
+      },
+      {
+        "productId": "Screen Component",
+        "productName": "Screen Padding by the FT",
+        "price": 12,
+        "quantity": 1,
+        "subtotal": 12,
+        "size": "By the Foot: 8'",
+        "color": "Blue",
+        "category": "Accessories"
+      },
+      {
+        "productId": "custom-net-36-10x12-sewnrope",
+        "productName": "Custom Net 10' 0\" x 12' 0\" — #36 Nylon (Sewn Rope border)",
+        "price": 199.95,
+        "quantity": 1,
+        "subtotal": 199.95,
+        "ship": 25,
+        "size": "10' 0\" x 12' 0\"",
+        "color": "#36 Nylon • Batting Cage | Sewn Rope",
+        "category": "netting"
+      }
+    ],
+    "total": 636.9,
+    "status": "paid",
+    "shippingAddress": {
+      "address1": "1 Peachtree St",
+      "address2": "",
+      "city": "Atlanta",
+      "state": "GA",
+      "postal": "30301",
+      "country": "US"
+    },
+    "customerInfo": {
+      "name": "Test Checkout",
+      "email": "test-checkout+1770495327794@example.com"
+    },
+    "paymentInfo": {
+      "method": "stripe",
+      "intentId": "pi_test_1770495327794",
+      "latestChargeId": "ch_test_1770495327794",
+      "amount": 626.4,
+      "currency": "usd",
+      "paidAt": "2026-02-07T20:15:27.965Z",
+      "customerEmailSentAt": "2026-02-07T20:15:28.013Z"
+    },
+    "subtotal": 561.9,
+    "shipping": 75,
+    "discount": 0,
+    "tax": 0,
+    "createdAt": "2026-02-07T20:15:27.930Z",
+    "updatedAt": "2026-02-07T20:15:28.014Z",
+    "id": 3017
+  },
+  {
+    "userId": null,
+    "userEmail": "test-checkout+1770495353644@example.com",
+    "items": [
+      {
+        "productId": "PITCHERSPOCKET9",
+        "productName": "Pitcher's Pocket 9",
+        "price": 349.95,
+        "quantity": 1,
+        "subtotal": 349.95,
+        "ship": 50,
+        "color": "Black",
+        "category": "Training"
+      },
+      {
+        "productId": "Screen Component",
+        "productName": "Screen Padding by the FT",
+        "price": 12,
+        "quantity": 1,
+        "subtotal": 12,
+        "size": "By the Foot: 8'",
+        "color": "Blue",
+        "category": "Accessories"
+      },
+      {
+        "productId": "custom-net-36-10x12-sewnrope",
+        "productName": "Custom Net 10' 0\" x 12' 0\" — #36 Nylon (Sewn Rope border)",
+        "price": 199.95,
+        "quantity": 1,
+        "subtotal": 199.95,
+        "ship": 25,
+        "size": "10' 0\" x 12' 0\"",
+        "color": "#36 Nylon • Batting Cage | Sewn Rope",
+        "category": "netting"
+      }
+    ],
+    "total": 636.9,
+    "status": "paid",
+    "shippingAddress": {
+      "address1": "1 Peachtree St",
+      "address2": "",
+      "city": "Atlanta",
+      "state": "GA",
+      "postal": "30301",
+      "country": "US"
+    },
+    "customerInfo": {
+      "name": "Test Checkout",
+      "email": "test-checkout+1770495353644@example.com"
+    },
+    "paymentInfo": {
+      "method": "stripe",
+      "intentId": "pi_test_1770495353644",
+      "latestChargeId": "ch_test_1770495353644",
+      "amount": 626.4,
+      "currency": "usd",
+      "paidAt": "2026-02-07T20:15:53.815Z",
+      "customerEmailSentAt": "2026-02-07T20:15:53.863Z",
+      "internalOrderEmailSentAt": "2026-02-07T20:15:53.995Z"
+    },
+    "subtotal": 561.9,
+    "shipping": 75,
+    "discount": 0,
+    "tax": 0,
+    "createdAt": "2026-02-07T20:15:53.783Z",
+    "updatedAt": "2026-02-07T20:15:53.997Z",
+    "id": 3018
+  },
+  {
+    "userId": null,
+    "userEmail": "test-checkout+1770496294506@example.com",
+    "items": [
+      {
+        "productId": "PITCHERSPOCKET9",
+        "productName": "Pitcher's Pocket 9",
+        "price": 349.95,
+        "quantity": 1,
+        "subtotal": 349.95,
+        "ship": 50,
+        "color": "Black",
+        "category": "Training"
+      },
+      {
+        "productId": "Screen Component",
+        "productName": "Screen Padding by the FT",
+        "price": 12,
+        "quantity": 1,
+        "subtotal": 12,
+        "size": "By the Foot: 8'",
+        "color": "Blue",
+        "category": "Accessories"
+      },
+      {
+        "productId": "custom-net-36-10x12-sewnrope",
+        "productName": "Custom Net 10' 0\" x 12' 0\" — #36 Nylon (Sewn Rope border)",
+        "price": 199.95,
+        "quantity": 1,
+        "subtotal": 199.95,
+        "ship": 25,
+        "size": "10' 0\" x 12' 0\"",
+        "color": "#36 Nylon • Batting Cage | Sewn Rope",
+        "category": "netting"
+      }
+    ],
+    "total": 636.9,
+    "status": "paid",
+    "shippingAddress": {
+      "address1": "1 Peachtree St",
+      "address2": "",
+      "city": "Atlanta",
+      "state": "GA",
+      "postal": "30301",
+      "country": "US"
+    },
+    "customerInfo": {
+      "name": "Test Checkout",
+      "email": "test-checkout+1770496294506@example.com"
+    },
+    "paymentInfo": {
+      "method": "stripe",
+      "intentId": "pi_test_1770496294506",
+      "latestChargeId": "ch_test_1770496294506",
+      "amount": 626.4,
+      "currency": "usd",
+      "paidAt": "2026-02-07T20:31:34.731Z",
+      "customerEmailSentAt": "2026-02-07T20:31:34.791Z",
+      "internalOrderEmailSentAt": "2026-02-07T20:31:34.930Z"
+    },
+    "subtotal": 561.9,
+    "shipping": 75,
+    "discount": 0,
+    "tax": 0,
+    "createdAt": "2026-02-07T20:31:34.698Z",
+    "updatedAt": "2026-02-07T20:31:34.931Z",
+    "id": 3019
+  },
+  {
+    "userId": null,
+    "userEmail": "test-checkout+1770496328181@example.com",
+    "items": [
+      {
+        "productId": "PITCHERSPOCKET9",
+        "productName": "Pitcher's Pocket 9",
+        "price": 349.95,
+        "quantity": 1,
+        "subtotal": 349.95,
+        "ship": 50,
+        "color": "Black",
+        "category": "Training"
+      },
+      {
+        "productId": "BULLETL",
+        "productName": "Bullet L Screen Baseball",
+        "price": 399.95,
+        "quantity": 2,
+        "subtotal": 799.9,
+        "size": "Padded",
+        "color": "Black",
+        "category": "Training"
+      },
+      {
+        "productId": "Screen Component",
+        "productName": "Screen Padding by the FT",
+        "price": 12,
+        "quantity": 1,
+        "subtotal": 12,
+        "size": "By the Foot: 8'",
+        "color": "Blue",
+        "category": "Accessories"
+      },
+      {
+        "productId": "custom-net-36-10x12-sewnrope",
+        "productName": "Custom Net 10' 0\" x 12' 0\" — #36 Nylon (Sewn Rope border)",
+        "price": 199.95,
+        "quantity": 1,
+        "subtotal": 199.95,
+        "ship": 25,
+        "size": "10' 0\" x 12' 0\"",
+        "color": "#36 Nylon • Batting Cage | Sewn Rope",
+        "category": "netting"
+      }
+    ],
+    "total": 1436.8,
+    "status": "paid",
+    "shippingAddress": {
+      "address1": "1 Peachtree St",
+      "address2": "",
+      "city": "Atlanta",
+      "state": "GA",
+      "postal": "30301",
+      "country": "US"
+    },
+    "customerInfo": {
+      "name": "Test Checkout",
+      "email": "test-checkout+1770496328181@example.com"
+    },
+    "paymentInfo": {
+      "method": "stripe",
+      "intentId": "pi_test_1770496328181",
+      "latestChargeId": "ch_test_1770496328181",
+      "amount": 1626.3,
+      "currency": "usd",
+      "paidAt": "2026-02-07T20:32:08.393Z",
+      "customerEmailSentAt": "2026-02-07T20:32:08.446Z",
+      "internalOrderEmailSentAt": "2026-02-07T20:32:08.611Z"
+    },
+    "subtotal": 1361.8,
+    "shipping": 75,
+    "discount": 0,
+    "tax": 0,
+    "createdAt": "2026-02-07T20:32:08.361Z",
+    "updatedAt": "2026-02-07T20:32:08.613Z",
+    "id": 3020
+  },
+  {
+    "userId": null,
+    "userEmail": "test-checkout+1770497379346@example.com",
+    "items": [
+      {
+        "productId": "PITCHERSPOCKET9",
+        "productName": "Pitcher's Pocket 9",
+        "price": 349.95,
+        "quantity": 1,
+        "subtotal": 349.95,
+        "ship": 50,
+        "color": "Black",
+        "category": "Training"
+      },
+      {
+        "productId": "BULLETL",
+        "productName": "Bullet L Screen Baseball",
+        "price": 399.95,
+        "quantity": 2,
+        "subtotal": 799.9,
+        "size": "Padded",
+        "color": "Black",
+        "category": "Training"
+      },
+      {
+        "productId": "Screen Component",
+        "productName": "Screen Padding by the FT",
+        "price": 12,
+        "quantity": 1,
+        "subtotal": 12,
+        "size": "By the Foot: 8'",
+        "color": "Blue",
+        "category": "Accessories"
+      },
+      {
+        "productId": "custom-net-36-10x12-sewnrope",
+        "productName": "Custom Net 10' 0\" x 12' 0\" — #36 Nylon (Sewn Rope border)",
+        "price": 199.95,
+        "quantity": 1,
+        "subtotal": 199.95,
+        "ship": 25,
+        "size": "10' 0\" x 12' 0\"",
+        "color": "#36 Nylon • Batting Cage | Sewn Rope",
+        "category": "netting"
+      }
+    ],
+    "total": 1436.8,
+    "status": "paid",
+    "shippingAddress": {
+      "address1": "1 Peachtree St",
+      "address2": "",
+      "city": "Atlanta",
+      "state": "GA",
+      "postal": "30301",
+      "country": "US"
+    },
+    "customerInfo": {
+      "name": "Test Checkout",
+      "email": "test-checkout+1770497379346@example.com"
+    },
+    "paymentInfo": {
+      "method": "stripe",
+      "intentId": "pi_test_1770497379346",
+      "latestChargeId": "ch_test_1770497379346",
+      "amount": 1626.3,
+      "currency": "usd",
+      "paidAt": "2026-02-07T20:49:39.627Z",
+      "customerEmailSentAt": "2026-02-07T20:49:39.678Z",
+      "internalOrderEmailSentAt": "2026-02-07T20:49:39.857Z"
+    },
+    "subtotal": 1361.8,
+    "shipping": 75,
+    "discount": 0,
+    "tax": 0,
+    "createdAt": "2026-02-07T20:49:39.591Z",
+    "updatedAt": "2026-02-07T20:49:39.858Z",
+    "id": 3021
+  },
+  {
+    "userId": null,
+    "userEmail": "test-checkout+1770498074849@example.com",
+    "items": [
+      {
+        "productId": "PITCHERSPOCKET9",
+        "productName": "Pitcher's Pocket 9",
+        "price": 349.95,
+        "quantity": 1,
+        "subtotal": 349.95,
+        "ship": 50,
+        "color": "Black",
+        "category": "Training"
+      },
+      {
+        "productId": "BULLETL",
+        "productName": "Bullet L Screen Baseball",
+        "price": 499.95,
+        "quantity": 2,
+        "subtotal": 999.9,
+        "size": "Padded",
+        "option": "Padded",
+        "color": "Black",
+        "category": "Training"
+      },
+      {
+        "productId": "Screen Component",
+        "productName": "Screen Padding by the FT",
+        "price": 12,
+        "quantity": 1,
+        "subtotal": 12,
+        "size": "By the Foot: 8'",
+        "option": "By the Foot: 8'",
+        "color": "Blue",
+        "category": "Accessories"
+      },
+      {
+        "productId": "custom-net-36-10x12-sewnrope",
+        "productName": "Custom Net 10' 0\" x 12' 0\" — #36 Nylon (Sewn Rope border)",
+        "price": 199.95,
+        "quantity": 1,
+        "subtotal": 199.95,
+        "ship": 25,
+        "size": "10' 0\" x 12' 0\"",
+        "option": "10' 0\" x 12' 0\"",
+        "color": "#36 Nylon • Batting Cage | Sewn Rope",
+        "category": "netting"
+      }
+    ],
+    "total": 1636.8,
+    "status": "paid",
+    "shippingAddress": {
+      "address1": "1 Peachtree St",
+      "address2": "",
+      "city": "Atlanta",
+      "state": "GA",
+      "postal": "30301",
+      "country": "US"
+    },
+    "customerInfo": {
+      "name": "Test Checkout",
+      "email": "test-checkout+1770498074849@example.com"
+    },
+    "paymentInfo": {
+      "method": "stripe",
+      "intentId": "pi_test_1770498074849",
+      "latestChargeId": "ch_test_1770498074849",
+      "amount": 1626.3,
+      "currency": "usd",
+      "paidAt": "2026-02-07T21:01:15.212Z",
+      "customerEmailSentAt": "2026-02-07T21:01:15.291Z",
+      "internalOrderEmailSentAt": "2026-02-07T21:01:15.482Z"
+    },
+    "subtotal": 1561.8,
+    "shipping": 75,
+    "discount": 0,
+    "tax": 0,
+    "createdAt": "2026-02-07T21:01:15.149Z",
+    "updatedAt": "2026-02-07T21:01:15.483Z",
+    "id": 3022
+  },
+  {
+    "userId": null,
+    "userEmail": "test-checkout+1770500114577@example.com",
+    "items": [
+      {
+        "productId": "PITCHERSPOCKET9",
+        "productName": "Pitcher's Pocket 9",
+        "price": 349.95,
+        "quantity": 1,
+        "subtotal": 349.95,
+        "ship": 50,
+        "color": "Black",
+        "category": "Training"
+      },
+      {
+        "productId": "BULLETL",
+        "productName": "Bullet L Screen Baseball",
+        "price": 499.95,
+        "quantity": 2,
+        "subtotal": 999.9,
+        "size": "Padded",
+        "option": "Padded",
+        "color": "Black",
+        "category": "Training"
+      },
+      {
+        "productId": "Screen Component",
+        "productName": "Screen Padding by the FT",
+        "price": 12,
+        "quantity": 1,
+        "subtotal": 12,
+        "size": "By the Foot: 8'",
+        "option": "By the Foot: 8'",
+        "color": "Blue",
+        "category": "Accessories"
+      },
+      {
+        "productId": "custom-net-36-10x12-sewnrope",
+        "productName": "Custom Net 10' 0\" x 12' 0\" — #36 Nylon (Sewn Rope border)",
+        "price": 199.95,
+        "quantity": 1,
+        "subtotal": 199.95,
+        "ship": 25,
+        "size": "10' 0\" x 12' 0\"",
+        "option": "10' 0\" x 12' 0\"",
+        "color": "#36 Nylon • Batting Cage | Sewn Rope",
+        "category": "netting"
+      }
+    ],
+    "total": 1636.8,
+    "status": "paid",
+    "shippingAddress": {
+      "address1": "1 Peachtree St",
+      "address2": "",
+      "city": "Atlanta",
+      "state": "GA",
+      "postal": "30301",
+      "country": "US"
+    },
+    "customerInfo": {
+      "name": "Test Checkout",
+      "email": "test-checkout+1770500114577@example.com"
+    },
+    "paymentInfo": {
+      "method": "stripe",
+      "intentId": "pi_test_1770500114577",
+      "latestChargeId": "ch_test_1770500114577",
+      "amount": 1626.3,
+      "currency": "usd",
+      "paidAt": "2026-02-07T21:35:14.846Z",
+      "customerEmailSentAt": "2026-02-07T21:35:14.912Z",
+      "internalOrderEmailSentAt": "2026-02-07T21:35:15.177Z"
+    },
+    "subtotal": 1561.8,
+    "shipping": 75,
+    "discount": 0,
+    "tax": 0,
+    "createdAt": "2026-02-07T21:35:14.811Z",
+    "updatedAt": "2026-02-07T21:35:15.178Z",
+    "id": 3023
+  },
+  {
+    "userId": null,
+    "userEmail": "test-checkout+1770500502071@example.com",
+    "items": [
+      {
+        "productId": "PITCHERSPOCKET9",
+        "productName": "Pitcher's Pocket 9",
+        "price": 349.95,
+        "quantity": 1,
+        "subtotal": 349.95,
+        "ship": 50,
+        "color": "Black",
+        "category": "Training"
+      },
+      {
+        "productId": "BULLETL",
+        "productName": "Bullet L Screen Baseball",
+        "price": 499.95,
+        "quantity": 2,
+        "subtotal": 999.9,
+        "size": "Padded",
+        "option": "Padded",
+        "color": "Black",
+        "category": "Training"
+      },
+      {
+        "productId": "Screen Component",
+        "productName": "Screen Padding by the FT",
+        "price": 12,
+        "quantity": 1,
+        "subtotal": 12,
+        "size": "By the Foot: 8'",
+        "option": "By the Foot: 8'",
+        "color": "Blue",
+        "category": "Accessories"
+      },
+      {
+        "productId": "custom-net-36-10x12-sewnrope",
+        "productName": "Custom Net 10' 0\" x 12' 0\" — #36 Nylon (Sewn Rope border)",
+        "price": 199.95,
+        "quantity": 1,
+        "subtotal": 199.95,
+        "ship": 25,
+        "size": "10' 0\" x 12' 0\"",
+        "option": "10' 0\" x 12' 0\"",
+        "color": "#36 Nylon • Batting Cage | Sewn Rope",
+        "category": "netting"
+      }
+    ],
+    "total": 1636.8,
+    "status": "paid",
+    "shippingAddress": {
+      "address1": "1 Peachtree St",
+      "address2": "",
+      "city": "Atlanta",
+      "state": "GA",
+      "postal": "30301",
+      "country": "US"
+    },
+    "customerInfo": {
+      "name": "Test Checkout",
+      "email": "test-checkout+1770500502071@example.com"
+    },
+    "paymentInfo": {
+      "method": "stripe",
+      "intentId": "pi_test_1770500502071",
+      "latestChargeId": "ch_test_1770500502071",
+      "amount": 1626.3,
+      "currency": "usd",
+      "paidAt": "2026-02-07T21:41:42.297Z",
+      "customerEmailSentAt": "2026-02-07T21:41:42.353Z",
+      "internalOrderEmailSentAt": "2026-02-07T21:41:42.583Z"
+    },
+    "subtotal": 1561.8,
+    "shipping": 75,
+    "discount": 0,
+    "tax": 0,
+    "createdAt": "2026-02-07T21:41:42.262Z",
+    "updatedAt": "2026-02-07T21:41:42.587Z",
+    "id": 3024
   }
 ]

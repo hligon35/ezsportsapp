@@ -99,11 +99,30 @@ class DatabaseManager {
     const defaults = { users: 1000, products: 2000, orders: 3000, analytics: 1, subscribers: 1, coupons: 1, emails: 1, payouts: 1, errors: 1 };
     schema.metadata.autoIncrement[collection] = defaults[collection] || 1;
   }
-  const currentId = schema.metadata.autoIncrement[collection] || 0;
-  schema.metadata.autoIncrement[collection] = currentId + 1;
+  const stored = schema.metadata.autoIncrement[collection] || 0;
+
+  // Guard against counter resets/collisions by considering existing records.
+  // This is important in environments where schema.json may be recreated/trimmed.
+  let maxExisting = 0;
+  if (collection !== 'schema' && collection !== 'products') {
+    try {
+      const existing = await this.read(collection);
+      if (Array.isArray(existing) && existing.length) {
+        for (const rec of existing) {
+          const idNum = Number(rec?.id);
+          if (Number.isFinite(idNum)) maxExisting = Math.max(maxExisting, idNum);
+        }
+      }
+    } catch {
+      // ignore
+    }
+  }
+
+  const nextId = Math.max(stored, maxExisting) + 1;
+  schema.metadata.autoIncrement[collection] = nextId;
   const filePath = path.join(this.dbPath, this.collections.schema);
   await fs.writeFile(filePath, JSON.stringify(schema, null, 2), 'utf8');
-      return currentId + 1;
+      return nextId;
     } catch (error) {
       throw error;
     }

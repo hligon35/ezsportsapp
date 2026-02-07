@@ -3161,8 +3161,6 @@ ensureHomeFirst() {
           if (lid === 'armorbasket' || /armor\s*(baseball)?\s*cart|armor\s*basket/.test(lt)) return true;
           // Do not show dots for Vinyl Top by the FT (VINYL* SKUs)
           if (/^vinyl/.test(lid) || /vinyl\s*top/.test(lt)) return true;
-          // Do not show dots for Screen Padding by the FT (Screen Component SKU)
-          if (/screen\s*padding/.test(lt)) return true;
         } catch {}
         return false;
       })();
@@ -3418,6 +3416,14 @@ ensureHomeFirst() {
         const fixed = ['black','columbiablue','darkgreen','maroon','navy','orange','purple','red','royal','yellow']
           .map(c => ({ name: c, class: c, image: hero }));
         return fixed;
+      }
+
+      const looksLikeScreenPadding = (/screen\s*padding/.test(tish)) || (pidish === 'screen component');
+      if (looksLikeScreenPadding) {
+        const hero = (Array.isArray(sources) && sources[0]) || product.img || 'assets/prodImgs/Accessories/Padding/padding.png';
+        // Standard 11-color palette used across team-color products
+        return ['black','columbiablue','darkgreen','green','maroon','navy','orange','purple','red','royal','yellow']
+          .map(c => ({ name: c, class: c, image: hero }));
       }
     } catch {}
     if (!sources.length) return [];

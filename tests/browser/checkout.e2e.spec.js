@@ -14,18 +14,16 @@ async function startServer() {
   if (fs.existsSync(envPath)) {
     dotenv.config({ path: envPath, override: true });
   }
-  const disableStripe = String(process.env.PLAYWRIGHT_DISABLE_STRIPE || '').toLowerCase() === 'true';
   const env = {
     ...process.env,
     PORT: process.env.PLAYWRIGHT_PORT || '5050',
     NODE_ENV: 'test',
   };
-  if (disableStripe || !process.env.STRIPE_SECRET_KEY) {
-    // Explicitly disable Stripe or if no key provided, enable test checkout fallback
-    env.STRIPE_SECRET_KEY = '';
-    env.STRIPE_PUBLISHABLE_KEY = '';
-    env.ALLOW_TEST_CHECKOUT = 'true';
-  }
+  // Force Stripe off for this suite to avoid external dependencies / flakiness.
+  // This ensures the UI goes through the "Place Order" test-checkout path.
+  env.STRIPE_SECRET_KEY = '';
+  env.STRIPE_PUBLISHABLE_KEY = '';
+  env.ALLOW_TEST_CHECKOUT = 'true';
   child = spawn(process.execPath, ['server/index.js'], {
     cwd: path.join(__dirname, '..', '..'),
     env,
@@ -126,5 +124,8 @@ test.describe('Checkout flow (browser, test mode)', () => {
     await expect(page.locator('#order-id')).not.toHaveText('—');
     await expect(page.locator('#total')).toContainText('$');
     await expect(page.locator('#lines li')).toHaveCount(1);
+
+    // Capture a screenshot artifact for quickly validating receipt layout
+    await page.screenshot({ path: 'test-results/checkout-confirmation.png', fullPage: true });
   });
 });

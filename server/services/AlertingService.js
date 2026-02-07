@@ -23,6 +23,7 @@ class AlertingService {
     this.email = new EmailService();
 
     this.alertTo = (process.env.ALERT_EMAIL_TO || 'hligon@getsparqd.com').trim();
+    this.reportTo = (process.env.REPORT_EMAIL_TO || 'info@getsparqd.com').trim();
     this.alertFrom = (process.env.ALERT_EMAIL_FROM || process.env.MAIL_FROM || '').trim() || undefined;
     this.alertEnabled = String(process.env.ALERT_EMAIL_ENABLED || 'true').toLowerCase() === 'true';
 
@@ -98,13 +99,27 @@ class AlertingService {
   }
 
   async sendDailyReport({ subject, html, text }) {
-    if (!this.alertEnabled || !this.alertTo) return { ok: false, skipped: true };
+    // Reports go to the reporting inbox (not the error-alert inbox)
+    if (!this.alertEnabled || !this.reportTo) return { ok: false, skipped: true };
     const out = await this.email.queue({
-      to: this.alertTo,
+      to: this.reportTo,
       subject: safeStr(subject || 'EZSports Daily Activity Report', 160),
       html: html || '<p>(no report)</p>',
       text: text || 'no report',
       tags: ['report', 'daily'],
+      from: this.alertFrom
+    });
+    return { ok: true, email: out };
+  }
+
+  async sendReport({ subject, html, text, tags = ['report'] }) {
+    if (!this.alertEnabled || !this.reportTo) return { ok: false, skipped: true };
+    const out = await this.email.queue({
+      to: this.reportTo,
+      subject: safeStr(subject || 'EZ Sports Report', 160),
+      html: html || '<p>(no report)</p>',
+      text: text || 'no report',
+      tags,
       from: this.alertFrom
     });
     return { ok: true, email: out };

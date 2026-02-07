@@ -1,0 +1,49 @@
+Subject: Weekly Payout Report — EZ Sports (EZS) — {{start_date}} to {{end_date}}
+To:
+- EZS Operations
+- SparQ Digital (SD)
+- Better Baseball Fulfillment — hligon@getsparqd.com
+
+Reporting Period
+From: {{start_date}} (Friday, 8:00 AM)
+To: {{end_date}} (Friday, 8:00 AM)
+
+⭐ Summary Overview
+- Total Orders: {{order_count}}
+- Total MAP Sold: ${{map_total_sum}}
+- Total Wholesale Cost: ${{wholesale_total_sum}}
+- Total SD Fees (1.5%): ${{sd_fee_sum}}
+- Total Stripe Processing Fees: ${{stripe_fee_sum}}
+- Total EZS Net Payout: ${{ezs_payout_sum}}
+- Total Amount Owed to Better Baseball: ${{wholesale_total_sum}}
+
+⭐ Product Sales Summary (Aggregated)
+This section shows the total quantity or footage sold per product across the entire week.
+{{#each product_summary}}
+{{this.product_name}}
+- Total Units Sold: {{this.total_units}}
+- Total Footage (if applicable): {{this.total_feet}}
+- Total MAP Value: ${{this.total_map_value}}
+- Total Wholesale Value: ${{this.total_wholesale_value}}
+
+{{/each}}
+
+⭐ Financial Distribution
+1. Better Baseball (BB) — Wholesale Amount
+Total wholesale cost for all products sold this week.
+- Amount Due to BB: ${{wholesale_total_sum}}
+- Send To: Better Baseball
+- Email: hligon@getsparqd.com
+
+2. SparQ Digital (SD) — Platform Fees
+SD receives 1.5% of the cart total before taxes.
+- Total SD Fees: ${{sd_fee_sum}}
+- Formula: sum(cart_total × 0.015)
+
+3. EZ Sports (EZS) — Net Payout
+Remaining amount after SD fees and Stripe processing fees.
+- Total EZS Payout: ${{ezs_payout_sum}}
+- Formula:
+sum(cart_total − sd_fee − stripe_processing_fee)
+
+
