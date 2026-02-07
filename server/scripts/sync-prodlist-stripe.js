@@ -9,18 +9,10 @@
  *
  * Notes:
  *  - prodList images are often relative paths (assets/img/...). Stripe requires public URLs for product images.
-
-const START = (() => {
-  const v = readArgValue('--start') ?? readArgValue('--offset');
-  if (!v) return 0;
-  const n = Number(v);
-  return Number.isFinite(n) && n >= 0 ? Math.floor(n) : 0;
-})();
-
  *    If PRODUCT_IMAGE_BASE_URL is set (e.g. https://yourdomain.com), relative paths will be converted.
  *
  * Usage:
- *  node server/scripts/sync-prodlist-stripe.js [--dry] [--limit=50]
+ *  node server/scripts/sync-prodlist-stripe.js [--dry] [--category=Accessories] [--start=0] [--limit=50]
  */
 
 require('dotenv').config();
@@ -46,10 +38,13 @@ const LIMIT = (() => {
   return Number.isFinite(n) && n > 0 ? Math.floor(n) : null;
 })();
 
-const SERVER_DIR = path.resolve(__dirname, '..');
-const REPO_ROOT = path.resolve(SERVER_DIR, '..');
+const START = (() => {
+  const v = readArgValue('--start') ?? readArgValue('--offset');
+  if (!v) return 0;
+  const n = Number(v);
+  return Number.isFinite(n) && n >= 0 ? Math.floor(n) : 0;
+})();
 
-// Load env from repo root, server/.env, and render/.env (if present)
 const CATEGORY_FILTER = (() => {
   const v = readArgValue('--category');
   if (!v) return null;
@@ -59,13 +54,15 @@ const CATEGORY_FILTER = (() => {
     .filter(Boolean);
   return parts.length ? new Set(parts) : null;
 })();
+
+const SERVER_DIR = path.resolve(__dirname, '..');
+const REPO_ROOT = path.resolve(SERVER_DIR, '..');
+
+// Load env from repo root, server/.env, and render/.env (if present)
 // (Later calls don't override existing vars unless dotenv is configured to.)
 try { require('dotenv').config({ path: path.join(REPO_ROOT, '.env') }); } catch {}
 try { require('dotenv').config({ path: path.join(SERVER_DIR, '.env') }); } catch {}
 try { require('dotenv').config({ path: path.join(REPO_ROOT, 'render', '.env') }); } catch {}
-
-  if (CATEGORY_FILTER) console.log('Category filter:', Array.from(CATEGORY_FILTER).join(', '));
-  if (START) console.log('Start offset:', START);
 const PROD_LIST_FILE = path.join(REPO_ROOT, 'assets', 'prodList.json');
 
 const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY || process.env.LIVE_STRIPE_SECRET_KEY;
@@ -74,7 +71,6 @@ if (!STRIPE_SECRET_KEY) {
   process.exit(1);
 }
 
-    if (CATEGORY_FILTER && !CATEGORY_FILTER.has(String(categoryName))) continue;
 let stripe;
 try {
   stripe = require('stripe')(STRIPE_SECRET_KEY);
@@ -353,6 +349,8 @@ async function main() {
   console.log('\n=== prodList -> Stripe Sync Starting ===');
   if (DRY_RUN) console.log('Running in DRY RUN mode – no Stripe mutations.');
   console.log('prodList:', PROD_LIST_FILE);
+  if (CATEGORY_FILTER) console.log('Category filter:', Array.from(CATEGORY_FILTER).join(', '));
+  if (START) console.log('Start offset:', START);
   const mode = STRIPE_SECRET_KEY.startsWith('sk_live_') ? 'LIVE' : (STRIPE_SECRET_KEY.startsWith('sk_test_') ? 'TEST' : 'UNKNOWN');
   console.log('Stripe key mode:', mode);
   const imgBase = baseUrlForImages();
@@ -373,6 +371,7 @@ async function main() {
   const warnings = [];
   let planned = [];
   for (const [categoryName, items] of Object.entries(categories)) {
+    if (CATEGORY_FILTER && !CATEGORY_FILTER.has(String(categoryName))) continue;
     if (!Array.isArray(items)) continue;
     for (const item of items) {
       const baseSku = (item?.sku || '').toString().trim();
@@ -436,7 +435,8 @@ async function main() {
     return true;
   });
 
-  if (LIMIT) planned = planned.slice(0, LIMIT);
+  const totalPlanned = planned.length;
+  planned = planned.slice(START, LIMIT ? (START + LIMIT) : undefined);
 
   // After we know what we're actually going to process, warn about image formats.
   for (const p of planned) {
@@ -444,7 +444,10 @@ async function main() {
       warnings.push(`No Stripe-compatible images for ${p.localId} (likely AVIF). Provide a JPG/PNG, or pass --allow-avif.`);
     }
   }
-  console.log(`Planned Stripe products: ${planned.length}${LIMIT ? ` (limited to ${LIMIT})` : ''}`);
+  const sliceLabel = LIMIT
+    ? `${START}..${START + planned.length - 1}`
+    : (START ? `${START}..${START + planned.length - 1}` : 'all');
+  console.log(`Planned Stripe products: ${planned.length} (from ${totalPlanned}; slice ${sliceLabel})`);
 
   let createdProducts = 0;
   let updatedProducts = 0;
