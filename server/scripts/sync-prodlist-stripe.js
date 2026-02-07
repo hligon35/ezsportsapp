@@ -74,18 +74,32 @@ const PROD_LIST_FILE = path.join(REPO_ROOT, 'assets', 'prodList.json');
 
 function pickStripeSecretKey() {
   if (STRIPE_MODE === 'test') {
-    return process.env.STRIPE_TEST_SECRET_KEY || process.env.TEST_STRIPE_SECRET_KEY || process.env.STRIPE_SECRET_KEY_TEST || null;
+    const explicit = process.env.STRIPE_TEST_SECRET_KEY || process.env.TEST_STRIPE_SECRET_KEY || process.env.STRIPE_SECRET_KEY_TEST || null;
+    if (explicit) return explicit;
+    const k = process.env.STRIPE_SECRET_KEY || null;
+    if (k && String(k).startsWith('sk_test_')) return k;
+    return null;
   }
   if (STRIPE_MODE === 'live') {
-    return process.env.STRIPE_SECRET_KEY || process.env.LIVE_STRIPE_SECRET_KEY;
+    const explicit = process.env.STRIPE_LIVE_SECRET_KEY || process.env.LIVE_STRIPE_SECRET_KEY || null;
+    if (explicit) return explicit;
+    const k = process.env.STRIPE_SECRET_KEY || null;
+    if (k && String(k).startsWith('sk_live_')) return k;
+    return null;
   }
   // Back-compat default
-  return process.env.STRIPE_SECRET_KEY || process.env.LIVE_STRIPE_SECRET_KEY;
+  return process.env.STRIPE_SECRET_KEY || process.env.STRIPE_LIVE_SECRET_KEY || process.env.LIVE_STRIPE_SECRET_KEY;
 }
 
 const STRIPE_SECRET_KEY = pickStripeSecretKey();
 if (!STRIPE_SECRET_KEY) {
-  console.error('Missing Stripe secret key. Set STRIPE_SECRET_KEY (live) and/or STRIPE_TEST_SECRET_KEY (test).');
+  if (STRIPE_MODE === 'test') {
+    console.error('Missing Stripe TEST secret key. Set STRIPE_TEST_SECRET_KEY or set STRIPE_SECRET_KEY to an sk_test_... value.');
+  } else if (STRIPE_MODE === 'live') {
+    console.error('Missing Stripe LIVE secret key. Set STRIPE_LIVE_SECRET_KEY/LIVE_STRIPE_SECRET_KEY or set STRIPE_SECRET_KEY to an sk_live_... value.');
+  } else {
+    console.error('Missing Stripe secret key. Set STRIPE_SECRET_KEY (or STRIPE_LIVE_SECRET_KEY/LIVE_STRIPE_SECRET_KEY).');
+  }
   process.exit(1);
 }
 
