@@ -15,11 +15,11 @@
     "createdAt": "2026-02-07T07:45:18.398Z",
     "retryCount": 0,
     "nextAttemptAt": "2026-02-07T07:45:18.397Z",
-    "updatedAt": "2026-02-07T07:49:26.227Z",
+    "updatedAt": "2026-02-07T07:49:41.915Z",
     "id": 3,
     "provider": "cloudflare-worker",
     "error": "Cloudflare email failed 401: Unauthorized",
-    "failedAt": "2026-02-07T07:49:26.226Z"
+    "failedAt": "2026-02-07T07:49:41.914Z"
   },
   {
     "to": "hligon@getsparqd.com",
@@ -36,11 +36,11 @@
     "createdAt": "2026-02-07T07:45:18.449Z",
     "retryCount": 0,
     "nextAttemptAt": "2026-02-07T07:45:18.448Z",
-    "updatedAt": "2026-02-07T07:49:26.267Z",
+    "updatedAt": "2026-02-07T07:49:41.978Z",
     "id": 4,
     "provider": "cloudflare-worker",
     "error": "Cloudflare email failed 401: Unauthorized",
-    "failedAt": "2026-02-07T07:49:26.266Z"
+    "failedAt": "2026-02-07T07:49:41.975Z"
   },
   {
     "to": "test-buyer+1770450435493@example.com",
@@ -59,11 +59,11 @@
     "createdAt": "2026-02-07T07:47:15.961Z",
     "retryCount": 0,
     "nextAttemptAt": "2026-02-07T07:47:15.961Z",
-    "updatedAt": "2026-02-07T07:49:26.302Z",
+    "updatedAt": "2026-02-07T07:49:42.025Z",
     "id": 5,
     "provider": "cloudflare-worker",
     "error": "Cloudflare email failed 401: Unauthorized",
-    "failedAt": "2026-02-07T07:49:26.301Z"
+    "failedAt": "2026-02-07T07:49:42.023Z"
   },
   {
     "to": "hligon@getsparqd.com",
@@ -82,10 +82,10 @@
     "createdAt": "2026-02-07T07:47:15.976Z",
     "retryCount": 0,
     "nextAttemptAt": "2026-02-07T07:47:15.975Z",
-    "updatedAt": "2026-02-07T07:49:26.342Z",
+    "updatedAt": "2026-02-07T07:49:42.072Z",
     "id": 6,
     "provider": "cloudflare-worker",
     "error": "Cloudflare email failed 401: Unauthorized",
-    "failedAt": "2026-02-07T07:49:26.338Z"
+    "failedAt": "2026-02-07T07:49:42.071Z"
   }
 ]
