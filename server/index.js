@@ -497,17 +497,22 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use(express.static(path.join(__dirname, '..')));
-
-// Static assets caching (1 year for immutable, 1 hour for html)
-app.use((req, res, next) => {
-  if (/\.(?:js|css|png|jpg|jpeg|svg|gif|webp|avif|ico)$/i.test(req.url)) {
-    res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
-  } else if (/\.(?:html)$/i.test(req.url)) {
-    res.setHeader('Cache-Control', 'public, max-age=3600');
+// Static file serving
+// IMPORTANT: Cache-Control must ONLY be applied to files that are actually served.
+// Setting long-lived caching headers on 404s can cause CDNs to cache missing assets for a year.
+const STATIC_ROOT = path.join(__dirname, '..');
+app.use(express.static(STATIC_ROOT, {
+  setHeaders: (res, filePath) => {
+    const p = String(filePath || '').toLowerCase();
+    if (/\.(?:js|css|png|jpg|jpeg|svg|gif|webp|avif|ico)$/i.test(p)) {
+      res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+      return;
+    }
+    if (/\.(?:html)$/i.test(p)) {
+      res.setHeader('Cache-Control', 'public, max-age=3600');
+    }
   }
-  next();
-});
+}));
 
 // Fallback static 404 logger for assets (after express.static)
 app.use((req, res, next) => {
