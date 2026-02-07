@@ -160,7 +160,10 @@ app.options('*', cors(corsOptions));
 app.use(helmet({
   contentSecurityPolicy: false, // Keep disabled for now to avoid breaking inline scripts/styles; tighten later
   crossOriginEmbedderPolicy: false,
-  crossOriginOpenerPolicy: false
+  crossOriginOpenerPolicy: false,
+  // Stripe Dashboard loads product images cross-origin; Helmet defaults this to same-origin,
+  // which prevents images from rendering even when the URL works directly.
+  crossOriginResourcePolicy: { policy: 'cross-origin' }
 }));
 // Add HSTS explicitly (works when behind proxy with trust proxy enabled)
 try {

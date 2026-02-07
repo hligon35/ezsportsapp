@@ -9,6 +9,14 @@
  *
  * Notes:
  *  - prodList images are often relative paths (assets/img/...). Stripe requires public URLs for product images.
+
+const START = (() => {
+  const v = readArgValue('--start') ?? readArgValue('--offset');
+  if (!v) return 0;
+  const n = Number(v);
+  return Number.isFinite(n) && n >= 0 ? Math.floor(n) : 0;
+})();
+
  *    If PRODUCT_IMAGE_BASE_URL is set (e.g. https://yourdomain.com), relative paths will be converted.
  *
  * Usage:
@@ -18,10 +26,12 @@
 require('dotenv').config();
 
 const fs = require('fs/promises');
+const fsSync = require('fs');
 const path = require('path');
 
 const args = process.argv.slice(2);
 const DRY_RUN = args.includes('--dry');
+const ALLOW_AVIF_IMAGES = args.includes('--allow-avif') || process.env.STRIPE_IMAGE_ALLOW_AVIF === '1';
 
 function readArgValue(prefix) {
   const hit = args.find(a => a.startsWith(prefix + '='));
@@ -40,11 +50,22 @@ const SERVER_DIR = path.resolve(__dirname, '..');
 const REPO_ROOT = path.resolve(SERVER_DIR, '..');
 
 // Load env from repo root, server/.env, and render/.env (if present)
+const CATEGORY_FILTER = (() => {
+  const v = readArgValue('--category');
+  if (!v) return null;
+  const parts = String(v)
+    .split(',')
+    .map(s => s.trim())
+    .filter(Boolean);
+  return parts.length ? new Set(parts) : null;
+})();
 // (Later calls don't override existing vars unless dotenv is configured to.)
 try { require('dotenv').config({ path: path.join(REPO_ROOT, '.env') }); } catch {}
 try { require('dotenv').config({ path: path.join(SERVER_DIR, '.env') }); } catch {}
 try { require('dotenv').config({ path: path.join(REPO_ROOT, 'render', '.env') }); } catch {}
 
+  if (CATEGORY_FILTER) console.log('Category filter:', Array.from(CATEGORY_FILTER).join(', '));
+  if (START) console.log('Start offset:', START);
 const PROD_LIST_FILE = path.join(REPO_ROOT, 'assets', 'prodList.json');
 
 const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY || process.env.LIVE_STRIPE_SECRET_KEY;
@@ -53,6 +74,7 @@ if (!STRIPE_SECRET_KEY) {
   process.exit(1);
 }
 
+    if (CATEGORY_FILTER && !CATEGORY_FILTER.has(String(categoryName))) continue;
 let stripe;
 try {
   stripe = require('stripe')(STRIPE_SECRET_KEY);
@@ -159,10 +181,55 @@ function baseUrlForImages() {
   return '';
 }
 
+function fileExtFromUrl(url) {
+  try {
+    const u = new URL(url);
+    const p = (u.pathname || '').toLowerCase();
+    const m = p.match(/\.([a-z0-9]+)$/i);
+    return m ? m[1] : '';
+  } catch {
+    const s = String(url || '').toLowerCase();
+    const m = s.match(/\.([a-z0-9]+)(\?.*)?$/i);
+    return m ? m[1] : '';
+  }
+}
+
+function isLikelyStripeSupportedImageUrl(url) {
+  // Stripe requires publicly accessible URLs. In practice, some modern formats (notably AVIF)
+  // often don't render in Stripe Dashboard even if the URL is valid.
+  const ext = fileExtFromUrl(url);
+  if (ext === 'avif') return !!ALLOW_AVIF_IMAGES;
+  return true;
+}
+
 function imageUrlFromProdList(img) {
   const raw = (img || '').toString().trim();
   if (!raw) return null;
   if (/^https?:\/\//i.test(raw)) return raw;
+
+  // If prodList points at an AVIF file, Stripe often won't render it.
+  // If a JPG/JPEG/PNG variant exists locally at the same path, use it.
+  const rawLower = raw.toLowerCase();
+  if (!ALLOW_AVIF_IMAGES && rawLower.endsWith('.avif') && rawLower.startsWith('assets/')) {
+    const tryExts = ['.jpg', '.jpeg', '.png'];
+    for (const ext of tryExts) {
+      const candidateRel = raw.slice(0, -'.avif'.length) + ext;
+      const candidateAbs = path.join(REPO_ROOT, candidateRel);
+      try {
+        if (fsSync.existsSync(candidateAbs)) {
+          const base = baseUrlForImages();
+          if (!base) return null;
+          const rel = candidateRel.startsWith('/') ? candidateRel : `/${candidateRel}`;
+          return base + rel;
+        }
+      } catch {
+        // ignore
+      }
+    }
+    // No compatible local fallback
+    return null;
+  }
+
   const base = baseUrlForImages();
   if (!base) return null;
   const rel = raw.startsWith('/') ? raw : `/${raw}`;
@@ -176,8 +243,13 @@ function resolveImageUrls(item) {
     if (Array.isArray(v)) { v.forEach(push); return; }
     const u = imageUrlFromProdList(v);
     if (!u) return;
+    if (!isLikelyStripeSupportedImageUrl(u)) return;
     if (!candidates.includes(u)) candidates.push(u);
   };
+  // Prefer Stripe-specific image fields (so we don't change the site's existing images)
+  push(item?.stripeImg);
+  push(item?.stripeImages);
+  // Fallback to normal prodList fields
   push(item?.img);
   push(item?.images);
   // Stripe currently supports multiple images; keep it reasonable
@@ -290,9 +362,15 @@ async function main() {
   } else {
     console.log('Image URL base:', imgBase);
   }
+  if (!ALLOW_AVIF_IMAGES) {
+    console.log('Image format policy: AVIF will be skipped (use --allow-avif or STRIPE_IMAGE_ALLOW_AVIF=1 to override).');
+  } else {
+    console.log('Image format policy: AVIF allowed.');
+  }
 
   const { categories } = await loadProdList();
 
+  const warnings = [];
   let planned = [];
   for (const [categoryName, items] of Object.entries(categories)) {
     if (!Array.isArray(items)) continue;
@@ -301,6 +379,7 @@ async function main() {
       const baseName = productTitle(item);
       const description = (item?.details?.description || item?.description || '').toString();
       const images = resolveImageUrls(item);
+      const hadAnyLocalImagePath = !!(item?.img || (Array.isArray(item?.images) && item.images.length));
       const isActive = item?.active === false ? false : true;
       const commonMeta = {
         source: 'prodList',
@@ -323,6 +402,7 @@ async function main() {
             currency: 'usd',
             unitPrice: price,
             images,
+            hadAnyLocalImagePath,
             active: isActive,
             metadata: { ...commonMeta, local_id_raw: localIdRaw, variation: opt }
           });
@@ -339,6 +419,7 @@ async function main() {
           currency: 'usd',
           unitPrice: price,
           images,
+          hadAnyLocalImagePath,
           active: isActive,
           metadata: { ...commonMeta, local_id_raw: localIdRaw }
         });
@@ -347,7 +428,6 @@ async function main() {
   }
 
   // Filter unusable entries (no price)
-  const warnings = [];
   planned = planned.filter(p => {
     if (p.unitPrice == null || !Number.isFinite(Number(p.unitPrice)) || Number(p.unitPrice) <= 0) {
       warnings.push(`Skipping ${p.localId}: missing/invalid price`);
@@ -357,6 +437,13 @@ async function main() {
   });
 
   if (LIMIT) planned = planned.slice(0, LIMIT);
+
+  // After we know what we're actually going to process, warn about image formats.
+  for (const p of planned) {
+    if (p?.hadAnyLocalImagePath && (!p.images || p.images.length === 0)) {
+      warnings.push(`No Stripe-compatible images for ${p.localId} (likely AVIF). Provide a JPG/PNG, or pass --allow-avif.`);
+    }
+  }
   console.log(`Planned Stripe products: ${planned.length}${LIMIT ? ` (limited to ${LIMIT})` : ''}`);
 
   let createdProducts = 0;
