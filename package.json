@@ -14,6 +14,8 @@
     "products:sync:dry": "node server/scripts/sync-products.js --dry --no-stripe",
     "prodlist:stripe:sync": "node server/scripts/sync-prodlist-stripe.js",
     "prodlist:stripe:sync:dry": "node server/scripts/sync-prodlist-stripe.js --dry",
+    "prodlist:images:stripe": "node scripts/convert-prodlist-images-for-stripe.js",
+    "prodlist:images:stripe:dry": "node scripts/convert-prodlist-images-for-stripe.js --dry",
     "screens:build": "node server/scripts/build-screens-catalog.js",
     "gloves:build": "node server/scripts/build-gloves-catalog.js",
     "prices:generate": "node scripts/generate-prices-md.js",
