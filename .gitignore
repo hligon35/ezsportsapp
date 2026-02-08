@@ -61,3 +61,14 @@ assets/content/ezsports-content-optimized/*.mp4
 assets/content/ezsports-content-optimized/*.MP4
 assets/content/ezsports-content-optimized/*.mov
 assets/content/ezsports-content-optimized/*.MOV
+
+# Generated artifacts (safe to ignore)
+# prodList backups created by image/catalog scripts
+assets/prodList.*backup-*.json
+
+# DB corrupt snapshots created by DatabaseManager auto-repair
+server/database/*.corrupt-*.bak
+
+# Test/email/report preview outputs (keep folder via .gitkeep)
+test-results/*
+!test-results/.gitkeep

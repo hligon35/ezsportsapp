@@ -97,5 +97,38 @@
     "createdAt": "2026-02-07T21:20:25.993Z",
     "updatedAt": "2026-02-07T21:20:25.993Z",
     "id": 69
+  },
+  {
+    "type": "pageview",
+    "path": "/",
+    "referrer": "",
+    "visitorId": null,
+    "userId": null,
+    "timestamp": "2026-02-07T23:30:15.114Z",
+    "createdAt": "2026-02-07T23:30:15.136Z",
+    "updatedAt": "2026-02-07T23:30:15.136Z",
+    "id": 70
+  },
+  {
+    "type": "pageview",
+    "path": "/",
+    "referrer": "",
+    "visitorId": null,
+    "userId": null,
+    "timestamp": "2026-02-07T23:36:01.455Z",
+    "createdAt": "2026-02-07T23:36:01.478Z",
+    "updatedAt": "2026-02-07T23:36:01.478Z",
+    "id": 71
+  },
+  {
+    "type": "pageview",
+    "path": "/",
+    "referrer": "",
+    "visitorId": null,
+    "userId": null,
+    "timestamp": "2026-02-07T23:37:59.370Z",
+    "createdAt": "2026-02-07T23:37:59.392Z",
+    "updatedAt": "2026-02-07T23:37:59.392Z",
+    "id": 72
   }
 ]
