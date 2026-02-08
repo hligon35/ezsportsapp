@@ -69,6 +69,9 @@ assets/prodList.*backup-*.json
 # DB corrupt snapshots created by DatabaseManager auto-repair
 server/database/*.corrupt-*.bak
 
+# Local runtime DB (set EZ_DB_PATH=server/database/local)
+server/database/local/
+
 # Test/email/report preview outputs (keep folder via .gitkeep)
 test-results/*
 !test-results/.gitkeep

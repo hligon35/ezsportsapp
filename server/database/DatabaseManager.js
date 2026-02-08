@@ -3,8 +3,13 @@ const fs = require('fs').promises;
 const path = require('path');
 
 class DatabaseManager {
-  constructor(dbPath = __dirname) {
-    this.dbPath = path.resolve(dbPath);
+  constructor(dbPath) {
+    const resolvedPath =
+      dbPath ||
+      process.env.EZ_DB_PATH ||
+      process.env.DB_PATH ||
+      __dirname;
+    this.dbPath = path.resolve(resolvedPath);
     this.collections = {
       users: 'users.json',
       products: 'products.json',
@@ -59,6 +64,8 @@ class DatabaseManager {
   // Write data to a collection
   async write(collection, data) {
     try {
+      // Allow DB_PATH/EZ_DB_PATH to point to a local folder not yet created
+      await fs.mkdir(this.dbPath, { recursive: true });
       const filePath = path.join(this.dbPath, this.collections[collection]);
       await fs.writeFile(filePath, JSON.stringify(data, null, 2), 'utf8');
       

@@ -130,5 +130,16 @@
     "createdAt": "2026-02-07T23:37:59.392Z",
     "updatedAt": "2026-02-07T23:37:59.392Z",
     "id": 72
+  },
+  {
+    "type": "pageview",
+    "path": "/",
+    "referrer": "",
+    "visitorId": null,
+    "userId": null,
+    "timestamp": "2026-02-08T00:30:10.166Z",
+    "createdAt": "2026-02-08T00:30:10.204Z",
+    "updatedAt": "2026-02-08T00:30:10.204Z",
+    "id": 73
   }
 ]

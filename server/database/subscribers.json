@@ -70,5 +70,13 @@
     "createdAt": "2026-02-07T23:37:59.418Z",
     "updatedAt": "2026-02-07T23:37:59.418Z",
     "id": 10
+  },
+  {
+    "email": "u1770510610229@example.com",
+    "name": "",
+    "subscribed": true,
+    "createdAt": "2026-02-08T00:30:10.239Z",
+    "updatedAt": "2026-02-08T00:30:10.239Z",
+    "id": 11
   }
 ]
