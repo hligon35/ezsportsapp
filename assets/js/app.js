@@ -680,7 +680,8 @@ ensureUniformFooter() {
           <div>
             <h4>Company</h4>
             <a href="about.html">About</a><br/>
-            <a href="contactus.html">Contact Us</a>
+            <a href="contactus.html">Contact Us</a><br/>
+            <a href="privacy-policy.html">Privacy Policy</a>
           </div>
           <form class="subscribe" method="post" action="#" autocomplete="off" novalidate>
             <h4>Get deals in your inbox</h4>

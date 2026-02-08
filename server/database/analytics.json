@@ -141,5 +141,103 @@
     "createdAt": "2026-02-08T00:30:10.204Z",
     "updatedAt": "2026-02-08T00:30:10.204Z",
     "id": 73
+  },
+  {
+    "type": "pageview",
+    "path": "/index.html",
+    "referrer": "",
+    "visitorId": "v_wm4bsuquxzkmld2ryg4",
+    "userId": null,
+    "timestamp": "2026-02-08T01:39:23.083Z",
+    "createdAt": "2026-02-08T01:39:23.090Z",
+    "updatedAt": "2026-02-08T01:39:23.090Z",
+    "id": 74
+  },
+  {
+    "type": "pageview",
+    "path": "/index.html",
+    "referrer": "",
+    "visitorId": "v_wm4bsuquxzkmld2ryg4",
+    "userId": null,
+    "timestamp": "2026-02-08T01:39:23.117Z",
+    "createdAt": "2026-02-08T01:39:23.152Z",
+    "updatedAt": "2026-02-08T01:39:23.152Z",
+    "id": 75
+  },
+  {
+    "type": "pageview",
+    "path": "/checkout.html",
+    "referrer": "",
+    "visitorId": "v_wm4bsuquxzkmld2ryg4",
+    "userId": null,
+    "timestamp": "2026-02-08T01:39:24.011Z",
+    "createdAt": "2026-02-08T01:39:24.017Z",
+    "updatedAt": "2026-02-08T01:39:24.017Z",
+    "id": 76
+  },
+  {
+    "type": "view_cart",
+    "productId": {
+      "items": [
+        {
+          "id": "PITCHERSPOCKET9",
+          "price": 349.95,
+          "qty": 1
+        }
+      ]
+    },
+    "visitorId": "v_wm4bsuquxzkmld2ryg4",
+    "userId": null,
+    "timestamp": "2026-02-08T01:39:24.376Z",
+    "createdAt": "2026-02-08T01:39:24.376Z",
+    "updatedAt": "2026-02-08T01:39:24.376Z",
+    "id": 77
+  },
+  {
+    "type": "view_cart",
+    "productId": {
+      "items": [
+        {
+          "id": "PITCHERSPOCKET9",
+          "price": 349.95,
+          "qty": 1
+        }
+      ]
+    },
+    "visitorId": "v_wm4bsuquxzkmld2ryg4",
+    "userId": null,
+    "timestamp": "2026-02-08T01:39:24.387Z",
+    "createdAt": "2026-02-08T01:39:24.389Z",
+    "updatedAt": "2026-02-08T01:39:24.389Z",
+    "id": 78
+  },
+  {
+    "type": "pageview",
+    "path": "/checkout.html",
+    "referrer": "",
+    "visitorId": "v_wm4bsuquxzkmld2ryg4",
+    "userId": null,
+    "timestamp": "2026-02-08T01:39:24.474Z",
+    "createdAt": "2026-02-08T01:39:24.475Z",
+    "updatedAt": "2026-02-08T01:39:24.475Z",
+    "id": 79
+  },
+  {
+    "type": "click_button",
+    "productId": null,
+    "visitorId": "v_wm4bsuquxzkmld2ryg4",
+    "userId": null,
+    "path": "/checkout.html",
+    "label": "Apply",
+    "value": null,
+    "meta": {
+      "href": "",
+      "id": "apply-code",
+      "className": "btn btn-secondary"
+    },
+    "timestamp": "2026-02-08T01:39:24.695Z",
+    "createdAt": "2026-02-08T01:39:24.704Z",
+    "updatedAt": "2026-02-08T01:39:24.704Z",
+    "id": 80
   }
 ]

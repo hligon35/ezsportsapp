@@ -102,5 +102,15 @@
         </div>
       </div>
     </main>
+
+    <footer class="site-footer">
+      <div class="subfooter container">
+        <p>© <span id="year"></span> EZ Sports Netting. <a href="privacy-policy.html">Privacy Policy</a></p>
+      </div>
+    </footer>
+
+    <script>
+      try { document.getElementById('year').textContent = String(new Date().getFullYear()); } catch {}
+    </script>
   </body>
   </html>
