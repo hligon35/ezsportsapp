@@ -17,7 +17,6 @@ logs/
 .env
 .env.*
 !**/.env.example
-!render/.env.example
 server/.env
 render/.env
 

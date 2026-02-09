@@ -7,6 +7,11 @@ Files
 - `worker-email-sender.js`: The Worker script that accepts POST JSON and sends via MailChannels
 - `wrangler.toml`: Example configuration for local dev and deployment
 
+Additional DB Worker files
+- `worker-db.js`: A Worker that exposes a tiny HTTP API backed by D1 (JSON collections)
+- `wrangler.db.toml`: Wrangler config for the DB Worker + D1 binding
+- `migrations/0001_collections.sql`: D1 schema (collections + meta)
+
 Prerequisites
 - A Cloudflare account (free plan is fine)
 - A domain on Cloudflare (recommended for best deliverability)
@@ -63,3 +68,42 @@ Security
 Local Dev
 
 - `wrangler dev cloudflare/worker-email-sender.js` will start a local endpoint; update `CF_EMAIL_WEBHOOK_URL` accordingly when testing locally.
+
+Cloudflare D1 Database Worker (Production DB)
+--------------------------------------------
+
+This repo can run production storage in Cloudflare (D1) while keeping the existing JSON-file database for local development.
+
+1) Install Wrangler CLI
+   - `npm install -g wrangler`
+
+2) Login
+   - `wrangler login`
+
+3) Create a D1 database
+   - `wrangler d1 create ezsports-prod`
+
+4) Bind D1 to the Worker
+   - Edit `cloudflare/wrangler.db.toml`:
+     - Set `database_id` from step (3)
+     - Optionally set `CF_DB_API_KEY` (recommended)
+
+5) Apply migrations
+   - `wrangler d1 migrations apply ezsports-prod --config wrangler.db.toml --cwd cloudflare --remote`
+
+6) Run locally (optional)
+   - `wrangler dev --config cloudflare/wrangler.db.toml`
+   - Your DB Worker URL will be printed; use it for `EZ_CF_DB_URL`
+
+7) Deploy
+   - `wrangler deploy --config cloudflare/wrangler.db.toml`
+
+8) Configure the Node server (Render)
+   - Set:
+     - `EZ_DB_DRIVER=cloudflare`
+     - `EZ_CF_DB_URL=<your worker URL>`
+     - `EZ_CF_DB_API_KEY=<same value as CF_DB_API_KEY>`
+
+Security
+
+- If `CF_DB_API_KEY` is set on the Worker, requests must include `Authorization: Bearer <token>`.

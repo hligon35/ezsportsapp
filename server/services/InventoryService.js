@@ -153,13 +153,13 @@ class InventoryService {
     this.lowStockThreshold = lowThreshold;
     this.criticalStockThreshold = criticalThreshold;
     try {
-      const schema = await this.db.read('schema');
+      const rawSchema = await this.db.read('schema');
+      const schema = (!rawSchema || typeof rawSchema !== 'object' || Array.isArray(rawSchema))
+        ? { metadata: {} }
+        : rawSchema;
       schema.metadata = schema.metadata || {};
       schema.metadata.inventoryThresholds = { low: lowThreshold, critical: criticalThreshold };
-      const fs = require('fs').promises;
-      const path = require('path');
-      const filePath = path.join(this.db.dbPath, this.db.collections.schema);
-      await fs.writeFile(filePath, JSON.stringify(schema, null, 2), 'utf8');
+      await this.db.write('schema', schema);
     } catch (e) {
       console.warn('Failed to persist thresholds:', e.message);
     }

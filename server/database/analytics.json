@@ -239,5 +239,16 @@
     "createdAt": "2026-02-08T01:39:24.704Z",
     "updatedAt": "2026-02-08T01:39:24.704Z",
     "id": 80
+  },
+  {
+    "type": "pageview",
+    "path": "/",
+    "referrer": "",
+    "visitorId": null,
+    "userId": null,
+    "timestamp": "2026-02-09T16:03:20.352Z",
+    "createdAt": "2026-02-09T16:03:20.386Z",
+    "updatedAt": "2026-02-09T16:03:20.386Z",
+    "id": 81
   }
 ]

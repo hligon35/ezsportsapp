@@ -3,7 +3,28 @@ const fs = require('fs').promises;
 const path = require('path');
 
 class DatabaseManager {
-  constructor(dbPath) {
+  constructor(dbPathOrOptions) {
+    // Backwards compatible signature:
+    // - new DatabaseManager(dbPathString)
+    // - new DatabaseManager({ driver: 'cloudflare', baseUrl, apiKey })
+    // Driver can also be selected via EZ_DB_DRIVER/DB_DRIVER.
+    const envDriver = (process.env.EZ_DB_DRIVER || process.env.DB_DRIVER || '').toLowerCase();
+    let options = null;
+    let dbPath = null;
+
+    if (dbPathOrOptions && typeof dbPathOrOptions === 'object' && !Array.isArray(dbPathOrOptions)) {
+      options = dbPathOrOptions;
+      dbPath = options.dbPath || null;
+    } else {
+      dbPath = dbPathOrOptions;
+    }
+
+    const selectedDriver = ((options && options.driver) || envDriver || 'json').toLowerCase();
+    if (selectedDriver === 'cloudflare') {
+      const CloudflareDatabaseManager = require('./CloudflareDatabaseManager');
+      return new CloudflareDatabaseManager(options || {});
+    }
+
     const resolvedPath =
       dbPath ||
       process.env.EZ_DB_PATH ||

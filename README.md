@@ -94,6 +94,29 @@ Visit: <http://localhost:4242/>
 
 (You can still open HTML directly for a purely static preview, but dynamic products & checkout require the server.)
 
+## Database (Dev vs Production)
+
+This project supports two database modes:
+
+- **Dev (default)**: JSON files under `server/database/*.json` (or a custom folder via env)
+- **Production**: Cloudflare D1 via a Cloudflare Worker HTTP API
+
+### Dev (JSON DB)
+
+- Default DB path is `server/database/`.
+- To keep runtime writes out of git, set a local DB folder:
+  - `EZ_DB_PATH=server/database/local`
+
+### Production (Cloudflare D1)
+
+Set the following environment variables on the Node server:
+
+- `EZ_DB_DRIVER=cloudflare`
+- `EZ_CF_DB_URL=<Cloudflare Worker URL>`
+- `EZ_CF_DB_API_KEY=<shared secret>` (optional, but recommended)
+
+Cloudflare setup docs are in `cloudflare/README.md`.
+
 ## Customize
 
 
