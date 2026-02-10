@@ -965,6 +965,8 @@ img[src*="/logo.svg"]{
 
 /* Buttons (gold primary theme) */
 .btn{display:inline-flex;align-items:center;justify-content:center;padding:.8rem 1.1rem;border-radius:.9rem;font-weight:800;letter-spacing:.3px;border:1px solid var(--gold);text-decoration:none;cursor:pointer;transition:.18s ease-in-out;text-transform:uppercase;background:var(--gold);color:#fff}
+/* Ensure <button> variants match <a class="btn"> sizing/metrics */
+button.btn{font:inherit;}
 .btn-quote{background:#000000;border-color:#000000;color:#fff}
 .btn-quote:hover{filter:brightness(1.12)}
 .btn.btn-dark{background:#000000;border-color:#000000;color:#fff}
@@ -1003,6 +1005,10 @@ button:disabled{
 .btn-quote{background:#000000 !important;color:#ffffff !important;border:1px solid #000000 !important;box-shadow:0 2px 6px rgba(0,0,0,.4);}
 .btn-quote:hover,.btn-quote:focus-visible{filter:brightness(1.15);outline:none;}
 .btn-block{width:100%}
+
+/* Toolbar rows (used on admin + analytics pages) */
+.toolbar{display:flex;gap:.75rem;align-items:center;flex-wrap:wrap;}
+.toolbar .btn{min-height:44px;}
 
 /* Fit-to-content defaults for form controls */
 input, select, textarea, button { width:auto; max-width:100%; }

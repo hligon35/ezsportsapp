@@ -3,13 +3,15 @@
     "id": 1000,
     "email": "admin@ezsportsnetting.com",
     "username": "admin",
-    "password": "$2b$10$oTfY/cJ4d20i0USVn9jpKe8QUZdRb5MKwLJTxhs0CDmjuOqIDcGu2",
+    "password": "$2b$10$PNT8X6og5rV7k1i3AnQEYua0JqraENTtnfGxpboFxebXiRy9Eby1.",
     "firstName": "Admin",
     "lastName": "User",
     "role": "admin",
     "createdAt": "2025-08-13T02:57:41.654Z",
-    "lastLogin": "2026-01-20T23:20:37.910Z",
-    "updatedAt": "2026-01-20T23:20:37.911Z"
+    "lastLogin": "2026-02-10T00:30:01.644Z",
+    "updatedAt": "2026-02-10T00:30:01.644Z",
+    "isAdmin": true,
+    "name": "Dev Admin"
   },
   {
     "id": 1001,

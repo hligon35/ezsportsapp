@@ -25,6 +25,7 @@ try {
     const sp = new URLSearchParams(location.search);
     const path = location.pathname.replace(/^\\/,'/');
     const isLocal = /^(localhost|127\.0\.0\.1)$/i.test(location.hostname);
+    const isDevSplit = isLocal && String(location.port) === '5500' && location.protocol.startsWith('http');
     if (sp.get('gate') === 'on') localStorage.setItem('__COMING_SOON__','on');
     if (sp.get('gate') === 'off') localStorage.setItem('__COMING_SOON__','off');
     if (sp.has('unlock')) localStorage.setItem('comingSoonUnlocked', JSON.stringify({ at: Date.now() }));
@@ -55,8 +56,34 @@ try {
     // Server-controlled flag via /api/config (MAINTENANCE or COMING_SOON env)
     const controller = (window.AbortController ? new AbortController() : null);
     const timer = controller ? setTimeout(()=>controller.abort(), 1500) : null;
-    fetch('/api/config', { cache: 'no-store', signal: controller ? controller.signal : undefined })
-      .then(res => res.ok ? res.json() : null)
+    const fetchConfig = async () => {
+      const opts = { cache: 'no-store', signal: controller ? controller.signal : undefined };
+      // When running the frontend on Live Server (5500), /api/* does not exist on 5500.
+      // Try common backend ports instead.
+      if (isDevSplit) {
+        const bases = [
+          'http://127.0.0.1:4243','http://localhost:4243',
+          'http://127.0.0.1:4242','http://localhost:4242',
+          'http://127.0.0.1:4244','http://localhost:4244',
+          'http://127.0.0.1:4245','http://localhost:4245',
+          'http://127.0.0.1:4246','http://localhost:4246',
+          'http://127.0.0.1:4247','http://localhost:4247'
+        ];
+        for (const b of bases) {
+          try {
+            const res = await fetch(`${b}/api/config`, opts);
+            if (res.ok) return res.json();
+          } catch {}
+        }
+        return null;
+      }
+
+      const res = await fetch('/api/config', opts);
+      if (!res.ok) return null;
+      return res.json();
+    };
+
+    Promise.resolve(fetchConfig())
       .then(cfg => {
         if (timer) clearTimeout(timer);
         const remoteOn = !!(cfg && cfg.maintenance === true);
@@ -291,6 +318,12 @@ function getVisitorId(){
 }
 
 async function postToApi(path, payload){
+  // When developing with Live Server (port 5500), avoid telemetry writes entirely.
+  // Those writes can trigger live-reload loops (because JSON DB files change), and
+  // POSTing to 5500 yields noisy 405s.
+  const isDevSplit = /^(localhost|127\.0\.0\.1)$/i.test(location.hostname) && String(location.port) === '5500' && location.protocol.startsWith('http');
+  if (isDevSplit) return false;
+
   const tryFetch = async (base) => {
     const url = (base ? base.replace(/\/$/,'') : '') + path;
     const controller = (window.AbortController ? new AbortController() : null);
@@ -314,17 +347,6 @@ async function postToApi(path, payload){
     if (await tryFetch('')) return true;
   } catch {}
 
-  // Dev fallback: frontend on Live Server (5500) but backend on 424x
-  const isDevSplit = /^(localhost|127\.0\.0\.1)$/i.test(location.hostname) && String(location.port) === '5500';
-  if (!isDevSplit) return false;
-  const bases = [
-    'http://127.0.0.1:4244','http://localhost:4244',
-    'http://127.0.0.1:4243','http://localhost:4243',
-    'http://127.0.0.1:4242','http://localhost:4242'
-  ];
-  for (const b of bases) {
-    try { if (await tryFetch(b)) return true; } catch {}
-  }
   return false;
 }
 

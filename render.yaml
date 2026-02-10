@@ -19,7 +19,7 @@ services:
       # - key: JWT_SECRET
       #   generateValue: true
       # - key: CORS_ORIGINS
-      #   value: https://ezsportsapp.onrender.com
+      #   value: https://ezsportsnetting.com,https://www.ezsportsnetting.com,https://ezsportsapp.onrender.com
       # - key: STRIPE_SECRET_KEY
       #   sync: false
       # - key: STRIPE_WEBHOOK_SECRET

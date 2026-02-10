@@ -201,7 +201,20 @@
   <script type="module" src="assets/js/app.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      const base = window.__API_BASE || '';
+      const base = (function(){
+        try {
+          const fromWindow = (window.__API_BASE ? String(window.__API_BASE) : '').trim();
+          if (fromWindow) return fromWindow.replace(/\/$/, '');
+        } catch {}
+        try {
+          const meta = document.querySelector('meta[name="api-base"]');
+          const v = (meta && meta.content ? String(meta.content) : '').trim();
+          if (v) return v.replace(/\/$/, '');
+        } catch {}
+        // Same-origin is the default when served by the API server.
+        // If the frontend is hosted separately, fall back to the Render API.
+        return 'https://ezsportsapp.onrender.com';
+      })();
       const currency = new Intl.NumberFormat(undefined, { style: 'currency', currency: 'USD' });
       const fetchJSON = async (url, opts={}) => {
         const res = await fetch(url, { credentials: 'include', ...opts });

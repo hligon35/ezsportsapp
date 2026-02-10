@@ -4,6 +4,56 @@ try {
 } catch {
   // dotenv is optional in production environments (e.g., Render) where env vars are injected.
 }
+
+// Dev-only bootstrap admin: allows you to set a deterministic admin user via env vars.
+// This runs ONLY when NODE_ENV !== 'production'.
+async function bootstrapDevAdminUser() {
+  try {
+    if (process.env.NODE_ENV === 'production') return;
+    const username = String(process.env.DEV_ADMIN_USERNAME || '').trim();
+    const password = String(process.env.DEV_ADMIN_PASSWORD || '').trim();
+    if (!username || !password) return;
+
+    const normalizeDevEmail = (raw, fallbackUser) => {
+      const v = String(raw || '').trim();
+      if (!v) return `${fallbackUser}@local.dev`;
+      // Allow shorthand like "admin" (no domain) in dev
+      if (!v.includes('@')) return `${v}@local.dev`;
+      return v;
+    };
+
+    const email = normalizeDevEmail(process.env.DEV_ADMIN_EMAIL, username);
+    const name = String(process.env.DEV_ADMIN_NAME || 'Dev Admin').trim();
+
+    const UserService = require('./services/UserService');
+    const bcrypt = require('bcrypt');
+    const svc = new UserService();
+    const all = await svc.getAllUsers();
+    const uLc = username.toLowerCase();
+    const eLc = email.toLowerCase();
+    const existing = (all || []).find(u =>
+      (u?.username && String(u.username).toLowerCase() === uLc) ||
+      (u?.email && String(u.email).toLowerCase() === eLc)
+    );
+
+    if (!existing) {
+      await svc.register({ email, username, password, name, isAdmin: true });
+    } else {
+      // Ensure admin flag + username are set, and force-update password.
+      const patch = { isAdmin: true };
+      if (!existing.username) patch.username = username;
+      if (!existing.name && name) patch.name = name;
+      try { await svc.updateUser(existing.id, patch); } catch {}
+
+      const hashed = await bcrypt.hash(password, 10);
+      await svc.db.update('users', { id: existing.id }, { password: hashed, isAdmin: true, username: (existing.username || username) });
+    }
+
+    console.log('[dev] Admin bootstrap ready:', { username, email });
+  } catch (e) {
+    console.warn('Dev admin bootstrap failed:', e?.message || e);
+  }
+}
 const express = require('express');
 const path = require('path');
 const cors = require('cors');
@@ -131,16 +181,34 @@ if (String(process.env.FORCE_HTTPS || '').toLowerCase() === 'true') {
 }
 
 // CORS with optional allowlist and credentials for cookie-based auth
+// Note: The frontend may be hosted on a separate origin (e.g. ezsportsnetting.com)
+// while the API runs on Render (ezsportsapp.onrender.com). Ensure both are allowed.
 const envOrigins = (process.env.CORS_ORIGINS || '').split(',').map(s => s.trim()).filter(Boolean);
+const isProduction = String(process.env.NODE_ENV || '').toLowerCase() === 'production';
+const prodOrigins = [
+  'https://www.ezsportsnetting.com',
+  'https://ezsportsnetting.com',
+  'https://ezsportsapp.onrender.com'
+];
 const devOrigins = [
   'http://127.0.0.1:5500',
   'http://localhost:5500',
+  'http://127.0.0.1:4242',
   'http://localhost:4242',
-  // Common production domains for the static site (adjust if your domain changes)
-  'https://www.ezsportsnetting.com',
-  'https://ezsportsnetting.com'
+  'http://127.0.0.1:4243',
+  'http://localhost:4243',
+  'http://127.0.0.1:4244',
+  'http://localhost:4244',
+  'http://127.0.0.1:4245',
+  'http://localhost:4245',
+  'http://127.0.0.1:4246',
+  'http://localhost:4246',
+  'http://127.0.0.1:4247',
+  'http://localhost:4247'
 ];
-const allowList = envOrigins.length ? envOrigins : devOrigins;
+
+const baseOrigins = isProduction ? prodOrigins : prodOrigins.concat(devOrigins);
+const allowList = Array.from(new Set(baseOrigins.concat(envOrigins)));
 const corsOptions = {
   origin: (origin, cb) => {
     // Allow non-browser/same-origin requests, and file:// (Origin: 'null') during development
@@ -825,9 +893,9 @@ app.post('/webhook/stripe', express.raw({ type: 'application/json' }), async (re
                 staffTextLines.push('- Email: hligon@getsparqd.com');
                 staffTextLines.push('');
                 staffTextLines.push('2. SparQ Digital Platform Fee');
-                staffTextLines.push('SparQ Digital receives 1.5% of the cart total before taxes.');
+                staffTextLines.push('SparQ Digital receives 1.5% of the cart total after taxes.');
                 staffTextLines.push(`- SparQ Digital Fee (1.5%): ${money(sdFee)}`);
-                staffTextLines.push(`- Formula: ${money(cartBeforeTax)} × 0.015`);
+                staffTextLines.push(`- Formula: ${money(customerPaid)} × 0.015`);
                 staffTextLines.push('');
                 staffTextLines.push('3. EZ Sports Net Payout');
                 staffTextLines.push('This is the remaining amount after wholesale, BB shipping, SparQ Digital’s fee, and Stripe fees.');
@@ -916,9 +984,9 @@ app.post('/webhook/stripe', express.raw({ type: 'application/json' }), async (re
                                   <div><strong>Email:</strong> <a href="mailto:hligon@getsparqd.com" style="color:${THEME.brand};text-decoration:none;">hligon@getsparqd.com</a></div>
                                   <hr style="border:0;border-top:1px solid ${THEME.border};margin:12px 0;"/>
                                   <div style="font-weight:800;">2. SparQ Digital Platform Fee</div>
-                                  <div style="color:${THEME.muted};">SparQ Digital receives 1.5% of the cart total before taxes.</div>
+                                  <div style="color:${THEME.muted};">SparQ Digital receives 1.5% of the cart total after taxes.</div>
                                   <div><strong>SparQ Digital Fee (1.5%):</strong> ${money(sdFee)}</div>
-                                  <div style="color:${THEME.muted};font-size:12px;">Formula: ${money(cartBeforeTax)} × 0.015</div>
+                                  <div style="color:${THEME.muted};font-size:12px;">Formula: ${money(customerPaid)} × 0.015</div>
                                   <hr style="border:0;border-top:1px solid ${THEME.border};margin:12px 0;"/>
                                   <div style="font-weight:800;">3. EZ Sports Net Payout</div>
                                   <div style="color:${THEME.muted};">This is the remaining amount after wholesale, BB shipping, SparQ Digital’s fee, and Stripe fees.</div>
@@ -1537,7 +1605,7 @@ app.post('/api/create-payment-intent', async (req, res) => {
     if (useAutomaticTaxEnv) {
       // When Automatic Tax is enabled on the PaymentIntent, Stripe computes the tax
       // amount based on your account tax registrations and the provided address.
-      // We set the amount to the pre-tax total and let Stripe add tax at confirmation.
+      // We set the amount based on the cart math here; Stripe may add tax at confirmation.
       amount = Math.max(0, subtotal + shippingCents - discountCents);
       usedAutomaticTax = true;
     } else {
@@ -1647,7 +1715,11 @@ app.post('/api/create-payment-intent', async (req, res) => {
 
     let paymentIntent;
     const transferGroup = newOrder?.id ? `order_${String(newOrder.id)}` : undefined;
-    const platformFeeCents = connectIntended ? calcFeeCents(amount, platformFeeBps) : 0;
+    // Platform fee should be calculated on the order total (after taxes).
+    // Note: when Stripe Automatic Tax is enabled, Stripe may compute taxes at confirmation.
+    // We still compute the application fee based on the amount used to create the PaymentIntent.
+    const totalAmountCents = Math.max(0, Number(amount) || 0);
+    const platformFeeCents = connectIntended ? calcFeeCents(totalAmountCents, platformFeeBps) : 0;
     try {
       paymentIntent = await stripe.paymentIntents.create({
         amount,
@@ -1710,7 +1782,8 @@ app.post('/api/create-payment-intent', async (req, res) => {
             return res.status(400).json({ error: `Order total is below the minimum charge amount (${(min/100).toFixed(2)} USD). Please add another item.` });
           }
           usedAutomaticTax = false;
-          const platformFeeCents = connectIntended ? calcFeeCents(amount, platformFeeBps) : 0;
+          const totalAmountCents = Math.max(0, Number(amount) || 0);
+          const platformFeeCents = connectIntended ? calcFeeCents(totalAmountCents, platformFeeBps) : 0;
           paymentIntent = await stripe.paymentIntents.create({
             amount,
             currency: safeCurrency,
@@ -1870,6 +1943,7 @@ function startServer(attempt = 0) {
   return srv;
 }
 
+bootstrapDevAdminUser().catch(() => {});
 const server = startServer();
 
 // Daily activity report scheduler (emails visitor activity summary)

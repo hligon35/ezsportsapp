@@ -2,13 +2,30 @@
 let currentEditingProduct = null;
 const API_BASES = (() => {
   const isHttp = location.protocol.startsWith('http');
-  // For Replit, use same-origin (empty string) first, then fallback to localhost for development
-  const bases = [''];
+  const isLiveServer = isHttp && location.port === '5500';
+  // For normal hosting (backend-served pages, Replit, etc.), use same-origin first.
+  // For Live Server (5500), do NOT try same-origin because /api/* doesn't exist there.
+  const bases = isLiveServer ? [] : [''];
+  try { if (window.__API_BASE) bases.unshift(String(window.__API_BASE).replace(/\/$/, '')); } catch {}
+  try {
+    const meta = document.querySelector('meta[name="api-base"]');
+    if (meta && meta.content) bases.push(String(meta.content).trim().replace(/\/$/, ''));
+  } catch {}
+  // Production default (Render). Safe no-op if unreachable.
+  bases.push('https://ezsportsapp.onrender.com');
   if (location.port === '5500') {
     // Live Server development
-    bases.push('http://localhost:4242', 'http://127.0.0.1:4242');
+    // Prefer higher ports first because the backend auto-increments when 4242 is in use.
+    bases.push(
+      'http://localhost:4247', 'http://127.0.0.1:4247',
+      'http://localhost:4246', 'http://127.0.0.1:4246',
+      'http://localhost:4245', 'http://127.0.0.1:4245',
+      'http://localhost:4244', 'http://127.0.0.1:4244',
+      'http://localhost:4243', 'http://127.0.0.1:4243',
+      'http://localhost:4242', 'http://127.0.0.1:4242'
+    );
   }
-  return bases;
+  return Array.from(new Set(bases));
 })();
 
 function authHeaders() {

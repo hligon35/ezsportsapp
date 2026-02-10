@@ -2,13 +2,16 @@
 // Guard: When running under Live Server (port 5500), disable tracking to avoid DB writes that trigger live-reload loops
 const __DEV_DISABLE_TRACKING__ = (location.protocol.startsWith('http') && location.port === '5500');
 const API_BASE_ANALYTICS = (() => {
-  const ports = [4242];
+  // Prefer higher ports first because the backend auto-increments when 4242 is in use.
+  const ports = [4243, 4242, 4244, 4245, 4246, 4247];
   const bases = [];
   const isHttp = location.protocol.startsWith('http');
   const onLiveServer = isHttp && location.port === '5500';
   // Prefer explicit overrides first
   try { if (window.__API_BASE) bases.push(String(window.__API_BASE).replace(/\/$/, '')); } catch {}
   try { const meta = document.querySelector('meta[name="api-base"]'); if (meta && meta.content) bases.push(String(meta.content).replace(/\/$/, '')); } catch {}
+  // Production default (Render). Safe no-op if unreachable.
+  bases.push('https://ezsportsapp.onrender.com');
   // Same-origin next (unless on Live Server where we avoid posting to 5500)
   if (!onLiveServer && isHttp) bases.push(`${location.protocol}//${location.host}`);
   // Localhost fallbacks last

@@ -2,10 +2,37 @@
 let isRegisterMode = false;
 // Detect Live Server (static 5500) so we don't POST to it
 const isLiveServer = (location.port === '5500') && (location.protocol.startsWith('http'));
-// In Live Server mode, only try the API server(s) on 4242 to avoid 405s on 5500
-const API_BASE_CANDIDATES = isLiveServer
-  ? ['http://127.0.0.1:4242', 'http://localhost:4242']
-  : [''];
+const API_BASE_CANDIDATES = (() => {
+  const bases = [];
+  // Prefer a previously discovered base first (set by admin/dashboard scripts).
+  try { if (window.__API_BASE) bases.push(String(window.__API_BASE).replace(/\/$/, '')); } catch {}
+  // Then prefer <meta name="api-base" content="https://api.example.com">
+  try {
+    const meta = document.querySelector('meta[name="api-base"]');
+    if (meta && meta.content) bases.push(String(meta.content).trim().replace(/\/$/, ''));
+  } catch {}
+
+  // Same-origin works when the frontend is served by the API server.
+  if (!isLiveServer) bases.push('');
+
+  // Production default (Render). Safe no-op if unreachable.
+  bases.push('https://ezsportsapp.onrender.com');
+
+  // In Live Server mode, only try the API server(s) on 424x to avoid 405s on 5500.
+  if (isLiveServer) {
+    // Most common dev ports first (4243/4242), then higher ports.
+    bases.push(
+      'http://127.0.0.1:4243', 'http://localhost:4243',
+      'http://127.0.0.1:4242', 'http://localhost:4242',
+      'http://127.0.0.1:4244', 'http://localhost:4244',
+      'http://127.0.0.1:4245', 'http://localhost:4245',
+      'http://127.0.0.1:4246', 'http://localhost:4246',
+      'http://127.0.0.1:4247', 'http://localhost:4247'
+    );
+  }
+
+  return Array.from(new Set(bases.filter(b => typeof b === 'string')));
+})();
 
 async function fetchWithFallback(path, options) {
   let lastErr;

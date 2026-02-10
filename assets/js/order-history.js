@@ -1,6 +1,30 @@
 // Order History: server-backed with guest email fallback and tabular view
 function currencyFmt(n){ return Number(n||0).toLocaleString(undefined,{style:'currency',currency:'USD'}); }
-const API_BASE = (location.port === '5500') ? 'http://localhost:4242' : '';
+const API_BASE = (() => {
+  const isHttp = location.protocol.startsWith('http');
+  const isLiveServer = isHttp && location.port === '5500';
+  const bases = [];
+  try { if (window.__API_BASE) bases.push(String(window.__API_BASE).replace(/\/$/, '')); } catch {}
+  try {
+    const meta = document.querySelector('meta[name="api-base"]');
+    if (meta && meta.content) bases.push(String(meta.content).trim().replace(/\/$/, ''));
+  } catch {}
+  // Same-origin works when the API server hosts the frontend.
+  if (!isLiveServer) bases.push('');
+  // Production default (Render).
+  bases.push('https://ezsportsapp.onrender.com');
+  if (isLiveServer) {
+    bases.push(
+      'http://127.0.0.1:4243','http://localhost:4243',
+      'http://127.0.0.1:4242','http://localhost:4242',
+      'http://127.0.0.1:4244','http://localhost:4244',
+      'http://127.0.0.1:4245','http://localhost:4245',
+      'http://127.0.0.1:4246','http://localhost:4246',
+      'http://127.0.0.1:4247','http://localhost:4247'
+    );
+  }
+  return Array.from(new Set(bases))[0] || '';
+})();
 
 function getCurrentUser(){
   try{ return JSON.parse(localStorage.getItem('currentUser')||'null'); }catch{ return null; }

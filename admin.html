@@ -10,12 +10,18 @@
   <style>
     .admin-container { max-width: 1000px; margin: 2rem auto; padding: clamp(1rem, 3.5vw, 2rem); }
     .admin-section { background: #fff; border-radius: 1.2rem; box-shadow: 0 4px 24px rgba(12,32,64,.10); padding: clamp(1rem, 3.5vw, 2rem); margin-bottom: 2rem; }
+    .admin-header-row { display:flex; align-items:center; gap:.75rem; flex-wrap:wrap; margin-bottom:.75rem; }
+    .admin-header-row h2 { margin: 0; }
+    .admin-header-row .ml-auto { margin-left:auto; }
     .product-form { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
     .product-form input, .product-form textarea, .product-form select { padding: .8rem; border: 1px solid #cfe0f5; border-radius: .6rem; width: 100%; box-sizing: border-box; }
+    /* In CSS grid, items stretch by default; keep action buttons sized to label text */
+    #product-form button.btn { justify-self: start; width: fit-content; }
     .product-list { display: grid; gap: 1rem; }
     .product-item { display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: #f7faff; border-radius: .8rem; flex-wrap: wrap; gap: .6rem; }
-    .admin-nav { display: flex; gap: .6rem; row-gap: .5rem; margin-bottom: 1.25rem; flex-wrap: wrap; overflow-x: visible; }
-  .admin-nav button { padding: .8rem 1.5rem; border: none; background: #e6edf6; border-radius: .6rem; cursor: pointer; color:#0b2a4a; font-weight:700; }
+    .admin-nav { display: flex; gap: .3rem; row-gap: .3rem; margin-bottom: 1.25rem; flex-wrap: nowrap; overflow-x: auto; }
+    .admin-nav > * { flex: 0 0 auto; }
+  .admin-nav button { padding: .55rem .9rem; border: none; background: #e6edf6; border-radius: .6rem; cursor: pointer; color:#0b2a4a; font-weight:700; white-space: nowrap; }
   .admin-nav button.active { background: var(--primary, #0b64d4); color: #ffffff; box-shadow: 0 2px 10px rgba(11,100,212,.25); }
   /* Inventory UI removed for dropship model */
     .hidden{display:none;}
@@ -23,7 +29,7 @@
     .filter-select{margin-left:.5rem; padding:.4rem;}
     @media (max-width: 768px) {
       .product-form { grid-template-columns: 1fr; }
-      .admin-nav button { padding: .55rem .8rem; font-size: .9rem; }
+      .admin-nav button { padding: .5rem .75rem; font-size: .9rem; }
     }
     @media (max-width: 640px) {
       .admin-nav { margin-bottom: 1rem; }
@@ -57,7 +63,10 @@
   </header>
   <main id="main">
     <div class="admin-container">
-      <h2>Admin Panel</h2>
+      <div class="admin-header-row">
+        <h2>Admin Panel</h2>
+        <a class="btn btn-ghost ml-auto" href="analytics.html">Analytics →</a>
+      </div>
       <div class="admin-nav">
   <button class="active" onclick="showSection('products', this)">Products</button>
   <button onclick="showSection('netting', this)">Netting</button>
@@ -68,7 +77,6 @@
     <button onclick="showSection('finance', this)">Finance</button>
     <button onclick="showSection('traffic', this)">Traffic</button>
     <button onclick="showSection('diag', this)">Diagnostics</button>
-  <a class="btn btn-ghost ml-auto" href="analytics.html">Analytics →</a>
       </div>
 
       <!-- Products Section -->
