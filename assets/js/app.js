@@ -2391,7 +2391,7 @@ ensureHomeFirst() {
                   <div><strong>Call:</strong> <a href="tel:+13868373131" aria-label="Call EZ Sports Netting at 386-837-3131">(386) 837-3131</a></div>
                   <div><strong>Email:</strong> <a href="mailto:info@ezsportsnetting.com">info@ezsportsnetting.com</a></div>
                 </div>
-                <div class="text-sm text-muted" id="agg-ship"></div>
+                <div class="text-sm text-muted" id="agg-ship" style="display:none;"></div>
                 <div class="stack-05" style="margin-top:.5rem;">
                   <label class="text-xs" for="agg-model-select" style="font-weight:700;letter-spacing:.4px;">Model</label>
                   <select id="agg-model-select" class="pd-option-select" style="padding:.7rem .8rem;border:1px solid var(--border);border-radius:.6rem;font-weight:600;">${options}</select>
@@ -2399,8 +2399,12 @@ ensureHomeFirst() {
                   <select id="agg-color-select" class="pd-option-select" style="padding:.7rem .8rem;border:1px solid var(--border);border-radius:.6rem;">${colorOptions}</select>
                   <div id="agg-selected" class="text-sm text-muted"></div>
                   <ul id="agg-features" class="feature-list" style="margin:.5rem 0 0 1rem; padding-left:1rem; list-style:disc;"></ul>
-                  <div class="row gap-06">
-                    <button class="btn btn-primary" id="agg-add">Add to Cart</button>
+                  <div class="stack-03">
+                    <div class="stack-02">
+                      <a class="calltoorder-desktop-link" href="tel:+13868373131" aria-label="Call to order at 386-837-3131">Call To Order</a>
+                      <a class="btn btn-primary calltoorder-mobile-btn" href="tel:+13868373131" aria-label="Call to order at 386-837-3131">Call To Order</a>
+                      <div class="text-sm text-muted"><strong>Email:</strong> <a href="mailto:info@ezsportsnetting.com">info@ezsportsnetting.com</a></div>
+                    </div>
                     <button class="btn btn-ghost" id="agg-back">Back</button>
                   </div>
                 </div>

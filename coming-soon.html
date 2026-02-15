@@ -17,12 +17,20 @@
     .cs-hero { text-align:center; }
     .cs-hero img { width: clamp(200px, 28vw, 380px); height:auto; filter: drop-shadow(0 6px 18px rgba(0,0,0,0.08)); }
     .cs-card { width:100%; background:#fff; border:1px solid #e6e6e6; border-radius: 16px; padding: clamp(1.25rem, 3vw, 2rem); box-shadow: 0 6px 24px rgba(0,0,0,0.06); text-align:center; position:relative; overflow:hidden; }
-    @media (min-width: 820px) { .cs-card { text-align: left; } }
     .cs-badge { display:inline-block; font-size:.875rem; background:#111; color:#fff; padding:.25rem .5rem; border-radius:999px; }
     h1 { font-size: clamp(1.5rem, 3.5vw, 2.25rem); margin:.5rem 0 0; }
     p { margin:.25rem 0; color:#444; }
+
+    .cs-countdown { margin-top: 1rem; display:grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .5rem; }
+    .cs-tile { border: 1px solid #e6e6e6; border-radius: 12px; padding: .75rem .5rem; text-align:center; background: #fff; }
+    .cs-num { display:block; font-size: clamp(1.25rem, 3vw, 1.75rem); font-weight: 800; line-height: 1; letter-spacing: .02em; }
+    .cs-lbl { display:block; margin-top: .25rem; font-size: .8rem; color:#666; text-transform: uppercase; letter-spacing: .08em; }
+
+    .cs-grand { margin-top: 1rem; text-align:center; font-weight: 900; font-size: clamp(1.25rem, 2.8vw, 1.75rem); letter-spacing: .01em; }
+    .cs-target { margin-top: .25rem; text-align:center; font-size: 1rem; color:#444; }
+
+    .cs-open { margin-top: 1rem; font-weight: 700; }
     .cs-cta { margin-top: 1rem; display:flex; gap:.5rem; justify-content:center; flex-wrap: wrap; }
-    @media (min-width: 820px) { .cs-cta { justify-content:flex-start; } }
     .btn { appearance:none; border: 1px solid #111; background:#111; color:#fff; padding:.65rem 1rem; border-radius: 10px; cursor:pointer; font-weight:600; }
     .btn.ghost { background:transparent; color:#111; }
     .cs-note { font-size:.875rem; color:#666; margin-top:.75rem; }
@@ -52,12 +60,22 @@
         <img src="assets/img/EZSportslogo.png" alt="EZ Sports Netting" />
       </div>
       <section class="cs-card" role="dialog" aria-modal="true" aria-describedby="desc">
-      <span class="cs-badge">Opening soon</span>
       <h1 id="title">We’re getting the nets just right</h1>
       <p id="desc">We’re putting the final tweaks on the EZ Sports experience. Check back shortly.</p>
+
+      <div class="cs-grand">Grand Opening</div>
+      <div class="cs-target">Feb 18 @ 12:00pm EST</div>
+
+      <div id="countdown" class="cs-countdown" aria-label="Countdown to grand opening" aria-live="polite">
+        <div class="cs-tile"><span class="cs-num" data-unit="days">—</span><span class="cs-lbl">Days</span></div>
+        <div class="cs-tile"><span class="cs-num" data-unit="hours">—</span><span class="cs-lbl">Hours</span></div>
+        <div class="cs-tile"><span class="cs-num" data-unit="mins">—</span><span class="cs-lbl">Minutes</span></div>
+        <div class="cs-tile"><span class="cs-num" data-unit="secs">—</span><span class="cs-lbl">Seconds</span></div>
+      </div>
+      <div id="open-state" class="cs-open" hidden>We’re open. <a class="btn" href="index.html">Enter site</a></div>
+
       <div class="cs-cta">
         <a class="btn ghost" href="mailto:info@ezsportsnetting.com">Contact us</a>
-        <a class="btn" href="support.html">Support</a>
       </div>
       </section>
     </div>
@@ -75,6 +93,61 @@
 
   <script>
     (function(){
+      // Feb 18 @ 12:00pm EST (UTC-05:00) => 2026-02-18T17:00:00Z
+      const OPEN_UTC = Date.UTC(2026, 1, 18, 17, 0, 0);
+      const $cd = document.getElementById('countdown');
+      const $open = document.getElementById('open-state');
+      const $badge = document.querySelector('.cs-badge');
+      const $title = document.getElementById('title');
+      const $desc = document.getElementById('desc');
+
+      const $days = document.querySelector('[data-unit="days"]');
+      const $hours = document.querySelector('[data-unit="hours"]');
+      const $mins = document.querySelector('[data-unit="mins"]');
+      const $secs = document.querySelector('[data-unit="secs"]');
+
+      function pad2(n){ return String(n).padStart(2,'0'); }
+      function setText(el, value){ if (el) el.textContent = value; }
+
+      function renderCountdown(){
+        const now = Date.now();
+        let remaining = OPEN_UTC - now;
+        if (!Number.isFinite(remaining)) remaining = 0;
+
+        if (remaining <= 0) {
+          setText($days, '0');
+          setText($hours, '00');
+          setText($mins, '00');
+          setText($secs, '00');
+          if ($open) $open.hidden = false;
+          if ($cd) $cd.setAttribute('aria-label', 'Grand opening is live');
+          if ($badge) $badge.textContent = 'Now open';
+          if ($title) $title.textContent = 'We’re open';
+          if ($desc) $desc.textContent = 'Welcome to EZ Sports Netting.';
+          return true;
+        }
+
+        const seconds = Math.floor(remaining / 1000);
+        const days = Math.floor(seconds / 86400);
+        const hours = Math.floor((seconds % 86400) / 3600);
+        const mins = Math.floor((seconds % 3600) / 60);
+        const secs = seconds % 60;
+
+        setText($days, String(days));
+        setText($hours, pad2(hours));
+        setText($mins, pad2(mins));
+        setText($secs, pad2(secs));
+        return false;
+      }
+
+      // Kick once immediately and then once per second.
+      let done = renderCountdown();
+      if (!done) {
+        const t = setInterval(function(){
+          if (renderCountdown()) clearInterval(t);
+        }, 1000);
+      }
+
       const KEY = 'comingSoonUnlocked';
       const MAX_WINDOW_MS = 5000; // 5 seconds
       const REQUIRED_CLICKS = 7;

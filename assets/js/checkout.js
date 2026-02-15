@@ -102,6 +102,19 @@ function normalizeShippingMethod(value) {
   return (v === 'expedited') ? 'expedited' : 'standard';
 }
 
+function isAccessoryCartItem(i){
+  try {
+    const cat = String(i?.category || '').toLowerCase();
+    if (cat === 'accessories' || cat === 'pad-kits' || cat === 'bullet-pad-kits') return true;
+    const id = String(i?.id || '').toUpperCase();
+    if (/^CABLE/.test(id)) return true;
+    // Heuristic fallback by title
+    const t = String(i?.title || i?.name || '').toLowerCase();
+    if (/\bcable\b|\btwine\b|\brope\b|\bvinyl\b|\bpadding\b|\bbasket\b|\bbatting\s*mat\b|screen\s*bulletz|armor/.test(t)) return true;
+  } catch {}
+  return false;
+}
+
 function getShippingMethod() {
   try {
     const el = document.getElementById('shipping-method');
@@ -131,6 +144,8 @@ function calcShippingCentsForCart(cart, shippingMethod = 'standard'){
   const expeditedSurchargeCentsPerItem = (method === 'expedited') ? 10000 : 0;
   let total = 0;
   for (const i of cart) {
+    // Accessories: shipping disabled (call-to-order)
+    if (isAccessoryCartItem(i)) continue;
     const raw = (typeof i.ship !== 'undefined') ? i.ship : i.shipAmount;
     const dsr = Number(raw);
     // Respect explicit zero as free shipping
@@ -205,6 +220,7 @@ function computeDiscountCents(sub, ship, applied) {
 async function initialize() {
   const form = document.getElementById('payment-form');
   const cart = readCart();
+  const hasAccessories = Array.isArray(cart) && cart.some(isAccessoryCartItem);
   let appliedCoupon = null; // { code, type, value }
   let clientSecret = null;
   let amount = 0;
@@ -247,6 +263,7 @@ async function initialize() {
     const qty = i.qty || 0;
     const unitCents = toCents(unit);
     const lineCents = unitCents * qty;
+    const isAcc = isAccessoryCartItem(i);
     const raw = (typeof i.ship !== 'undefined') ? i.ship : i.shipAmount;
     const shipPer = Number(raw);
     const shipEach = Number.isFinite(shipPer) ? (shipPer === 0 ? 0 : (shipPer > 0 ? shipPer : 100)) : 100;
@@ -260,7 +277,7 @@ async function initialize() {
           ${variant ? `<div class="muted">${variant}</div>` : ''}
           <div class="muted text-xs">SKU: ${i.id}</div>
           <div class="muted">${currencyFmt(unitCents)} × ${qty}</div>
-          <div class="muted">Shipping: ${shipEachWithMethod===0 ? 'Free' : currencyFmt(toCents(shipEachWithMethod))} × ${qty}${initialShippingMethod === 'expedited' ? ' (expedited)' : ''}</div>
+          ${isAcc ? `<div class="muted">Shipping: Call to order</div>` : `<div class="muted">Shipping: ${shipEachWithMethod===0 ? 'Free' : currencyFmt(toCents(shipEachWithMethod))} × ${qty}${initialShippingMethod === 'expedited' ? ' (expedited)' : ''}</div>`}
         </div>
         <div class="text-right">
           <strong>${currencyFmt(lineCents)}</strong>
@@ -269,6 +286,58 @@ async function initialize() {
     `;
   }).join('');
   document.getElementById('order-lines').innerHTML = lines || '<p>Your cart is empty.</p>';
+
+  // If cart contains Accessories, disable shipping + online checkout and show Call To Order CTA
+  if (hasAccessories) {
+    try {
+      // Hide shipping method selector (not applicable)
+      const shipMethodEl = document.getElementById('shipping-method');
+      const shipMethodRow = shipMethodEl ? shipMethodEl.closest('.field-row') : null;
+      if (shipMethodRow) shipMethodRow.style.display = 'none';
+
+      // Remove required constraints so users can still view the page without validation issues
+      ['address1','city','state','postal','name','email'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.required = false;
+      });
+
+      // Replace payment UI with call-to-order CTA
+      const pe = document.getElementById('payment-element');
+      if (pe) {
+        pe.innerHTML = `
+          <div class="stack-03">
+            <p class="muted">Accessories must be ordered by phone.</p>
+            <div class="stack-02">
+              <a class="calltoorder-desktop-link" href="tel:+13868373131" aria-label="Call to order at 386-837-3131">Call To Order</a>
+              <a class="btn btn-primary calltoorder-mobile-btn" href="tel:+13868373131" aria-label="Call to order at 386-837-3131">Call To Order</a>
+              <div class="text-sm text-muted"><strong>Email:</strong> <a href="mailto:info@ezsportsnetting.com">info@ezsportsnetting.com</a></div>
+            </div>
+          </div>
+        `;
+      }
+      const submit = document.getElementById('submit');
+      if (submit) {
+        submit.disabled = true;
+        submit.setAttribute('aria-disabled','true');
+        submit.style.display = 'none';
+      }
+      const msg = document.getElementById('payment-message');
+      if (msg) msg.textContent = '';
+
+      // Force summary shipping display to a neutral placeholder
+      const shipSum = document.getElementById('sum-shipping');
+      if (shipSum) shipSum.textContent = '—';
+      // Compute totals with shipping disabled
+      updateSummary(cart, appliedCoupon, getShippingAddress(), 'standard');
+
+      // Prevent any submission attempts and default to tel:
+      form?.addEventListener('submit', (e) => {
+        try { e.preventDefault(); } catch {}
+        try { window.location.href = 'tel:+13868373131'; } catch {}
+      });
+    } catch {}
+    return;
+  }
 
   const getPayload = () => {
     const fd = new FormData(form);

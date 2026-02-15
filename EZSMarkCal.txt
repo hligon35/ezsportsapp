@@ -1,0 +1,316 @@
+Date,Month,Week,Channel,Type,Theme,Topic,Description,Season,Holiday,SEO Phase
+2026-02-18,Month 1,Week 1,Facebook,Post,Brand Awareness,What Makes EZ Sports Netting Different?,Brand intro, durability, fast shipping, custom sizing.,Late Winter,None,Foundation
+2026-02-19,Month 1,Week 1,Instagram,Post,Product Highlight,Product Close-Ups,High-quality netting texture and materials.,Late Winter,None,Foundation
+2026-02-20,Month 1,Week 1,Facebook,Ad,Traffic,Upgrade Your Field or Backyard,Target coaches, facility managers, parents.,Late Winter,None,Foundation
+2026-02-21,Month 1,Week 1,Google,Ad,Search,Sports Netting Search Ad,Baseball netting keywords + CTA.,Late Winter,None,Foundation
+2026-02-22,Month 1,Week 1,Instagram,Reel,Education,3 Places You Can Use Netting,Backyards, facilities, schools.,Late Winter,None,Foundation
+
+2026-02-24,Month 1,Week 2,Facebook,Post,Seasonal Prep,Spring Training Is Coming,Baseball/softball season hype.,Late Winter,None,Foundation
+2026-02-26,Month 1,Week 2,Instagram,Story,Engagement,Sport Poll,Baseball / Softball / Golf / Soccer.,Late Winter,None,Foundation
+
+2026-03-01,Month 1,Week 3,Facebook,Post,Product Highlight,Baseball/Softball Netting,Highlight UV protection + durability.,Preseason,None,Foundation
+2026-03-03,Month 1,Week 3,Instagram,Post,Installation,Before/After Installations,3–5 transformation slides.,Preseason,None,Foundation
+2026-03-04,Month 1,Week 3,Facebook,Ad,Engagement,Backyard Batting Cage?,Target parents + youth sports families.,Preseason,None,Foundation
+2026-03-05,Month 1,Week 3,Google,Ad,Display,Backyard Setup Display Ad,Lifestyle backyard images.,Preseason,None,Foundation
+2026-03-06,Month 1,Week 3,Instagram,Post,Customer Use Case,Customer Highlight,Share a customer photo.,Preseason,None,Foundation
+
+2026-03-08,Month 1,Week 4,Facebook,Post,Education,How to Measure Your Space,Simple guide for accurate measurements.,Preseason,None,Foundation
+2026-03-10,Month 1,Week 4,Instagram,Reel,Product Highlight,Netting Durability Test,Show strength + material quality.,Preseason,None,Foundation
+
+2026-03-12,Month 1,Week 4,Facebook,Post,Promotion,Limited-Time Offer,10% Off All Netting Orders.,Preseason,None,Foundation
+2026-03-13,Month 1,Week 4,Instagram,Story,Promotion,Promo Countdown,3 Days Left.,Preseason,None,Foundation
+2026-03-14,Month 1,Week 4,Facebook,Ad,Conversions,Promo-Focused Ad,Retargeting + lookalikes.,Preseason,None,Foundation
+2026-03-15,Month 1,Week 4,Google,Ad,Search,Netting Discount Search Ad,High-intent keywords.,Preseason,None,Foundation
+
+2026-03-16,Month 1,Week 4,Instagram,Reel,Education,How to Measure for Netting,Quick tips + CTA.,Preseason,None,Foundation
+2026-03-18,Month 1,Week 4,Facebook,Post,Education,Why Custom Netting Matters,Explain sizing accuracy + safety.,Preseason,None,Foundation
+2026-03-20,Month 1,Week 4,Instagram,Post,Product Highlight,Material Spotlight,Knotless vs knotted netting.,Preseason,None,Foundation
+
+2026-03-22,Month 1,Week 5,Facebook,Post,Customer Use Case,Testimonial,"Our new netting is amazing…",Preseason,None,Foundation
+2026-03-23,Month 1,Week 5,Instagram,Post,Installation,Installations Gallery,5–7 customer photos.,Preseason,None,Foundation
+2026-03-24,Month 1,Week 5,Facebook,Ad,Retargeting,Retargeting Ad,Past 30-day visitors.,Preseason,None,Foundation
+2026-03-25,Month 1,Week 5,Google,Ad,Display,Finish Your Order Display Ad,Abandoned carts.,Preseason,None,Foundation
+2026-03-26,Month 1,Week 5,Instagram,Post,Behind the Scenes,Behind the Scenes,Cutting netting + quality checks.,Preseason,None,Foundation
+2026-03-28,Month 1,Week 5,Facebook,Post,Engagement,What Sport Next?,Engagement question.,Preseason,None,Foundation
+2026-03-29,Month 1,Week 5,Instagram,Story,Engagement,Poll,Baseball / Softball / Golf / Soccer.,Preseason,None,Foundation
+
+2026-03-30,Month 1,Week 5,Facebook,Ad,Lead Gen,Lead Gen Ad,Free custom quote.,Preseason,None,Foundation
+2026-03-31,Month 1,Week 5,Google,Ad,Search,Custom Netting Quote Search Ad,High-intent keywords.,Preseason,None,Foundation
+
+2026-04-01,Month 2,Week 1,Facebook,Post,Seasonal Prep,Opening Day Ready?,Baseball/softball season hype.,Spring,Easter Season,Foundation
+2026-04-03,Month 2,Week 1,Instagram,Post,Product Highlight,Baseball Netting Close-Up,Show stitching + UV coating.,Spring,Easter Season,Foundation
+2026-04-04,Month 2,Week 1,Facebook,Ad,Traffic,Backyard Batting Cage Promo,Target parents.,Spring,Easter Season,Foundation
+2026-04-05,Month 2,Week 1,Google,Ad,Search,Baseball Netting Search Ad,High-intent baseball keywords.,Spring,Easter,Foundation
+
+2026-04-06,Month 2,Week 2,Instagram,Reel,Education,3 Backyard Cage Ideas,Quick inspiration.,Spring,None,Foundation
+2026-04-08,Month 2,Week 2,Facebook,Post,Seasonal Prep,Golf Season Is Starting,Promote golf netting.,Spring,None,Foundation
+2026-04-10,Month 2,Week 2,Instagram,Story,Engagement,Golf or Baseball?,Engagement.,Spring,None,Foundation
+
+2026-04-12,Month 2,Week 3,Facebook,Post,Product Highlight,Golf Netting Benefits,Weather resistance + durability.,Spring,None,Foundation
+2026-04-13,Month 2,Week 3,Instagram,Post,Installation,Golf Installations,Show 3–5 setups.,Spring,None,Foundation
+2026-04-14,Month 2,Week 3,Facebook,Ad,Traffic,Golf Practice Netting Ad,Target golfers.,Spring,None,Foundation
+2026-04-15,Month 2,Week 3,Google,Ad,Search,Golf Netting Search Ad,Keywords: golf practice netting.,Spring,None,Foundation
+
+2026-04-16,Month 2,Week 3,Instagram,Post,Customer Use Case,Customer Highlight,Golf customer spotlight.,Spring,None,Foundation
+2026-04-18,Month 2,Week 3,Facebook,Post,Education,Spring Safety Tips,Prevent property damage.,Spring,None,Foundation
+2026-04-20,Month 2,Week 3,Instagram,Reel,Education,How to Choose Netting,Quick educational breakdown.,Spring,None,Foundation
+
+2026-04-22,Month 2,Week 4,Facebook,Post,Promotion,Spring Sale,10% Off All Netting.,Spring,None,Foundation
+2026-04-23,Month 2,Week 4,Instagram,Story,Promotion,Sale Countdown,2 Days Left.,Spring,None,Foundation
+2026-04-24,Month 2,Week 4,Facebook,Ad,Conversions,Spring Promo Ad,Conversions.,Spring,None,Foundation
+2026-04-25,Month 2,Week 4,Google,Ad,Search,Spring Netting Sale Search Ad,Seasonal keywords.,Spring,None,Foundation
+
+2026-04-26,Month 2,Week 4,Instagram,Reel,Education,Netting Installation Tips,DIY steps.,Spring,None,Foundation
+2026-04-28,Month 2,Week 4,Facebook,Post,Product Highlight,Why Our Netting Lasts Longer,Material + craftsmanship.,Spring,None,Foundation
+2026-04-30,Month 2,Week 4,Instagram,Post,Product Highlight,Material Comparison,Show difference between grades.,Spring,None,Foundation
+
+2026-05-01,Month 3,Week 1,Facebook,Post,Customer Use Case,Customer Testimonial,Highlight a baseball family.,Spring,None,Authority Growth
+2026-05-02,Month 3,Week 1,Instagram,Post,Installation,Installations Gallery,5–7 photos.,Spring,None,Authority Growth
+2026-05-03,Month 3,Week 1,Facebook,Ad,Retargeting,Retargeting Ad,Past 30-day visitors.,Spring,None,Authority Growth
+2026-05-04,Month 3,Week 1,Google,Ad,Display,Finish Your Order Display Ad,Abandoned carts.,Spring,None,Authority Growth
+2026-05-05,Month 3,Week 1,Instagram,Post,Behind the Scenes,Behind the Scenes,Busy season production.,Spring,None,Authority Growth
+2026-05-06,Month 3,Week 1,YouTube Shorts,Short,Education,How Strong Is EZ Netting?,Quick durability demo.,Spring,None,Authority Growth
+
+2026-05-07,Month 3,Week 2,Facebook,Post,Engagement,What Sport Next?,Engagement question.,Spring,None,Authority Growth
+2026-05-08,Month 3,Week 2,Instagram,Story,Engagement,Poll,Golf / Baseball / Soccer / Lacrosse.,Spring,None,Authority Growth
+
+2026-05-10,Month 3,Week 2,Facebook,Ad,Lead Gen,Lead Gen Ad,Free custom quote.,Spring,None,Authority Growth
+2026-05-11,Month 3,Week 2,Google,Ad,Search,Custom Netting Quote Search Ad,High-intent keywords.,Spring,None,Authority Growth
+2026-05-12,Month 3,Week 2,Facebook,Post,Seasonal Prep,School Sports Wrapping Up,Promote summer upgrades.,Spring,None,Authority Growth
+2026-05-13,Month 3,Week 2,Instagram,Post,Installation,Baseball Installations,Showcase recent work.,Spring,None,Authority Growth
+2026-05-14,Month 3,Week 2,Facebook,Ad,Traffic,Facility Upgrade Ad,Target school + facility managers.,Spring,None,Authority Growth
+2026-05-15,Month 3,Week 2,Google,Ad,Search,School Netting Search Ad,Keywords: school sports netting.,Spring,None,Authority Growth
+
+2026-05-16,Month 3,Week 3,Instagram,Reel,Education,3 Summer Project Ideas,Backyard cages + golf setups.,Spring,None,Authority Growth
+2026-05-17,Month 3,Week 3,YouTube Shorts,Short,Education,Backyard Cage in 10 Seconds,Fast walkthrough.,Spring,None,Authority Growth
+2026-05-18,Month 3,Week 3,Facebook,Post,Seasonal Prep,Summer Is Coming,Backyard sports prep.,Spring,None,Authority Growth
+
+2026-05-20,Month 3,Week 3,Instagram,Post,Product Highlight,Golf Netting for Summer,Highlight UV resistance.,Spring,None,Authority Growth
+2026-05-22,Month 3,Week 3,Facebook,Post,Customer Use Case,Customer Testimonial,Golf customer.,Spring,None,Authority Growth
+2026-05-24,Month 3,Week 3,Instagram,Post,Installation,Installations Gallery,5–7 photos.,Spring,None,Authority Growth
+
+2026-05-25,Month 3,Week 4,Facebook,Ad,Promotion,Memorial Day Sale,Holiday promo.,Spring,Memorial Day,Authority Growth
+2026-05-26,Month 3,Week 4,Instagram,Story,Promotion,Memorial Day Countdown,Holiday promo.,Spring,Memorial Day,Authority Growth
+2026-05-27,Month 3,Week 4,Google,Ad,Search,Holiday Netting Sale Search Ad,Seasonal keywords.,Spring,Memorial Day,Authority Growth
+
+2026-06-01,Month 4,Week 1,Facebook,Post,Education,Backyard Netting Benefits,Family-friendly messaging.,Summer,None,Authority Growth
+2026-06-02,Month 4,Week 1,Instagram,Post,Installation,Backyard Transformations,Before/after.,Summer,None,Authority Growth
+2026-06-03,Month 4,Week 1,YouTube Shorts,Short,Education,3 Backyard Netting Ideas,Quick inspiration.,Summer,None,Authority Growth
+2026-06-04,Month 4,Week 1,Facebook,Ad,Traffic,Backyard Cage Ad,Target parents + homeowners.,Summer,None,Authority Growth
+2026-06-05,Month 4,Week 1,Google,Ad,Search,Backyard Sports Search Ad,High-intent summer keywords.,Summer,None,Authority Growth
+2026-06-06,Month 4,Week 1,Instagram,Post,Customer Use Case,Customer Highlight,Backyard customer.,Summer,None,Authority Growth
+
+2026-06-08,Month 4,Week 2,Facebook,Post,Education,How to Install Netting Indoors,Training facility content.,Summer,None,Authority Growth
+2026-06-10,Month 4,Week 2,Instagram,Reel,Installation,Indoor Cage Setup,Quick walkthrough.,Summer,None,Authority Growth
+
+2026-06-12,Month 4,Week 2,Facebook,Post,Promotion,Father’s Day Sale,Seasonal promo.,Summer,Father's Day,Authority Growth
+2026-06-13,Month 4,Week 2,Instagram,Story,Promotion,Father’s Day Countdown,Promo.,Summer,Father's Day,Authority Growth
+2026-06-14,Month 4,Week 2,Facebook,Ad,Promotion,Father’s Day Promo Ad,Conversions.,Summer,Father's Day,Authority Growth
+2026-06-15,Month 4,Week 2,Google,Ad,Search,Father’s Day Search Ad,Seasonal keywords.,Summer,Father's Day,Authority Growth
+
+2026-06-16,Month 4,Week 3,Instagram,Reel,Education,Netting Care Tips,Summer maintenance.,Summer,None,Authority Growth
+2026-06-18,Month 4,Week 3,Facebook,Post,Product Highlight,Golf Netting for Summer,Highlight UV resistance.,Summer,None,Authority Growth
+
+2026-06-19,Month 5,Week 3,Instagram,Post,Product Highlight,Golf Close-Ups,Material + stitching.,Summer,None,Authority Growth
+2026-06-20,Month 5,Week 3,Facebook,Post,Customer Use Case,Customer Testimonial,Highlight a golfer.,Summer,None,Authority Growth
+2026-06-22,Month 5,Week 4,Instagram,Post,Installation,Installations Gallery,5–7 photos.,Summer,None,Authority Growth
+2026-06-24,Month 5,Week 4,Facebook,Ad,Retargeting,Retargeting Ad,Past 30-day visitors.,Summer,None,Authority Growth
+2026-06-25,Month 5,Week 4,Google,Ad,Display,Finish Your Order Display Ad,Abandoned carts.,Summer,None,Authority Growth
+2026-06-26,Month 5,Week 4,Instagram,Post,Behind the Scenes,Behind the Scenes,Summer production workflow.,Summer,None,Authority Growth
+2026-06-28,Month 5,Week 4,Facebook,Post,Engagement,What Sport Next?,Engagement question.,Summer,None,Authority Growth
+2026-06-29,Month 5,Week 4,Instagram,Story,Engagement,Poll,Golf / Baseball / Soccer / Lacrosse.,Summer,None,Authority Growth
+
+2026-07-01,Month 6,Week 1,Facebook,Post,Seasonal Prep,Mid-Summer Sports Tips,Baseball/softball maintenance.,Summer,Independence Day,Authority Growth
+2026-07-02,Month 6,Week 1,Instagram,Post,Installation,Golf Practice Setups,Showcase customer setups.,Summer,Independence Day,Authority Growth
+2026-07-03,Month 6,Week 1,YouTube Shorts,Short,Education,3 Mistakes When Buying Netting,Educational.,Summer,Independence Day,Authority Growth
+2026-07-04,Month 6,Week 1,Facebook,Ad,Promotion,4th of July Sale,Holiday promo.,Summer,Independence Day,Authority Growth
+2026-07-05,Month 6,Week 1,Google,Ad,Search,4th of July Search Ad,Seasonal keywords.,Summer,Independence Day,Authority Growth
+
+2026-07-06,Month 6,Week 2,Instagram,Post,Customer Use Case,Customer Highlight,Baseball family.,Summer,None,Authority Growth
+2026-07-08,Month 6,Week 2,Facebook,Post,Behind the Scenes,Behind the Scenes,Summer shipping rush.,Summer,None,Authority Growth
+2026-07-10,Month 6,Week 2,Instagram,Reel,Product Highlight,How Strong Is EZ Netting?,Durability demo.,Summer,None,Authority Growth
+
+2026-07-12,Month 6,Week 3,Facebook,Post,Education,Why Netting Matters for Safety,Educational.,Summer,None,Authority Growth
+2026-07-13,Month 6,Week 3,Instagram,Post,Product Highlight,Material Spotlight,Knotless vs knotted.,Summer,None,Authority Growth
+2026-07-14,Month 6,Week 3,Facebook,Ad,Conversions,Summer Sports Netting Ad,Conversions.,Summer,None,Authority Growth
+2026-07-15,Month 6,Week 3,Google,Ad,Search,Summer Netting Search Ad,High-intent keywords.,Summer,None,Authority Growth
+
+2026-07-16,Month 6,Week 3,Instagram,Reel,Education,How to Measure Your Space,Quick guide.,Summer,None,Authority Growth
+2026-07-18,Month 6,Week 3,Facebook,Post,Customer Use Case,Customer Testimonial,Highlight a golfer.,Summer,None,Authority Growth
+2026-07-20,Month 6,Week 3,Instagram,Post,Installation,Installations Gallery,5–7 photos.,Summer,None,Authority Growth
+
+2026-07-22,Month 6,Week 4,Facebook,Post,Seasonal Prep,Prep for Fall Sports,Introduce soccer/football netting.,Summer,None,Authority Growth
+2026-07-24,Month 6,Week 4,Instagram,Post,Product Highlight,Soccer Netting Close-Up,Material + durability.,Summer,None,Authority Growth
+2026-07-26,Month 6,Week 4,YouTube Shorts,Short,Education,How Strong Is Soccer Netting?,Quick demo.,Summer,None,Authority Growth
+2026-07-27,Month 6,Week 4,Facebook,Ad,Traffic,Fall Sports Upgrade Ad,Target schools.,Summer,None,Authority Growth
+2026-07-28,Month 6,Week 4,Google,Ad,Search,Soccer Netting Search Ad,High-intent keywords.,Summer,None,Authority Growth
+
+2026-08-01,Month 7,Week 1,Facebook,Post,Seasonal Prep,Soccer Netting Spotlight,Promote fall sports.,Late Summer,None,Authority Growth
+2026-08-02,Month 7,Week 1,Instagram,Post,Product Highlight,Football Practice Netting,Showcase durability.,Late Summer,None,Authority Growth
+2026-08-03,Month 7,Week 1,YouTube Shorts,Short,Education,How Strong Is Football Netting?,Quick demo.,Late Summer,None,Authority Growth
+2026-08-04,Month 7,Week 1,Facebook,Ad,Traffic,Fall Sports Upgrade Ad,Target schools.,Late Summer,None,Authority Growth
+2026-08-05,Month 7,Week 1,Google,Ad,Search,Football Netting Search Ad,High-intent keywords.,Late Summer,None,Authority Growth
+
+2026-08-06,Month 7,Week 2,Instagram,Post,Customer Use Case,Customer Highlight,School installation.,Late Summer,None,Authority Growth
+2026-08-08,Month 7,Week 2,Facebook,Post,Behind the Scenes,Behind the Scenes,Custom school orders.,Late Summer,None,Authority Growth
+2026-08-10,Month 7,Week 2,Instagram,Reel,Education,3 Fall Sports Uses for Netting,Educational.,Late Summer,None,Authority Growth
+
+2026-08-12,Month 7,Week 3,Facebook,Post,Promotion,Back-to-School Sports Sale,Seasonal promo.,Late Summer,None,Authority Growth
+2026-08-13,Month 7,Week 3,Instagram,Story,Engagement,Poll,Soccer / Football / Lacrosse.,Late Summer,None,Authority Growth
+2026-08-14,Month 7,Week 3,Facebook,Ad,Conversions,School Sports Promo Ad,Conversions.,Late Summer,None,Authority Growth
+2026-08-15,Month 7,Week 3,Google,Ad,Search,School Sports Search Ad,Seasonal keywords.,Late Summer,None,Authority Growth
+
+2026-08-16,Month 7,Week 3,Instagram,Reel,Education,Netting for Football Drills,Training tips.,Late Summer,None,Authority Growth
+2026-08-18,Month 7,Week 3,Facebook,Post,Education,Why Schools Choose EZ Netting,Durability + safety.,Late Summer,None,Authority Growth
+2026-08-20,Month 7,Week 3,Instagram,Post,Installation,Installations Gallery,5–7 photos.,Late Summer,None,Authority Growth
+
+2026-08-22,Month 7,Week 4,Facebook,Post,Seasonal Prep,Prep for Indoor Training,Introduce indoor netting.,Late Summer,None,Authority Growth
+2026-08-24,Month 7,Week 4,Instagram,Post,Product Highlight,Indoor Netting Close-Up,Material + stitching.,Late Summer,None,Authority Growth
+2026-08-26,Month 7,Week 4,YouTube Shorts,Short,Education,Indoor Cage Setup in 10 Seconds,Quick demo.,Late Summer,None,Authority Growth
+2026-08-27,Month 7,Week 4,Facebook,Ad,Traffic,Indoor Facility Ad,Target gyms + facilities.,Late Summer,None,Authority Growth
+2026-08-28,Month 7,Week 4,Google,Ad,Search,Indoor Netting Search Ad,High-intent keywords.,Late Summer,None,Authority Growth
+
+2026-09-01,Month 8,Week 1,Facebook,Post,Seasonal Prep,School Sports in Full Swing,Promote facility upgrades.,Fall,None,Authority Growth
+2026-09-02,Month 8,Week 1,Instagram,Post,Installation,Indoor Facility Netting,Showcase indoor setups.,Fall,None,Authority Growth
+2026-09-03,Month 8,Week 1,YouTube Shorts,Short,Education,Indoor Cage Setup in 10 Seconds,Quick demo.,Fall,None,Authority Growth
+2026-09-04,Month 8,Week 1,Facebook,Ad,Traffic,Indoor Facility Ad,Target gyms + facilities.,Fall,None,Authority Growth
+2026-09-05,Month 8,Week 1,Google,Ad,Search,Indoor Netting Search Ad,High-intent keywords.,Fall,None,Authority Growth
+
+2026-09-06,Month 8,Week 2,Instagram,Post,Customer Use Case,Customer Highlight,Indoor facility.,Fall,None,Authority Growth
+2026-09-08,Month 8,Week 2,Facebook,Post,Behind the Scenes,Behind the Scenes,Indoor production.,Fall,None,Authority Growth
+2026-09-10,Month 8,Week 2,Instagram,Reel,Education,Indoor Training Tips,Educational.,Fall,None,Authority Growth
+
+2026-09-12,Month 8,Week 3,Facebook,Post,Promotion,Indoor Training Season Sale,Seasonal promo.,Fall,None,Authority Growth
+2026-09-13,Month 8,Week 3,Instagram,Story,Engagement,Poll,Indoor / Outdoor Training.,Fall,None,Authority Growth
+2026-09-14,Month 8,Week 3,Facebook,Ad,Conversions,Indoor Promo Ad,Conversions.,Fall,None,Authority Growth
+2026-09-15,Month 8,Week 3,Google,Ad,Search,Indoor Training Search Ad,Seasonal keywords.,Fall,None,Authority Growth
+
+2026-09-16,Month 8,Week 3,Instagram,Reel,Education,How to Choose Indoor Netting,Educational.,Fall,None,Authority Growth
+2026-09-18,Month 8,Week 3,Facebook,Post,Customer Use Case,Customer Testimonial,Indoor facility.,Fall,None,Authority Growth
+2026-09-20,Month 8,Week 3,Instagram,Post,Installation,Installations Gallery,5–7 photos.,Fall,None,Authority Growth
+
+2026-09-22,Month 8,Week 4,Facebook,Post,Seasonal Prep,Indoor Baseball Season Begins,Promote indoor cages.,Fall,None,Domination
+2026-09-24,Month 8,Week 4,Instagram,Post,Product Highlight,Indoor Cage Close-Ups,Material + stitching.,Fall,None,Domination
+2026-09-26,Month 8,Week 4,YouTube Shorts,Short,Education,Indoor Cage Setup,Quick demo.,Fall,None,Domination
+2026-09-27,Month 8,Week 4,Facebook,Ad,Traffic,Indoor Cage Ad,Target baseball facilities.,Fall,None,Domination
+2026-09-28,Month 8,Week 4,Google,Ad,Search,Indoor Baseball Netting Search Ad,High-intent keywords.,Fall,None,Domination
+
+2026-10-01,Month 8,Week 5,Facebook,Post,Education,Why Indoor Netting Matters,Training safety.,Fall,None,Domination
+2026-10-02,Month 8,Week 5,Instagram,Post,Product Highlight,Indoor Netting Materials,Showcase durability.,Fall,None,Domination
+2026-10-03,Month 8,Week 5,YouTube Shorts,Short,Education,Indoor Netting Strength Test,Quick demo.,Fall,None,Domination
+2026-10-04,Month 8,Week 5,Facebook,Ad,Conversions,Indoor Training Conversions Ad,Retargeting.,Fall,None,Domination
+2026-10-05,Month 8,Week 5,Google,Ad,Search,Indoor Training High-Intent Search Ad,High-intent keywords.,Fall,None,Domination
+
+2026-10-06,Month 8,Week 5,Instagram,Post,Customer Use Case,Indoor Training Highlight,Customer story.,Fall,None,Domination
+2026-10-08,Month 8,Week 5,Facebook,Post,Behind the Scenes,Indoor Production Workflow,Show craftsmanship.,Fall,None,Domination
+2026-10-10,Month 8,Week 5,Instagram,Reel,Education,Indoor Training Tips,Educational.,Fall,None,Domination
+
+2026-10-12,Month 8,Week 6,Facebook,Post,Promotion,Fall Training Sale,Seasonal promo.,Fall,None,Domination
+2026-10-13,Month 8,Week 6,Instagram,Story,Engagement,Poll,Indoor / Outdoor Training.,Fall,None,Domination
+2026-10-14,Month 8,Week 6,Facebook,Ad,Conversions,Fall Promo Ad,Conversions.,Fall,None,Domination
+2026-10-15,Month 8,Week 6,Google,Ad,Search,Fall Training Search Ad,Seasonal keywords.,Fall,None,Domination
+
+2026-10-16,Month 8,Week 6,Instagram,Reel,Education,Choosing the Right Indoor Netting,Educational.,Fall,None,Domination
+2026-10-18,Month 8,Week 6,Facebook,Post,Customer Use Case,Indoor Facility Testimonial,Highlight a facility.,Fall,None,Domination
+
+2026-10-19,Month 9,Week 1,Instagram,Post,Product Highlight,Indoor Netting Close-Up,Showcase durability + stitching.,Fall,Halloween,Domination
+2026-10-20,Month 9,Week 1,Facebook,Post,Education,Why Indoor Netting Matters,Training safety.,Fall,Halloween,Domination
+2026-10-22,Month 9,Week 1,YouTube Shorts,Short,Education,Indoor Netting Strength Test,Quick demo.,Fall,Halloween,Domination
+2026-10-23,Month 9,Week 1,Facebook,Ad,Conversions,Indoor Training Conversions Ad,Retargeting.,Fall,Halloween,Domination
+2026-10-24,Month 9,Week 1,Google,Ad,Search,Indoor Training High-Intent Search Ad,High-intent keywords.,Fall,Halloween,Domination
+
+2026-10-26,Month 9,Week 2,Instagram,Post,Customer Use Case,Indoor Training Highlight,Customer story.,Fall,Halloween,Domination
+2026-10-28,Month 9,Week 2,Facebook,Post,Behind the Scenes,Indoor Production Workflow,Show craftsmanship.,Fall,Halloween,Domination
+2026-10-30,Month 9,Week 2,Instagram,Reel,Education,Indoor Training Tips,Educational.,Fall,Halloween,Domination
+
+2026-11-01,Month 9,Week 3,Facebook,Post,Seasonal Prep,Winter Training Starts,Promote indoor cages.,Fall,None,Domination
+2026-11-02,Month 9,Week 3,Instagram,Post,Product Highlight,Winter Netting Close-Up,Cold-weather durability.,Fall,None,Domination
+2026-11-03,Month 9,Week 3,YouTube Shorts,Short,Education,Winter Cage Setup,Quick demo.,Fall,None,Domination
+2026-11-04,Month 9,Week 3,Facebook,Ad,Traffic,Winter Training Ad,Target indoor facilities.,Fall,None,Domination
+2026-11-05,Month 9,Week 3,Google,Ad,Search,Winter Netting Search Ad,High-intent keywords.,Fall,None,Domination
+
+2026-11-06,Month 9,Week 3,Instagram,Post,Customer Use Case,Indoor Facility Testimonial,Highlight a facility.,Fall,None,Domination
+2026-11-08,Month 9,Week 3,Facebook,Post,Education,Choosing Winter Netting,Cold-weather considerations.,Fall,None,Domination
+2026-11-10,Month 9,Week 3,Instagram,Reel,Education,Winter Training Tips,Educational.,Fall,None,Domination
+
+2026-11-12,Month 9,Week 4,Facebook,Post,Promotion,Early Black Friday Sale,Seasonal promo.,Fall,Thanksgiving,Domination
+2026-11-13,Month 9,Week 4,Instagram,Story,Promotion,Black Friday Countdown,Holiday promo.,Fall,Thanksgiving,Domination
+2026-11-14,Month 9,Week 4,Facebook,Ad,Conversions,Black Friday Promo Ad,Conversions.,Fall,Thanksgiving,Domination
+2026-11-15,Month 9,Week 4,Google,Ad,Search,Black Friday Netting Search Ad,Seasonal keywords.,Fall,Thanksgiving,Domination
+
+2026-11-16,Month 9,Week 4,Instagram,Reel,Product Highlight,Best Netting for Winter,Educational.,Fall,Thanksgiving,Domination
+2026-11-18,Month 9,Week 4,Facebook,Post,Customer Use Case,Winter Training Testimonial,Highlight a customer.,Fall,Thanksgiving,Domination
+2026-11-20,Month 9,Week 4,Instagram,Post,Installation,Winter Installations Gallery,5–7 photos.,Fall,Thanksgiving,Domination
+
+2026-11-22,Month 9,Week 5,Facebook,Post,Promotion,Black Friday Sale,Holiday promo.,Fall,Thanksgiving,Domination
+2026-11-23,Month 9,Week 5,Instagram,Story,Promotion,Cyber Monday Countdown,Holiday promo.,Fall,Thanksgiving,Domination
+2026-11-24,Month 9,Week 5,Facebook,Ad,Conversions,Cyber Monday Promo Ad,Conversions.,Fall,Thanksgiving,Domination
+2026-11-25,Month 9,Week 5,Google,Ad,Search,Cyber Monday Netting Search Ad,Seasonal keywords.,Fall,Thanksgiving,Domination
+
+2026-12-01,Month 10,Week 1,Facebook,Post,Seasonal Prep,Holiday Training Season,Promote indoor setups.,Winter,Christmas,Domination
+2026-12-02,Month 10,Week 1,Instagram,Post,Product Highlight,Holiday Netting Close-Up,Showcase premium materials.,Winter,Christmas,Domination
+2026-12-03,Month 10,Week 1,YouTube Shorts,Short,Education,Top 3 Netting Installs of the Year,Quick recap.,Winter,Christmas,Domination
+2026-12-04,Month 10,Week 1,Facebook,Ad,Traffic,Holiday Sports Gift Ad,Target parents + athletes.,Winter,Christmas,Domination
+2026-12-05,Month 10,Week 1,Google,Ad,Search,Holiday Netting Gift Search Ad,Seasonal keywords.,Winter,Christmas,Domination
+
+2026-12-06,Month 10,Week 2,Instagram,Post,Customer Use Case,Customer Highlight of the Year,Showcase best install.,Winter,Christmas,Domination
+2026-12-08,Month 10,Week 2,Facebook,Post,Behind the Scenes,Holiday Production Workflow,Show craftsmanship.,Winter,Christmas,Domination
+2026-12-10,Month 10,Week 2,Instagram,Reel,Education,Winter Training Tips,Educational.,Winter,Christmas,Domination
+
+2026-12-12,Month 10,Week 3,Facebook,Post,Promotion,Holiday Sale,15% Off All Netting.,Winter,Christmas,Domination
+2026-12-13,Month 10,Week 3,Instagram,Story,Promotion,Holiday Sale Countdown,Holiday promo.,Winter,Christmas,Domination
+2026-12-14,Month 10,Week 3,Facebook,Ad,Conversions,Holiday Promo Ad,Conversions.,Winter,Christmas,Domination
+2026-12-15,Month 10,Week 3,Google,Ad,Search,Holiday Netting Search Ad,Seasonal keywords.,Winter,Christmas,Domination
+
+2026-12-16,Month 10,Week 3,Instagram,Reel,Product Highlight,Best Netting for Winter Training,Educational.,Winter,Christmas,Domination
+2026-12-18,Month 10,Week 3,Facebook,Post,Customer Use Case,Holiday Customer Testimonial,Highlight a family.,Winter,Christmas,Domination
+2026-12-20,Month 10,Week 3,Instagram,Post,Installation,Holiday Installations Gallery,5–7 photos.,Winter,Christmas,Domination
+
+2026-12-22,Month 10,Week 4,Facebook,Post,Seasonal Prep,New Year Training Prep,Promote preseason baseball.,Winter,Christmas,Domination
+2026-12-23,Month 10,Week 4,Instagram,Story,Engagement,Poll,What Are You Training For?,Winter,Christmas,Domination
+2026-12-24,Month 10,Week 4,Facebook,Ad,Traffic,New Year Training Ad,Target baseball families.,Winter,Christmas,Domination
+2026-12-26,Month 10,Week 4,Google,Ad,Search,New Year Netting Search Ad,High-intent keywords.,Winter,Christmas,Domination
+
+2027-01-01,Month 11,Week 1,Facebook,Post,Seasonal Prep,New Year Training Season,Promote preseason baseball.,Winter,New Year,Domination
+2027-01-02,Month 11,Week 1,Instagram,Post,Product Highlight,Baseball Netting Close-Up,Showcase durability.,Winter,New Year,Domination
+2027-01-03,Month 11,Week 1,YouTube Shorts,Short,Education,Why EZ Netting Lasts Longer,Quick demo.,Winter,New Year,Domination
+2027-01-04,Month 11,Week 1,Facebook,Ad,Traffic,New Year Baseball Ad,Target parents + coaches.,Winter,New Year,Domination
+2027-01-05,Month 11,Week 1,Google,Ad,Search,Baseball Netting Search Ad,High-intent keywords.,Winter,New Year,Domination
+
+2027-01-06,Month 11,Week 2,Instagram,Post,Customer Use Case,Baseball Family Highlight,Customer story.,Winter,None,Domination
+2027-01-08,Month 11,Week 2,Facebook,Post,Behind the Scenes,New Year Production Workflow,Show craftsmanship.,Winter,None,Domination
+2027-01-10,Month 11,Week 2,Instagram,Reel,Education,Preseason Training Tips,Educational.,Winter,None,Domination
+
+2027-01-12,Month 11,Week 3,Facebook,Post,Promotion,New Year Training Sale,Seasonal promo.,Winter,None,Domination
+2027-01-13,Month 11,Week 3,Instagram,Story,Promotion,Sale Countdown,Holiday promo.,Winter,None,Domination
+2027-01-14,Month 11,Week 3,Facebook,Ad,Conversions,New Year Promo Ad,Conversions.,Winter,None,Domination
+2027-01-15,Month 11,Week 3,Google,Ad,Search,New Year Netting Search Ad,Seasonal keywords.,Winter,None,Domination
+
+2027-01-16,Month 11,Week 3,Instagram,Reel,Product Highlight,Best Netting for Preseason,Educational.,Winter,None,Domination
+2027-01-18,Month 11,Week 3,Facebook,Post,Customer Use Case,Preseason Testimonial,Highlight a coach.,Winter,None,Domination
+2027-01-20,Month 11,Week 3,Instagram,Post,Installation,Preseason Installations Gallery,5–7 photos.,Winter,None,Domination
+
+2027-01-22,Month 11,Week 4,Facebook,Post,Seasonal Prep,Baseball Season Approaching,Promote early orders.,Winter,None,Domination
+2027-01-24,Month 11,Week 4,Instagram,Post,Product Highlight,Baseball Netting Materials,Showcase quality.,Winter,None,Domination
+2027-01-26,Month 11,Week 4,YouTube Shorts,Short,Education,How to Measure for Baseball Netting,Quick demo.,Winter,None,Domination
+2027-01-27,Month 11,Week 4,Facebook,Ad,Traffic,Baseball Preseason Ad,Target coaches.,Winter,None,Domination
+2027-01-28,Month 11,Week 4,Google,Ad,Search,Baseball Preseason Search Ad,High-intent keywords.,Winter,None,Domination
+
+2027-02-01,Month 12,Week 1,Facebook,Post,Seasonal Prep,Preseason Baseball Begins,Promote batting cages.,Winter,None,Domination
+2027-02-02,Month 12,Week 1,Instagram,Post,Product Highlight,Batting Cage Netting Close-Up,Showcase durability.,Winter,None,Domination
+2027-02-03,Month 12,Week 1,YouTube Shorts,Short,Education,Top 3 Preseason Netting Tips,Quick demo.,Winter,None,Domination
+2027-02-04,Month 12,Week 1,Facebook,Ad,Traffic,Preseason Baseball Ad,Target parents + coaches.,Winter,None,Domination
+2027-02-05,Month 12,Week 1,Google,Ad,Search,Preseason Baseball Search Ad,High-intent keywords.,Winter,None,Domination
+
+2027-02-06,Month 12,Week 2,Instagram,Post,Customer Use Case,Baseball Coach Highlight,Customer story.,Winter,None,Domination
+2027-02-08,Month 12,Week 2,Facebook,Post,Behind the Scenes,Preseason Production Workflow,Show craftsmanship.,Winter,None,Domination
+2027-02-10,Month 12,Week 2,Instagram,Reel,Education,Preseason Training Tips,Educational.,Winter,None,Domination
+
+2027-02-12,Month 12,Week 3,Facebook,Post,Promotion,Preseason Sale,10% Off Baseball Netting.,Winter,None,Domination
+2027-02-13,Month 12,Week 3,Instagram,Story,Promotion,Sale Countdown,Promo.,Winter,None,Domination
+2027-02-14,Month 12,Week 3,Facebook,Ad,Conversions,Preseason Promo Ad,Conversions.,Winter,Valentine’s Day,Domination
+2027-02-15,Month 12,Week 3,Google,Ad,Search,Preseason Netting Search Ad,Seasonal keywords.,Winter,None,Domination
+
+2027-02-16,Month 12,Week 3,Instagram,Reel,Product Highlight,Choosing the Right Batting Cage Netting,Educational.,Winter,None,Domination
+2027-02-17,Month 12,Week 3,Facebook,Post,Customer Use Case,Preseason Testimonial,Highlight a baseball family.,Winter,None,Domination
+

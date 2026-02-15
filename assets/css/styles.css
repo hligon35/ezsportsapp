@@ -1006,6 +1006,17 @@ button:disabled{
 .btn-quote:hover,.btn-quote:focus-visible{filter:brightness(1.15);outline:none;}
 .btn-block{width:100%}
 
+/* Call To Order (Accessories)
+   Desktop: show text link
+   Mobile: show full button */
+.calltoorder-desktop-link{display:inline-flex;align-items:center;gap:.35rem;font-weight:800;letter-spacing:.3px;text-transform:uppercase;color:var(--gold);text-decoration:underline;}
+.calltoorder-desktop-link:hover{color:var(--gold-hover);}
+.calltoorder-mobile-btn{display:none;}
+@media (max-width:640px){
+  .calltoorder-desktop-link{display:none;}
+  .calltoorder-mobile-btn{display:inline-flex;width:100%;}
+}
+
 /* Toolbar rows (used on admin + analytics pages) */
 .toolbar{display:flex;gap:.75rem;align-items:center;flex-wrap:wrap;}
 .toolbar .btn{min-height:44px;}

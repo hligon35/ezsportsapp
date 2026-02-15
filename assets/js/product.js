@@ -38,12 +38,16 @@
     // Legacy shape: pageKey arrays directly on root
     for (const [k,v] of Object.entries(data)) {
       if (k === 'schemaVersion' || k === 'updatedAt' || k === 'categories') continue;
-      if (Array.isArray(v)) out.push(...v.filter(isVisible));
+      if (Array.isArray(v)) out.push(...v.filter(isVisible).map(p => {
+        try { return { ...p, __category: k }; } catch { try { p.__category = k; } catch {} return p; }
+      }));
     }
     // New shape: categories map
     if (data.categories && typeof data.categories === 'object') {
-      for (const arr of Object.values(data.categories)) {
-        if (Array.isArray(arr)) out.push(...arr.filter(isVisible));
+      for (const [catName, arr] of Object.entries(data.categories)) {
+        if (Array.isArray(arr)) out.push(...arr.filter(isVisible).map(p => {
+          try { return { ...p, __category: catName }; } catch { try { p.__category = catName; } catch {} return p; }
+        }));
       }
     }
     return out;
@@ -81,6 +85,8 @@
   function toDisplayItem(p){
     const id = String(p.sku || p.id || p.name || p.title || Math.random().toString(36).slice(2));
     const title = String(p.name || p.title || id);
+    const categoryName = String(p.__category || p.category || '').trim();
+    const category = toSlug(categoryName);
     const variations = Array.isArray(p.variations) ? p.variations.slice() : [];
     const parseNumberLikePrice = (val) => {
       if (val == null) return 0;
@@ -280,7 +286,7 @@
     const lt = String(p.name || p.title || '').toLowerCase();
     const isFreeShip = (lid === 'battingmat' || lid === 'armorbasket') || (/\bbatting\s*mat\b/.test(lt)) || (/armor\s*(baseball)?\s*cart|armor\s*basket/.test(lt));
     const dsr = isFreeShip ? 0 : (Number(p.dsr ?? 0) || 0);
-    return { id, title, price, priceMin, priceMax, primary, galleryPairs, displayPairs, features, description, variations, dsr };
+    return { id, title, price, priceMin, priceMax, primary, galleryPairs, displayPairs, features, description, variations, dsr, category, categoryName };
   }
 
   function render(prod){
@@ -295,6 +301,14 @@
     const isTwineSpoolGroup = /^twine-forever-black$/i.test(String(prod.id||''));
     const isCableGroup = /^cable-wire$/i.test(String(prod.id||''));
     const isRopeGroup = /^rope-516-poly$/i.test(String(prod.id||'')) || /5\/16\"\s*poly\s*twisted\s*rope/i.test(String(prod.title||''));
+
+    const isAccessories = (() => {
+      try {
+        if (String(prod.category || '').toLowerCase() === 'accessories') return true;
+        if (isTwineSpoolGroup || isCableGroup || isRopeGroup) return true;
+      } catch {}
+      return false;
+    })();
     // Render price or price range; will update dynamically on option change
     const basePriceHtml = (() => {
       // Cable group: hide price until a selection is made (then show Talk to an Expert)
@@ -318,6 +332,8 @@
     const initialShippingText = (() => {
       // Cable group: shipping blank until an option is selected
       if (isCableGroup) return ``;
+      // Accessories: shipping disabled
+      if (isAccessories) return ``;
       const lid = String(prod.id||'').toLowerCase();
       const lt = String(prod.title||'').toLowerCase();
       const isFreeShip = (lid === 'battingmat' || lid === 'armorbasket') || (/\bbatting\s*mat\b/.test(lt)) || (/armor\s*(baseball)?\s*cart|armor\s*basket/.test(lt));
@@ -372,6 +388,13 @@
       </select>
     ` : '';
     const features = Array.isArray(prod.features) && prod.features.length ? `<ul class="features">${prod.features.map(f=>`<li>${f}</li>`).join('')}</ul>` : '';
+    const callToOrderHtml = `
+      <div class="stack-02">
+        <a class="calltoorder-desktop-link" href="tel:+13868373131" aria-label="Call to order at 386-837-3131">Call To Order</a>
+        <a class="btn btn-primary calltoorder-mobile-btn" href="tel:+13868373131" aria-label="Call to order at 386-837-3131">Call To Order</a>
+        <div class="text-sm text-muted"><strong>Email:</strong> <a href="mailto:info@ezsportsnetting.com">info@ezsportsnetting.com</a></div>
+      </div>
+    `;
     el.innerHTML = `
       <div class="pd-grid">
         <div class="pd-media">
@@ -413,7 +436,7 @@
               <div class="text-xs text-muted">Sold by the foot (1' increments).</div>
             </div>
             <div class="row gap-06">
-              <button class="btn btn-primary" id="pd-add">Add to Cart</button>
+              ${isAccessories ? callToOrderHtml : `<button class="btn btn-primary" id="pd-add">Add to Cart</button>`}
               <button class="btn btn-ghost" type="button" id="pd-back">Back</button>
             </div>
           </div>
@@ -424,6 +447,14 @@
         </div>
       </div>
     `;
+
+    // Hide shipping row entirely when disabled
+    try {
+      if (isAccessories) {
+        const ship = document.getElementById('pd-shipping');
+        if (ship) ship.style.display = 'none';
+      }
+    } catch {}
     // Disable Add to Cart for Cable group pages
     try {
       if (isCableGroup) {
@@ -503,8 +534,9 @@
           }
           // Shipping (dsr): prefer selected variation's dsr, else product-level, else keep initial/range
           if (shipEl) {
-            if (isCableGroup) {
+            if (isCableGroup || isAccessories) {
               shipEl.textContent = '';
+              if (isAccessories) shipEl.style.display = 'none';
             } else {
             const lid = String(prod.id||'').toLowerCase();
             const lt = String(prod.title||'').toLowerCase();
@@ -686,6 +718,10 @@
         if (/^cable-wire$/i.test(String(pidKey))) {
           return; // disabled behavior enforced above; double-guard here
         }
+        // Accessories are call-to-order only
+        if (isAccessories) {
+          return;
+        }
         // Determine selected variation (if any)
         const optSel = document.getElementById('pd-option-select');
         const colorSel = document.getElementById('pd-color-select');
@@ -772,7 +808,7 @@
             })();
         const color = (colorSel && colorSel.value) ? colorSel.value : undefined;
         // Include per-product shipping only when an explicit dsr is defined (>0). Otherwise omit and default $100 applies at checkout.
-        const product = { id: prod.id, title: chosenLabel, price: chosenPrice, img: chosenImg, category: 'netting' };
+        const product = { id: prod.id, title: chosenLabel, price: chosenPrice, img: chosenImg, category: (isAccessories ? 'accessories' : 'netting') };
         const opts = { size, color };
         // Free shipping override
         try {
@@ -843,6 +879,8 @@
         const synthetic = {
           id: pidKey,
           title: 'Forever Black Twine Spool',
+          category: 'accessories',
+          categoryName: 'Accessories',
           price: priceMin || 0,
           priceMin: priceMin || 0,
           priceMax: priceMax || priceMin || 0,
@@ -892,6 +930,8 @@
         const synthetic = {
           id: pidKey,
           title: 'Cable',
+          category: 'accessories',
+          categoryName: 'Accessories',
           price: priceMin || 0,
           priceMin: priceMin || 0,
           priceMax: priceMax || priceMin || 0,
@@ -933,6 +973,8 @@
         const synthetic = {
           id: pidKey,
           title: '5/16" Poly Twisted Rope',
+          category: 'accessories',
+          categoryName: 'Accessories',
           price: priceMin,
           priceMin,
           priceMax,
