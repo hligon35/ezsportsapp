@@ -819,7 +819,7 @@ ensureSEO() {
       // OG/Twitter fallback
       const title = document.title || 'EZ Sports Netting';
       const descEl = head.querySelector('meta[name="description"]');
-      const desc = (descEl && descEl.getAttribute('content')) || 'Shop premium baseball nets, bats, gloves, helmets & training gear.';
+        const desc = (descEl && descEl.getAttribute('content')) || 'Shop custom sports netting, pre-made cages, L-screens, replacement nets, bullet pad kits & accessories.';
       const url = (head.querySelector('link[rel="canonical"]')?.getAttribute('href')) || location.href;
   const defaultImage = (location.origin || '') + '/assets/img/EZSportslogo.png';
       const og = {
