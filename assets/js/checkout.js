@@ -306,11 +306,12 @@ async function initialize() {
       if (pe) {
         pe.innerHTML = `
           <div class="stack-03">
-            <p class="muted">Accessories must be ordered by phone.</p>
+            <p class="muted">Accessories must be ordered by phone or email.</p>
             <div class="stack-02">
-              <a class="calltoorder-desktop-link" href="tel:+13868373131" aria-label="Call to order at 386-837-3131">Call To Order</a>
-              <a class="btn btn-primary calltoorder-mobile-btn" href="tel:+13868373131" aria-label="Call to order at 386-837-3131">Call To Order</a>
-              <div class="text-sm text-muted"><strong>Email:</strong> <a href="mailto:info@ezsportsnetting.com">info@ezsportsnetting.com</a></div>
+              <div class="row gap-06" style="flex-wrap:wrap;">
+                <a class="btn btn-primary" href="tel:+13868373131" aria-label="Call to order at 386-837-3131">Call To Order</a>
+                <a class="btn btn-ghost" href="mailto:info@ezsportsnetting.com" aria-label="Email EZ Sports Netting">Email</a>
+              </div>
             </div>
           </div>
         `;

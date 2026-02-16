@@ -87,7 +87,19 @@
     const title = String(p.name || p.title || id);
     const categoryName = String(p.__category || p.category || '').trim();
     const category = toSlug(categoryName);
-    const variations = Array.isArray(p.variations) ? p.variations.slice() : [];
+    let variations = Array.isArray(p.variations) ? p.variations.slice() : [];
+    // Pro Batting Mat: only Clay + Green are currently available
+    try {
+      const lid = String(id || '').toLowerCase();
+      const lt = String(title || '').toLowerCase();
+      const isBattingMat = (lid === 'battingmat') || (/\bbatting\s*mat\b/.test(lt));
+      if (isBattingMat) {
+        variations = variations.filter(v => {
+          const opt = String(v?.option ?? v?.name ?? '').toLowerCase();
+          return opt === 'clay' || opt === 'green';
+        });
+      }
+    } catch {}
     const parseNumberLikePrice = (val) => {
       if (val == null) return 0;
       if (typeof val === 'number' && Number.isFinite(val)) return val;
@@ -206,21 +218,16 @@
         const extras = unique.filter(u => !curated.includes(u));
         unique = [...curated, ...extras].slice(0, 20);
       }
-      // Pro Batting Mat (Accessories)
+      // Pro Batting Mat (Accessories) — only show Clay + Green photos
       if (lowerId === 'battingmat' || /\bbatting\s*mat\b/.test(lowerTitle)) {
         const base = 'assets/prodImgs/Battingmat';
         const curated = [
           `${base}/battingmata.avif`,
-          `${base}/battingmat_blacka.avif`,
-          `${base}/battingmat_browna.avif`,
-          `${base}/battingmat_greena.avif`,
-          `${base}/battingmat_orangea.avif`,
-          `${base}/battingmat_reda.avif`,
-          `${base}/battingmat_royala.avif`
+          `${base}/battingmat_greena.avif`
         ];
         primary = curated[0];
-        const extras = unique.filter(u => !curated.includes(u));
-        unique = [...curated, ...extras].slice(0, 20);
+        // Do not append other images; requirement is to hide non Clay/Green photos
+        unique = curated.slice();
       }
     } catch {}
 
@@ -309,6 +316,14 @@
       } catch {}
       return false;
     })();
+
+    const isBattingMat = (() => {
+      try {
+        const lid = String(prod.id || '').toLowerCase();
+        const lt = String(prod.title || '').toLowerCase();
+        return (lid === 'battingmat') || (/\bbatting\s*mat\b/.test(lt));
+      } catch { return false; }
+    })();
     // Render price or price range; will update dynamically on option change
     const basePriceHtml = (() => {
       // Cable group: hide price until a selection is made (then show Talk to an Expert)
@@ -376,13 +391,37 @@
       <select id="pd-color-select" class="pd-option-select" aria-label="Color" style="padding:.7rem .8rem;border:1px solid var(--border);border-radius:.6rem;font-weight:600;">
         <option value="">Choose a Color...</option>
         ${(() => {
+          const pidish = String(prod.id || '').toLowerCase();
+          const tish = String(prod.title || '').toLowerCase();
+          const isBattingMat = (pidish === 'battingmat') || (/\bbatting\s*mat\b/.test(tish));
+          // Pro Batting Mat: only Clay + Green available
+          const enabledSet = isBattingMat ? new Set(['green','clay','brown','maroon']) : null;
+
           let neutralIndex = 1;
           return colorOptions.map(c => {
-            const isNeutral = (c.class || '') === 'neutral';
-            const label = isNeutral
+            const rawClass = String(c.class || '').toLowerCase();
+            const rawName = String(c.name || '').toLowerCase();
+            const key = rawClass || rawName;
+            const isNeutral = (rawClass === 'neutral');
+
+            const isClayKey = (key === 'brown' || key === 'clay' || key === 'maroon');
+            const prettyLabel = isNeutral
               ? `Image ${neutralIndex++}`
-              : (c.class ? (c.class.charAt(0).toUpperCase() + c.class.slice(1)) : (c.name ? (c.name.charAt(0).toUpperCase() + c.name.slice(1)) : 'Image'));
-            return `<option value="${(c.name||'').replace(/"/g,'&quot;')}" data-image="${c.image}" data-color-class="${c.class||''}">${label}</option>`;
+              : (isBattingMat && isClayKey)
+                ? 'Clay'
+                : (isBattingMat && key === 'green')
+                  ? 'Green'
+                  : (rawClass
+                    ? (rawClass.charAt(0).toUpperCase() + rawClass.slice(1))
+                    : (rawName
+                      ? (rawName.charAt(0).toUpperCase() + rawName.slice(1))
+                      : 'Image'));
+
+            const isEnabled = (!enabledSet) ? true : enabledSet.has(key);
+            const suffix = (!enabledSet || isEnabled) ? '' : ' (coming soon)';
+            const disabledAttr = (!enabledSet || isEnabled) ? '' : ' disabled aria-disabled="true"';
+
+            return `<option value="${(c.name||'').replace(/"/g,'&quot;')}" data-image="${c.image}" data-color-class="${c.class||''}"${disabledAttr}>${prettyLabel}${suffix}</option>`;
           }).join('');
         })()}
       </select>
@@ -390,9 +429,10 @@
     const features = Array.isArray(prod.features) && prod.features.length ? `<ul class="features">${prod.features.map(f=>`<li>${f}</li>`).join('')}</ul>` : '';
     const callToOrderHtml = `
       <div class="stack-02">
-        <a class="calltoorder-desktop-link" href="tel:+13868373131" aria-label="Call to order at 386-837-3131">Call To Order</a>
-        <a class="btn btn-primary calltoorder-mobile-btn" href="tel:+13868373131" aria-label="Call to order at 386-837-3131">Call To Order</a>
-        <div class="text-sm text-muted"><strong>Email:</strong> <a href="mailto:info@ezsportsnetting.com">info@ezsportsnetting.com</a></div>
+        <div class="row gap-06" style="flex-wrap:wrap;">
+          <a class="btn btn-primary" href="tel:+13868373131" aria-label="Call to order at 386-837-3131">Call To Order</a>
+          <a class="btn btn-ghost" href="mailto:info@ezsportsnetting.com" aria-label="Email EZ Sports Netting">Email</a>
+        </div>
       </div>
     `;
     el.innerHTML = `
@@ -411,7 +451,7 @@
           <div class="text-sm text-muted" id="pd-shipping">${initialShippingText}</div>
           <div class="stack-05" id="pd-option-block" style="margin-top:.5rem;">
             <div class="row gap-06" id="pd-select-row">
-              ${(prod.variations && prod.variations.length > 1) ? `
+              ${(!isBattingMat && prod.variations && prod.variations.length > 1) ? `
                 <select id="pd-option-select" class="pd-option-select" aria-label="Options" style="padding:.7rem .8rem;border:1px solid var(--border);border-radius:.6rem;font-weight:600;">
                   <option value="">Choose an Option...</option>
                   ${prod.variations.map((v,i)=>{
@@ -619,24 +659,41 @@
     try {
       const colorSel = document.getElementById('pd-color-select');
       if (colorSel) {
+        const firstEnabledIndex = () => {
+          const opts = Array.from(colorSel.options);
+          for (let i = 1; i < opts.length; i++) {
+            const o = opts[i];
+            if (o && !o.disabled) return i;
+          }
+          return -1;
+        };
         const applyColorImage = () => {
           const opt = colorSel.options[colorSel.selectedIndex];
+          if (opt && opt.disabled) return;
           const imgSrc = opt?.dataset?.image;
           if (imgSrc) {
             main.src = imgSrc;
           }
         };
         colorSel.addEventListener('change', applyColorImage);
-        // Preselect based on current main image if a matching color exists; else default to first real color
+        // Preselect based on current main image if a matching enabled color exists; else default to first enabled color
         const idx = Array.from(colorSel.options).findIndex(o => {
+          if (!o || o.disabled) return false;
           const dataImg = o.dataset?.image || '';
           if (!dataImg) return false;
           // Normalize: compare by file name tail to avoid absolute vs relative mismatch
           const tail = (str) => (str||'').split('/').pop();
           return tail(dataImg) === tail(main.src||'');
         });
-        if (idx > 0) { colorSel.selectedIndex = idx; }
-        else if (colorSel.options.length > 1) { colorSel.selectedIndex = 1; applyColorImage(); }
+        if (idx > 0) {
+          colorSel.selectedIndex = idx;
+        } else {
+          const firstIdx = firstEnabledIndex();
+          if (firstIdx > 0) {
+            colorSel.selectedIndex = firstIdx;
+            applyColorImage();
+          }
+        }
       }
     } catch {}
 

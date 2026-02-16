@@ -1462,6 +1462,7 @@ ensureHomeFirst() {
     if (base === 'product.html') {
       const params = new URLSearchParams(location.search);
       const pid = params.get('pid');
+      const pidLower = String(pid || '').toLowerCase();
       // Special-case: Pre-Made Cages grouped product pages
       const pidKey = (pid||'').toLowerCase();
       const GROUP_TITLES = {
@@ -1570,13 +1571,21 @@ ensureHomeFirst() {
       // 1) Try unified catalog if present (product-loader)
       try {
         if (!prod && Array.isArray(window.CATALOG_PRODUCTS) && window.CATALOG_PRODUCTS.length && pid) {
-          const rec = window.CATALOG_PRODUCTS.find(r => String(r.id) === pid || String(r.sourceSKU||'') === pid);
+          const rec = window.CATALOG_PRODUCTS.find(r => {
+            const rid = String(r.id || '').toLowerCase();
+            const rsku = String(r.sourceSKU || '').toLowerCase();
+            return rid === pidLower || rsku === pidLower;
+          });
           if (rec) { prod = rec.raw || rec; }
         }
       } catch {}
       // 2) Try API products
       if (!prod && Array.isArray(PRODUCTS) && PRODUCTS.length && pid) {
-        prod = PRODUCTS.find(p => String(p.id) === pid || String(p.sku) === pid);
+        prod = PRODUCTS.find(p => {
+          const pidish = String(p.id || '').toLowerCase();
+          const psku = String(p.sku || '').toLowerCase();
+          return pidish === pidLower || psku === pidLower;
+        });
       }
       // 3) Fallback to prodList.json
       if (!prod && pid) {
@@ -1585,7 +1594,7 @@ ensureHomeFirst() {
           if (data && data.categories && typeof data.categories === 'object') {
             for (const [catName, arr] of Object.entries(data.categories)) {
               if (!Array.isArray(arr)) continue;
-              const hit = arr.find(p => String(p.sku||p.id) === pid);
+              const hit = arr.find(p => String(p.sku||p.id||'').toLowerCase() === pidLower);
               if (hit) { prod = hit; foundCategoryName = catName; break; }
             }
           }
@@ -1596,7 +1605,8 @@ ensureHomeFirst() {
         const name = (p?.name || p?.title || '').toLowerCase();
         const sku = String(p?.sku || p?.id || '').toLowerCase();
         const pathName = (Array.isArray(p?.details?.category_path) && p.details.category_path[0]) || '';
-        const catName = pathName || foundCategoryName;
+        const categoryField = String(p?.category || p?.__category || '').trim();
+        const catName = pathName || foundCategoryName || categoryField;
         // Direct category name mapping
         const direct = {
           "Baseball L-Screens": { label: 'Baseball L-Screens', href: 'baseball-l-screens.html' },
@@ -1609,6 +1619,14 @@ ensureHomeFirst() {
           "Bullet Pad Kits": { label: 'Accessories', href: 'accessories.html' }
         };
         if (catName && direct[catName]) return direct[catName];
+
+        // Category field can come in as a lowercase slug from the API (e.g., "accessories")
+        const catLower = String(catName || '').toLowerCase();
+        if (catLower === 'accessories') return { label: 'Accessories', href: 'accessories.html' };
+        if (catLower === 'pre-made cages' || catLower === 'pre-made-cages' || catLower === 'premade cages') return { label: 'Pre-Made Cages', href: 'pre-made-cages.html' };
+        if (catLower === 'replacement nets' || catLower === 'replacement-nets') return { label: 'Replacement Screens', href: 'replacement-screens.html' };
+        if (catLower === "pitcher's pocket" || catLower === 'pitchers pocket' || catLower === 'pitchers-pocket') return { label: "Pitcher's Pocket", href: 'pitchers-pocket.html' };
+        if (catLower === 'baseball l-screens' || catLower === 'baseball-l-screens') return { label: 'Baseball L-Screens', href: 'baseball-l-screens.html' };
         // Heuristics by product name/sku
         if (/replacement/.test(name) || /\brn-/.test(sku)) return { label: 'Replacement Screens', href: 'replacement-screens.html' };
         if (/pitcher|pocket/.test(name) || /bbpp/.test(sku)) return { label: "Pitcher's Pocket", href: 'pitchers-pocket.html' };
@@ -1616,6 +1634,10 @@ ensureHomeFirst() {
         if (/l[- ]?screen/.test(name) || /^bullet/.test(name)) return { label: 'Baseball L-Screens', href: 'baseball-l-screens.html' };
         // Pad kits are now considered Accessories
         if (/pad\s*kit/.test(name) || /^pk-/.test(sku)) return { label: 'Accessories', href: 'accessories.html' };
+        // Accessories keyword fallback (covers Batting Mat, Armor Basket, etc.)
+        if (/\b(accessor(y|ies)|cable|twine|rope|basket|mat|screen\s*bulletz|armor)\b/.test(name) || /\b(battingmat|armorbasket|wbasket)\b/.test(sku)) {
+          return { label: 'Accessories', href: 'accessories.html' };
+        }
         return { label: 'EZ Custom Nets', href: 'ez-nets.html' };
       };
       if (prod) {
@@ -2401,9 +2423,10 @@ ensureHomeFirst() {
                   <ul id="agg-features" class="feature-list" style="margin:.5rem 0 0 1rem; padding-left:1rem; list-style:disc;"></ul>
                   <div class="stack-03">
                     <div class="stack-02">
-                      <a class="calltoorder-desktop-link" href="tel:+13868373131" aria-label="Call to order at 386-837-3131">Call To Order</a>
-                      <a class="btn btn-primary calltoorder-mobile-btn" href="tel:+13868373131" aria-label="Call to order at 386-837-3131">Call To Order</a>
-                      <div class="text-sm text-muted"><strong>Email:</strong> <a href="mailto:info@ezsportsnetting.com">info@ezsportsnetting.com</a></div>
+                      <div class="row gap-06" style="flex-wrap:wrap;">
+                        <a class="btn btn-primary" href="tel:+13868373131" aria-label="Call to order at 386-837-3131">Call To Order</a>
+                        <a class="btn btn-ghost" href="mailto:info@ezsportsnetting.com" aria-label="Email EZ Sports Netting">Email</a>
+                      </div>
                     </div>
                     <button class="btn btn-ghost" id="agg-back">Back</button>
                   </div>
@@ -2790,17 +2813,61 @@ ensureHomeFirst() {
             // Prefer curated image when provided
             const curated = img && typeof img === 'string' ? img : '';
             const firstImg = curated || this.normalizeProdListItem(items[0]).img || 'assets/img/EZSportslogo.png';
+            const showPadDots = /\bbullet\s*pad\s*kits?\b/i.test(String(title||''));
+            const padDotColors = showPadDots
+              ? ['black','columbiablue','darkgreen','green','maroon','navy','orange','purple','red','royal','yellow']
+              : [];
+            const initialColorIndex = padDotColors.length ? Math.floor(Math.random() * padDotColors.length) : -1;
+            const colorDotsHtml = (showPadDots && padDotColors.length) ? `
+              <div class="color-dots" data-product-id="bullet-pad-kits">
+                ${padDotColors.map((c, idx) => `
+                  <div class="color-dot ${c} ${idx === initialColorIndex ? 'active' : ''}"
+                       data-color="${c}"
+                       data-image="${firstImg}"
+                       title="${c.charAt(0).toUpperCase() + c.slice(1)}"
+                       role="button"
+                       tabindex="0"
+                       aria-label="Select ${c}"></div>
+                `).join('')}
+              </div>
+            ` : '';
             const article = document.createElement('article');
             article.className = 'card';
             article.innerHTML = `
               <a class="media" href="${href}"><img src="${firstImg}" alt="${alt||title}" loading="lazy" class="product-main-image"/></a>
               <div class="body">
                 <h3 class="h3-tight"><a href="${href}">${title}</a></h3>
+                ${colorDotsHtml}
                 <div class="price-row">
                   <span class="price">${range}</span>
                   <a class="btn btn-ghost" href="${href}" aria-label="View ${title}">View</a>
                 </div>
               </div>`;
+
+            // Bind dot interactions for this grouped card
+            try {
+              if (showPadDots) {
+                const dots = article.querySelectorAll('.color-dot');
+                dots.forEach(dot => {
+                  dot.addEventListener('click', (ev) => {
+                    const colorDot = ev.currentTarget;
+                    const container = colorDot.closest('.color-dots');
+                    const card = colorDot.closest('article');
+                    const productImage = card ? card.querySelector('.product-main-image') : null;
+                    const newImageSrc = colorDot.dataset.image;
+                    if (container) container.querySelectorAll('.color-dot').forEach(d => d.classList.remove('active'));
+                    colorDot.classList.add('active');
+                    if (productImage && newImageSrc) productImage.src = newImageSrc;
+                  });
+                  dot.addEventListener('keydown', (ev) => {
+                    if (ev.key === 'Enter' || ev.key === ' ') {
+                      ev.preventDefault();
+                      ev.currentTarget.click();
+                    }
+                  });
+                });
+              }
+            } catch {}
             return article;
           };
           // Helper to build the special grouped rope card that links to a dedicated product page
@@ -3463,8 +3530,48 @@ ensureHomeFirst() {
         return ['black','columbiablue','darkgreen','green','maroon','navy','orange','purple','red','royal','yellow']
           .map(c => ({ name: c, class: c, image: hero }));
       }
+
+      const looksLikeBulletPadKit = (/^pk-?bullet/.test(pidish)) || (/(^|\b)bullet\s*pad\s*kits?(\b|$)/.test(tish));
+      if (looksLikeBulletPadKit) {
+        const hero = (Array.isArray(sources) && sources[0]) || product.img || 'assets/prodImgs/Bullet_Pad_Kit/bulletpadkit.avif';
+        // Bullet Pad Kits: show standard team-color palette (11 colors)
+        return ['black','columbiablue','darkgreen','green','maroon','navy','orange','purple','red','royal','yellow']
+          .map(c => ({ name: c, class: c, image: hero }));
+      }
     } catch {}
     if (!sources.length) return [];
+
+    // Baffles + Backstop: never show color dots (single-SKU / no meaningful color variants)
+    try {
+      const pidish = String(product.id || product.sku || '').toLowerCase();
+      const tish = String(product.title || '').toLowerCase();
+      const isBaffles = /\bbaffles?\b/.test(tish);
+      const isBackstop = /\bbackstop\b/.test(tish) || pidish === 'ez-bkstp' || pidish === 'ez_bkstp';
+      if (isBaffles || isBackstop) return [];
+    } catch {}
+
+    // Pro Batting Mat: only Clay + Green are available; battingmata.avif is the Clay image
+    try {
+      const pidish = String(product.id || product.sku || '').toLowerCase();
+      const tish = String(product.title || '').toLowerCase();
+      const looksLikeBattingMat = (pidish === 'battingmat') || (/\bbatting\s*mat\b/.test(tish));
+      if (looksLikeBattingMat) {
+        const norm = (s) => (s || '').toString().split('/').pop().toLowerCase();
+        const claySrc = sources.find(s => /battingmata\.(?:avif|png|jpe?g|webp|gif)$/i.test(norm(s)))
+          || sources.find(s => /browna\./i.test(norm(s)))
+          || sources.find(s => /\b(brown|clay)\b/.test(norm(s)));
+        const greenSrc = sources.find(s => /\bgreen\b/.test(norm(s)))
+          || sources.find(s => {
+            // fallback: if curated sources are present but not named, treat the first non-clay as green
+            if (!claySrc) return true;
+            return String(s || '') !== String(claySrc || '');
+          });
+        const out = [];
+        if (claySrc) out.push({ name: 'clay', class: 'maroon', image: claySrc });
+        if (greenSrc) out.push({ name: 'green', class: 'green', image: greenSrc });
+        return out;
+      }
+    } catch {}
 
     // Special-case (legacy): some Bullet JR images were previously numbered without color tokens.
     // Only apply this fallback if we actually detect numbered filenames; otherwise
