@@ -74,6 +74,22 @@ router.get('/diagnostics', requireAdmin, async (req, res) => {
     // CORS
     const corsOrigins = (process.env.CORS_ORIGINS || '').split(',').map(s=>s.trim()).filter(Boolean);
 
+    // Storage driver/location sanity (do NOT expose secrets)
+    const storageDriver = (db && typeof db === 'object' && db.driver) ? String(db.driver) : 'json';
+    const storageLocation = (storageDriver === 'cloudflare')
+      ? (db.baseUrl ? String(db.baseUrl) : null)
+      : (db.dbPath ? String(db.dbPath) : null);
+    let storageOk = true;
+    let storageError = null;
+    try {
+      // Lightweight check: read schema collection (works for both drivers)
+      if (typeof db.read === 'function') await db.read('schema');
+      else if (typeof db.findAll === 'function') await db.findAll('schema');
+    } catch (e) {
+      storageOk = false;
+      storageError = e?.message || String(e);
+    }
+
     res.json({
       now: new Date().toISOString(),
       uptimeSec: Math.round(process.uptime()),
@@ -84,6 +100,10 @@ router.get('/diagnostics', requireAdmin, async (req, res) => {
       auth: { jwtSet, cookieDomain },
       cors: { origins: corsOrigins },
       storage: {
+        driver: storageDriver,
+        location: storageLocation,
+        ok: storageOk,
+        error: storageError,
         ordersCount, analyticsCount, couponsCount, subscribersCount: subsCount, emailsCount, payoutsCount
       },
       analytics: traffic7 ? {

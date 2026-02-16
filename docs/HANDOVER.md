@@ -40,8 +40,7 @@ This document summarizes what is implemented, what was added in this review, and
 - PWA assets (service worker + manifest) with cache strategy
   - `service-worker.js`, `manifest.webmanifest`
 - Environment templates for secrets and configs
-  - `.env.example` (root) — Created
-  - `server/.env.example` — Already existed (reviewed)
+  - `server/EZenvLIVE.TXT` — Canonical reference template (do not commit secrets)
 - QA smoke test script
   - `server/scripts/smoke-test.js` — Created
 
@@ -130,7 +129,7 @@ This document summarizes what is implemented, what was added in this review, and
 
 ## Deployment notes
 
-- Render blueprint `render.yaml` is present. Ensure env vars are set before deployment (see .env.example).
+- Render blueprint `render.yaml` is present. Ensure env vars are set before deployment (see `server/EZenvLIVE.TXT`).
 - Enable `FORCE_HTTPS=true` and `TRUST_PROXY=1` in production for secure cookies and HSTS.
 - Configure Stripe webhook to point to `https://<your-host>/webhook/stripe` with the signing secret.
 - If enabling address validation, ensure corresponding API is enabled and keys are present.

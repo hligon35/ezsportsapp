@@ -1,0 +1,185 @@
+
+# EZ Sports App - LIVE environment variables
+# Format: KEY=VALUE (Render/Heroku style). Lines starting with # are comments.
+#
+# Notes:
+# - Values marked "REQUIRED" must be set for full production functionality.
+# - Values marked "OPTIONAL" enable extra features (reports, CF admin, address validation, etc.).
+# - Anything that looks like a secret/token/key should be created by you and kept private.
+
+### Core (REQUIRED)
+NODE_ENV=production
+# Most hosts (Render, Heroku) inject PORT automatically. Set only if your host requires it.
+# PORT=4242
+
+### Base URLs / CORS (REQUIRED)
+# Public marketing site URL (used in receipts/emails/links)
+SITE_URL=https://ezsportsnetting.com
+PUBLIC_SITE_URL=https://ezsportsnetting.com
+
+# Server base URL (used for links like reset-password). Set to your deployed server origin.
+# Example (Render): https://ezsportsapp.onrender.com
+APP_BASE_URL=https://ezsportsapp.onrender.com
+
+# Comma-separated list of allowed browser origins
+# Example: https://ezsportsnetting.com,https://www.ezsportsnetting.com,https://ezsportsapp.onrender.com
+CORS_ORIGINS=https://ezsportsnetting.com,https://www.ezsportsnetting.com
+
+# If behind a proxy/load balancer (Render/Cloudflare), keep TRUST_PROXY=1
+TRUST_PROXY=1
+
+# If your platform terminates TLS before Node, you can force HTTPS redirects
+FORCE_HTTPS=true
+
+### Auth / Cookies (REQUIRED)
+# Create this yourself: long random string (32+ bytes). Changing it logs everyone out.
+JWT_SECRET=
+
+JWT_ISS=ezsports
+JWT_AUD=ezsports-apps
+
+# Cookie settings for cross-site auth. For same-site only deployments you can change these.
+COOKIE_SECURE=true
+COOKIE_SAMESITE=None
+
+# Set if you want cookies valid across subdomains. Example: .ezsportsnetting.com
+COOKIE_DOMAIN=.ezsportsnetting.com
+
+### Stripe Payments (REQUIRED for card checkout)
+# Create these yourself from Stripe Dashboard (LIVE keys)
+STRIPE_PUBLISHABLE_KEY=
+STRIPE_SECRET_KEY=
+
+# Create this yourself from Stripe Webhook endpoint configuration
+STRIPE_WEBHOOK_SECRET=
+
+# Stripe API version pinned in server
+STRIPE_API_VERSION=2022-11-15
+
+# If you have Stripe Automatic Tax configured/registered, set true. Otherwise leave false.
+STRIPE_TAX_AUTOMATIC=false
+
+### Stripe Connect (OPTIONAL)
+# Only enable if you are running destination charges.
+# STRIPE_CONNECT_ENABLED=false
+# STRIPE_CONNECT_PREVIEW_ONLY=true
+# STRIPE_CONNECT_DESTINATION_ACCOUNT=
+# STRIPE_PLATFORM_FEE_BPS=150
+
+### Order & Contact Notifications (REQUIRED for "send order to correct destination")
+# Where contact form submissions go
+CONTACT_INBOX=info@ezsportsnetting.com
+
+# Where paid-order internal notifications go (staff inbox). If blank, falls back to CONTACT_INBOX.
+ORDER_NOTIFY_TO=info@ezsportsnetting.com,hligon@getsparqd.com
+
+### Email Delivery (REQUIRED for customer receipts + internal notifications)
+MAIL_FROM=no-reply@ezsportsnetting.com
+MAIL_FROM_NAME=EZ Sports Netting
+
+# Cloudflare Worker endpoint that actually sends mail (MailChannels)
+CF_EMAIL_WEBHOOK_URL=https://ez-email-worker.hligon.workers.dev/
+
+# Create this yourself if your Worker expects bearer auth
+CF_EMAIL_API_KEY=
+
+# OPTIONAL: Cloudflare Access service token headers (only if the Worker is behind CF Access)
+CF_ACCESS_CLIENT_ID=
+CF_ACCESS_CLIENT_SECRET=
+
+# OPTIONAL debug toggles
+EMAIL_DEBUG=false
+EMAIL_HTTP_TIMEOUT_MS=2500
+
+### Database (REQUIRED)
+# Default driver is json (writes to server/database/*.json). Keep as json unless you moved storage.
+EZ_DB_DRIVER=cloudflare
+
+# OPTIONAL: change DB storage folder (defaults to server/database)
+# EZ_DB_PATH=/var/data/ezsportsapp
+# DB_PATH=/var/data/ezsportsapp
+
+# OPTIONAL: Cloudflare DB driver settings (only if EZ_DB_DRIVER=cloudflare)
+EZ_CF_DB_URL=https://ez-db-worker.hligon.workers.dev
+EZ_CF_DB_API_KEY=
+# CF_DB_URL=https://ez-db-worker.hligon.workers.dev
+# CF_DB_API_KEY=l6lAkeTlsr6qrqSWPHK0GUVvFcGE2tkUBPnvVH9UKzY
+
+### Security / Safety toggles
+# Keep false in production; /api/order fallback endpoint is blocked when false.
+ALLOW_TEST_CHECKOUT=false
+
+### Maintenance Mode (OPTIONAL)
+# When true, server may present “maintenance/coming soon” behavior in some endpoints.
+MAINTENANCE=true
+
+### Fraud / Bot protection (OPTIONAL but recommended)
+# Turnstile site key is public; secret must be created by you in Cloudflare Turnstile.
+TURNSTILE_SITE_KEY=0x4AAAAAACYwf3jdfxjtUr_I
+CF_TURNSTILE_SECRET=
+
+# Set true only for debugging; disables verification.
+TURNSTILE_BYPASS=false
+CF_TURNSTILE_BYPASS=false
+
+### Address validation (OPTIONAL)
+ADDRESS_VALIDATION_ENABLED=false
+ADDRESS_VALIDATION_PROVIDER=none
+ADDRESS_VALIDATION_TIMEOUT_MS=3000
+
+# Smarty (if ADDRESS_VALIDATION_PROVIDER=smarty) - create yourself
+SMARTY_AUTH_ID=
+SMARTY_AUTH_TOKEN=
+
+# Google Maps (optional address helpers/autocomplete) - create yourself
+GOOGLE_MAPS_API_KEY=
+# MAPS_API_KEY=
+# GMAPS_KEY=
+
+### Marketing integration (OPTIONAL)
+MARKETING_APPS_SCRIPT_URL=https://script.google.com/macros/s/AKfycbw1npuTQiIpGQqlB6LPh4AoihC9bVW8XngIq270ZYaQfZ7msW1zz5cOjmWwATkrqtmr/exec
+
+### Cloudflare Admin helpers (OPTIONAL)
+# Used by /api/admin/cloudflare/* endpoints
+CLOUDFLARE_API_TOKEN=
+CLOUDFLARE_ZONE_ID=
+CLOUDFLARE_ACCOUNT_ID=
+
+### Error reporting / rate limits (OPTIONAL)
+ERROR_REPORT_RATE_LIMIT_PER_MIN=30
+
+### Scheduled reports (OPTIONAL)
+ALERT_EMAIL_ENABLED=true
+ALERT_EMAIL_TO=info@getsparqd.com
+ALERT_EMAIL_FROM=salesreports@ezsportsnetting.com
+ALERT_DEDUPE_MINUTES=10
+
+REPORT_EMAIL_TO=info@getsparqd.com
+
+FINANCE_REPORT_ENABLED=true
+FINANCE_REPORT_TIME_UTC=18:15
+
+DAILY_REPORT_ENABLED=true
+# DAILY_REPORT_TZ=America/Indianapolis
+# DAILY_REPORT_TIME_LOCAL=07:00
+DAILY_REPORT_TIME_UTC=18:00
+
+### Shipping provider (OPTIONAL)
+SHIPPING_PROVIDER_ENABLED=false
+SHIPPING_PROVIDER=none
+
+### Automation (OPTIONAL)
+# Auto-sync product catalog on boot (used by server/index.js startup hook)
+AUTOSYNC_PRODUCTS=0
+AUTOSYNC_STRIPE=0
+
+### Dev-only admin bootstrap (OPTIONAL; ignored in production)
+DEV_ADMIN_USERNAME=admin
+DEV_ADMIN_PASSWORD=
+DEV_ADMIN_EMAIL=hligon@getsparqd.com
+DEV_ADMIN_NAME=Harold Ligon
+
+### Script-only (OPTIONAL)
+PRODUCT_IMAGE_BASE_URL=
+# STRIPE_IMAGE_ALLOW_AVIF=0
+

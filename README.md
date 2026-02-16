@@ -392,7 +392,7 @@ Recommended
 - CLOUDFLARE_ZONE_ID=…
 - AUTOSYNC_PRODUCTS=1 (optional) and AUTOSYNC_STRIPE=1 (optional)
 
-Tip: copy `server/.env.example` to `server/.env` for local dev and fill the values; Do NOT commit real secrets (`server/.env` is gitignored).
+Tip: for local dev, create `server/.env` (gitignored) using `server/EZenvLIVE.TXT` as the reference template; do NOT commit real secrets.
 
 ### 2) Webhook setup options
 

@@ -7,7 +7,7 @@ This document summarizes cleanup changes to reduce confusion and risk while keep
 - Removed unused root-level serverless artifacts (kept separate from the Express server under `server/`).
 - Protected secrets:
   - Added `render/.env` to `.gitignore`.
-  - Added `render/.env.example` with placeholders. Move real secrets to Render dashboard environment.
+  - Keep production secrets in the Render dashboard environment (not in the repo). Use `server/EZenvLIVE.TXT` as the canonical reference template.
 - Left untouched by request: `cloudflare/` directory (MailChannels Worker example + docs).
 
 ## Why it’s safe
