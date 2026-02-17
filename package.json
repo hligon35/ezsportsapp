@@ -19,6 +19,7 @@
     "screens:build": "node server/scripts/build-screens-catalog.js",
     "gloves:build": "node server/scripts/build-gloves-catalog.js",
     "prices:generate": "node scripts/generate-prices-md.js",
+    "emails:previews": "node tools/test-email-flows.js",
     "media:optimize": "node scripts/optimize-ezsports-content.js",
     "test": "jest --runInBand --testPathIgnorePatterns=tests/browser",
     "test:e2e": "jest --runInBand --verbose",

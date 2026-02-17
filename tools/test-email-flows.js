@@ -7,6 +7,9 @@
   - Test order creation + Stripe webhook simulation (customer receipt + internal)
   - Daily + Weekly payout report emails
   - Daily Activity report email
+  - Password reset email
+  - Error alert email
+  - Newsletter sample email
   - (Legacy daily finance report removed; payout reports are the finance reports now)
 
   Safe defaults:
@@ -55,6 +58,46 @@ function writePreviews(emails, dir) {
       const text = e.text ? String(e.text) : '';
       if (html) fs.writeFileSync(path.join(dir, `${base}.html`), html, 'utf8');
       if (text) fs.writeFileSync(path.join(dir, `${base}.txt`), text, 'utf8');
+    } catch {
+      // ignore
+    }
+  }
+}
+
+function hasAllTags(email, requiredTags) {
+  const tags = Array.isArray(email?.tags) ? email.tags : [];
+  return requiredTags.every((t) => tags.includes(t));
+}
+
+function writeOneOfEachPreviews(emails, dir) {
+  try { fs.mkdirSync(dir, { recursive: true }); } catch {}
+  const list = Array.isArray(emails) ? emails.slice() : [];
+
+  // Predicates are ordered; first match wins.
+  const types = [
+    { key: 'subscribe-internal', match: (e) => hasAllTags(e, ['subscribe', 'internal']) },
+    { key: 'subscribe-welcome', match: (e) => hasAllTags(e, ['subscribe', 'welcome']) },
+    { key: 'contact-ack', match: (e) => hasAllTags(e, ['contact', 'ack']) },
+    { key: 'contact-internal', match: (e) => Array.isArray(e?.tags) && e.tags.includes('contact') && !hasAllTags(e, ['contact', 'ack']) },
+    { key: 'password-reset', match: (e) => hasAllTags(e, ['password-reset']) },
+    { key: 'order-receipt-customer', match: (e) => hasAllTags(e, ['order', 'paid', 'customer']) },
+    { key: 'order-paid-internal', match: (e) => hasAllTags(e, ['order', 'paid', 'internal']) },
+    { key: 'report-daily-payout', match: (e) => hasAllTags(e, ['report', 'daily', 'payout']) },
+    { key: 'report-weekly-payout', match: (e) => hasAllTags(e, ['report', 'weekly', 'payout']) },
+    // Daily activity report uses ['report','daily'] only (no payout)
+    { key: 'report-daily-activity', match: (e) => hasAllTags(e, ['report', 'daily']) && !(Array.isArray(e?.tags) && e.tags.includes('payout')) },
+    { key: 'alert-error', match: (e) => Array.isArray(e?.tags) && e.tags.includes('alert') && e.tags.includes('error') },
+    { key: 'newsletter', match: (e) => hasAllTags(e, ['newsletter']) }
+  ];
+
+  for (const t of types) {
+    const found = list.find(t.match);
+    if (!found) continue;
+    try {
+      const html = found.html ? String(found.html) : '';
+      const text = found.text ? String(found.text) : '';
+      if (html) fs.writeFileSync(path.join(dir, `${t.key}.html`), html, 'utf8');
+      if (text) fs.writeFileSync(path.join(dir, `${t.key}.txt`), text, 'utf8');
     } catch {
       // ignore
     }
@@ -216,6 +259,43 @@ async function main() {
   // Allow marketing route background handlers to queue emails
   await sleep(1200);
 
+  // 2b) Password reset email (queued directly; avoids needing a real user record)
+  try {
+    // eslint-disable-next-line global-require
+    const EmailService = require('../server/services/EmailService');
+    // eslint-disable-next-line global-require
+    const { renderBrandedEmailHtml, escapeHtml } = require('../server/services/EmailTheme');
+    const token = `test-reset-${suffix}`;
+    const url = new URL('/reset-password.html', baseUrl);
+    url.searchParams.set('token', token);
+    const link = url.toString();
+    const emailSvc = new EmailService();
+    const bodyHtml = `
+      <p style="margin:0 0 10px;">We received a request to reset your password.</p>
+      <p style="margin:0 0 12px;color:#5a5a5a;line-height:20px;">Click the button below to choose a new password. This link is valid for 1 hour.</p>
+      <div style="margin:16px 0 14px;">
+        <a href="${escapeHtml(link)}" style="display:inline-block;background:#241773;color:#ffffff;text-decoration:none;font-weight:800;padding:10px 14px;border-radius:10px;">Reset Password</a>
+      </div>
+      <div style="margin:12px 0 8px;color:#5a5a5a;font-size:12px;line-height:18px;">If the button doesn’t work, copy and paste this link into your browser:</div>
+      <div style="border:1px solid #d3d0d7;border-radius:10px;padding:10px 12px;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,\"Liberation Mono\",\"Courier New\",monospace;font-size:12px;line-height:1.45;word-break:break-word;">${escapeHtml(link)}</div>
+      <p style="margin:14px 0 0;color:#5a5a5a;line-height:20px;">If you didn’t request a password reset, you can ignore this email.</p>
+    `;
+    const html = renderBrandedEmailHtml({
+      title: 'Reset your password',
+      subtitle: 'EZ Sports Netting Account',
+      bodyHtml
+    });
+    await emailSvc.queue({
+      to: `test+reset-${suffix}@example.com`,
+      subject: 'Reset your EZ Sports Netting password',
+      text: `We received a request to reset your password.\n\nReset link (valid for 1 hour): ${link}\n\nIf you didn’t request this, you can ignore this email.`,
+      html,
+      tags: ['password-reset']
+    });
+  } catch {
+    // ignore
+  }
+
   // 3) Create an order record (does NOT send emails yet)
   const orderResp = await postJson(`${baseUrl}/api/order`, {
     userId: null,
@@ -302,6 +382,62 @@ async function main() {
   const drs = new DailyReportService();
   const activityOut = await drs.sendDailyActivityReport({ day: today });
 
+  // 5c) Error alert email (queues via AlertingService.sendErrorAlert)
+  try {
+    // eslint-disable-next-line global-require
+    const AlertingService = require('../server/services/AlertingService');
+    const alerts = new AlertingService();
+    await alerts.sendErrorAlert({
+      title: 'EZSports Error (preview)',
+      errorRecord: {
+        createdAt: new Date().toISOString(),
+        source: 'preview',
+        message: 'This is a preview error alert for email layout review.',
+        name: 'PreviewError',
+        stack: 'PreviewError: Example stack trace\n    at tools/test-email-flows.js:1:1',
+        path: '/preview',
+        url: `${baseUrl}/preview`
+      }
+    });
+  } catch {
+    // ignore
+  }
+
+  // 5d) Newsletter sample email (queues directly)
+  try {
+    // eslint-disable-next-line global-require
+    const EmailService = require('../server/services/EmailService');
+    // eslint-disable-next-line global-require
+    const { renderBrandedEmailHtml, escapeHtml } = require('../server/services/EmailTheme');
+    const emailSvc = new EmailService();
+    const body = `
+      <p style="margin:0 0 10px;">Hi there,</p>
+      <p style="margin:0 0 12px;color:#5a5a5a;line-height:20px;">This is a sample newsletter email used to preview formatting and spacing.</p>
+      <div style="border:1px solid #d3d0d7;border-radius:10px;padding:12px 12px 10px;">
+        <div style="font-weight:800;color:#241773;">Featured</div>
+        <ul style="margin:8px 0 0;padding-left:18px;">
+          <li>${escapeHtml('New netting sizes now available')}</li>
+          <li>${escapeHtml('Save 10% on protective screens this week')}</li>
+          <li>${escapeHtml('Design help for training facilities')}</li>
+        </ul>
+      </div>
+    `;
+    const html = renderBrandedEmailHtml({
+      title: 'EZ Sports Netting Newsletter',
+      subtitle: 'Preview email',
+      bodyHtml: body
+    });
+    await emailSvc.queue({
+      to: `test+newsletter-${suffix}@example.com`,
+      subject: 'EZ Sports Netting Newsletter (Preview)',
+      html,
+      text: 'This is a sample newsletter email used to preview formatting and spacing.',
+      tags: ['newsletter']
+    });
+  } catch {
+    // ignore
+  }
+
   // 6) Summarize emails recorded since start
   const db = new DatabaseManager();
   const all = await db.findAll('emails');
@@ -343,6 +479,7 @@ async function main() {
   try {
     const previewDir = path.join(__dirname, 'email-previews');
     writePreviews(recent, previewDir);
+    writeOneOfEachPreviews(recent, path.join(previewDir, 'one-of-each'));
   } catch {}
 
   console.log(JSON.stringify({

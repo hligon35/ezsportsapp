@@ -3,6 +3,7 @@ const router = express.Router();
 const crypto = require('crypto');
 const UserService = require('../services/UserService');
 const EmailService = require('../services/EmailService');
+const { escapeHtml, renderBrandedEmailHtml } = require('../services/EmailTheme');
 const { signToken, requireAdmin, requireAuth, setAuthCookie, clearAuthCookie, getUserFromRequest } = require('../middleware/auth');
 
 const userService = new UserService();
@@ -321,12 +322,33 @@ router.post('/forgot-password', async (req, res) => {
   const base = process.env.APP_BASE_URL || `${req.protocol}://${req.get('host')}`;
     const url = new URL('/reset-password.html', base);
     url.searchParams.set('token', token);
-    // Queue email (replace with real provider later)
+
+    const link = url.toString();
+    const bodyHtml = `
+      <p style="margin:0 0 10px;">We received a request to reset your password.</p>
+      <p style="margin:0 0 12px;color:#5a5a5a;line-height:20px;">Click the button below to choose a new password. This link is valid for 1 hour.</p>
+
+      <div style="margin:16px 0 14px;">
+        <a href="${escapeHtml(link)}" style="display:inline-block;background:#241773;color:#ffffff;text-decoration:none;font-weight:800;padding:10px 14px;border-radius:10px;">Reset Password</a>
+      </div>
+
+      <div style="margin:12px 0 8px;color:#5a5a5a;font-size:12px;line-height:18px;">If the button doesn’t work, copy and paste this link into your browser:</div>
+      <div style="border:1px solid #d3d0d7;border-radius:10px;padding:10px 12px;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,\"Liberation Mono\",\"Courier New\",monospace;font-size:12px;line-height:1.45;word-break:break-word;">${escapeHtml(link)}</div>
+
+      <p style="margin:14px 0 0;color:#5a5a5a;line-height:20px;">If you didn’t request a password reset, you can ignore this email.</p>
+    `;
+    const html = renderBrandedEmailHtml({
+      title: 'Reset your password',
+      subtitle: 'EZ Sports Netting Account',
+      bodyHtml
+    });
+
+    // Queue email
     await emailService.queue({
       to: userEmail,
       subject: 'Reset your EZ Sports Netting password',
-      text: `Click the link to reset your password: ${url.toString()} (valid for 1 hour)`,
-      html: `<p>Click the link to reset your password:</p><p><a href="${url.toString()}">${url.toString()}</a></p><p>This link is valid for 1 hour.</p>`,
+      text: `We received a request to reset your password.\n\nReset link (valid for 1 hour): ${link}\n\nIf you didn’t request this, you can ignore this email.`,
+      html,
       tags: ['password-reset']
     });
     res.json({ message: 'If an account exists for this email, you will receive a reset link.' });

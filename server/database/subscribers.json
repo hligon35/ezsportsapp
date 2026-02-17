@@ -182,5 +182,21 @@
     "createdAt": "2026-02-17T03:07:15.772Z",
     "updatedAt": "2026-02-17T03:07:15.772Z",
     "id": 24
+  },
+  {
+    "email": "test+sub-1771342230234@example.com",
+    "name": "Email Flow Test",
+    "subscribed": true,
+    "createdAt": "2026-02-17T15:30:30.386Z",
+    "updatedAt": "2026-02-17T15:30:30.386Z",
+    "id": 25
+  },
+  {
+    "email": "test+sub-1771343655082@example.com",
+    "name": "Email Flow Test",
+    "subscribed": true,
+    "createdAt": "2026-02-17T15:54:15.184Z",
+    "updatedAt": "2026-02-17T15:54:15.184Z",
+    "id": 26
   }
 ]

@@ -1,6 +1,7 @@
 const crypto = require('crypto');
 const DatabaseManager = require('../database/DatabaseManager');
 const EmailService = require('./EmailService');
+const { escapeHtml, renderBrandedEmailHtml } = require('./EmailTheme');
 
 function safeStr(v, max = 4000) {
   const s = (v === undefined || v === null) ? '' : String(v);
@@ -75,17 +76,38 @@ class AlertingService {
     const stack = safeStr(errorRecord?.stack || '', 8000);
     const url = safeStr(errorRecord?.url || errorRecord?.path || '', 2000);
 
-    const html = `
-      <h2>EZ Sports App Error Alert</h2>
-      <p><strong>When:</strong> ${when}</p>
-      <p><strong>Source:</strong> ${src}</p>
-      <p><strong>URL/Path:</strong> ${url || '(unknown)'}</p>
-      <p><strong>Message:</strong> ${msg || '(none)'}</p>
-      <pre style="white-space:pre-wrap;word-break:break-word">${stack || ''}</pre>
-      <p><small>Fingerprint: ${fingerprint}</small></p>
-    `;
+    const safeWhen = escapeHtml(when);
+    const safeSrc = escapeHtml(src);
+    const safeUrl = escapeHtml(url || '(unknown)');
+    const safeMsg = escapeHtml(msg || '(none)');
+    const safeStack = escapeHtml(stack || '');
+    const safeFingerprint = escapeHtml(fingerprint);
 
     const subject = safeStr(title || `EZSports Error (${src})`, 160);
+
+    const bodyHtml = `
+      <p style="margin:0 0 12px;color:#5a5a5a;line-height:20px;">An application error was captured.</p>
+      <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="border:1px solid #d3d0d7;border-radius:10px;overflow:hidden;">
+        <tr><td style="padding:10px 12px;background:#ffffff;color:#5a5a5a;width:38%;border-bottom:1px solid #d3d0d7;">When</td><td style="padding:10px 12px;border-bottom:1px solid #d3d0d7;">${safeWhen}</td></tr>
+        <tr><td style="padding:10px 12px;background:#ffffff;color:#5a5a5a;width:38%;border-bottom:1px solid #d3d0d7;">Source</td><td style="padding:10px 12px;border-bottom:1px solid #d3d0d7;">${safeSrc}</td></tr>
+        <tr><td style="padding:10px 12px;background:#ffffff;color:#5a5a5a;width:38%;">URL/Path</td><td style="padding:10px 12px;">${safeUrl}</td></tr>
+      </table>
+
+      <div style="margin:16px 0 8px;font-weight:800;color:#241773;">Message</div>
+      <div style="border:1px solid #d3d0d7;border-radius:10px;padding:10px 12px;color:#000000;line-height:20px;">${safeMsg}</div>
+
+      <div style="margin:16px 0 8px;font-weight:800;color:#241773;">Stack</div>
+      <pre style="margin:0;padding:12px 12px;border:1px solid #d3d0d7;border-radius:10px;white-space:pre-wrap;word-break:break-word;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,\"Liberation Mono\",\"Courier New\",monospace;font-size:12px;line-height:1.45;color:#000000;">${safeStack}</pre>
+
+      <div style="margin-top:12px;color:#5a5a5a;font-size:11px;line-height:15px;">Fingerprint: ${safeFingerprint}</div>
+    `;
+
+    const html = renderBrandedEmailHtml({
+      title: 'EZ Sports App Error Alert',
+      subtitle: escapeHtml(subject),
+      bodyHtml,
+      maxWidth: 680
+    });
     const out = await this.email.queue({
       to: this.alertTo,
       subject,

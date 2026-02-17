@@ -2587,5 +2587,97 @@
     "createdAt": "2026-02-17T03:07:17.014Z",
     "updatedAt": "2026-02-17T03:07:17.106Z",
     "id": 3036
+  },
+  {
+    "userId": null,
+    "userEmail": "test+order-1771342230234@example.com",
+    "items": [
+      {
+        "productId": "TEST-SKU-1",
+        "productName": "Test Item",
+        "price": 10,
+        "quantity": 1,
+        "subtotal": 10,
+        "category": "netting"
+      }
+    ],
+    "total": 10,
+    "status": "paid",
+    "shippingAddress": {
+      "name": "Email Flow Test",
+      "address1": "123 Test St",
+      "address2": "",
+      "city": "Testville",
+      "state": "IN",
+      "postal": "46201",
+      "country": "US",
+      "phone": "555-0101"
+    },
+    "customerInfo": {
+      "email": "test+order-1771342230234@example.com",
+      "name": "Email Flow Test",
+      "phone": "555-0101"
+    },
+    "paymentInfo": {
+      "method": "stripe",
+      "intentId": "pi_test_1771342230234",
+      "amount": 10,
+      "currency": "usd",
+      "paidAt": "2026-02-17T15:30:31.689Z",
+      "customerEmailSentAt": "2026-02-17T15:30:31.753Z"
+    },
+    "subtotal": 10,
+    "shipping": 0,
+    "discount": 0,
+    "tax": 0,
+    "createdAt": "2026-02-17T15:30:31.670Z",
+    "updatedAt": "2026-02-17T15:30:31.755Z",
+    "id": 3037
+  },
+  {
+    "userId": null,
+    "userEmail": "test+order-1771343655082@example.com",
+    "items": [
+      {
+        "productId": "TEST-SKU-1",
+        "productName": "Test Item",
+        "price": 10,
+        "quantity": 1,
+        "subtotal": 10,
+        "category": "netting"
+      }
+    ],
+    "total": 10,
+    "status": "paid",
+    "shippingAddress": {
+      "name": "Email Flow Test",
+      "address1": "123 Test St",
+      "address2": "",
+      "city": "Testville",
+      "state": "IN",
+      "postal": "46201",
+      "country": "US",
+      "phone": "555-0101"
+    },
+    "customerInfo": {
+      "email": "test+order-1771343655082@example.com",
+      "name": "Email Flow Test",
+      "phone": "555-0101"
+    },
+    "paymentInfo": {
+      "method": "stripe",
+      "intentId": "pi_test_1771343655082",
+      "amount": 10,
+      "currency": "usd",
+      "paidAt": "2026-02-17T15:54:16.513Z",
+      "customerEmailSentAt": "2026-02-17T15:54:16.548Z"
+    },
+    "subtotal": 10,
+    "shipping": 0,
+    "discount": 0,
+    "tax": 0,
+    "createdAt": "2026-02-17T15:54:16.490Z",
+    "updatedAt": "2026-02-17T15:54:16.550Z",
+    "id": 3038
   }
 ]
