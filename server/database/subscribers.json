@@ -94,5 +94,93 @@
     "createdAt": "2026-02-09T22:40:40.524Z",
     "updatedAt": "2026-02-09T22:40:40.524Z",
     "id": 13
+  },
+  {
+    "email": "test+sub-1771291752060@example.com",
+    "name": "Email Flow Test",
+    "subscribed": true,
+    "createdAt": "2026-02-17T01:29:12.133Z",
+    "updatedAt": "2026-02-17T01:29:12.133Z",
+    "id": 14
+  },
+  {
+    "email": "test+sub-1771292855183@example.com",
+    "name": "Email Flow Test",
+    "subscribed": true,
+    "createdAt": "2026-02-17T01:47:35.282Z",
+    "updatedAt": "2026-02-17T01:47:35.282Z",
+    "id": 15
+  },
+  {
+    "email": "test+sub-1771293751264@example.com",
+    "name": "Email Flow Test",
+    "subscribed": true,
+    "createdAt": "2026-02-17T02:02:31.360Z",
+    "updatedAt": "2026-02-17T02:02:31.360Z",
+    "id": 16
+  },
+  {
+    "email": "test+manual-sub-1771294257596@example.com",
+    "name": "Manual Test",
+    "subscribed": true,
+    "createdAt": "2026-02-17T02:10:57.910Z",
+    "updatedAt": "2026-02-17T02:10:57.910Z",
+    "id": 17
+  },
+  {
+    "email": "test+manual-sub2-1771294332314@example.com",
+    "name": "Manual Test 2",
+    "subscribed": true,
+    "createdAt": "2026-02-17T02:12:12.322Z",
+    "updatedAt": "2026-02-17T02:12:12.322Z",
+    "id": 18
+  },
+  {
+    "email": "test+sub-1771294669815@example.com",
+    "name": "Email Flow Test",
+    "subscribed": true,
+    "createdAt": "2026-02-17T02:17:49.869Z",
+    "updatedAt": "2026-02-17T02:17:49.869Z",
+    "id": 19
+  },
+  {
+    "email": "test+sub-welcome-1771294977072@example.com",
+    "name": "Welcome Test",
+    "subscribed": true,
+    "createdAt": "2026-02-17T02:22:57.079Z",
+    "updatedAt": "2026-02-17T02:22:57.079Z",
+    "id": 20
+  },
+  {
+    "email": "test+sub-welcome2-1771295447424@example.com",
+    "name": "Welcome Test",
+    "subscribed": true,
+    "createdAt": "2026-02-17T02:30:47.459Z",
+    "updatedAt": "2026-02-17T02:30:47.459Z",
+    "id": 21
+  },
+  {
+    "email": "test+sub-1771295598891@example.com",
+    "name": "Email Flow Test",
+    "subscribed": true,
+    "createdAt": "2026-02-17T02:33:18.946Z",
+    "updatedAt": "2026-02-17T02:33:18.946Z",
+    "id": 22
+  },
+  {
+    "email": "test+sub-1771297052513@example.com",
+    "name": "Email Flow Test",
+    "subscribed": true,
+    "createdAt": "2026-02-17T02:57:32.592Z",
+    "updatedAt": "2026-02-17T02:57:32.592Z",
+    "id": 23
+  },
+  {
+    "email": "test+sub-1771297635679@example.com",
+    "name": "Email Flow Test",
+    "subscribed": true,
+    "createdAt": "2026-02-17T03:07:15.772Z",
+    "updatedAt": "2026-02-17T03:07:15.772Z",
+    "id": 24
   }
 ]

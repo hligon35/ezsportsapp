@@ -12,6 +12,10 @@ class EmailService {
     this.cfAccessId = process.env.CF_ACCESS_CLIENT_ID || '';
     this.cfAccessSecret = process.env.CF_ACCESS_CLIENT_SECRET || '';
     this.debug = String(process.env.EMAIL_DEBUG || '').toLowerCase() === 'true';
+
+    // Testing support: redirect all outbound mail to a single inbox.
+    // Opt-in only; does nothing unless set.
+    this.overrideTo = String(process.env.EMAIL_OVERRIDE_TO || process.env.EMAIL_TEST_OVERRIDE_TO || '').trim();
   }
 
   async queue({ to, subject, html, text, tags=[], replyTo = undefined, from = undefined, fromName = undefined }){
@@ -49,6 +53,19 @@ class EmailService {
     const chosenFrom = from || this.from;
     const chosenFromName = fromName || this.fromName;
 
+    const originalTo = String(to || '').trim();
+    const effectiveTo = this.overrideTo || originalTo;
+    const isOverridden = !!(this.overrideTo && originalTo && this.overrideTo !== originalTo);
+    const prefix = isOverridden ? `[TEST to:${originalTo}] ` : '';
+    const subjectOut = `${prefix}${subject}`;
+    const bannerHtml = isOverridden
+      ? `<div style="padding:10px 12px;border:1px solid #d3d0d7;border-radius:10px;margin:0 0 12px;background:#ffffff;color:#000;font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;font-size:12px;line-height:16px;"><strong>TEST OVERRIDE</strong> — original recipient: <span style="font-family:ui-monospace,Menlo,Consolas,monospace;">${originalTo.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</span></div>`
+      : '';
+    const htmlOut = (html && isOverridden) ? `${bannerHtml}${html}` : html;
+    const textOut = (text && isOverridden)
+      ? `TEST OVERRIDE — original recipient: ${originalTo}\n\n${text}`
+      : text;
+
     // Cloudflare Worker (MailChannels) is the only supported delivery path.
     if (!this.cfUrl) {
       // Leave queued until configured.
@@ -57,7 +74,7 @@ class EmailService {
     }
 
     try {
-      const payload = { to, subject, html, text, from: chosenFrom };
+      const payload = { to: effectiveTo, subject: subjectOut, html: htmlOut, text: textOut, from: chosenFrom };
       if (replyTo) payload.replyTo = replyTo;
       if (chosenFromName) payload.fromName = chosenFromName;
       const headers = { 'Content-Type': 'application/json' };
@@ -91,21 +108,21 @@ class EmailService {
         clearTimeout(t);
       }
       if (resp.ok) {
-        await this.db.update('emails', { id }, { status: 'sent', provider: 'cloudflare-worker', sentAt: new Date().toISOString() });
-        return { ...email, status: 'sent', provider: 'cloudflare-worker' };
+        await this.db.update('emails', { id }, { status: 'sent', provider: 'cloudflare-worker', sentAt: new Date().toISOString(), deliveredTo: effectiveTo });
+        return { ...email, status: 'sent', provider: 'cloudflare-worker', deliveredTo: effectiveTo };
       }
       const body = await resp.text().catch(() => '');
       const msg = `Cloudflare email failed ${resp.status}: ${body}`;
-      await this.db.update('emails', { id }, { status: 'failed', provider: 'cloudflare-worker', error: msg, failedAt: new Date().toISOString() });
+      await this.db.update('emails', { id }, { status: 'failed', provider: 'cloudflare-worker', error: msg, failedAt: new Date().toISOString(), deliveredTo: effectiveTo });
       if (this.debug) console.warn('[EmailService] Worker response not OK', { status: resp.status, body: body?.slice(0, 200) });
-      return { ...email, status: 'failed', provider: 'cloudflare-worker', error: msg };
+      return { ...email, status: 'failed', provider: 'cloudflare-worker', error: msg, deliveredTo: effectiveTo };
     } catch (e) {
       const msg = e?.message || String(e);
       try {
-        await this.db.update('emails', { id }, { status: 'failed', provider: 'cloudflare-worker', error: msg, failedAt: new Date().toISOString() });
+        await this.db.update('emails', { id }, { status: 'failed', provider: 'cloudflare-worker', error: msg, failedAt: new Date().toISOString(), deliveredTo: effectiveTo });
       } catch {}
       if (this.debug) console.warn('Email send via Cloudflare failed:', msg);
-      return { ...email, status: 'failed', provider: 'cloudflare-worker', error: msg };
+      return { ...email, status: 'failed', provider: 'cloudflare-worker', error: msg, deliveredTo: effectiveTo };
     }
   }
 

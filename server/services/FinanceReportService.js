@@ -1,5 +1,6 @@
 const DatabaseManager = require('../database/DatabaseManager');
 const AlertingService = require('./AlertingService');
+const { escapeHtml, renderBrandedEmailHtml } = require('./EmailTheme');
 
 function startOfDayUTC(date = new Date()) {
   return new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(), 0, 0, 0, 0));
@@ -79,7 +80,7 @@ class FinanceReportService {
       .slice(0, 20);
 
     const lines = [];
-    lines.push(`<h2>Finance Report — ${dayKey} (UTC)</h2>`);
+    lines.push(`<h2 style="margin:0 0 12px;">Finance Report — ${escapeHtml(dayKey)} (UTC)</h2>`);
     lines.push(`<ul>`);
     lines.push(`<li><strong>Paid orders:</strong> ${paid.length}</li>`);
     lines.push(`<li><strong>Gross (from Stripe PI amount):</strong> ${money(sums.gross)}</li>`);
@@ -100,13 +101,18 @@ class FinanceReportService {
         const platformFee = Number(p.applicationFee || 0) || 0;
         const dest = p.connectDestination ? safeText(p.connectDestination, 24) : '';
         const when = safeText(p.paidAt || o.updatedAt || o.createdAt || '', 32);
-        lines.push(`<li>#${safeText(o.id, 24)} — ${money(gross)}${platformFee ? ` (fee ${money(platformFee)})` : ''}${dest ? ` — ${dest}` : ''} — ${when}</li>`);
+        lines.push(`<li>#${escapeHtml(safeText(o.id, 24))} — ${escapeHtml(money(gross))}${platformFee ? ` (fee ${escapeHtml(money(platformFee))})` : ''}${dest ? ` — ${escapeHtml(dest)}` : ''} — ${escapeHtml(when)}</li>`);
       }
       lines.push(`</ol>`);
     }
 
     const subject = `EZSports Finance Report — ${dayKey} (UTC)`;
-    const html = lines.join('\n');
+    const bodyHtml = lines.join('\n');
+    const html = renderBrandedEmailHtml({
+      title: subject,
+      subtitle: 'Daily finance summary',
+      bodyHtml
+    });
     const text = [
       `Finance Report — ${dayKey} (UTC)`,
       `Paid orders: ${paid.length}`,

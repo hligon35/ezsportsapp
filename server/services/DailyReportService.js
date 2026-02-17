@@ -1,6 +1,7 @@
 const DatabaseManager = require('../database/DatabaseManager');
 const OrderService = require('./OrderService');
 const AlertingService = require('./AlertingService');
+const { escapeHtml, renderBrandedEmailHtml } = require('./EmailTheme');
 
 function startOfDayUTC(date = new Date()) {
   const d = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(), 0, 0, 0, 0));
@@ -74,7 +75,7 @@ class DailyReportService {
     const purchaseEvents = countByType('purchase');
 
     const lines = [];
-    lines.push(`<h2>Daily Visitor Activity — ${dayKey} (UTC)</h2>`);
+    lines.push(`<h2 style="margin:0 0 12px;">Daily Visitor Activity — ${escapeHtml(dayKey)} (UTC)</h2>`);
     lines.push(`<ul>`);
     lines.push(`<li><strong>Pageviews:</strong> ${pageviews.length}</li>`);
     lines.push(`<li><strong>Unique visitors:</strong> ${uniqueVisitors}</li>`);
@@ -91,12 +92,17 @@ class DailyReportService {
       lines.push(`<p>(no pageviews recorded)</p>`);
     } else {
       lines.push(`<ol>`);
-      topPages.forEach(p => lines.push(`<li>${safeText(p.path, 120)} — ${p.count}</li>`));
+      topPages.forEach(p => lines.push(`<li>${escapeHtml(safeText(p.path, 120))} — ${p.count}</li>`));
       lines.push(`</ol>`);
     }
 
     const subject = `EZSports Daily Report — ${dayKey} (UTC)`;
-    const html = lines.join('\n');
+    const bodyHtml = lines.join('\n');
+    const html = renderBrandedEmailHtml({
+      title: subject,
+      subtitle: 'Daily visitor activity',
+      bodyHtml
+    });
     const text = `Daily Visitor Activity — ${dayKey} (UTC)\n\nPageviews: ${pageviews.length}\nUnique visitors: ${uniqueVisitors}\nClicks tracked: ${clicks.length}\nAdd to cart: ${addToCart}\nBegin checkout: ${beginCheckout}\nPurchase events (client): ${purchaseEvents}\nPaid orders: ${paidOrders.length}\nGross revenue: $${grossRevenue.toFixed(2)}\n\nTop pages:\n` + topPages.map(p => `- ${p.path}: ${p.count}`).join('\n');
 
     return { dayKey, start: start.toISOString(), end: end.toISOString(), subject, html, text };

@@ -1954,7 +1954,7 @@ try {
   console.warn('Daily report scheduler not started:', e?.message || e);
 }
 
-// Daily finance report scheduler (emails paid orders/fees summary)
+// Finance report scheduler (sends Daily + Weekly Payout Reports)
 try {
   const { startFinanceReportScheduler } = require('./jobs/financeReportScheduler');
   startFinanceReportScheduler();

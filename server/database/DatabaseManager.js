@@ -3,6 +3,8 @@ const fs = require('fs').promises;
 const path = require('path');
 
 class DatabaseManager {
+  static _dbLocks = new Map();
+
   constructor(dbPathOrOptions) {
     // Backwards compatible signature:
     // - new DatabaseManager(dbPathString)
@@ -46,6 +48,19 @@ class DatabaseManager {
     };
   }
 
+  async _withDbLock(work) {
+    const key = this.dbPath;
+    const prev = DatabaseManager._dbLocks.get(key) || Promise.resolve();
+    const next = prev.then(work, work);
+    DatabaseManager._dbLocks.set(key, next);
+    next.finally(() => {
+      if (DatabaseManager._dbLocks.get(key) === next) {
+        DatabaseManager._dbLocks.delete(key);
+      }
+    });
+    return next;
+  }
+
   // Convenience: return all records in a collection
   async findAll(collection) {
     return this.read(collection);
@@ -84,25 +99,29 @@ class DatabaseManager {
 
   // Write data to a collection
   async write(collection, data) {
-    try {
-      // Allow DB_PATH/EZ_DB_PATH to point to a local folder not yet created
-      await fs.mkdir(this.dbPath, { recursive: true });
-      const filePath = path.join(this.dbPath, this.collections[collection]);
-      await fs.writeFile(filePath, JSON.stringify(data, null, 2), 'utf8');
-      
-      // Update schema metadata
-      await this.updateMetadata();
-      return true;
-    } catch (error) {
-      throw error;
-    }
+    return this._withDbLock(() => this._writeUnlocked(collection, data));
+  }
+
+  async _writeUnlocked(collection, data) {
+    // Allow DB_PATH/EZ_DB_PATH to point to a local folder not yet created
+    await fs.mkdir(this.dbPath, { recursive: true });
+    const filePath = path.join(this.dbPath, this.collections[collection]);
+    await fs.writeFile(filePath, JSON.stringify(data, null, 2), 'utf8');
+
+    // Update schema metadata
+    await this._updateMetadataUnlocked();
+    return true;
   }
 
   // Update metadata with last modified time
   async updateMetadata() {
+    return this._withDbLock(() => this._updateMetadataUnlocked());
+  }
+
+  async _updateMetadataUnlocked() {
     try {
       const schema = await this.read('schema');
-      if (schema && typeof schema === 'object') {
+      if (schema && typeof schema === 'object' && !Array.isArray(schema)) {
         schema.metadata = schema.metadata || {};
         schema.metadata.lastModified = new Date().toISOString();
         const filePath = path.join(this.dbPath, this.collections.schema);
@@ -115,45 +134,45 @@ class DatabaseManager {
 
   // Get next auto-increment ID
   async getNextId(collection) {
-    try {
-  let schema = await this.read('schema');
-  // schema.json should be an object; if it’s an array or otherwise malformed, normalize it.
-  if (!schema || typeof schema !== 'object' || Array.isArray(schema)) schema = { metadata: {} };
-  schema.metadata = schema.metadata || {};
-  schema.metadata.autoIncrement = schema.metadata.autoIncrement || {};
-  // Ensure key exists for this collection
-  if (typeof schema.metadata.autoIncrement[collection] !== 'number') {
-    // sensible defaults
-    const defaults = { users: 1000, products: 2000, orders: 3000, analytics: 1, subscribers: 1, coupons: 1, emails: 1, payouts: 1, errors: 1 };
-    schema.metadata.autoIncrement[collection] = defaults[collection] || 1;
+    return this._withDbLock(() => this._getNextIdUnlocked(collection));
   }
-  const stored = schema.metadata.autoIncrement[collection] || 0;
 
-  // Guard against counter resets/collisions by considering existing records.
-  // This is important in environments where schema.json may be recreated/trimmed.
-  let maxExisting = 0;
-  if (collection !== 'schema' && collection !== 'products') {
-    try {
-      const existing = await this.read(collection);
-      if (Array.isArray(existing) && existing.length) {
-        for (const rec of existing) {
-          const idNum = Number(rec?.id);
-          if (Number.isFinite(idNum)) maxExisting = Math.max(maxExisting, idNum);
+  async _getNextIdUnlocked(collection) {
+    let schema = await this.read('schema');
+    // schema.json should be an object; if it’s an array or otherwise malformed, normalize it.
+    if (!schema || typeof schema !== 'object' || Array.isArray(schema)) schema = { metadata: {} };
+    schema.metadata = schema.metadata || {};
+    schema.metadata.autoIncrement = schema.metadata.autoIncrement || {};
+    // Ensure key exists for this collection
+    if (typeof schema.metadata.autoIncrement[collection] !== 'number') {
+      // sensible defaults
+      const defaults = { users: 1000, products: 2000, orders: 3000, analytics: 1, subscribers: 1, coupons: 1, emails: 1, payouts: 1, errors: 1 };
+      schema.metadata.autoIncrement[collection] = defaults[collection] || 1;
+    }
+    const stored = schema.metadata.autoIncrement[collection] || 0;
+
+    // Guard against counter resets/collisions by considering existing records.
+    // This is important in environments where schema.json may be recreated/trimmed.
+    let maxExisting = 0;
+    if (collection !== 'schema' && collection !== 'products') {
+      try {
+        const existing = await this.read(collection);
+        if (Array.isArray(existing) && existing.length) {
+          for (const rec of existing) {
+            const idNum = Number(rec?.id);
+            if (Number.isFinite(idNum)) maxExisting = Math.max(maxExisting, idNum);
+          }
         }
+      } catch {
+        // ignore
       }
-    } catch {
-      // ignore
     }
-  }
 
-  const nextId = Math.max(stored, maxExisting) + 1;
-  schema.metadata.autoIncrement[collection] = nextId;
-  const filePath = path.join(this.dbPath, this.collections.schema);
-  await fs.writeFile(filePath, JSON.stringify(schema, null, 2), 'utf8');
-      return nextId;
-    } catch (error) {
-      throw error;
-    }
+    const nextId = Math.max(stored, maxExisting) + 1;
+    schema.metadata.autoIncrement[collection] = nextId;
+    const filePath = path.join(this.dbPath, this.collections.schema);
+    await fs.writeFile(filePath, JSON.stringify(schema, null, 2), 'utf8');
+    return nextId;
   }
 
   // Find records by criteria
@@ -182,67 +201,73 @@ class DatabaseManager {
 
   // Insert a new record
   async insert(collection, data) {
-    const records = await this.read(collection);
-    
-    // Add timestamps
-    data.createdAt = new Date().toISOString();
-    if (collection !== 'schema') {
-      data.updatedAt = new Date().toISOString();
-    }
-    
-    // Generate ID if not provided
-    if (!data.id) {
-      if (collection === 'products') {
-        data.id = `prod-${await this.getNextId(collection)}`;
-      } else {
-        data.id = await this.getNextId(collection);
+    return this._withDbLock(async () => {
+      const records = await this.read(collection);
+
+      // Add timestamps
+      data.createdAt = new Date().toISOString();
+      if (collection !== 'schema') {
+        data.updatedAt = new Date().toISOString();
       }
-    }
-    
-    records.push(data);
-    await this.write(collection, records);
-    return data;
+
+      // Generate ID if not provided
+      if (!data.id) {
+        if (collection === 'products') {
+          data.id = `prod-${await this._getNextIdUnlocked(collection)}`;
+        } else {
+          data.id = await this._getNextIdUnlocked(collection);
+        }
+      }
+
+      records.push(data);
+      await this._writeUnlocked(collection, records);
+      return data;
+    });
   }
 
   // Update a record
   async update(collection, criteria, updateData) {
-    const records = await this.read(collection);
-    let updated = false;
-    
-    const updatedRecords = records.map(record => {
-      const matches = Object.keys(criteria).every(key => record[key] === criteria[key]);
-      if (matches) {
-        updated = true;
-        return {
-          ...record,
-          ...updateData,
-          updatedAt: new Date().toISOString()
-        };
+    return this._withDbLock(async () => {
+      const records = await this.read(collection);
+      let updated = false;
+
+      const updatedRecords = records.map(record => {
+        const matches = Object.keys(criteria).every(key => record[key] === criteria[key]);
+        if (matches) {
+          updated = true;
+          return {
+            ...record,
+            ...updateData,
+            updatedAt: new Date().toISOString()
+          };
+        }
+        return record;
+      });
+
+      if (updated) {
+        await this._writeUnlocked(collection, updatedRecords);
       }
-      return record;
+
+      return updated;
     });
-    
-    if (updated) {
-      await this.write(collection, updatedRecords);
-    }
-    
-    return updated;
   }
 
   // Delete records
   async delete(collection, criteria) {
-    const records = await this.read(collection);
-    const filteredRecords = records.filter(record => {
-      return !Object.keys(criteria).every(key => record[key] === criteria[key]);
+    return this._withDbLock(async () => {
+      const records = await this.read(collection);
+      const filteredRecords = records.filter(record => {
+        return !Object.keys(criteria).every(key => record[key] === criteria[key]);
+      });
+
+      const deletedCount = records.length - filteredRecords.length;
+
+      if (deletedCount > 0) {
+        await this._writeUnlocked(collection, filteredRecords);
+      }
+
+      return deletedCount;
     });
-    
-    const deletedCount = records.length - filteredRecords.length;
-    
-    if (deletedCount > 0) {
-      await this.write(collection, filteredRecords);
-    }
-    
-    return deletedCount;
   }
 
   // Initialize database with default data

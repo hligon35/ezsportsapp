@@ -156,8 +156,13 @@ ALERT_DEDUPE_MINUTES=10
 
 REPORT_EMAIL_TO=info@getsparqd.com
 
+# “Finance report” scheduler: sends the payout reports
+# - Daily Payout Report runs every day
+# - Weekly Payout Report runs once per week
 FINANCE_REPORT_ENABLED=true
 FINANCE_REPORT_TIME_UTC=18:15
+# 0=Sun ... 6=Sat (or mon/tue/wed/thu/fri/sat/sun). Default is Monday.
+# FINANCE_REPORT_WEEKLY_DAY_UTC=1
 
 DAILY_REPORT_ENABLED=true
 # DAILY_REPORT_TZ=America/Indianapolis

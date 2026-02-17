@@ -4,6 +4,7 @@ const rateLimit = require('express-rate-limit');
 const SubscriberService = require('../services/SubscriberService');
 const CouponService = require('../services/CouponService');
 const EmailService = require('../services/EmailService');
+const { escapeHtml, renderBrandedEmailHtml } = require('../services/EmailTheme');
 const { requireAdmin } = require('../middleware/auth');
 
 const subs = new SubscriberService();
@@ -25,21 +26,41 @@ router.post('/subscribe', async (req, res) => {
     // Queue emails in the background (do not await)
     try {
       const inbox = (process.env.CONTACT_INBOX || 'info@ezsportsnetting.com').trim();
+      const safeAddr = escapeHtml(addr);
+      const safeName = name ? escapeHtml(name) : '';
+      const safeSource = source ? escapeHtml(source) : '';
+      const safeReferer = referer ? escapeHtml(referer) : '';
+
       if (inbox) {
-        const html = `
-          <h2>New Newsletter Subscriber</h2>
-          <p><strong>Email:</strong> ${addr}</p>
-          ${name ? `<p><strong>Name:</strong> ${name}</p>` : ''}
-          ${source ? `<p><strong>Source:</strong> ${source}</p>` : ''}
-          ${referer ? `<p><strong>Referrer:</strong> ${referer}</p>` : ''}
+        const internalBody = `
+          <p style="margin:0 0 10px;">A new visitor subscribed to the newsletter.</p>
+          <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="border:1px solid #d3d0d7;border-radius:10px;overflow:hidden;">
+            <tr><td style="padding:10px 12px;background:#ffffff;color:#5a5a5a;width:38%;border-bottom:1px solid #d3d0d7;">Email</td><td style="padding:10px 12px;border-bottom:1px solid #d3d0d7;">${safeAddr}</td></tr>
+            ${safeName ? `<tr><td style="padding:10px 12px;background:#ffffff;color:#5a5a5a;width:38%;border-bottom:1px solid #d3d0d7;">Name</td><td style="padding:10px 12px;border-bottom:1px solid #d3d0d7;">${safeName}</td></tr>` : ''}
+            ${safeSource ? `<tr><td style="padding:10px 12px;background:#ffffff;color:#5a5a5a;width:38%;border-bottom:1px solid #d3d0d7;">Source</td><td style="padding:10px 12px;border-bottom:1px solid #d3d0d7;">${safeSource}</td></tr>` : ''}
+            ${safeReferer ? `<tr><td style="padding:10px 12px;background:#ffffff;color:#5a5a5a;width:38%;">Referrer</td><td style="padding:10px 12px;">${safeReferer}</td></tr>` : ''}
+          </table>
         `;
+        const html = renderBrandedEmailHtml({
+          title: 'New subscriber',
+          subtitle: 'Newsletter subscription',
+          bodyHtml: internalBody
+        });
+
         // Fire-and-forget; log errors but don't delay response
         void mail.queue({ to: inbox, subject: 'New subscriber', html, text: `Email: ${addr}\nName: ${name||''}\nSource: ${source||''}\nReferrer: ${referer||''}`, tags: ['subscribe','internal'], replyTo: addr }).catch(err=>console.warn('Subscribe internal email failed:', err?.message||err));
       }
-      const welcomeHtml = `
-        <p>Thanks for subscribing to EZ Sports Netting!</p>
-        <p>We’ll send occasional deals and product updates. You can unsubscribe anytime.</p>
+
+      const welcomeBody = `
+        <p style="margin:0 0 10px;">Thanks for subscribing to EZ Sports Netting!</p>
+        <p style="margin:0;color:#5a5a5a;line-height:20px;">We’ll send occasional deals and product updates. You can unsubscribe anytime.</p>
       `;
+      const welcomeHtml = renderBrandedEmailHtml({
+        title: 'Thanks for subscribing',
+        subtitle: 'EZ Sports Netting Newsletter',
+        bodyHtml: welcomeBody
+      });
+
       void mail.queue({ to: addr, subject: 'Thanks for subscribing to EZ Sports Netting', html: welcomeHtml, text: 'Thanks for subscribing to EZ Sports Netting! We’ll send occasional deals and product updates.', tags: ['subscribe','welcome'], replyTo: inbox }).catch(err=>console.warn('Subscribe welcome email failed:', err?.message||err));
     } catch {}
 
@@ -101,27 +122,47 @@ router.post('/contact', async (req, res) => {
           }
         } catch { /* ignore */ }
 
-        const html = `
-          <h2>Contact Form Submission</h2>
-          <p><strong>Name:</strong> ${name}</p>
-          <p><strong>Email:</strong> ${email}</p>
-          ${phone ? `<p><strong>Phone:</strong> ${phone}</p>` : ''}
-          <p><strong>Subject:</strong> ${subject}</p>
-          <p><strong>Message:</strong></p>
-          <pre style="white-space:pre-wrap">${message}</pre>
+        const safeName = escapeHtml(name);
+        const safeEmail = escapeHtml(email);
+        const safePhone = phone ? escapeHtml(phone) : '';
+        const safeSubject = escapeHtml(subject);
+        const safeMessage = escapeHtml(message);
+
+        const internalBody = `
+          <p style="margin:0 0 12px;color:#5a5a5a;">A contact form submission was received from the website.</p>
+          <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="border:1px solid #d3d0d7;border-radius:10px;overflow:hidden;">
+            <tr><td style="padding:10px 12px;background:#ffffff;color:#5a5a5a;width:38%;border-bottom:1px solid #d3d0d7;">Name</td><td style="padding:10px 12px;border-bottom:1px solid #d3d0d7;">${safeName}</td></tr>
+            <tr><td style="padding:10px 12px;background:#ffffff;color:#5a5a5a;width:38%;border-bottom:1px solid #d3d0d7;">Email</td><td style="padding:10px 12px;border-bottom:1px solid #d3d0d7;">${safeEmail}</td></tr>
+            ${safePhone ? `<tr><td style="padding:10px 12px;background:#ffffff;color:#5a5a5a;width:38%;border-bottom:1px solid #d3d0d7;">Phone</td><td style="padding:10px 12px;border-bottom:1px solid #d3d0d7;">${safePhone}</td></tr>` : ''}
+            <tr><td style="padding:10px 12px;background:#ffffff;color:#5a5a5a;width:38%;">Subject</td><td style="padding:10px 12px;">${safeSubject}</td></tr>
+          </table>
+
+          <div style="margin:16px 0 8px;font-weight:800;color:#241773;">Message</div>
+          <pre style="margin:0;padding:12px 12px;border:1px solid #d3d0d7;border-radius:10px;white-space:pre-wrap;word-break:break-word;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,\"Liberation Mono\",\"Courier New\",monospace;font-size:12px;line-height:1.45;color:#000000;">${safeMessage}</pre>
         `;
+
+        const html = renderBrandedEmailHtml({
+          title: `[Contact] ${subject}`,
+          subtitle: 'Contact form submission',
+          bodyHtml: internalBody,
+          maxWidth: 680
+        });
 
         const inbox = (process.env.CONTACT_INBOX || 'info@ezsportsnetting.com').trim();
 
         // Always send an acknowledgement to the sender (does not depend on captcha)
         try {
-          const ackHtml = `
-            <p>Hi ${name.replace(/</g,'&lt;')},</p>
-            <p>Thanks for contacting EZ Sports Netting! We received your message and will get back to you soon.</p>
-            <hr/>
-            <p><strong>Your message:</strong></p>
-            <pre style="white-space:pre-wrap">${message.replace(/</g,'&lt;')}</pre>
+          const ackBody = `
+            <p style="margin:0 0 10px;">Hi ${safeName},</p>
+            <p style="margin:0 0 12px;color:#5a5a5a;line-height:20px;">Thanks for contacting EZ Sports Netting! We received your message and will get back to you soon.</p>
+            <div style="margin:16px 0 8px;font-weight:800;color:#241773;">Your message</div>
+            <pre style="margin:0;padding:12px 12px;border:1px solid #d3d0d7;border-radius:10px;white-space:pre-wrap;word-break:break-word;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,\"Liberation Mono\",\"Courier New\",monospace;font-size:12px;line-height:1.45;color:#000000;">${safeMessage}</pre>
           `;
+          const ackHtml = renderBrandedEmailHtml({
+            title: 'We received your message',
+            subtitle: 'EZ Sports Netting Support',
+            bodyHtml: ackBody
+          });
           void mail.queue({
             to: email,
             subject: 'We received your message',

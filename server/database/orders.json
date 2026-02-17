@@ -2261,5 +2261,331 @@
     "createdAt": "2026-02-10T00:35:56.912Z",
     "updatedAt": "2026-02-10T00:35:56.912Z",
     "id": 3029
+  },
+  {
+    "userId": null,
+    "userEmail": "test+order-1771291752060@example.com",
+    "items": [
+      {
+        "productId": "TEST-SKU-1",
+        "productName": "Test Item",
+        "price": 10,
+        "quantity": 1,
+        "subtotal": 10,
+        "category": "netting"
+      }
+    ],
+    "total": 10,
+    "status": "paid",
+    "shippingAddress": {
+      "name": "Email Flow Test",
+      "address1": "123 Test St",
+      "address2": "",
+      "city": "Testville",
+      "state": "IN",
+      "postal": "46201",
+      "country": "US",
+      "phone": "555-0101"
+    },
+    "customerInfo": {
+      "email": "test+order-1771291752060@example.com",
+      "name": "Email Flow Test",
+      "phone": "555-0101"
+    },
+    "paymentInfo": {
+      "method": "stripe",
+      "intentId": "pi_test_1771291752060",
+      "amount": 10,
+      "currency": "usd",
+      "paidAt": "2026-02-17T01:29:12.293Z",
+      "customerEmailSentAt": "2026-02-17T01:29:12.358Z",
+      "internalOrderEmailSentAt": "2026-02-17T01:29:12.384Z"
+    },
+    "subtotal": 10,
+    "shipping": 0,
+    "discount": 0,
+    "tax": 0,
+    "createdAt": "2026-02-17T01:29:12.207Z",
+    "updatedAt": "2026-02-17T01:29:12.386Z",
+    "id": 3030
+  },
+  {
+    "userId": null,
+    "userEmail": "test+order-1771292855183@example.com",
+    "items": [
+      {
+        "productId": "TEST-SKU-1",
+        "productName": "Test Item",
+        "price": 10,
+        "quantity": 1,
+        "subtotal": 10,
+        "category": "netting"
+      }
+    ],
+    "total": 10,
+    "status": "paid",
+    "shippingAddress": {
+      "name": "Email Flow Test",
+      "address1": "123 Test St",
+      "address2": "",
+      "city": "Testville",
+      "state": "IN",
+      "postal": "46201",
+      "country": "US",
+      "phone": "555-0101"
+    },
+    "customerInfo": {
+      "email": "test+order-1771292855183@example.com",
+      "name": "Email Flow Test",
+      "phone": "555-0101"
+    },
+    "paymentInfo": {
+      "method": "stripe",
+      "intentId": "pi_test_1771292855183",
+      "amount": 10,
+      "currency": "usd",
+      "paidAt": "2026-02-17T01:47:35.664Z",
+      "customerEmailSentAt": "2026-02-17T01:47:35.916Z",
+      "internalOrderEmailSentAt": "2026-02-17T01:47:36.050Z"
+    },
+    "subtotal": 10,
+    "shipping": 0,
+    "discount": 0,
+    "tax": 0,
+    "createdAt": "2026-02-17T01:47:35.519Z",
+    "updatedAt": "2026-02-17T01:47:36.053Z",
+    "id": 3031
+  },
+  {
+    "userId": null,
+    "userEmail": "test+order-1771293751264@example.com",
+    "items": [
+      {
+        "productId": "TEST-SKU-1",
+        "productName": "Test Item",
+        "price": 10,
+        "quantity": 1,
+        "subtotal": 10,
+        "category": "netting"
+      }
+    ],
+    "total": 10,
+    "status": "paid",
+    "shippingAddress": {
+      "name": "Email Flow Test",
+      "address1": "123 Test St",
+      "address2": "",
+      "city": "Testville",
+      "state": "IN",
+      "postal": "46201",
+      "country": "US",
+      "phone": "555-0101"
+    },
+    "customerInfo": {
+      "email": "test+order-1771293751264@example.com",
+      "name": "Email Flow Test",
+      "phone": "555-0101"
+    },
+    "paymentInfo": {
+      "method": "stripe",
+      "intentId": "pi_test_1771293751264",
+      "amount": 10,
+      "currency": "usd",
+      "paidAt": "2026-02-17T02:02:31.452Z",
+      "customerEmailSentAt": "2026-02-17T02:02:31.518Z",
+      "internalOrderEmailSentAt": "2026-02-17T02:02:31.599Z"
+    },
+    "subtotal": 10,
+    "shipping": 0,
+    "discount": 0,
+    "tax": 0,
+    "createdAt": "2026-02-17T02:02:31.423Z",
+    "updatedAt": "2026-02-17T02:02:31.601Z",
+    "id": 3032
+  },
+  {
+    "userId": null,
+    "userEmail": "test+order-1771294669815@example.com",
+    "items": [
+      {
+        "productId": "TEST-SKU-1",
+        "productName": "Test Item",
+        "price": 10,
+        "quantity": 1,
+        "subtotal": 10,
+        "category": "netting"
+      }
+    ],
+    "total": 10,
+    "status": "paid",
+    "shippingAddress": {
+      "name": "Email Flow Test",
+      "address1": "123 Test St",
+      "address2": "",
+      "city": "Testville",
+      "state": "IN",
+      "postal": "46201",
+      "country": "US",
+      "phone": "555-0101"
+    },
+    "customerInfo": {
+      "email": "test+order-1771294669815@example.com",
+      "name": "Email Flow Test",
+      "phone": "555-0101"
+    },
+    "paymentInfo": {
+      "method": "stripe",
+      "intentId": "pi_test_1771294669815",
+      "amount": 10,
+      "currency": "usd",
+      "paidAt": "2026-02-17T02:17:51.160Z",
+      "customerEmailSentAt": "2026-02-17T02:17:51.215Z",
+      "internalOrderEmailSentAt": "2026-02-17T02:17:51.285Z"
+    },
+    "subtotal": 10,
+    "shipping": 0,
+    "discount": 0,
+    "tax": 0,
+    "createdAt": "2026-02-17T02:17:51.122Z",
+    "updatedAt": "2026-02-17T02:17:51.292Z",
+    "id": 3033
+  },
+  {
+    "userId": null,
+    "userEmail": "test+order-1771295598891@example.com",
+    "items": [
+      {
+        "productId": "TEST-SKU-1",
+        "productName": "Test Item",
+        "price": 10,
+        "quantity": 1,
+        "subtotal": 10,
+        "category": "netting"
+      }
+    ],
+    "total": 10,
+    "status": "paid",
+    "shippingAddress": {
+      "name": "Email Flow Test",
+      "address1": "123 Test St",
+      "address2": "",
+      "city": "Testville",
+      "state": "IN",
+      "postal": "46201",
+      "country": "US",
+      "phone": "555-0101"
+    },
+    "customerInfo": {
+      "email": "test+order-1771295598891@example.com",
+      "name": "Email Flow Test",
+      "phone": "555-0101"
+    },
+    "paymentInfo": {
+      "method": "stripe",
+      "intentId": "pi_test_1771295598891",
+      "amount": 10,
+      "currency": "usd",
+      "paidAt": "2026-02-17T02:33:20.235Z",
+      "customerEmailSentAt": "2026-02-17T02:33:20.284Z"
+    },
+    "subtotal": 10,
+    "shipping": 0,
+    "discount": 0,
+    "tax": 0,
+    "createdAt": "2026-02-17T02:33:20.210Z",
+    "updatedAt": "2026-02-17T02:33:20.285Z",
+    "id": 3034
+  },
+  {
+    "userId": null,
+    "userEmail": "test+order-1771297052513@example.com",
+    "items": [
+      {
+        "productId": "TEST-SKU-1",
+        "productName": "Test Item",
+        "price": 10,
+        "quantity": 1,
+        "subtotal": 10,
+        "category": "netting"
+      }
+    ],
+    "total": 10,
+    "status": "paid",
+    "shippingAddress": {
+      "name": "Email Flow Test",
+      "address1": "123 Test St",
+      "address2": "",
+      "city": "Testville",
+      "state": "IN",
+      "postal": "46201",
+      "country": "US",
+      "phone": "555-0101"
+    },
+    "customerInfo": {
+      "email": "test+order-1771297052513@example.com",
+      "name": "Email Flow Test",
+      "phone": "555-0101"
+    },
+    "paymentInfo": {
+      "method": "stripe",
+      "intentId": "pi_test_1771297052513",
+      "amount": 10,
+      "currency": "usd",
+      "paidAt": "2026-02-17T02:57:33.865Z",
+      "customerEmailSentAt": "2026-02-17T02:57:33.895Z"
+    },
+    "subtotal": 10,
+    "shipping": 0,
+    "discount": 0,
+    "tax": 0,
+    "createdAt": "2026-02-17T02:57:33.834Z",
+    "updatedAt": "2026-02-17T02:57:33.896Z",
+    "id": 3035
+  },
+  {
+    "userId": null,
+    "userEmail": "test+order-1771297635679@example.com",
+    "items": [
+      {
+        "productId": "TEST-SKU-1",
+        "productName": "Test Item",
+        "price": 10,
+        "quantity": 1,
+        "subtotal": 10,
+        "category": "netting"
+      }
+    ],
+    "total": 10,
+    "status": "paid",
+    "shippingAddress": {
+      "name": "Email Flow Test",
+      "address1": "123 Test St",
+      "address2": "",
+      "city": "Testville",
+      "state": "IN",
+      "postal": "46201",
+      "country": "US",
+      "phone": "555-0101"
+    },
+    "customerInfo": {
+      "email": "test+order-1771297635679@example.com",
+      "name": "Email Flow Test",
+      "phone": "555-0101"
+    },
+    "paymentInfo": {
+      "method": "stripe",
+      "intentId": "pi_test_1771297635679",
+      "amount": 10,
+      "currency": "usd",
+      "paidAt": "2026-02-17T03:07:17.040Z",
+      "customerEmailSentAt": "2026-02-17T03:07:17.102Z"
+    },
+    "subtotal": 10,
+    "shipping": 0,
+    "discount": 0,
+    "tax": 0,
+    "createdAt": "2026-02-17T03:07:17.014Z",
+    "updatedAt": "2026-02-17T03:07:17.106Z",
+    "id": 3036
   }
 ]

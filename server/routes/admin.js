@@ -130,16 +130,26 @@ router.post('/reports/daily/send', requireAdmin, async (req, res) => {
   }
 });
 
-// --- Reports: send daily finance email now (admin) ---
+// --- Reports: send daily/weekly payout reports now (admin) ---
+// NOTE: Kept under the legacy /reports/finance path, but it now sends payout reports.
 router.post('/reports/finance/send', requireAdmin, async (req, res) => {
   try {
-    const { day } = req.body || {}; // 'yesterday' (default) or 'YYYY-MM-DD'
-    const FinanceReportService = require('../services/FinanceReportService');
-    const svc = new FinanceReportService();
-    const out = await svc.sendDailyFinanceReport({ day: day || 'yesterday' });
-    res.json({ ok: true, report: { dayKey: out.dayKey, start: out.start, end: out.end }, sent: out.sent });
+    const { day, kind } = req.body || {};
+    const mode = String(kind || 'both').toLowerCase();
+    const PayoutReportService = require('../services/PayoutReportService');
+    const svc = new PayoutReportService();
+
+    const out = {};
+    if (mode === 'daily' || mode === 'both') {
+      out.daily = await svc.sendDailyPayoutReport({ day: day || 'yesterday' });
+    }
+    if (mode === 'weekly' || mode === 'both') {
+      out.weekly = await svc.sendWeeklyPayoutReport({ end: new Date() });
+    }
+
+    res.json({ ok: true, out });
   } catch (e) {
-    res.status(500).json({ ok: false, message: e.message || 'Failed to send finance report' });
+    res.status(500).json({ ok: false, message: e.message || 'Failed to send payout report(s)' });
   }
 });
 
