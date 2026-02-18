@@ -3,8 +3,10 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>EZ Sports Netting — Elevate Your Game</title>
-  <meta name="description" content="Custom sports netting, pre-made cages, L-screens, replacement nets, bullet pad kits & accessories. Built to last." />
+  <!-- SEO: Primary page metadata (unique title/description/keywords + canonical) -->
+  <title>EZ Sports Netting | Custom Sports Netting, L-Screens & Batting Cages</title>
+  <meta name="description" content="Custom sports netting, pre-made cages, L-screens, replacement nets, bullet pad kits & accessories—built to last." />
+  <meta name="keywords" content="custom sports netting, batting cage netting, backstop netting, L-screens, protective screens, replacement nets, netting calculator, training facility netting, golf netting" />
   <meta name="robots" content="index,follow" />
   <link rel="canonical" href="https://ezsportsnetting.com/" />
   <link rel="dns-prefetch" href="//fonts.gstatic.com" />
@@ -15,14 +17,15 @@
   <!-- Removed preload for missing bats.jpg; hero loads its own background -->
   <meta property="og:site_name" content="EZ Sports Netting" />
   <meta property="og:type" content="website" />
-  <meta property="og:title" content="EZ Sports Netting — Elevate Your Game" />
+  <meta property="og:title" content="EZ Sports Netting | Custom Sports Netting, L-Screens & Batting Cages" />
   <meta property="og:description" content="Shop custom sports netting, pre-made cages, L-screens, replacement nets, bullet pad kits & accessories." />
   <meta property="og:url" content="https://ezsportsnetting.com/" />
-  <meta property="og:image" content="assets/img/netting.jpg" />
+  <!-- SEO: Use absolute URLs for social images -->
+  <meta property="og:image" content="https://ezsportsnetting.com/assets/img/netting.jpg" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="EZ Sports Netting — Elevate Your Game" />
+  <meta name="twitter:title" content="EZ Sports Netting | Custom Sports Netting, L-Screens & Batting Cages" />
   <meta name="twitter:description" content="Shop custom sports netting, pre-made cages, L-screens, replacement nets, bullet pad kits & accessories." />
-  <meta name="twitter:image" content="assets/img/netting.jpg" />
+  <meta name="twitter:image" content="https://ezsportsnetting.com/assets/img/netting.jpg" />
   <meta name="theme-color" content="#241773" />
   <link rel="manifest" href="manifest.webmanifest" />
   <link rel="icon" type="image/png" href="assets/img/EZSportslogo.png" />
@@ -91,7 +94,47 @@
     .inline-links a{color:#6d28d9;font-weight:600;text-decoration:none;}
     .inline-links a:hover{text-decoration:underline;}
   </style>
-  <script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"EZ Sports Netting","url":"https://ezsportsnetting.com/","logo":"https://ezsportsnetting.com/assets/EZSportslogo.png"}</script>
+  <!-- SEO: Structured data (JSON-LD) for brand + site search -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Organization",
+        "@id": "https://ezsportsnetting.com/#organization",
+        "name": "EZ Sports Netting",
+        "url": "https://ezsportsnetting.com/",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "https://ezsportsnetting.com/assets/img/EZSportslogo.png"
+        },
+        "sameAs": [
+          "https://www.facebook.com/Ezsportsnetting/"
+        ]
+      },
+      {
+        "@type": "WebSite",
+        "@id": "https://ezsportsnetting.com/#website",
+        "name": "EZ Sports Netting",
+        "url": "https://ezsportsnetting.com/",
+        "publisher": { "@id": "https://ezsportsnetting.com/#organization" },
+        "potentialAction": {
+          "@type": "SearchAction",
+          "target": "https://ezsportsnetting.com/search-results.html?q={search_term_string}",
+          "query-input": "required name=search_term_string"
+        }
+      },
+      {
+        "@type": "WebPage",
+        "@id": "https://ezsportsnetting.com/#webpage",
+        "url": "https://ezsportsnetting.com/",
+        "name": "EZ Sports Netting | Custom Sports Netting, L-Screens & Batting Cages",
+        "isPartOf": { "@id": "https://ezsportsnetting.com/#website" },
+        "about": { "@id": "https://ezsportsnetting.com/#organization" }
+      }
+    ]
+  }
+  </script>
 </head>
 <body>
   <a class="skip" href="#main">Skip to content</a>
