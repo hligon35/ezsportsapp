@@ -1032,7 +1032,10 @@ ensureServiceWorkerRegistered() {
 ensurePromoBanner() {
     try {
       const defaults = {
-        enabled: true,
+        // UX request: keep promo banner hidden by default.
+        // To re-enable later without code changes, set `window.PROMO_BANNER = { enabled: true, ... }`
+        // before this script runs.
+        enabled: false,
         id: 'promo-2026-01',
         message: 'Limited-time promo: Free training facility design consult.',
         ctaText: 'Request Quote',
