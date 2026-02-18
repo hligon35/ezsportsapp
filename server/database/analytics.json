@@ -628,5 +628,132 @@
     "createdAt": "2026-02-16T04:43:31.486Z",
     "updatedAt": "2026-02-16T04:43:31.486Z",
     "id": 111
+  },
+  {
+    "type": "pageview",
+    "path": "/index.html",
+    "referrer": "",
+    "visitorId": "v_68v7upcocmqmlsax9q5",
+    "userId": null,
+    "timestamp": "2026-02-18T17:24:00.536Z",
+    "createdAt": "2026-02-18T17:24:00.586Z",
+    "updatedAt": "2026-02-18T17:24:00.586Z",
+    "id": 112
+  },
+  {
+    "type": "pageview",
+    "path": "/index.html",
+    "referrer": "",
+    "visitorId": "v_68v7upcocmqmlsax9q5",
+    "userId": null,
+    "timestamp": "2026-02-18T17:24:00.974Z",
+    "createdAt": "2026-02-18T17:24:00.976Z",
+    "updatedAt": "2026-02-18T17:24:00.976Z",
+    "id": 113
+  },
+  {
+    "type": "pageview",
+    "path": "/checkout.html",
+    "referrer": "",
+    "visitorId": "v_68v7upcocmqmlsax9q5",
+    "userId": null,
+    "timestamp": "2026-02-18T17:24:01.534Z",
+    "createdAt": "2026-02-18T17:24:01.537Z",
+    "updatedAt": "2026-02-18T17:24:01.537Z",
+    "id": 114
+  },
+  {
+    "type": "view_cart",
+    "productId": {
+      "items": [
+        {
+          "id": "PITCHERSPOCKET9",
+          "price": 349.95,
+          "qty": 1
+        }
+      ]
+    },
+    "visitorId": "v_68v7upcocmqmlsax9q5",
+    "userId": null,
+    "timestamp": "2026-02-18T17:24:01.817Z",
+    "createdAt": "2026-02-18T17:24:01.818Z",
+    "updatedAt": "2026-02-18T17:24:01.818Z",
+    "id": 115
+  },
+  {
+    "type": "view_cart",
+    "productId": {
+      "items": [
+        {
+          "id": "PITCHERSPOCKET9",
+          "price": 349.95,
+          "qty": 1
+        }
+      ]
+    },
+    "visitorId": "v_68v7upcocmqmlsax9q5",
+    "userId": null,
+    "timestamp": "2026-02-18T17:24:01.855Z",
+    "createdAt": "2026-02-18T17:24:01.858Z",
+    "updatedAt": "2026-02-18T17:24:01.858Z",
+    "id": 116
+  },
+  {
+    "type": "pageview",
+    "path": "/checkout.html",
+    "referrer": "",
+    "visitorId": "v_68v7upcocmqmlsax9q5",
+    "userId": null,
+    "timestamp": "2026-02-18T17:24:02.017Z",
+    "createdAt": "2026-02-18T17:24:02.019Z",
+    "updatedAt": "2026-02-18T17:24:02.019Z",
+    "id": 117
+  },
+  {
+    "type": "click_button",
+    "productId": null,
+    "visitorId": "v_68v7upcocmqmlsax9q5",
+    "userId": null,
+    "path": "/checkout.html",
+    "label": "Apply",
+    "value": null,
+    "meta": {
+      "href": "",
+      "id": "apply-code",
+      "className": "btn btn-secondary"
+    },
+    "timestamp": "2026-02-18T17:24:02.206Z",
+    "createdAt": "2026-02-18T17:24:02.219Z",
+    "updatedAt": "2026-02-18T17:24:02.219Z",
+    "id": 118
+  },
+  {
+    "type": "click_button",
+    "productId": null,
+    "visitorId": "v_68v7upcocmqmlsax9q5",
+    "userId": null,
+    "path": "/checkout.html",
+    "label": "Place Order",
+    "value": null,
+    "meta": {
+      "href": "",
+      "id": "submit",
+      "className": "btn btn-primary"
+    },
+    "timestamp": "2026-02-18T17:24:02.502Z",
+    "createdAt": "2026-02-18T17:24:02.505Z",
+    "updatedAt": "2026-02-18T17:24:02.505Z",
+    "id": 119
+  },
+  {
+    "type": "pageview",
+    "path": "/",
+    "referrer": "",
+    "visitorId": null,
+    "userId": null,
+    "timestamp": "2026-02-18T17:24:53.154Z",
+    "createdAt": "2026-02-18T17:24:53.183Z",
+    "updatedAt": "2026-02-18T17:24:53.183Z",
+    "id": 120
   }
 ]

@@ -2679,5 +2679,45 @@
     "createdAt": "2026-02-17T15:54:16.490Z",
     "updatedAt": "2026-02-17T15:54:16.550Z",
     "id": 3038
+  },
+  {
+    "userId": null,
+    "userEmail": "browser+1771435433743@example.com",
+    "items": [
+      {
+        "productId": "PITCHERSPOCKET9",
+        "productName": "Pitcher's Pocket 9",
+        "price": 299.95,
+        "quantity": 1,
+        "subtotal": 299.95,
+        "size": "",
+        "color": "",
+        "category": ""
+      }
+    ],
+    "total": 299.95,
+    "status": "pending",
+    "shippingAddress": {
+      "address1": "1 Peachtree St",
+      "address2": "",
+      "city": "Atlanta",
+      "state": "GA",
+      "postal": "30301",
+      "country": "US"
+    },
+    "customerInfo": {
+      "name": "Browser E2E",
+      "email": "browser+1771435433743@example.com"
+    },
+    "paymentInfo": {
+      "method": "stripe"
+    },
+    "subtotal": 299.95,
+    "shipping": 0,
+    "discount": 0,
+    "tax": 0,
+    "createdAt": "2026-02-18T17:24:02.529Z",
+    "updatedAt": "2026-02-18T17:24:02.529Z",
+    "id": 3039
   }
 ]

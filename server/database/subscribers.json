@@ -198,5 +198,13 @@
     "createdAt": "2026-02-17T15:54:15.184Z",
     "updatedAt": "2026-02-17T15:54:15.184Z",
     "id": 26
+  },
+  {
+    "email": "u1771435493202@example.com",
+    "name": "",
+    "subscribed": true,
+    "createdAt": "2026-02-18T17:24:53.210Z",
+    "updatedAt": "2026-02-18T17:24:53.210Z",
+    "id": 27
   }
 ]
