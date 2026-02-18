@@ -287,8 +287,6 @@ function buildMessage(estimate) {
     '',
     `Add-ons: Track=${add.trackSystem ? 'Yes' : 'No'}, Install=${add.installation ? 'Yes' : 'No'}, Padding=${add.padding ? 'Yes' : 'No'}, Doors/Openings=${add.doorCount}`,
     '',
-    `Estimated range: ${fmtMoney(estimate.price.low)} – ${fmtMoney(estimate.price.high)}`,
-    '',
     'Notes: (add any special requirements, bays/lanes, ceiling obstructions, pole spacing, etc.)'
   ];
   return lines.join('\n');
@@ -300,11 +298,10 @@ function renderEstimate(container, estimate) {
   container.innerHTML = `
     <div style="display:grid; gap:.6rem;">
       <div style="display:flex; align-items:baseline; justify-content:space-between; gap:.75rem; flex-wrap:wrap;">
-        <div style="font-weight:900; font-size:1.1rem;">${fmtMoney(estimate.price.low)} – ${fmtMoney(estimate.price.high)}</div>
-        <div class="muted" style="font-weight:700;">~${totalSqft.toLocaleString()} sq ft</div>
+        <div style="font-weight:900; font-size:1.1rem;">~${totalSqft.toLocaleString()} sq ft</div>
       </div>
       <div class="muted" style="font-size:.9rem; line-height:1.35;">
-        Estimated price range based on your selections. For a detailed quote, please contact our team.
+        For pricing, please request a custom quote.
       </div>
       <div style="display:grid; gap:.35rem; font-size:.92rem;">
         <div><strong>Coverage:</strong> ${estimate.coverage === 'full' ? 'Full enclosure (walls + ceiling)' : 'Perimeter walls only'}</div>
