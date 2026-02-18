@@ -1401,7 +1401,6 @@
         "sku": "Battingmat",
         "name": "Pro Batting Mat",
         "wholesale": 475,
-        "map": 575,
         "dsr": 0,
         "notes": "",
         "variations": [
@@ -1417,12 +1416,6 @@
             "color": "green",
             "map": 549.95
           },
-          {
-            "id": "Battingmat-RED",
-            "name": "Red",
-            "color": "red",
-            "map": 799.95
-          }
         ],
         "details": {
           "features": [
