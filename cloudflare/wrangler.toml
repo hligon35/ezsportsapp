@@ -7,3 +7,18 @@ DEFAULT_FROM = "no-reply@ezsportsnetting.com"
 
 [env.production.vars]
 # CF_EMAIL_API_KEY=78d92d9b-88a2-44d2-9ceb-0cdc838e57f0
+
+[observability]
+enabled = false
+head_sampling_rate = 1
+
+[observability.logs]
+enabled = true
+head_sampling_rate = 1
+persist = true
+invocation_logs = true
+
+[observability.traces]
+enabled = true
+persist = true
+head_sampling_rate = 1

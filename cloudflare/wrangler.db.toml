@@ -15,3 +15,18 @@ database_id = "53d1f79c-2e74-4d18-ae8d-00fab25986c6"
 [vars]
 # Optional (recommended): shared secret for API access
 CF_DB_API_KEY = ""
+
+[observability]
+enabled = false
+head_sampling_rate = 1
+
+[observability.logs]
+enabled = true
+head_sampling_rate = 1
+persist = true
+invocation_logs = true
+
+[observability.traces]
+enabled = true
+persist = true
+head_sampling_rate = 1
