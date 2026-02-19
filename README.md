@@ -228,9 +228,13 @@ This repo includes email-based monitoring:
 
 The server will use the first available email transport:
 
-1) SendGrid HTTP API (`SENDGRID_API_KEY`, `SENDGRID_FROM`)
-2) SMTP (`SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, optional `SMTP_FROM`)
-3) Cloudflare Worker (MailChannels) (`CF_EMAIL_WEBHOOK_URL`, optional `CF_EMAIL_API_KEY`)
+1) SendGrid HTTP API (primary) (`SENDGRID_API_KEY`, optional `SENDGRID_FROM`, optional `SENDGRID_FROM_NAME`)
+2) Cloudflare Worker (MailChannels) (backup) (`CF_EMAIL_WEBHOOK_URL`, optional `CF_EMAIL_API_KEY`)
+
+Notes:
+
+- If SendGrid is configured but returns an error, the server will attempt the Cloudflare Worker as a fallback.
+- If neither transport is configured, emails stay queued in the outbox for later delivery.
 
 ### Monitoring Env Vars
 
@@ -327,8 +331,8 @@ Email sender
 
 Notes:
 
-- The email service prefers a verified SENDGRID_FROM and classifies 550 Sender Identity errors as permanent to avoid retries. Ensure you’ve verified the from address or domain in SendGrid to enable delivery.
-- If not using SendGrid, configure SMTP_* variables (see comments in server/services/EmailService.js). The same MAIL_FROM_NAME will be applied across providers.
+- Ensure `SENDGRID_FROM` is a verified sender/domain in SendGrid; otherwise SendGrid will reject sends.
+- If SendGrid is down/misconfigured, configure `CF_EMAIL_WEBHOOK_URL` (and optionally `CF_EMAIL_API_KEY`) so the Cloudflare Worker can deliver as a backup.
 
 ## Quality / Edge Cases
 

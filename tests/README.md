@@ -29,7 +29,7 @@ npm run test:e2e
 - Address validation: If ADDRESS_VALIDATION_ENABLED=true
   - google → GOOGLE_MAPS_API_KEY
   - smartystreets → SMARTY_AUTH_ID, SMARTY_AUTH_TOKEN
-- Email: Optionally set SENDGRID_API_KEY or SMTP_* to exercise EmailService
+- Email: Optionally set SENDGRID_API_KEY (primary) and/or CF_EMAIL_WEBHOOK_URL (backup) to exercise EmailService
 
 Where to obtain:
 

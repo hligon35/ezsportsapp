@@ -755,5 +755,129 @@
     "createdAt": "2026-02-18T17:24:53.183Z",
     "updatedAt": "2026-02-18T17:24:53.183Z",
     "id": 120
+  },
+  {
+    "type": "pageview",
+    "path": "/training-facility-design.html",
+    "referrer": "",
+    "visitorId": "4e8fe984-0919-42fc-8796-41bcdaf3d05e",
+    "userId": null,
+    "timestamp": "2026-02-19T20:39:55.881Z",
+    "createdAt": "2026-02-19T20:39:55.968Z",
+    "updatedAt": "2026-02-19T20:39:55.968Z",
+    "id": 121
+  },
+  {
+    "type": "pageview",
+    "path": "/index.html",
+    "referrer": "",
+    "visitorId": "v_nt4qtpja2rmltxd55k",
+    "userId": null,
+    "timestamp": "2026-02-19T20:39:58.825Z",
+    "createdAt": "2026-02-19T20:39:59.491Z",
+    "updatedAt": "2026-02-19T20:39:59.491Z",
+    "id": 122
+  },
+  {
+    "type": "pageview",
+    "path": "/index.html",
+    "referrer": "",
+    "visitorId": "v_nt4qtpja2rmltxd55k",
+    "userId": null,
+    "timestamp": "2026-02-19T20:39:59.721Z",
+    "createdAt": "2026-02-19T20:40:00.123Z",
+    "updatedAt": "2026-02-19T20:40:00.123Z",
+    "id": 123
+  },
+  {
+    "type": "pageview",
+    "path": "/checkout.html",
+    "referrer": "",
+    "visitorId": "v_nt4qtpja2rmltxd55k",
+    "userId": null,
+    "timestamp": "2026-02-19T20:40:01.236Z",
+    "createdAt": "2026-02-19T20:40:01.247Z",
+    "updatedAt": "2026-02-19T20:40:01.247Z",
+    "id": 124
+  },
+  {
+    "type": "pageview",
+    "path": "/checkout.html",
+    "referrer": "",
+    "visitorId": "v_nt4qtpja2rmltxd55k",
+    "userId": null,
+    "timestamp": "2026-02-19T20:40:01.515Z",
+    "createdAt": "2026-02-19T20:40:01.518Z",
+    "updatedAt": "2026-02-19T20:40:01.518Z",
+    "id": 125
+  },
+  {
+    "type": "view_cart",
+    "productId": {
+      "items": [
+        {
+          "id": "PITCHERSPOCKET9",
+          "price": 349.95,
+          "qty": 1
+        }
+      ]
+    },
+    "visitorId": "v_nt4qtpja2rmltxd55k",
+    "userId": null,
+    "timestamp": "2026-02-19T20:40:01.517Z",
+    "createdAt": "2026-02-19T20:40:01.526Z",
+    "updatedAt": "2026-02-19T20:40:01.526Z",
+    "id": 126
+  },
+  {
+    "type": "view_cart",
+    "productId": {
+      "items": [
+        {
+          "id": "PITCHERSPOCKET9",
+          "price": 349.95,
+          "qty": 1
+        }
+      ]
+    },
+    "visitorId": "v_nt4qtpja2rmltxd55k",
+    "userId": null,
+    "timestamp": "2026-02-19T20:40:03.352Z",
+    "createdAt": "2026-02-19T20:40:03.353Z",
+    "updatedAt": "2026-02-19T20:40:03.353Z",
+    "id": 127
+  },
+  {
+    "type": "pageview",
+    "path": "/training-facility-design.html",
+    "referrer": "",
+    "visitorId": "349bff6e-d32c-4c9f-86a2-b13ed268376c",
+    "userId": null,
+    "timestamp": "2026-02-19T20:40:04.435Z",
+    "createdAt": "2026-02-19T20:40:04.457Z",
+    "updatedAt": "2026-02-19T20:40:04.457Z",
+    "id": 128
+  },
+  {
+    "type": "pageview",
+    "path": "/netting-calculator.html",
+    "referrer": "",
+    "visitorId": "v_l6tjrt8gaclmltxdbwr",
+    "userId": null,
+    "timestamp": "2026-02-19T20:40:07.581Z",
+    "createdAt": "2026-02-19T20:40:07.628Z",
+    "updatedAt": "2026-02-19T20:40:07.628Z",
+    "id": 129
+  },
+  {
+    "type": "pageview",
+    "path": "/netting-calculator.html",
+    "referrer": "",
+    "visitorId": "v_l6tjrt8gaclmltxdbwr",
+    "userId": null,
+    "timestamp": "2026-02-19T20:40:08.992Z",
+    "createdAt": "2026-02-19T20:40:08.992Z",
+    "updatedAt": "2026-02-19T20:40:08.992Z",
+    "id": 130
   }
 ]
