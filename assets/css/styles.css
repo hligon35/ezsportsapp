@@ -1431,6 +1431,11 @@ nav.quick-links li a[href="careers.html"]{
 .facility-hp{display:none}
 .facility-grow{flex:1 1 240px}
 
+/* Training facility design: keep Coverage + Net type on one row when space allows */
+.calc-form .facility-two-col{display:flex;gap:.9rem;flex-wrap:wrap;align-items:flex-start}
+.calc-form .facility-two-col > .form-row{flex:1 1 240px}
+.calc-form .facility-two-col select{width:100%}
+
 /* Training facility design: auto-scrolling media carousel (images only) */
 .facility-media-carousel{margin:1rem auto 0}
 .auto-carousel{position:relative}
