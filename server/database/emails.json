@@ -1633,5 +1633,105 @@
     "failedAt": "2026-02-19T20:40:34.205Z",
     "deliveredTo": "test+newsletter-1771343655082@example.com",
     "lastError": "SendGrid failed 401: {\"errors\":[{\"message\":\"Maximum credits exceeded\",\"field\":null,\"help\":null}]}"
+  },
+  {
+    "to": "info@ezsportsnetting.com",
+    "subject": "New subscriber",
+    "html": "<div style=\"margin:0;padding:0;background:#ffffff;\">\n  <table role=\"presentation\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" style=\"background:#ffffff;padding:24px 0;\">\n    <tr>\n      <td align=\"center\" style=\"padding:0 12px;\">\n        <table role=\"presentation\" cellpadding=\"0\" cellspacing=\"0\" width=\"600\" style=\"width:600px;max-width:600px;border:1px solid #d3d0d7;border-radius:12px;overflow:hidden;background:#ffffff;\">\n          <tr>\n            <td style=\"background:#241773;padding:16px 18px;\">\n              \n      <div style=\"margin-bottom:12px;\">\n        <div style=\"display:inline-block;background:#ffffff;border-radius:12px;padding:8px 12px;\">\n          <img src=\"https://ezsportsnetting.com/assets/img/EZSportslogo.png\" alt=\"EZ Sports Netting logo\" width=\"170\" style=\"display:block;height:auto;max-width:170px;border:0;outline:none;text-decoration:none;\" />\n        </div>\n      </div>\n    \n              <div style=\"color:#ffffff;font-weight:900;font-size:18px;line-height:22px;\">New subscriber</div>\n              <div style=\"color:#ffffff;opacity:.92;font-size:13px;line-height:18px;margin-top:4px;\">Newsletter subscription</div>\n            </td>\n          </tr>\n          <tr>\n            <td style=\"padding:18px 20px;color:#000000;font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;\">\n              \n          <p style=\"margin:0 0 10px;\">A new visitor subscribed to the newsletter.</p>\n          <table role=\"presentation\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" style=\"border:1px solid #d3d0d7;border-radius:10px;overflow:hidden;\">\n            <tr><td style=\"padding:10px 12px;background:#ffffff;color:#5a5a5a;width:38%;border-bottom:1px solid #d3d0d7;\">Email</td><td style=\"padding:10px 12px;border-bottom:1px solid #d3d0d7;\">u1771726089552@example.com</td></tr>\n            \n            \n            \n          </table>\n        \n            </td>\n          </tr>\n        </table>\n      </td>\n    </tr>\n  </table>\n</div>",
+    "text": "Email: u1771726089552@example.com\nName: \nSource: \nReferrer: ",
+    "tags": [
+      "subscribe",
+      "internal"
+    ],
+    "replyTo": "u1771726089552@example.com",
+    "from": "no-reply@ezsports.app",
+    "fromName": "EZ Sports Netting",
+    "status": "permanent-failure",
+    "createdAt": "2026-02-22T02:08:09.574Z",
+    "retryCount": 1,
+    "nextAttemptAt": null,
+    "updatedAt": "2026-02-22T02:09:52.065Z",
+    "id": 87,
+    "provider": "sendgrid",
+    "error": "SendGrid failed 401: {\"errors\":[{\"message\":\"Maximum credits exceeded\",\"field\":null,\"help\":null}]}",
+    "failedAt": "2026-02-22T02:09:52.060Z",
+    "deliveredTo": "info@ezsportsnetting.com",
+    "lastError": "SendGrid failed 401: {\"errors\":[{\"message\":\"Maximum credits exceeded\",\"field\":null,\"help\":null}]}"
+  },
+  {
+    "to": "info@ezsportsnetting.com",
+    "subject": "New subscriber",
+    "html": "<div style=\"margin:0;padding:0;background:#ffffff;\">\n  <table role=\"presentation\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" style=\"background:#ffffff;padding:24px 0;\">\n    <tr>\n      <td align=\"center\" style=\"padding:0 12px;\">\n        <table role=\"presentation\" cellpadding=\"0\" cellspacing=\"0\" width=\"600\" style=\"width:600px;max-width:600px;border:1px solid #d3d0d7;border-radius:12px;overflow:hidden;background:#ffffff;\">\n          <tr>\n            <td style=\"background:#241773;padding:16px 18px;\">\n              \n      <div style=\"margin-bottom:12px;\">\n        <div style=\"display:inline-block;background:#ffffff;border-radius:12px;padding:8px 12px;\">\n          <img src=\"https://ezsportsnetting.com/assets/img/EZSportslogo.png\" alt=\"EZ Sports Netting logo\" width=\"170\" style=\"display:block;height:auto;max-width:170px;border:0;outline:none;text-decoration:none;\" />\n        </div>\n      </div>\n    \n              <div style=\"color:#ffffff;font-weight:900;font-size:18px;line-height:22px;\">New subscriber</div>\n              <div style=\"color:#ffffff;opacity:.92;font-size:13px;line-height:18px;margin-top:4px;\">Newsletter subscription</div>\n            </td>\n          </tr>\n          <tr>\n            <td style=\"padding:18px 20px;color:#000000;font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;\">\n              \n          <p style=\"margin:0 0 10px;\">A new visitor subscribed to the newsletter.</p>\n          <table role=\"presentation\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" style=\"border:1px solid #d3d0d7;border-radius:10px;overflow:hidden;\">\n            <tr><td style=\"padding:10px 12px;background:#ffffff;color:#5a5a5a;width:38%;border-bottom:1px solid #d3d0d7;\">Email</td><td style=\"padding:10px 12px;border-bottom:1px solid #d3d0d7;\">u1771729812033@example.com</td></tr>\n            \n            \n            \n          </table>\n        \n            </td>\n          </tr>\n        </table>\n      </td>\n    </tr>\n  </table>\n</div>",
+    "text": "Email: u1771729812033@example.com\nName: \nSource: \nReferrer: ",
+    "tags": [
+      "subscribe",
+      "internal"
+    ],
+    "replyTo": "u1771729812033@example.com",
+    "from": "no-reply@ezsports.app",
+    "fromName": "EZ Sports Netting",
+    "status": "queued",
+    "createdAt": "2026-02-22T03:10:12.049Z",
+    "retryCount": 0,
+    "nextAttemptAt": "2026-02-22T03:10:12.046Z",
+    "updatedAt": "2026-02-22T03:10:12.049Z",
+    "id": 88
+  },
+  {
+    "to": "info@ezsportsnetting.com",
+    "subject": "New subscriber",
+    "html": "<div style=\"margin:0;padding:0;background:#ffffff;\">\n  <table role=\"presentation\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" style=\"background:#ffffff;padding:24px 0;\">\n    <tr>\n      <td align=\"center\" style=\"padding:0 12px;\">\n        <table role=\"presentation\" cellpadding=\"0\" cellspacing=\"0\" width=\"600\" style=\"width:600px;max-width:600px;border:1px solid #d3d0d7;border-radius:12px;overflow:hidden;background:#ffffff;\">\n          <tr>\n            <td style=\"background:#241773;padding:16px 18px;\">\n              \n      <div style=\"margin-bottom:12px;\">\n        <div style=\"display:inline-block;background:#ffffff;border-radius:12px;padding:8px 12px;\">\n          <img src=\"https://ezsportsnetting.com/assets/img/EZSportslogo.png\" alt=\"EZ Sports Netting logo\" width=\"170\" style=\"display:block;height:auto;max-width:170px;border:0;outline:none;text-decoration:none;\" />\n        </div>\n      </div>\n    \n              <div style=\"color:#ffffff;font-weight:900;font-size:18px;line-height:22px;\">New subscriber</div>\n              <div style=\"color:#ffffff;opacity:.92;font-size:13px;line-height:18px;margin-top:4px;\">Newsletter subscription</div>\n            </td>\n          </tr>\n          <tr>\n            <td style=\"padding:18px 20px;color:#000000;font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;\">\n              \n          <p style=\"margin:0 0 10px;\">A new visitor subscribed to the newsletter.</p>\n          <table role=\"presentation\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" style=\"border:1px solid #d3d0d7;border-radius:10px;overflow:hidden;\">\n            <tr><td style=\"padding:10px 12px;background:#ffffff;color:#5a5a5a;width:38%;border-bottom:1px solid #d3d0d7;\">Email</td><td style=\"padding:10px 12px;border-bottom:1px solid #d3d0d7;\">u1771730078230@example.com</td></tr>\n            \n            \n            \n          </table>\n        \n            </td>\n          </tr>\n        </table>\n      </td>\n    </tr>\n  </table>\n</div>",
+    "text": "Email: u1771730078230@example.com\nName: \nSource: \nReferrer: ",
+    "tags": [
+      "subscribe",
+      "internal"
+    ],
+    "replyTo": "u1771730078230@example.com",
+    "from": "no-reply@ezsports.app",
+    "fromName": "EZ Sports Netting",
+    "status": "queued",
+    "createdAt": "2026-02-22T03:14:38.248Z",
+    "retryCount": 0,
+    "nextAttemptAt": "2026-02-22T03:14:38.244Z",
+    "updatedAt": "2026-02-22T03:14:38.248Z",
+    "id": 89
+  },
+  {
+    "to": "u1771730078230@example.com",
+    "subject": "Thanks for subscribing to EZ Sports Netting",
+    "html": "<div style=\"margin:0;padding:0;background:#ffffff;\">\n  <table role=\"presentation\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" style=\"background:#ffffff;padding:24px 0;\">\n    <tr>\n      <td align=\"center\" style=\"padding:0 12px;\">\n        <table role=\"presentation\" cellpadding=\"0\" cellspacing=\"0\" width=\"600\" style=\"width:600px;max-width:600px;border:1px solid #d3d0d7;border-radius:12px;overflow:hidden;background:#ffffff;\">\n          <tr>\n            <td style=\"background:#241773;padding:16px 18px;\">\n              \n      <div style=\"margin-bottom:12px;\">\n        <div style=\"display:inline-block;background:#ffffff;border-radius:12px;padding:8px 12px;\">\n          <img src=\"https://ezsportsnetting.com/assets/img/EZSportslogo.png\" alt=\"EZ Sports Netting logo\" width=\"170\" style=\"display:block;height:auto;max-width:170px;border:0;outline:none;text-decoration:none;\" />\n        </div>\n      </div>\n    \n              <div style=\"color:#ffffff;font-weight:900;font-size:18px;line-height:22px;\">Thanks for subscribing</div>\n              <div style=\"color:#ffffff;opacity:.92;font-size:13px;line-height:18px;margin-top:4px;\">EZ Sports Netting Newsletter</div>\n            </td>\n          </tr>\n          <tr>\n            <td style=\"padding:18px 20px;color:#000000;font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;\">\n              \n        <p style=\"margin:0 0 10px;\">Thanks for subscribing to EZ Sports Netting!</p>\n        <p style=\"margin:0;color:#5a5a5a;line-height:20px;\">We’ll send occasional deals and product updates. You can unsubscribe anytime.</p>\n      \n            </td>\n          </tr>\n        </table>\n      </td>\n    </tr>\n  </table>\n</div>",
+    "text": "Thanks for subscribing to EZ Sports Netting! We’ll send occasional deals and product updates.",
+    "tags": [
+      "subscribe",
+      "welcome"
+    ],
+    "replyTo": "info@ezsportsnetting.com",
+    "from": "no-reply@ezsports.app",
+    "fromName": "EZ Sports Netting",
+    "status": "queued",
+    "createdAt": "2026-02-22T03:14:38.281Z",
+    "retryCount": 0,
+    "nextAttemptAt": "2026-02-22T03:14:38.244Z",
+    "updatedAt": "2026-02-22T03:14:38.281Z",
+    "id": 90
+  },
+  {
+    "to": "info@ezsportsnetting.com",
+    "subject": "New subscriber",
+    "html": "<div style=\"margin:0;padding:0;background:#ffffff;\">\n  <table role=\"presentation\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" style=\"background:#ffffff;padding:24px 0;\">\n    <tr>\n      <td align=\"center\" style=\"padding:0 12px;\">\n        <table role=\"presentation\" cellpadding=\"0\" cellspacing=\"0\" width=\"600\" style=\"width:600px;max-width:600px;border:1px solid #d3d0d7;border-radius:12px;overflow:hidden;background:#ffffff;\">\n          <tr>\n            <td style=\"background:#241773;padding:16px 18px;\">\n              \n      <div style=\"margin-bottom:12px;\">\n        <div style=\"display:inline-block;background:#ffffff;border-radius:12px;padding:8px 12px;\">\n          <img src=\"https://ezsportsnetting.com/assets/img/EZSportslogo.png\" alt=\"EZ Sports Netting logo\" width=\"170\" style=\"display:block;height:auto;max-width:170px;border:0;outline:none;text-decoration:none;\" />\n        </div>\n      </div>\n    \n              <div style=\"color:#ffffff;font-weight:900;font-size:18px;line-height:22px;\">New subscriber</div>\n              <div style=\"color:#ffffff;opacity:.92;font-size:13px;line-height:18px;margin-top:4px;\">Newsletter subscription</div>\n            </td>\n          </tr>\n          <tr>\n            <td style=\"padding:18px 20px;color:#000000;font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;\">\n              \n          <p style=\"margin:0 0 10px;\">A new visitor subscribed to the newsletter.</p>\n          <table role=\"presentation\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" style=\"border:1px solid #d3d0d7;border-radius:10px;overflow:hidden;\">\n            <tr><td style=\"padding:10px 12px;background:#ffffff;color:#5a5a5a;width:38%;border-bottom:1px solid #d3d0d7;\">Email</td><td style=\"padding:10px 12px;border-bottom:1px solid #d3d0d7;\">u1771731070009@example.com</td></tr>\n            \n            \n            \n          </table>\n        \n            </td>\n          </tr>\n        </table>\n      </td>\n    </tr>\n  </table>\n</div>",
+    "text": "Email: u1771731070009@example.com\nName: \nSource: \nReferrer: ",
+    "tags": [
+      "subscribe",
+      "internal"
+    ],
+    "replyTo": "u1771731070009@example.com",
+    "from": "no-reply@ezsports.app",
+    "fromName": "EZ Sports Netting",
+    "status": "queued",
+    "createdAt": "2026-02-22T03:31:10.032Z",
+    "retryCount": 0,
+    "nextAttemptAt": "2026-02-22T03:31:10.025Z",
+    "updatedAt": "2026-02-22T03:31:10.032Z",
+    "id": 91
   }
 ]

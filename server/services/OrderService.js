@@ -104,6 +104,7 @@ class OrderService {
       // Calculate total
       let itemsSubtotal = 0;
       let shippingFromItems = 0;
+      let weightLbsFromItems = 0;
       const enrichedItems = [];
 
       for (const item of orderData.items) {
@@ -176,6 +177,20 @@ class OrderService {
         const shipVal = Number(item.ship || 0);
         if (Number.isFinite(shipVal) && shipVal > 0) shippingFromItems += shipVal;
 
+        // Optional: persist weight fields (lbs) when provided by client
+        const qtyForWeight = qty;
+        const wEachRaw = Number(item.weightLbsEach ?? item.weightEach ?? item.weight);
+        const wTotalRaw = Number(item.weightLbsTotal ?? item.weightLbs ?? item.weightTotal);
+        let weightLbsEach = (Number.isFinite(wEachRaw) && wEachRaw > 0) ? wEachRaw : undefined;
+        let weightLbsTotal = (Number.isFinite(wTotalRaw) && wTotalRaw > 0) ? wTotalRaw : undefined;
+        if (weightLbsEach === undefined && weightLbsTotal !== undefined && qtyForWeight > 0) {
+          weightLbsEach = weightLbsTotal / qtyForWeight;
+        }
+        if (weightLbsTotal === undefined && weightLbsEach !== undefined) {
+          weightLbsTotal = weightLbsEach * qtyForWeight;
+        }
+        if (Number.isFinite(weightLbsTotal) && weightLbsTotal > 0) weightLbsFromItems += weightLbsTotal;
+
         enrichedItems.push({
           productId: item.id,
           productName,
@@ -184,6 +199,9 @@ class OrderService {
           subtotal: itemTotal,
           // Optional: store per-line shipping provided by client for future detailed invoices
           ship: Number(item.ship || 0) || undefined,
+          // Optional: weight data (lbs)
+          weightLbsEach,
+          weightLbsTotal,
           // Optional: persist variation details for confirmation/email
           size: (item.size !== undefined && item.size !== null) ? String(item.size) : undefined,
           option: selectedOption || undefined,
@@ -217,6 +235,10 @@ class OrderService {
         shippingAddress: orderData.shippingAddress || null,
         customerInfo: orderData.customerInfo || null,
         paymentInfo: orderData.paymentInfo || null,
+        // Optional: store order-level weight (lbs)
+        weightLbsTotal: (Number.isFinite(Number(orderData.weightLbsTotal)) && Number(orderData.weightLbsTotal) > 0)
+          ? Number(orderData.weightLbsTotal)
+          : (weightLbsFromItems > 0 ? weightLbsFromItems : undefined),
         // Persist breakdown if provided by caller (compute otherwise)
         subtotal,
         shipping,

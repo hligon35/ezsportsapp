@@ -1,12 +1,10 @@
 {
   "metadata": {
     "autoIncrement": {
-      "analytics": 130,
-      "subscribers": 27,
-      "emails": 84,
-      "orders": 3039,
-      "errors": 3
+      "analytics": 163,
+      "subscribers": 33,
+      "emails": 91
     },
-    "lastModified": "2026-02-19T20:40:34.219Z"
+    "lastModified": "2026-02-22T03:31:10.057Z"
   }
 }

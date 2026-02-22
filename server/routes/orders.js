@@ -5,6 +5,26 @@ const { requireAuth, requireAdmin } = require('../middleware/auth');
 
 const orderService = new OrderService();
 
+function stripWeightFields(order) {
+  if (!order || typeof order !== 'object') return order;
+  const out = { ...order };
+  if (Object.prototype.hasOwnProperty.call(out, 'weightLbsTotal')) delete out.weightLbsTotal;
+  if (Object.prototype.hasOwnProperty.call(out, 'totalWeightLbs')) delete out.totalWeightLbs;
+  if (Object.prototype.hasOwnProperty.call(out, 'weightTotal')) delete out.weightTotal;
+  if (Object.prototype.hasOwnProperty.call(out, 'totalWeight')) delete out.totalWeight;
+  if (Array.isArray(out.items)) {
+    out.items = out.items.map(i => {
+      if (!i || typeof i !== 'object') return i;
+      const ii = { ...i };
+      ['weightLbsEach','weightLbsTotal','weightEach','weightTotal','weightLbs','weight'].forEach(k => {
+        if (Object.prototype.hasOwnProperty.call(ii, k)) delete ii[k];
+      });
+      return ii;
+    });
+  }
+  return out;
+}
+
 // Create new order
 router.post('/', requireAuth, async (req, res) => {
   try {
@@ -71,7 +91,7 @@ router.get('/:id', requireAuth, async (req, res) => {
     // Only owner or admin can see
     const isOwner = order.userId && String(order.userId) === String(req.user.id);
     if (!isOwner && !req.user.isAdmin) return res.status(403).json({ message: 'Forbidden' });
-    res.json(order);
+    res.json(req.user.isAdmin ? order : stripWeightFields(order));
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -83,7 +103,7 @@ router.get('/user/:userId', requireAuth, async (req, res) => {
   const isSelf = String(req.params.userId) === String(req.user.id);
   if (!isSelf && !req.user.isAdmin) return res.status(403).json({ message: 'Forbidden' });
   const orders = await orderService.getOrdersByUser(req.params.userId);
-    res.json(orders);
+    res.json(req.user.isAdmin ? orders : (orders || []).map(stripWeightFields));
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -104,7 +124,7 @@ router.get('/me', requireAuth, async (req, res) => {
   try {
     const userId = req.user.id;
     const orders = await orderService.getOrdersByUser(userId);
-    res.json(orders);
+    res.json(req.user.isAdmin ? orders : (orders || []).map(stripWeightFields));
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

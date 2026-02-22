@@ -161,11 +161,16 @@ REPORT_EMAIL_TO=info@getsparqd.com
 # - Weekly Payout Report runs once per week
 FINANCE_REPORT_ENABLED=true
 FINANCE_REPORT_TIME_UTC=18:15
+# If you want the finance reports to run at a specific LOCAL time (recommended), set:
+# FINANCE_REPORT_TZ=America/Indiana/Indianapolis
+# FINANCE_REPORT_TIME_LOCAL=18:15
 # 0=Sun ... 6=Sat (or mon/tue/wed/thu/fri/sat/sun). Default is Monday.
 # FINANCE_REPORT_WEEKLY_DAY_UTC=1
+# Optional: when using FINANCE_REPORT_TIME_LOCAL, you can set the weekly day in that same timezone:
+# FINANCE_REPORT_WEEKLY_DAY_LOCAL=1
 
 DAILY_REPORT_ENABLED=true
-# DAILY_REPORT_TZ=America/Indianapolis
+# DAILY_REPORT_TZ=America/Indiana/Indianapolis
 # DAILY_REPORT_TIME_LOCAL=07:00
 DAILY_REPORT_TIME_UTC=18:00
 

@@ -4156,6 +4156,10 @@ ensureHomeFirst() {
     const exists = this.state.cart.find(i => this.keyFor(i) === key);
     if (exists) {
       exists.qty += 1;
+      // If this line predates weight support, fill it in when provided
+      if (!Number.isFinite(Number(exists.weightLbsEach)) && Number.isFinite(Number(opts.weightLbsEach))) {
+        exists.weightLbsEach = Number(opts.weightLbsEach);
+      }
     } else {
       // Store a snapshot for items that may not exist in PRODUCTS (e.g., dynamic pages like gloves)
       let imgSrc = product.img;
@@ -4176,6 +4180,12 @@ ensureHomeFirst() {
         }
         return 100; // default $100 when no dsr
       })();
+      const weightLbsEach = (() => {
+        const raw = (opts && Object.prototype.hasOwnProperty.call(opts, 'weightLbsEach')) ? opts.weightLbsEach
+          : (Object.prototype.hasOwnProperty.call(product, 'weightLbsEach') ? product.weightLbsEach : undefined);
+        const n = Number(raw);
+        return (Number.isFinite(n) && n > 0) ? n : undefined;
+      })();
       this.state.cart.push({
         id: product.id,
         qty: 1,
@@ -4186,7 +4196,8 @@ ensureHomeFirst() {
         img: imgSrc || 'assets/img/EZSportslogo.png',
         category: product.category,
         ship: rawShip, // preserve original value (could be string)
-        shipAmount // numeric amount used in totals
+        shipAmount, // numeric amount used in totals
+        weightLbsEach
       });
     }
     this.persist();
@@ -4320,12 +4331,24 @@ ensureHomeFirst() {
 
   toggleCart() {
     if (!this.ui.dialog) return;
-    this.ui.dialog.open ? this.ui.dialog.close() : this.ui.dialog.showModal();
+    const dlg = this.ui.dialog;
+    // Standard modal <dialog>
+    if (typeof dlg.showModal === 'function') {
+      dlg.open ? dlg.close() : dlg.showModal();
+      return;
+    }
+    // Non-dialog container fallback (e.g., floating cart panel)
+    try { dlg.classList.toggle('is-open'); } catch {}
   },
 
   openCart() {
     if (!this.ui.dialog) return;
-    if (!this.ui.dialog.open) this.ui.dialog.showModal();
+    const dlg = this.ui.dialog;
+    if (typeof dlg.showModal === 'function') {
+      if (!dlg.open) dlg.showModal();
+      return;
+    }
+    try { dlg.classList.add('is-open'); } catch {}
   },
 
   checkout() {

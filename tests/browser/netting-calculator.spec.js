@@ -59,43 +59,55 @@ test.describe('Netting calculator math', () => {
   test('area, perimeter, and total price compute correctly', async ({ page }) => {
     const base = process.env.BASE_URL || 'http://localhost:5051';
 
-    // Provide deterministic pricing config so the expected total is stable.
+    // Provide deterministic CSV pricing so the expected total is stable.
+    await page.route('**/assets/product-pricing-weights.csv', async (route) => {
+      const csv = [
+        'Column 1,Retail,Wholesale,Weight',
+        '"#18",0.35,0.10,0.01',
+        'Rope,0.25,0.25,0.02',
+        '"Sewn Rope",0.5,0.5,0.02',
+        '"No Border",0,0,0',
+      ].join('\n');
+      await route.fulfill({ status: 200, contentType: 'text/csv', body: csv });
+    });
+
+    await page.route('**/assets/border-pricing-multipliers.csv', async (route) => {
+      const csv = [
+        'Border Item,Standard Cost Multiplier,Override/Final Multiplier',
+        'Rope,0.25,',
+        '"Sewn Rope",0.5,',
+      ].join('\n');
+      await route.fulfill({ status: 200, contentType: 'text/csv', body: csv });
+    });
+
+    // netting.json is still loaded for shipping defaults; keep it deterministic.
     await page.route('**/assets/netting.json', async (route) => {
-      const body = {
-        defaults: {
-          borderSurchargePerFt: 0.5,
-          expeditedFee: 25,
-          shipPerItem: 100,
-          markupPerSqFt: 0.25,
-        },
-        meshPrices: [
-          { id: 'baseball-18', label: '#18', sport: 'baseball', wholesaleSqFt: 0.10 },
-        ],
-      };
+      const body = { defaults: { shipPerItem: 100 } };
       await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(body) });
     });
 
     await page.goto(base + '/netting-calculator.html');
 
-    await page.locator('#mesh option[value="baseball-18"]').waitFor();
-    await page.selectOption('#mesh', 'baseball-18');
+    // Creator forms are now hidden behind <details> dropdowns.
+    await page.locator('details.creator-block >> text=Netting Panel Creator').first().click();
+
+    await page.locator('#mesh option[value="#18"]').waitFor({ state: 'attached' });
+    await page.selectOption('#mesh', '#18');
 
     // 10' x 10' => 100 sq ft; perimeter = 40 ft
     await page.fill('#len-ft', '10');
-    await page.fill('#len-in', '0');
     await page.fill('#wid-ft', '10');
-    await page.fill('#wid-in', '0');
 
     // Sewn border adds 0.5/ft => 40 * 0.5 = 20
-    await page.check('input[name="border"][value="sewn"]');
+    await page.selectOption('#border', 'sewn');
 
     // qty = 2
     await page.fill('#qty', '2');
 
     // Expected:
-    // priceSqFt = wholesale (0.10) + markup (0.25) = 0.35
+    // retail_price_per_unit (#18) = 0.35
     // base = 100 * 0.35 = 35
-    // border = 20
+    // sewn border base_cost = 0.5/ft => 40 * 0.5 = 20
     // perPanel = 55
     // total = 55 * 2 = 110
     await expect(page.locator('#sum-area')).toHaveText('100.0 sq ft');
@@ -104,10 +116,72 @@ test.describe('Netting calculator math', () => {
     const totalText = await page.locator('#sum-total').textContent();
     const total = parseMoney(totalText);
     expect(total).toBeCloseTo(110, 2);
+  });
 
-    // Mobile mirror should match too.
-    const mobileText = await page.locator('#sum-total-mobile').textContent();
-    const mobileTotal = parseMoney(mobileText);
-    expect(mobileTotal).toBeCloseTo(110, 2);
+  test('batting cage total includes $50 per door', async ({ page }) => {
+    const base = process.env.BASE_URL || 'http://localhost:5051';
+
+    // Provide deterministic CSV pricing so the expected total is stable.
+    await page.route('**/assets/product-pricing-weights.csv', async (route) => {
+      const csv = [
+        'Column 1,Retail,Wholesale,Weight',
+        '"#18",0.35,0.10,0.01',
+        'Rope,0.25,0.25,0.02',
+        '"Sewn Rope",0.5,0.5,0.02',
+        '"No Border",0,0,0',
+      ].join('\n');
+      await route.fulfill({ status: 200, contentType: 'text/csv', body: csv });
+    });
+
+    await page.route('**/assets/border-pricing-multipliers.csv', async (route) => {
+      const csv = [
+        'Border Item,Standard Cost Multiplier,Override/Final Multiplier',
+        'Rope,0.25,',
+        '"Sewn Rope",0.5,',
+      ].join('\n');
+      await route.fulfill({ status: 200, contentType: 'text/csv', body: csv });
+    });
+
+    await page.route('**/assets/netting.json', async (route) => {
+      const body = { defaults: { shipPerItem: 100 } };
+      await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(body) });
+    });
+
+    await page.goto(base + '/netting-calculator.html');
+
+    // Open cage creator
+    await page.locator('details.creator-block >> text=Batting Cage Creator').first().click();
+
+    await page.locator('#cage-mesh option[value="#18"]').waitFor({ state: 'attached' });
+    await page.selectOption('#cage-mesh', '#18');
+
+    // Choose dimensions so math is clean:
+    // W=10, H=10, L=10 => tubePerimeter=2*(W+H)=40
+    // area = tubePerimeter*L = 400 sq ft
+    // borderLinearFt = 2*tubePerimeter = 80 ft
+    await page.fill('#cage-wid-ft', '10');
+    await page.fill('#cage-hgt-ft', '10');
+    await page.fill('#cage-len-ft', '10');
+
+    // Sewn border 0.5/ft => 80*0.5 = 40
+    await page.selectOption('#cage-border', 'sewn');
+
+    // doors = 2 => 100
+    await page.fill('#cage-doors', '2');
+
+    // qty = 1
+    await page.fill('#cage-qty', '1');
+
+    // Expected:
+    // base = 400 * 0.35 = 140
+    // border = 40
+    // doors = 100
+    // total = 280
+    await expect(page.locator('#cage-sum-area')).toHaveText('400.0 sq ft');
+    await expect(page.locator('#cage-sum-perim')).toHaveText('80.0 ft');
+
+    const totalText = await page.locator('#cage-sum-total').textContent();
+    const total = parseMoney(totalText);
+    expect(total).toBeCloseTo(280, 2);
   });
 });

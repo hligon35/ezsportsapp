@@ -4,4 +4,5 @@ module.exports = {
   roots: ['<rootDir>/tests'],
   setupFiles: ['dotenv/config'],
   testTimeout: 30000,
+  testPathIgnorePatterns: ['<rootDir>/tests/browser/'],
 };

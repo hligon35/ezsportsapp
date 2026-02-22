@@ -111,6 +111,7 @@ const OrderService = require('./services/OrderService');
 const CouponService = require('./services/CouponService');
 const InvoiceService = require('./services/InvoiceService');
 const AnalyticsService = require('./services/AnalyticsService');
+const { calculatePrice: calculateNettingPrice } = require('./services/NettingPricingEngine');
 const couponService = new CouponService();
 const { requireAdmin } = require('./middleware/auth');
 const AddressService = require('./services/AddressService');
@@ -1201,6 +1202,21 @@ app.get('/api/config', (req, res) => {
   });
 });
 
+// Netting calculator pricing endpoint (CSV-backed). Contract must remain stable.
+// POST /calculate_price
+// Body: { Net_Height, Net_Width, Net_Length, Net_Gauge, Border_Type, Doors?, Freight? }
+// Response: { totalRetailPrice, totalWholesalePrice, totalProductWeight }
+app.post('/calculate_price', async (req, res) => {
+  try {
+    const result = await calculateNettingPrice(req.body || {});
+    res.json(result);
+  } catch (e) {
+    const msg = e?.message || 'Invalid request';
+    const status = e?.code === 'VALIDATION_ERROR' ? 400 : 500;
+    res.status(status).json({ message: msg });
+  }
+});
+
 // Fallback endpoints (defensive): ensure core routes respond in dev even if router mounting is altered
 app.post('/api/analytics/track', async (req, res) => {
   try {
@@ -1540,22 +1556,38 @@ function calcTaxCents(subtotalCents = 0, shippingCents = 0, discountCents = 0, s
 
 // Create payment intent with server-side calculation
 app.post('/api/create-payment-intent', async (req, res) => {
-  const { items = [], customer = {}, shipping = {}, shippingMethod = 'standard', currency = 'usd', couponCode = '', existingOrderId = null } = req.body;
+  const { items = [], customer = {}, shipping = {}, shippingMethod = 'standard', currency = 'usd', couponCode = '', existingOrderId = null, weightLbsTotal: clientOrderWeightLbsTotal = null } = req.body;
   try {
     if (!stripe) {
       return res.status(503).json({ error: 'Stripe is not configured on the server.' });
     }
     // Basic input validation and normalization
     if (!Array.isArray(items) || items.length === 0) return res.status(400).json({ error: 'Items are required' });
-    const normItems = items.map(i => ({
-      id: String(i.id || '').trim(),
-      qty: Math.max(1, Math.min(20, parseInt(i.qty || 1))),
-      // Optional variation fields (persisted on order for confirmation/email)
-      size: String(i.size || '').trim(),
-      color: String(i.color || '').trim(),
-      category: String(i.category || '').trim(),
-      name: String(i.name || '').trim()
-    }));
+    const normItems = items.map(i => {
+      const qty = Math.max(1, Math.min(20, parseInt(i.qty || 1)));
+      const weightEach = (() => {
+        const n = Number(i.weightLbsEach);
+        return Number.isFinite(n) && n >= 0 ? n : undefined;
+      })();
+      const weightTotal = (() => {
+        const n = Number(i.weightLbsTotal);
+        if (Number.isFinite(n) && n >= 0) return n;
+        if (weightEach !== undefined) return weightEach * qty;
+        return undefined;
+      })();
+      return {
+        id: String(i.id || '').trim(),
+        qty,
+        // Optional: weights in pounds
+        weightLbsEach: weightEach,
+        weightLbsTotal: weightTotal,
+        // Optional variation fields (persisted on order for confirmation/email)
+        size: String(i.size || '').trim(),
+        color: String(i.color || '').trim(),
+        category: String(i.category || '').trim(),
+        name: String(i.name || '').trim()
+      };
+    });
     const safeCurrency = (String(currency || 'usd').toLowerCase() === 'usd') ? 'usd' : 'usd';
     // Optional: validate/normalize shipping address before calculations
     let normalizedShipping = shipping;
@@ -1625,10 +1657,23 @@ app.post('/api/create-payment-intent', async (req, res) => {
       const orderPayload = {
         userId: null,
         userEmail: customer.email || undefined,
-        items: normItems.map(i => ({ id: i.id, qty: i.qty, size: i.size || undefined, color: i.color || undefined, category: i.category || undefined, name: i.name || undefined })),
+        items: normItems.map(i => ({
+          id: i.id,
+          qty: i.qty,
+          // Optional: weights in pounds
+          weightLbsEach: i.weightLbsEach,
+          weightLbsTotal: i.weightLbsTotal,
+          // Optional variation fields for confirmation/email
+          size: i.size || undefined,
+          color: i.color || undefined,
+          category: i.category || undefined,
+          name: i.name || undefined,
+        })),
         shippingAddress: shipping,
         customerInfo: customer,
         paymentInfo: { method: 'stripe' },
+        // Optional: order-level weight in pounds
+        weightLbsTotal: Number.isFinite(Number(clientOrderWeightLbsTotal)) ? Number(clientOrderWeightLbsTotal) : undefined,
         // Persist current server-side pricing snapshot for confirmation/history accuracy
         subtotal,
         shipping: shippingCents,
@@ -1893,7 +1938,8 @@ app.post('/api/order', async (req, res) => {
         items: orderData.items,
         shippingAddress: orderData.shipping,
         customerInfo: orderData.customer,
-        paymentInfo: { method: 'stripe' }
+        paymentInfo: { method: 'stripe' },
+        weightLbsTotal: Number.isFinite(Number(orderData.weightLbsTotal)) ? Number(orderData.weightLbsTotal) : undefined,
       });
       res.json({ status: 'ok', orderId: order.id });
     } else {

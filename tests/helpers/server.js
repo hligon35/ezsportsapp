@@ -1,9 +1,24 @@
 const path = require('path');
 const { spawn } = require('child_process');
 const waitOn = require('wait-on');
+const net = require('net');
+
+function getEphemeralPort() {
+  return new Promise((resolve, reject) => {
+    const srv = net.createServer();
+    srv.unref();
+    srv.on('error', reject);
+    srv.listen(0, '127.0.0.1', () => {
+      const addr = srv.address();
+      const port = addr && typeof addr === 'object' ? addr.port : null;
+      srv.close(() => resolve(port));
+    });
+  });
+}
 
 async function startServer() {
-  const env = { ...process.env, PORT: process.env.PORT || '5050', NODE_ENV: 'test' };
+  const port = process.env.PORT || String(await getEphemeralPort());
+  const env = { ...process.env, PORT: port, NODE_ENV: 'test' };
   const child = spawn(process.execPath, ['server/index.js'], {
     cwd: path.join(__dirname, '..', '..'),
     env,

@@ -42,4 +42,40 @@ describe('API endpoints', () => {
     expect(ok.status).toBe(200);
     expect(ok.body).toHaveProperty('ok', true);
   });
+
+  test('POST /calculate_price returns totals (CSV-backed)', async () => {
+    const res = await request(baseUrl).post('/calculate_price').send({
+      Net_Height: 10,
+      Net_Width: 10,
+      Net_Length: 0,
+      Net_Gauge: '#18',
+      Border_Type: 'Sewn Rope',
+      Doors: 2,
+      Freight: true,
+    });
+
+    expect(res.status).toBe(200);
+    expect(res.body).toHaveProperty('totalRetailPrice');
+    expect(res.body).toHaveProperty('totalWholesalePrice');
+    expect(res.body).toHaveProperty('totalProductWeight');
+
+    // Uses current CSV assets:
+    // #18 retail=0.2699, wholesale=0.21592, weight=0.018375
+    // Sewn Rope base_cost=0.5 (from border multipliers), weight_per_unit=0.02 (from weights)
+    // area=100, perimeter=40, doors=2, freight=true
+    expect(res.body.totalRetailPrice).toBeCloseTo(221.99, 2);
+    expect(res.body.totalWholesalePrice).toBeCloseTo(41.592, 3);
+    expect(res.body.totalProductWeight).toBeCloseTo(2.6375, 4);
+  });
+
+  test('POST /calculate_price rejects unknown gauge', async () => {
+    const res = await request(baseUrl).post('/calculate_price').send({
+      Net_Height: 10,
+      Net_Width: 10,
+      Net_Length: 0,
+      Net_Gauge: '#999',
+      Border_Type: 'Rope',
+    });
+    expect(res.status).toBe(400);
+  });
 });

@@ -1272,6 +1272,7 @@ nav.quick-links li a[href="careers.html"]{
 /* Mini cart */
 .mini-cart{border:none;padding:0;background:transparent}
 .mini-cart[open]{display:grid;place-items:start end}
+.mini-cart.is-open{display:grid;place-items:start end}
 .mini-cart__backdrop{position:fixed;inset:0;background:rgba(0,0,0,.55)}
 .mini-cart__panel{position:fixed;top:0;right:0;height:100dvh;width:min(420px,92vw);background:#ffffff;border-left:1px solid var(--border);display:flex;flex-direction:column}
 .mini-cart__panel header{display:flex;justify-content:space-between;align-items:center;padding:1rem;border-bottom:1px solid var(--border)}
@@ -1280,6 +1281,34 @@ nav.quick-links li a[href="careers.html"]{
 .mini-cart__footer{margin-top:auto;border-top:1px solid var(--border);padding:1rem}
 .totals{display:flex;justify-content:space-between;margin-bottom:.6rem}
 .btn-col{display:grid;gap:.5rem}
+
+/* Netting calculator: floating cart panel to the right of content (desktop) */
+@media (min-width:1101px){
+  body.page-netting-calculator .calc-grid{grid-template-columns:minmax(0,1fr) minmax(280px,420px);align-items:start}
+  body.page-netting-calculator .calc-media,
+  body.page-netting-calculator .calc-card{grid-column:1}
+  body.page-netting-calculator .calc-card{width:100%;max-width:none;position:static;top:auto;justify-self:stretch}
+
+  body.page-netting-calculator .mini-cart{grid-column:2;grid-row:1 / span 2;display:block;position:static}
+  body.page-netting-calculator .mini-cart__backdrop{display:none}
+  body.page-netting-calculator .mini-cart__panel{
+    position:static;
+    top:auto;
+    height:auto;
+    max-height:none;
+    width:100%;
+    border:1px solid var(--border);
+    border-radius:1rem;
+    box-shadow:0 8px 24px rgba(12,32,64,.06);
+  }
+  body.page-netting-calculator .mini-cart__items{overflow:visible}
+}
+
+/* Netting calculator: cart becomes an overlay on smaller screens */
+@media (max-width:1100px){
+  body.page-netting-calculator .mini-cart{display:none}
+  body.page-netting-calculator .mini-cart.is-open{display:grid;position:fixed;inset:0;z-index:120}
+}
 
 /* Responsive */
 /* --- Responsive Layout Adjustments --- */
@@ -1364,8 +1393,8 @@ nav.quick-links li a[href="careers.html"]{
 .calc-media{overflow:visible}
 /* Calculator gallery */
 /* Gallery now acts as a slider on narrow widths */
-.calc-gallery{list-style:none;margin:.75rem 0 0;padding:0;display:flex;flex-wrap:wrap;gap:.55rem;min-height:110px;position:relative}
-.calc-gallery li{width:78px;aspect-ratio:1/1;border:2px solid var(--border);border-radius:.65rem;overflow:hidden;position:relative;cursor:pointer;background:#fff;display:grid;place-items:center}
+.calc-gallery{list-style:none;margin:.75rem 0 0;padding:0;display:flex;flex-wrap:wrap;gap:.55rem;min-height:86px;position:relative}
+.calc-gallery li{width:60px;aspect-ratio:1/1;border:2px solid var(--border);border-radius:.65rem;overflow:hidden;position:relative;cursor:pointer;background:#fff;display:grid;place-items:center}
 .calc-gallery li img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .35s ease}
 /* Info diagram variants (filenames in assets/info) should not be hard-cropped */
 .calc-gallery li img[src*='assets/info/']{object-fit:contain;background:#fff;padding:4px}
@@ -1379,7 +1408,7 @@ nav.quick-links li a[href="careers.html"]{
 /* Slider variant (applied via JS below 640px) */
 .calc-gallery.slider{flex-wrap:nowrap;overflow:hidden;position:relative}
 .calc-gallery.slider .calc-gallery-track{display:flex;gap:.55rem;transition:transform .5s cubic-bezier(.6,.2,.3,1)}
-.calc-gallery.slider li{flex:0 0 70px}
+.calc-gallery.slider li{flex:0 0 54px}
 .calc-gallery.slider .gallery-nav{position:absolute;top:50%;transform:translateY(-50%);display:flex;justify-content:space-between;left:0;right:0;pointer-events:none}
 .calc-gallery.slider .gallery-btn{pointer-events:auto;background:#000000;color:#fff;border:none;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;cursor:pointer;font-size:1.1rem;box-shadow:0 4px 14px rgba(0,0,0,.25);transition:.2s}
 .calc-gallery.slider .gallery-btn:hover{filter:brightness(1.1)}
@@ -1436,10 +1465,23 @@ nav.quick-links li a[href="careers.html"]{
 .calc-form .unit{opacity:.65}
 .calc-form fieldset{border:1px solid var(--border);border-radius:.75rem;padding:.65rem}
 .calc-form legend{padding:0 .25rem;font-weight:900;color:var(--ink-2); letter-spacing:.2px}
-/* Mesh row: make select span full width for easy scanning */
-.calc-form #mesh { width: 100%; max-width: 100%; }
+/* Mesh row: keep dropdown readable but prevent full-form blowout */
+.calc-form #mesh { max-width: 100%; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+
+/* Netting panel creator: keep Mesh + Dimensions + Border on one row when space allows */
+.calc-form .creator-row{display:flex;flex-wrap:wrap;gap:.9rem;align-items:center}
+.calc-form .creator-row > *{min-width:0}
+
+/* Mesh: not full-form width, but also not max-content (longest option) width */
+.calc-form .creator-row .mesh-row{flex:0 1 22rem;max-width:22rem}
+.calc-form .creator-row .mesh-row #mesh{width:100%}
+
+/* Dimensions / Border: fit to content */
+.calc-form .creator-row fieldset{width:fit-content;flex:0 0 auto}
+.calc-form .creator-row .dims{gap:10px}
+.calc-form .creator-row .choices{gap:.75rem}
 /* Mesh helper spacing */
-.mesh-help{margin:-.35rem 0 .2rem;font-size:.7rem;line-height:1.3;max-width:420px}
+.mesh-help{margin:.15rem 0 0;font-size:.7rem;line-height:1.3;max-width:22rem}
 /* Overflow containment & responsive tightening for calculator form */
 /* Ensure internal grids never force horizontal scroll on very narrow devices */
 .calc-card{overflow:hidden;}
@@ -1574,6 +1616,21 @@ nav.quick-links li a[href="careers.html"]{
 .summary strong{ font-weight:800 }
 .summary .total strong{ font-size:1.2rem }
 .actions{margin-top:.5rem}
+
+/* Netting calculator: qty + add-to-cart + summary on one row */
+.calc-form .purchase-row{display:flex;flex-wrap:wrap;gap:.9rem;align-items:center}
+.calc-form .purchase-row .qty-row{width:fit-content;flex:0 0 auto}
+.calc-form .purchase-row .border-row{width:fit-content;flex:0 0 auto}
+.calc-form .purchase-row .doors-row{width:fit-content;flex:0 0 auto}
+.calc-form .purchase-row .doors-row input{max-width:6rem}
+.calc-form .purchase-row #add-cart{flex:0 0 auto}
+.calc-form .purchase-row .summary{margin-left:auto}
+
+/* Inline summary variant: labels next to values (not split columns) */
+.summary.summary-inline{display:flex;flex-wrap:wrap;gap:.35rem 1rem;border-top:none;padding-top:0;align-items:center;justify-content:flex-end}
+.summary.summary-inline > div{display:inline-flex;align-items:baseline;justify-content:flex-start;gap:.35rem}
+.summary.summary-inline > div span{opacity:.7}
+.summary.summary-inline .total{font-size:1.15rem}
 /* Netting calculator: make the Add Configured Net button fit content */
 #add-cart{ width:auto; white-space:nowrap; }
 /* Center the calculator button row only within the calculator card */
@@ -1583,6 +1640,10 @@ nav.quick-links li a[href="careers.html"]{
 @media (min-width:1101px){
   .calc-grid{grid-template-columns:minmax(0,1fr) auto; align-items:start}
   .calc-card{ width:fit-content; max-width:min(100%, 680px); align-self:start; justify-self:start; position:sticky; top:1rem }
+
+  /* Netting calculator: keep stacked layout on desktop too */
+  .calc-grid.calc-stack{grid-template-columns:1fr !important; align-items:stretch}
+  .calc-grid.calc-stack .calc-card{width:100%;max-width:none;position:static;top:auto;justify-self:stretch}
 }
 
 /* Training facility configurator: opt-out of calculator sticky/fit-content desktop tweaks */
@@ -1593,7 +1654,7 @@ nav.quick-links li a[href="careers.html"]{
 /* Legacy safeguard (kept harmless): if JS adds calc-stack ensure single column */
 .calc-grid.calc-stack{grid-template-columns:1fr !important}
 @media (max-width:540px){
-  .calc-gallery li{width:64px}
+  .calc-gallery li{width:48px}
 }
 
 /* Mobile sticky action bar for calculator */
@@ -1632,6 +1693,12 @@ nav.quick-links li a[href="careers.html"]{
 .info-block[open] > summary::before{content:"▾"}
 .info-block[open] > summary{border-bottom:1px solid var(--border);}
 .info-block .info-content{padding:.6rem .9rem;display:grid;gap:.6rem;max-height:420px;overflow:auto}
+
+/* Nested dropdowns (e.g., Details -> subsections) should scroll as one panel */
+.info-block .info-block .info-content{max-height:none;overflow:visible}
+
+/* Creator dropdowns should not be height-limited or scrollable */
+.creator-block .creator-content{max-height:none;overflow:visible}
 .gauge h3{margin:.1rem 0;font-size:1rem}
 .gauge p{margin:0}
 .gauge ul{margin:.2rem 0 0 .95rem}

@@ -215,25 +215,47 @@ function renderOrders() {
         list.innerHTML = '<p>No orders found.</p>';
         return;
       }
-      const html = orders.map(order => `
-        <div class="product-item">
-          <div>
-            <strong>Order #${order.id}</strong> — <small>${order.status||'pending'}</small>
-            <br><small>${new Date(order.createdAt||order.date).toLocaleString()}</small>
-            <br>Items: ${order.items.map(i => `${(i.quantity||i.qty)}x ${i.productId||i.id}`).join(', ')}
-            ${order.paymentInfo && (order.paymentInfo.fees!=null || order.paymentInfo.net!=null) ? `<br><small>Fees: $${Number(order.paymentInfo.fees||0).toFixed(2)} • Net: $${Number(order.paymentInfo.net||0).toFixed(2)}</small>` : ''}
+      const html = orders.map(order => {
+        const fmtLbs = (n) => {
+          const v = Number(n);
+          return (Number.isFinite(v) && v > 0) ? `${(Math.round(v * 10) / 10).toFixed(1)} lbs` : null;
+        };
+        const weightFromOrder = fmtLbs(order.weightLbsTotal ?? order.totalWeightLbs ?? order.weightTotal ?? order.totalWeight);
+        const weightFromItems = (() => {
+          const items = Array.isArray(order.items) ? order.items : [];
+          let sum = 0;
+          for (const it of items) {
+            const qty = Math.max(1, Number(it.quantity ?? it.qty) || 1);
+            const wTotal = Number(it.weightLbsTotal ?? it.weightTotal ?? it.weightLbs);
+            const wEach = Number(it.weightLbsEach ?? it.weightEach ?? it.weight);
+            if (Number.isFinite(wTotal) && wTotal > 0) sum += wTotal;
+            else if (Number.isFinite(wEach) && wEach > 0) sum += (wEach * qty);
+          }
+          return fmtLbs(sum);
+        })();
+        const weightLabel = weightFromOrder || weightFromItems;
+
+        return `
+          <div class="product-item">
+            <div>
+              <strong>Order #${order.id}</strong> — <small>${order.status||'pending'}</small>
+              <br><small>${new Date(order.createdAt||order.date).toLocaleString()}</small>
+              <br>Items: ${order.items.map(i => `${(i.quantity||i.qty)}x ${i.productId||i.id}`).join(', ')}
+              ${weightLabel ? `<br><small>Weight: ${weightLabel}</small>` : ''}
+              ${order.paymentInfo && (order.paymentInfo.fees!=null || order.paymentInfo.net!=null) ? `<br><small>Fees: $${Number(order.paymentInfo.fees||0).toFixed(2)} • Net: $${Number(order.paymentInfo.net||0).toFixed(2)}</small>` : ''}
+            </div>
+            <div class="flex-row gap-05 items-center">
+              <strong>$${(order.total||0).toFixed(2)}</strong>
+              <a class="btn btn-ghost" href="${(window.__API_BASE||'')}/api/invoices/INV-${order.id}/print" target="_blank" rel="noopener">View Invoice</a>
+              ${order.customerInfo?.email ? `<button class="btn btn-ghost" data-portal="${order.customerInfo.email}">Billing Portal</button>` : ''}
+              <select data-order-id="${order.id}" class="order-status-select">
+                ${['pending','paid','fulfilled','cancelled'].map(s=>`<option value="${s}" ${s===(order.status||'pending')?'selected':''}>${s}</option>`).join('')}
+              </select>
+              <button class="btn btn-ghost" data-update-status="${order.id}">Update</button>
+            </div>
           </div>
-          <div class="flex-row gap-05 items-center">
-            <strong>$${(order.total||0).toFixed(2)}</strong>
-            <a class="btn btn-ghost" href="${(window.__API_BASE||'')}/api/invoices/INV-${order.id}/print" target="_blank" rel="noopener">View Invoice</a>
-            ${order.customerInfo?.email ? `<button class="btn btn-ghost" data-portal="${order.customerInfo.email}">Billing Portal</button>` : ''}
-            <select data-order-id="${order.id}" class="order-status-select">
-              ${['pending','paid','fulfilled','cancelled'].map(s=>`<option value="${s}" ${s===(order.status||'pending')?'selected':''}>${s}</option>`).join('')}
-            </select>
-            <button class="btn btn-ghost" data-update-status="${order.id}">Update</button>
-          </div>
-        </div>
-      `).join('');
+        `;
+      }).join('');
 
       const pager = `
         <div class="flex-row gap-1 items-center mt-1">

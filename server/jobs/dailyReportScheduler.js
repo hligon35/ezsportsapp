@@ -93,6 +93,12 @@ function startDailyReportScheduler() {
   const time = (tz && localTime) ? localTime : utcTime;
   const svc = new DailyReportService();
 
+  const computeDelay = () => {
+    return (tz && localTime)
+      ? msUntilNextLocal({ hh: time.hh, mm: time.mm, timeZone: tz })
+      : msUntilNextUTC(time);
+  };
+
   const run = async () => {
     try {
       await svc.sendDailyActivityReport({ day: 'yesterday' });
@@ -100,13 +106,11 @@ function startDailyReportScheduler() {
     } catch (e) {
       console.warn('[daily-report] failed:', e?.message || e);
     } finally {
-      setTimeout(run, 24 * 60 * 60 * 1000);
+      setTimeout(run, computeDelay());
     }
   };
 
-  const delay = (tz && localTime)
-    ? msUntilNextLocal({ hh: time.hh, mm: time.mm, timeZone: tz })
-    : msUntilNextUTC(time);
+  const delay = computeDelay();
   if (tz && localTime) {
     console.log(`[daily-report] scheduled for ${String(time.hh).padStart(2,'0')}:${String(time.mm).padStart(2,'0')} ${tz} (in ${Math.round(delay/1000)}s)`);
   } else {
