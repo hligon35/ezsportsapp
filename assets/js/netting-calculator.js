@@ -42,18 +42,34 @@ function toFeet(ft) {
   return Number(ft) || 0;
 }
 
+function queryFirst(root, selectors) {
+  const base = root || document;
+  for (const sel of selectors) {
+    const el = base.querySelector(sel);
+    if (el) return el;
+  }
+  return null;
+}
+
+function valueOf(root, selectors, fallback = '') {
+  const el = queryFirst(root, selectors);
+  return (el && 'value' in el) ? el.value : fallback;
+}
+
 function calcTotals({ meshId, lenFt, widFt, border, qty, fab }) {
-  const mesh = NET_COMPONENTS.find(m => normKey(m.name) === normKey(meshId)) || NET_COMPONENTS[0];
+  const meshFound = NET_COMPONENTS.find(m => normKey(m.name) === normKey(meshId));
+  const mesh = (meshId ? (meshFound || NET_COMPONENTS[0]) : null) || { name: meshId || '', retail_price_per_unit: 0, weight_per_unit: 0 };
   const L = toFeet(lenFt);
   const W = toFeet(widFt);
   const area = Math.max(1, L * W); // sq ft
   const perim = 2 * (L + W); // ft
-  const base = area * (Number(mesh?.retail_price_per_unit) || 0);
-  const nettingWeightLbs = area * (Number(mesh?.weight_per_unit) || 0);
+  const hasMesh = !!String(meshId || '').trim();
+  const base = hasMesh ? (area * (Number(mesh?.retail_price_per_unit) || 0)) : 0;
+  const nettingWeightLbs = hasMesh ? (area * (Number(mesh?.weight_per_unit) || 0)) : 0;
   const borderType = mapUiBorderToBorderType(border);
   const borderOpt = findBorderOption(borderType);
-  const borderCost = perim * (Number(borderOpt?.base_cost) || 0);
-  const borderWeightLbs = perim * (Number(borderOpt?.weight_per_unit) || 0);
+  const borderCost = hasMesh ? (perim * (Number(borderOpt?.base_cost) || 0)) : 0;
+  const borderWeightLbs = hasMesh ? (perim * (Number(borderOpt?.weight_per_unit) || 0)) : 0;
   const perPanel = base + borderCost;
   const expedited = 0;
   const total = (perPanel * qty) + expedited;
@@ -62,10 +78,12 @@ function calcTotals({ meshId, lenFt, widFt, border, qty, fab }) {
 }
 
 function calcCageTotals({ meshId, widFt, lenFt, hgtFt, border, doors, qty }) {
-  const mesh = NET_COMPONENTS.find(m => normKey(m.name) === normKey(meshId)) || NET_COMPONENTS[0];
+  const meshFound = NET_COMPONENTS.find(m => normKey(m.name) === normKey(meshId));
+  const mesh = (meshId ? (meshFound || NET_COMPONENTS[0]) : null) || { name: meshId || '', retail_price_per_unit: 0, weight_per_unit: 0 };
   const W = toFeet(widFt);
   const L = toFeet(lenFt);
   const H = toFeet(hgtFt);
+  const hasMesh = !!String(meshId || '').trim();
 
   // Surface area approximation consistent with catalog "tube" cages: (perimeter of cross-section) * length
   // Cross-section is Width x Height; no end caps.
@@ -75,15 +93,15 @@ function calcCageTotals({ meshId, widFt, lenFt, hgtFt, border, doors, qty }) {
   // Border for cages: apply to both open ends (2x cross-section perimeter)
   const borderLinearFt = 2 * tubePerimeter; // ft
 
-  const base = area * (Number(mesh?.retail_price_per_unit) || 0);
-  const nettingWeightLbs = area * (Number(mesh?.weight_per_unit) || 0);
+  const base = hasMesh ? (area * (Number(mesh?.retail_price_per_unit) || 0)) : 0;
+  const nettingWeightLbs = hasMesh ? (area * (Number(mesh?.weight_per_unit) || 0)) : 0;
   const borderType = mapUiBorderToBorderType(border);
   const borderOpt = findBorderOption(borderType);
-  const borderCost = borderLinearFt * (Number(borderOpt?.base_cost) || 0);
-  const borderWeightLbs = borderLinearFt * (Number(borderOpt?.weight_per_unit) || 0);
+  const borderCost = hasMesh ? (borderLinearFt * (Number(borderOpt?.base_cost) || 0)) : 0;
+  const borderWeightLbs = hasMesh ? (borderLinearFt * (Number(borderOpt?.weight_per_unit) || 0)) : 0;
 
   const doorCount = Math.max(0, Math.floor(Number(doors) || 0));
-  const doorFee = doorCount * 50;
+  const doorFee = hasMesh ? (doorCount * 50) : 0;
 
   const perCage = base + borderCost + doorFee;
   const total = perCage * Math.max(1, Number(qty) || 1);
@@ -202,12 +220,14 @@ function updateCageSummary(form){
 
 function readForm(form){
   return {
-    meshId: form.querySelector('#mesh').value,
-    usage: form.querySelector('#usage')?.value || '',
-    lenFt: form.querySelector('#len-ft').value,
-    widFt: form.querySelector('#wid-ft').value,
-    border: form.querySelector('#border')?.value || 'regular',
-    qty: Math.max(1, Number(form.querySelector('#qty').value) || 1),
+    // Backward compatible selectors: older UI used inch inputs like #len-in/#wid-in
+    // and some builds may omit optional fields while the JS still loads.
+    meshId: valueOf(form, ['#mesh', '#mesh-size'], ''),
+    usage: valueOf(form, ['#usage'], ''),
+    lenFt: valueOf(form, ['#len-ft', '#len-in', '#len'], '0'),
+    widFt: valueOf(form, ['#wid-ft', '#wid-in', '#wid'], '0'),
+    border: valueOf(form, ['#border'], 'regular') || 'regular',
+    qty: Math.max(1, Number(valueOf(form, ['#qty'], '1')) || 1),
     // Fabrication selection removed; default to standard for backward compatibility
     fab: 'standard'
   };
@@ -215,13 +235,13 @@ function readForm(form){
 
 function readCageForm(form){
   return {
-    meshId: form.querySelector('#cage-mesh')?.value || '',
-    widFt: form.querySelector('#cage-wid-ft')?.value,
-    lenFt: form.querySelector('#cage-len-ft')?.value,
-    hgtFt: form.querySelector('#cage-hgt-ft')?.value,
-    border: form.querySelector('#cage-border')?.value || 'regular',
-    doors: form.querySelector('#cage-doors')?.value,
-    qty: Math.max(1, Number(form.querySelector('#cage-qty')?.value) || 1),
+    meshId: valueOf(form, ['#cage-mesh'], ''),
+    widFt: valueOf(form, ['#cage-wid-ft', '#cage-wid-in'], '0'),
+    lenFt: valueOf(form, ['#cage-len-ft', '#cage-len-in'], '0'),
+    hgtFt: valueOf(form, ['#cage-hgt-ft', '#cage-hgt-in'], '0'),
+    border: valueOf(form, ['#cage-border'], 'regular') || 'regular',
+    doors: valueOf(form, ['#cage-doors'], '0'),
+    qty: Math.max(1, Number(valueOf(form, ['#cage-qty'], '1')) || 1),
   };
 }
 
