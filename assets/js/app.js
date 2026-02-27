@@ -3273,9 +3273,9 @@ ensureHomeFirst() {
       })();
       // Right-align Add button for Vinyl Top and Screen Padding cards when price is not displayed
       const moveAddRight = (/^vinyl/.test(lid) || /vinyl\s*top/.test(lt) || /screen\s*padding/.test(lt));
-      const initialColorIndex = colors.length > 0 ? Math.floor(Math.random() * colors.length) : -1;
+      const initialColorIndex = colors.length > 1 ? Math.floor(Math.random() * colors.length) : -1;
       const initialImg = (initialColorIndex >= 0 && colors[initialColorIndex]?.image) ? colors[initialColorIndex].image : img;
-      const colorDotsHtml = (!suppressDots && colors.length > 0) ? `
+      const colorDotsHtml = (!suppressDots && colors.length > 1) ? `
         <div class="color-dots" data-product-id="${id}">
           ${colors.map((color, index) => `
             <div class="color-dot ${color.class} ${index === initialColorIndex ? 'active' : ''}" 
@@ -3348,10 +3348,24 @@ ensureHomeFirst() {
 
       // If this card is JR or Pitcher's Pocket Pro, rebuild dots using dynamic color classification to ensure 1:1 dot→image
       try {
-        const looksLikeJR = /bulletjrbb/i.test(id) || /\bjr\b/i.test(title);
-        const looksLikePocketPro = /pitcher'?s\s*pocket.*\bpro\b/i.test(title) || /BBPP[-_]?PRO/i.test(id) || /PPPRO/i.test(id);
-        if (looksLikeJR || looksLikePocketPro) {
-          this._recolorJRDots(article);
+        const pidish = String(id || '').toLowerCase();
+        const tish = String(title || '').toLowerCase();
+        const isReplacementNet = (/\breplacement\b/.test(tish) && /\bnet\b/.test(tish)) || /replacement\s*nets?\b/.test(tish);
+        const isNonScreenAccessory = /screen\s*padding|screen\s*component|screen\s*wheel|wheel\s*kit|leg\s*caps?\b/.test(tish);
+        const isScreenBulletz = /screen\s*bulletz/.test(tish);
+        const looksLikeJR = /bulletjrbb/.test(pidish) || /\bbullet\s*l\s*screen\s*jr\b/.test(tish) || /\bjr\b/.test(tish);
+        const looksLikePocketPro = /pitcher'?s\s*pocket.*\bpro\b/.test(tish) || /bbpp[-_]?pro/.test(pidish) || /pppro/.test(pidish);
+        const looksLikeLScreen = /\bl\s*-?\s*screen\b/.test(tish) || /\blscreen\b/.test(tish);
+        const looksLikeProtectiveScreen = /\bprotective\s*screen\b/.test(tish);
+        const looksLikePitchersPocket = /pitcher'?s\s*pocket\b/.test(tish) || /\bpitchers\s*pocket\b/.test(tish);
+        const looksLikeAnyScreen = (/(^|\b)screen(\b|$)/.test(tish) || /\bfront\s*toss\b/.test(tish) || /\bfast\s*pitch\b/.test(tish))
+          && !isReplacementNet
+          && !isNonScreenAccessory
+          && !isScreenBulletz;
+        if (looksLikeJR || looksLikePocketPro || looksLikeAnyScreen || looksLikeLScreen || looksLikeProtectiveScreen || looksLikePitchersPocket) {
+          const wrap = article.querySelector('.color-dots');
+          const hasNeutral = !!wrap?.querySelector('.color-dot.neutral');
+          if (hasNeutral) this._recolorJRDots(article);
         }
       } catch {}
       
@@ -3512,37 +3526,79 @@ ensureHomeFirst() {
       else if (Array.isArray(product.raw.images)) sources = product.raw.images.slice();
       else if (Array.isArray(product.raw.gallery)) sources = product.raw.gallery.slice();
     }
+
+    // Standard team-color palette used across covered screen products
+    const TEAM_COLORS = ['black','columbiablue','darkgreen','green','maroon','navy','orange','purple','red','royal','yellow'];
+    const numberedSetToTeamColors = (srcs) => {
+      try {
+        const map = new Map();
+        (Array.isArray(srcs) ? srcs : []).forEach(src => {
+          const name = String(src || '').split('/').pop().toLowerCase();
+          const m = name.match(/^(\d{2})\.(?:png|jpe?g|webp|avif|gif|svg)(\?|$)/);
+          if (!m) return;
+          const idx = parseInt(m[1], 10);
+          if (!Number.isFinite(idx)) return;
+          if (!map.has(idx)) map.set(idx, src);
+        });
+        for (let i = 1; i <= TEAM_COLORS.length; i++) {
+          if (!map.has(i)) return null;
+        }
+        return TEAM_COLORS.map((c, i) => ({ name: c, class: c, image: map.get(i + 1) }));
+      } catch {
+        return null;
+      }
+    };
     // Product-specific override: Wheeled Ball Basket should show standard team-color swatches even without per-color images
     try {
       const pidish = String(product.id || product.sku || '').toLowerCase();
       const tish = String(product.title || '').toLowerCase();
       const looksLikeWBasket = pidish === 'wbasket' || (/wheeled\s*ball\s*basket/.test(tish));
       if (looksLikeWBasket) {
-        // Use first available image (or curated hero) for all swatches
+        // Prefer full 01..11 set when present; else use a single hero image for all colors.
+        const mapped = numberedSetToTeamColors(sources);
+        if (mapped) return mapped;
         const hero = (Array.isArray(sources) && sources[0]) || product.img || 'assets/prodImgs/Accessories/Wbasket/wbasket.avif';
-        // Standard 10-color palette (exclude plain green to keep to 10)
-        const fixed = ['black','columbiablue','darkgreen','maroon','navy','orange','purple','red','royal','yellow']
-          .map(c => ({ name: c, class: c, image: hero }));
-        return fixed;
+        return TEAM_COLORS.map(c => ({ name: c, class: c, image: hero }));
       }
 
-      const looksLikeScreenPadding = (/screen\s*padding/.test(tish)) || (pidish === 'screen component');
+      const looksLikeScreenPadding = (/screen\s*padding/.test(tish)) || (pidish === 'screen component' && /padding/.test(tish));
       if (looksLikeScreenPadding) {
+        // Prefer full 01..11 set when present; else use a single hero image for all colors.
+        const mapped = numberedSetToTeamColors(sources);
+        if (mapped) return mapped;
         const hero = (Array.isArray(sources) && sources[0]) || product.img || 'assets/prodImgs/Accessories/Padding/padding.png';
-        // Standard 11-color palette used across team-color products
-        return ['black','columbiablue','darkgreen','green','maroon','navy','orange','purple','red','royal','yellow']
-          .map(c => ({ name: c, class: c, image: hero }));
+        return TEAM_COLORS.map(c => ({ name: c, class: c, image: hero }));
       }
 
       const looksLikeBulletPadKit = (/^pk-?bullet/.test(pidish)) || (/(^|\b)bullet\s*pad\s*kits?(\b|$)/.test(tish));
       if (looksLikeBulletPadKit) {
+        // Prefer full 01..11 set when present; else use a single hero image for all colors.
+        const mapped = numberedSetToTeamColors(sources);
+        if (mapped) return mapped;
         const hero = (Array.isArray(sources) && sources[0]) || product.img || 'assets/prodImgs/Bullet_Pad_Kit/bulletpadkit.avif';
-        // Bullet Pad Kits: show standard team-color palette (11 colors)
-        return ['black','columbiablue','darkgreen','green','maroon','navy','orange','purple','red','royal','yellow']
-          .map(c => ({ name: c, class: c, image: hero }));
+        return TEAM_COLORS.map(c => ({ name: c, class: c, image: hero }));
       }
     } catch {}
     if (!sources.length) return [];
+
+    // Covered screen products: enforce standardized team-color variations WITH matching photos.
+    // If the full 01..11 set isn't present, suppress dots (and let the audit script report it).
+    try {
+      const titleLower = String(product.title || product.name || '').toLowerCase();
+      const idLower = String(product.id || product.sku || '').toLowerCase();
+      const isReplacementNet = (/\breplacement\b/.test(titleLower) && /\bnet\b/.test(titleLower)) || /replacement\s*nets?\b/.test(titleLower);
+      const isScreenBulletz = /screen\s*bulletz/.test(titleLower);
+      const isNonScreenAccessory = /screen\s*padding|screen\s*component|screen\s*wheel|wheel\s*kit|leg\s*caps?\b/.test(titleLower);
+      const looksLikeAnyScreen = (/(^|\b)screen(\b|$)/.test(titleLower) || /\bfront\s*toss\b/.test(titleLower) || /\bfast\s*pitch\b/.test(titleLower))
+        && !isReplacementNet
+        && !isNonScreenAccessory
+        && !isScreenBulletz;
+      const looksLikePitchersPocket = /pitcher'?s\s*pocket\b/.test(titleLower) || /\bpitchers\s*pocket\b/.test(titleLower) || /bbpp[-_]?pro/.test(idLower) || /pppro/.test(idLower);
+      const isTeamColorCoveredProduct = looksLikeAnyScreen || looksLikePitchersPocket;
+      if (isTeamColorCoveredProduct) {
+        return numberedSetToTeamColors(sources) || [];
+      }
+    } catch {}
 
     // Baffles + Backstop: never show color dots (single-SKU / no meaningful color variants)
     try {
@@ -3668,16 +3724,31 @@ ensureHomeFirst() {
         out.push({ name: 'option', class: 'neutral', image: seq[i].src });
       }
     }
-    // Special-case adjustments
+    // Special-case adjustments and final gating:
+    // Only show dots when there are 2+ distinct *real* colors. If we only have neutral/unknown
+    // images (angles/zooms), hide dots to avoid the all-gray dot row.
     try {
       const pidish = String(product.id || product.sku || '').toLowerCase();
-      const tish = String(product.title || '').toLowerCase();
+      const tish = String(product.title || product.name || '').toLowerCase();
+
       // Batting Mat: show only real color dots, remove any leftover neutral 'option' dot (generic hero)
       if (pidish === 'battingmat' || /\bbatting\s*mat\b/.test(tish)) {
-        return out.filter(o => o.class && o.class !== 'neutral');
+        const real = out.filter(o => o.class && o.class !== 'neutral');
+        const seen = new Set();
+        const unique = [];
+        real.forEach(o => { if (!seen.has(o.class)) { seen.add(o.class); unique.push(o); } });
+        return unique.length >= 2 ? unique : [];
       }
+
+      // (JR / L-Screens / Protective Screens / Pitcher's Pocket families are handled above
+      // by seeding neutral dots and using the recolor pass.)
     } catch {}
-    return out;
+
+    const real = out.filter(o => o.class && o.class !== 'neutral');
+    const seen = new Set();
+    const unique = [];
+    real.forEach(o => { if (!seen.has(o.class)) { seen.add(o.class); unique.push(o); } });
+    return unique.length >= 2 ? unique : [];
   },
 
   // Palette and color utils for JR dynamic classification
@@ -3748,8 +3819,14 @@ ensureHomeFirst() {
         const color = await this._classifyImageToPalette(src);
         if (!map.has(color)) map.set(color, src);
       }));
+      const colorsFound = paletteOrder.filter(c=>map.has(c));
+      // Only keep dots when we found 2+ distinct colors
+      if (colorsFound.length < 2) {
+        wrap.remove();
+        return;
+      }
       // build new dots in palette order
-      const html = paletteOrder.filter(c=>map.has(c)).map((c,idx)=>{
+      const html = colorsFound.map((c,idx)=>{
         const cls = c; const src = map.get(c);
         return `<div class="color-dot ${cls} ${idx===0?'active':''}" data-color="${c}" data-image="${src}" role="button" tabindex="0" aria-label="Select ${c}"></div>`;
       }).join('');
@@ -3819,9 +3896,9 @@ ensureHomeFirst() {
       
       // Extract color variations for this product and randomly select an initial color
       const colors = this.extractProductColors(p);
-      const initialColorIndex = colors.length > 0 ? Math.floor(Math.random() * colors.length) : -1;
+      const initialColorIndex = colors.length > 1 ? Math.floor(Math.random() * colors.length) : -1;
       const initialImg = (initialColorIndex >= 0 && colors[initialColorIndex]?.image) ? colors[initialColorIndex].image : p.img;
-      const colorDotsHtml = colors.length > 0 ? `
+      const colorDotsHtml = colors.length > 1 ? `
         <div class="color-dots" data-product-id="${p.id}">
           ${colors.map((color, index) => `
             <div class="color-dot ${color.class} ${index === initialColorIndex ? 'active' : ''}" 
@@ -3889,11 +3966,24 @@ ensureHomeFirst() {
       this.ui.grid.querySelectorAll('article.card').forEach(card => {
         const title = (card.querySelector('h3')?.textContent||'').toLowerCase();
         const pid = card.getAttribute('data-product-id')||'';
-        const looksLikeJR = /bullet\s*l\s*screen\s*jr/.test(title) || /BULLETJRBB/i.test(pid);
+        const pidish = String(pid || '').toLowerCase();
+        const isReplacementNet = (/\breplacement\b/.test(title) && /\bnet\b/.test(title)) || /replacement\s*nets?\b/.test(title);
+        const isNonScreenAccessory = /screen\s*padding|screen\s*component|screen\s*wheel|wheel\s*kit|leg\s*caps?\b/.test(title);
+        const isScreenBulletz = /screen\s*bulletz/.test(title);
+        const looksLikeJR = /bullet\s*l\s*screen\s*jr/.test(title) || /bulletjrbb/.test(pidish);
         // Pitcher's Pocket Pro detection: title mentions Pitcher's Pocket and Pro, or id/sku looks like BBPP-PRO or PPPRO
-        const looksLikePocketPro = /pitcher'?s\s*pocket.*\bpro\b/i.test(title) || /BBPP[-_]?PRO/i.test(pid) || /PPPRO/i.test(pid);
-        if (looksLikeJR || looksLikePocketPro) {
-          this._recolorJRDots(card);
+        const looksLikePocketPro = /pitcher'?s\s*pocket.*\bpro\b/i.test(title) || /bbpp[-_]?pro/.test(pidish) || /pppro/.test(pidish);
+        const looksLikeLScreen = /\bl\s*-?\s*screen\b/.test(title) || /\blscreen\b/.test(title);
+        const looksLikeProtectiveScreen = /\bprotective\s*screen\b/.test(title);
+        const looksLikePitchersPocket = /pitcher'?s\s*pocket\b/.test(title) || /\bpitchers\s*pocket\b/.test(title);
+        const looksLikeAnyScreen = (/(^|\b)screen(\b|$)/.test(title) || /\bfront\s*toss\b/.test(title) || /\bfast\s*pitch\b/.test(title))
+          && !isReplacementNet
+          && !isNonScreenAccessory
+          && !isScreenBulletz;
+        if (looksLikeJR || looksLikePocketPro || looksLikeAnyScreen || looksLikeLScreen || looksLikeProtectiveScreen || looksLikePitchersPocket) {
+          const wrap = card.querySelector('.color-dots');
+          const hasNeutral = !!wrap?.querySelector('.color-dot.neutral');
+          if (hasNeutral) this._recolorJRDots(card);
         }
       });
     } catch {}
