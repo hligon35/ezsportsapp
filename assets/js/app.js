@@ -1,3 +1,5 @@
+import './tracking.js';
+
 // EZ Sports Netting — tiny storefront demo (no backend)
 // Lightweight state + rendering so you can drop this in and it just works.
 
@@ -306,15 +308,13 @@ async function fetchProducts() {
 // --- Telemetry helpers (analytics + error reporting) ---
 function getVisitorId(){
   try {
-    const key = 'visitorId';
-    let id = localStorage.getItem(key);
-    if (id && id.length > 8) return id;
-    id = (crypto && crypto.randomUUID) ? crypto.randomUUID() : ('v_' + Math.random().toString(16).slice(2) + Date.now().toString(16));
-    localStorage.setItem(key, id);
-    return id;
+    if (window.EZTrack && typeof window.EZTrack.getVisitorId === 'function') {
+      return window.EZTrack.getVisitorId();
+    }
   } catch {
     return 'v_' + Math.random().toString(16).slice(2);
   }
+  return 'v_' + Math.random().toString(16).slice(2);
 }
 
 async function postToApi(path, payload){
@@ -350,35 +350,15 @@ async function postToApi(path, payload){
   return false;
 }
 
-// Lightweight analytics dispatcher (now POSTs to /api/analytics/event when available)
-window.trackEvent = function(eventName, payload) {
-  try {
-    console.debug('[analytics]', eventName, payload);
-    // Local popularity counters (will inform FEATURED selection later)
-    const raw = localStorage.getItem('analyticsCounters');
-    const counters = raw ? JSON.parse(raw) : { view_item: {}, add_to_cart: {} };
-    if (eventName === 'view_item' && payload?.id) {
-      counters.view_item[payload.id] = (counters.view_item[payload.id] || 0) + 1;
-    } else if (eventName === 'add_to_cart' && (payload?.id || typeof payload === 'string')) {
-      const id = payload.id || payload; counters.add_to_cart[id] = (counters.add_to_cart[id] || 0) + 1;
-    }
-    localStorage.setItem('analyticsCounters', JSON.stringify(counters));
-
-    // Server-side analytics (best-effort)
-    const visitorId = getVisitorId();
-    const productId = payload?.id || (typeof payload === 'string' ? payload : payload?.productId) || null;
-    const body = {
-      type: String(eventName || ''),
-      productId,
-      visitorId,
-      userId: (window.Store && window.Store.state && window.Store.state.user) ? window.Store.state.user.id : null,
-      path: location.pathname,
-      meta: (payload && typeof payload === 'object') ? payload : { value: payload },
-      ts: new Date().toISOString()
-    };
-    postToApi('/api/analytics/event', body).catch(()=>{});
-  } catch {}
-};
+if (typeof window.trackEvent !== 'function') {
+  window.trackEvent = function(eventName, payload) {
+    try {
+      if (window.EZTrack && typeof window.EZTrack.trackLegacy === 'function') {
+        void window.EZTrack.trackLegacy(eventName, payload);
+      }
+    } catch {}
+  };
+}
 
 function computeFeatured(products) {
   if (!Array.isArray(products) || products.length === 0) return [];
@@ -574,58 +554,13 @@ const Store = {
 
   ensureTelemetry(){
     try {
-      // Page view
+      try {
+        if (window.EZTrack && typeof window.EZTrack.boot === 'function') {
+          window.EZTrack.boot({ trackPageView: true });
+        }
+      } catch {}
+
       const visitorId = getVisitorId();
-      const payload = {
-        path: location.pathname,
-        referrer: document.referrer || '',
-        visitorId,
-        userId: this.state.user ? this.state.user.id : null,
-        ts: new Date().toISOString()
-      };
-      postToApi('/api/analytics/track', payload).catch(()=>{});
-
-      // Click tracking (throttled, avoids extreme noise)
-      if (!document.__clickTelemetryBound) {
-        document.__clickTelemetryBound = true;
-        let lastSentAt = 0;
-        let sentCount = 0;
-        const MAX_PER_PAGE = 80;
-        document.addEventListener('click', (ev) => {
-          try {
-            if (sentCount >= MAX_PER_PAGE) return;
-            const now = Date.now();
-            if (now - lastSentAt < 250) return;
-
-            const a = ev.target && ev.target.closest && ev.target.closest('a');
-            const btn = ev.target && ev.target.closest && ev.target.closest('button');
-            const el = a || btn;
-            if (!el) return;
-            // Ignore clicks inside the error reporter itself or non-user triggers
-            if (el.hasAttribute('data-no-track')) return;
-
-            const href = a ? (a.getAttribute('href') || '') : '';
-            const label = (el.textContent || '').trim().slice(0, 80);
-            const type = a ? 'click_link' : 'click_button';
-
-            lastSentAt = now;
-            sentCount++;
-            postToApi('/api/analytics/event', {
-              type,
-              visitorId,
-              userId: this.state.user ? this.state.user.id : null,
-              path: location.pathname,
-              label,
-              meta: {
-                href,
-                id: el.id || null,
-                className: (el.className && String(el.className).slice(0, 120)) || null
-              },
-              ts: new Date().toISOString()
-            }).catch(()=>{});
-          } catch {}
-        }, { capture: true, passive: true });
-      }
 
       // Client error reporting
       if (!window.__errorTelemetryBound) {

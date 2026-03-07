@@ -3,6 +3,8 @@
 // - Live estimated price range
 // - Lead capture via /api/marketing/contact
 
+import './tracking.js';
+
 function clampNumber(value, min, max) {
   const n = Number(value);
   if (!Number.isFinite(n)) return min;
@@ -337,6 +339,18 @@ function initFacilityConfigurator() {
     padding: false,
     doorCount: 0
   };
+  let didTrackEngage = false;
+
+  const trackEngage = () => {
+    if (didTrackEngage) return;
+    didTrackEngage = true;
+    if (!window.EZTrack) return;
+    void window.EZTrack.track('facility_configurator_engage', {
+      formId: 'facility-form',
+      quoteType: 'training_facility',
+      estimatedValue: 0
+    });
+  };
 
   const readStateFromForm = () => {
     const get = (name) => form.elements.namedItem(name);
@@ -371,6 +385,7 @@ function initFacilityConfigurator() {
 
   form.addEventListener('input', update, { passive: true });
   form.addEventListener('change', update);
+  form.addEventListener('focusin', trackEngage, { once: true });
 
   // Initial render (fast) using fallbacks, then refresh with catalog-derived pricing.
   update();
@@ -457,6 +472,37 @@ function initFacilityConfigurator() {
         }, 5500);
         const data = await res.json().catch(() => ({}));
         if (res.ok && data && data.ok !== false) {
+          if (window.EZTrack) {
+            void window.EZTrack.identify({
+              email,
+              name,
+              phone,
+              source: 'facility_configurator'
+            });
+            void window.EZTrack.track('quote_submit', {
+              submissionType: 'facility_configurator',
+              quoteType: 'training_facility',
+              formId: 'facility-quote-form',
+              topic: 'training-facility-design',
+              email,
+              estimatedValue: est?.price?.high || est?.price?.low || 0,
+              lead: {
+                submissionType: 'facility_configurator',
+                quoteType: 'training_facility',
+                formId: 'facility-quote-form',
+                estimatedValue: est?.price?.high || est?.price?.low || 0
+              },
+              meta: {
+                company,
+                location: locationText,
+                messageLength: notes.length,
+                facility: {
+                  state: { ...state },
+                  estimate: est
+                }
+              }
+            });
+          }
           setMsg('Request sent! We’ll reach out shortly.', 'is-success');
           quoteForm.reset();
           return;

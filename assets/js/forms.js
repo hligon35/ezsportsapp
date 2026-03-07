@@ -91,6 +91,18 @@
             console.debug('Subscribe: not confirmed:', { data, isSpam, savedViaProxy, okViaAppsScript });
             throw 0;
           }
+          try {
+            if (window.EZTrack) {
+              void window.EZTrack.identify({ email, source: 'subscribe_form' });
+              void window.EZTrack.track('email_capture', {
+                captureType: 'newsletter_subscribe',
+                formId: form.id || 'footer-subscribe',
+                submissionType: 'newsletter',
+                sourcePage: location.pathname,
+                email
+              });
+            }
+          } catch {}
           statusEl.textContent='Subscribed! Check your inbox for future deals.';
           if (emailInput) emailInput.value='';
         } catch { statusEl.textContent='Could not subscribe right now.'; }
@@ -134,6 +146,25 @@
           } catch { /* try next */ }
         }
         if (!ok || !data.ok) throw 0;
+        try {
+          const email = String(fd.get('email') || '').trim();
+          if (window.EZTrack) {
+            void window.EZTrack.identify({
+              email,
+              name: String(fd.get('name') || '').trim(),
+              phone: String(fd.get('phone') || '').trim(),
+              source: 'contact_form'
+            });
+            void window.EZTrack.track('quote_submit', {
+              submissionType: 'contact_form',
+              quoteType: 'contact',
+              formId: form.id || 'contact-form',
+              topic: String(fd.get('subject') || 'general_contact').trim() || 'general_contact',
+              messageLength: String(fd.get('message') || '').trim().length,
+              email
+            });
+          }
+        } catch {}
         msgEl.textContent='Message sent!'; msgEl.style.color='green';
         form.reset();
       } catch { msgEl.textContent='Could not send right now.'; msgEl.style.color='red'; }

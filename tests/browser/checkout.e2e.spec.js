@@ -112,7 +112,7 @@ test.describe('Checkout flow (browser, test mode)', () => {
     // Assert math: subtotal + shipping + GA tax (7%) = total
     // Seeded cart line: $349.95 with $50 shipping
     // Tax base = 349.95 + 50.00 = 399.95; tax = round(399.95 * 0.07) = 28.00
-    // Total = 349.95 + 50.00 + 28.00 = 437.95
+    // Total = 349.95 + 50.00 + 28.00 = 427.95
     await expect(page.locator('#sum-subtotal')).toContainText('$');
     await expect(page.locator('#sum-shipping')).toContainText('$');
     // Tax row should show for GA
@@ -126,7 +126,7 @@ test.describe('Checkout flow (browser, test mode)', () => {
     expect(sub).toBeCloseTo(349.95, 2);
     expect(shipCost).toBeCloseTo(50.00, 2);
     expect(tax).toBeCloseTo(28.00, 2);
-    expect(total).toBeCloseTo(437.95, 2);
+    expect(total).toBeCloseTo(427.95, 2);
 
     // Optionally apply a bogus promo to exercise UX (should show invalid)
     await page.fill('#promo-code', 'NOTAREALCODE');

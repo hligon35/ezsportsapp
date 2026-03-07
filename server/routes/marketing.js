@@ -4,12 +4,16 @@ const rateLimit = require('express-rate-limit');
 const SubscriberService = require('../services/SubscriberService');
 const CouponService = require('../services/CouponService');
 const EmailService = require('../services/EmailService');
+const AnalyticsService = require('../services/AnalyticsService');
+const WorkflowAutomationService = require('../services/WorkflowAutomationService');
 const { escapeHtml, renderBrandedEmailHtml } = require('../services/EmailTheme');
 const { requireAdmin } = require('../middleware/auth');
 
 const subs = new SubscriberService();
 const coupons = new CouponService();
 const mail = new EmailService();
+const analytics = new AnalyticsService();
+const automation = new WorkflowAutomationService();
 
 // Public subscribe endpoint
 router.post('/subscribe', async (req, res) => {
@@ -23,46 +27,30 @@ router.post('/subscribe', async (req, res) => {
     // Save subscriber
     const s = await subs.addOrUpdate(addr, name);
 
-    // Queue emails in the background (do not await)
-    try {
-      const inbox = (process.env.CONTACT_INBOX || 'info@ezsportsnetting.com').trim();
-      const safeAddr = escapeHtml(addr);
-      const safeName = name ? escapeHtml(name) : '';
-      const safeSource = source ? escapeHtml(source) : '';
-      const safeReferer = referer ? escapeHtml(referer) : '';
-
-      if (inbox) {
-        const internalBody = `
-          <p style="margin:0 0 10px;">A new visitor subscribed to the newsletter.</p>
-          <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="border:1px solid #d3d0d7;border-radius:10px;overflow:hidden;">
-            <tr><td style="padding:10px 12px;background:#ffffff;color:#5a5a5a;width:38%;border-bottom:1px solid #d3d0d7;">Email</td><td style="padding:10px 12px;border-bottom:1px solid #d3d0d7;">${safeAddr}</td></tr>
-            ${safeName ? `<tr><td style="padding:10px 12px;background:#ffffff;color:#5a5a5a;width:38%;border-bottom:1px solid #d3d0d7;">Name</td><td style="padding:10px 12px;border-bottom:1px solid #d3d0d7;">${safeName}</td></tr>` : ''}
-            ${safeSource ? `<tr><td style="padding:10px 12px;background:#ffffff;color:#5a5a5a;width:38%;border-bottom:1px solid #d3d0d7;">Source</td><td style="padding:10px 12px;border-bottom:1px solid #d3d0d7;">${safeSource}</td></tr>` : ''}
-            ${safeReferer ? `<tr><td style="padding:10px 12px;background:#ffffff;color:#5a5a5a;width:38%;">Referrer</td><td style="padding:10px 12px;">${safeReferer}</td></tr>` : ''}
-          </table>
-        `;
-        const html = renderBrandedEmailHtml({
-          title: 'New subscriber',
-          subtitle: 'Newsletter subscription',
-          bodyHtml: internalBody
-        });
-
-        // Fire-and-forget; log errors but don't delay response
-        void mail.queue({ to: inbox, subject: 'New subscriber', html, text: `Email: ${addr}\nName: ${name||''}\nSource: ${source||''}\nReferrer: ${referer||''}`, tags: ['subscribe','internal'], replyTo: addr }).catch(err=>console.warn('Subscribe internal email failed:', err?.message||err));
+    await analytics.trackCanonicalEvent({
+      eventName: 'email_capture',
+      source: 'server_marketing',
+      path: source || '/subscribe',
+      referrer: referer || req.headers.referer || '',
+      email: addr,
+      visitorId: req.body?.visitorId || null,
+      sessionId: req.body?.sessionId || null,
+      lead: {
+        submissionType: 'subscribe_form',
+        formId: 'subscribe',
+        topic: 'newsletter'
+      },
+      meta: {
+        captureType: 'subscribe_form',
+        name: name || null
       }
+    }).catch(() => null);
 
-      const welcomeBody = `
-        <p style="margin:0 0 10px;">Thanks for subscribing to EZ Sports Netting!</p>
-        <p style="margin:0;color:#5a5a5a;line-height:20px;">We’ll send occasional deals and product updates. You can unsubscribe anytime.</p>
-      `;
-      const welcomeHtml = renderBrandedEmailHtml({
-        title: 'Thanks for subscribing',
-        subtitle: 'EZ Sports Netting Newsletter',
-        bodyHtml: welcomeBody
+    setImmediate(() => {
+      void automation.processPending({ limit: 10 }).catch(err => {
+        console.warn('Subscribe workflow processing failed:', err?.message || err);
       });
-
-      void mail.queue({ to: addr, subject: 'Thanks for subscribing to EZ Sports Netting', html: welcomeHtml, text: 'Thanks for subscribing to EZ Sports Netting! We’ll send occasional deals and product updates.', tags: ['subscribe','welcome'], replyTo: inbox }).catch(err=>console.warn('Subscribe welcome email failed:', err?.message||err));
-    } catch {}
+    });
 
     // Optional Apps Script forward (non-blocking)
     try {
@@ -100,12 +88,38 @@ router.post('/contact', async (req, res) => {
 
     if (!email || !message) return res.status(400).json({ ok: false, error: 'Missing email or message' });
 
+    await analytics.trackCanonicalEvent({
+      eventName: 'quote_submit',
+      source: 'server_marketing',
+      path: body.source || req.path,
+      referrer: body.referer || req.headers.referer || '',
+      email,
+      visitorId: body.visitorId || null,
+      sessionId: body.sessionId || null,
+      lead: {
+        submissionType: body.topic === 'training-facility-design' ? 'facility_configurator' : 'contact_form',
+        quoteType: body.topic === 'training-facility-design' ? 'training_facility' : 'contact',
+        topic: body.topic || subject,
+        formId: body.topic === 'training-facility-design' ? 'facility-quote-form' : 'contact-form',
+        estimatedValue: Number(body?.facility?.estimate?.price?.high || body?.facility?.estimate?.price?.low || 0) || 0
+      },
+      meta: {
+        phone: phone || null,
+        messageLength: message.length,
+        facility: body.facility || null
+      }
+    }).catch(() => null);
+
     // Respond immediately to keep the UI snappy
     res.json({ ok: true, queued: true });
 
     // Continue work in background: verify Turnstile (if enabled) and send emails.
     setImmediate(async () => {
       try {
+        void automation.processPending({ limit: 10 }).catch(err => {
+          console.warn('Quote workflow processing failed:', err?.message || err);
+        });
+
         // Optional Cloudflare Turnstile verification (enable by setting CF_TURNSTILE_SECRET)
         let captchaOk = true;
         try {
@@ -149,29 +163,6 @@ router.post('/contact', async (req, res) => {
         });
 
         const inbox = (process.env.CONTACT_INBOX || 'info@ezsportsnetting.com').trim();
-
-        // Always send an acknowledgement to the sender (does not depend on captcha)
-        try {
-          const ackBody = `
-            <p style="margin:0 0 10px;">Hi ${safeName},</p>
-            <p style="margin:0 0 12px;color:#5a5a5a;line-height:20px;">Thanks for contacting EZ Sports Netting! We received your message and will get back to you soon.</p>
-            <div style="margin:16px 0 8px;font-weight:800;color:#241773;">Your message</div>
-            <pre style="margin:0;padding:12px 12px;border:1px solid #d3d0d7;border-radius:10px;white-space:pre-wrap;word-break:break-word;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,\"Liberation Mono\",\"Courier New\",monospace;font-size:12px;line-height:1.45;color:#000000;">${safeMessage}</pre>
-          `;
-          const ackHtml = renderBrandedEmailHtml({
-            title: 'We received your message',
-            subtitle: 'EZ Sports Netting Support',
-            bodyHtml: ackBody
-          });
-          void mail.queue({
-            to: email,
-            subject: 'We received your message',
-            html: ackHtml,
-            text: `Hi ${name},\n\nThanks for contacting EZ Sports Netting! We received your message and will get back to you soon.\n\n---\nYour message:\n${message}`,
-            tags: ['contact','ack'],
-            replyTo: inbox
-          }).catch(()=>{});
-        } catch { /* ignore ack failure */ }
 
         // Send internal notification only if captcha passes or bypass is enabled
         if (captchaOk || bypassTurnstile) {

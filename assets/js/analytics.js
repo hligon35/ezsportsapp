@@ -1,6 +1,6 @@
+import './tracking.js';
+
 // Frontend analytics: admin dashboard rendering and client-side tracking hooks
-// Guard: When running under Live Server (port 5500), disable tracking to avoid DB writes that trigger live-reload loops
-const __DEV_DISABLE_TRACKING__ = (location.protocol.startsWith('http') && location.port === '5500');
 const API_BASE_ANALYTICS = (() => {
   // Prefer higher ports first because the backend auto-increments when 4242 is in use.
   const ports = [4243, 4242, 4244, 4245, 4246, 4247];
@@ -19,63 +19,16 @@ const API_BASE_ANALYTICS = (() => {
   return Array.from(new Set(bases));
 })();
 
-function getVisitorId() {
-  try {
-    let id = localStorage.getItem('visitorId');
-    if (!id) {
-      id = 'v_' + Math.random().toString(36).slice(2) + Date.now().toString(36);
-      localStorage.setItem('visitorId', id);
-    }
-    return id;
-  } catch {
-    return undefined;
-  }
-}
-
-async function postWithFallback(path, data) {
-  for (const base of API_BASE_ANALYTICS) {
-    try {
-      const res = await fetch(`${base}${path}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify(data)
-      });
-      // Stop retrying after first HTTP response to avoid duplicate 400 logs
-      try { if (res.ok) window.__API_BASE = base; } catch {}
-      return res.ok;
-    } catch {}
-  }
-  return false;
-}
-
-// Lightweight pageview tracking on all pages that include this script
 export async function trackPageview() {
-  if (__DEV_DISABLE_TRACKING__) {
-    try { console.warn('[analytics] tracking disabled in Live Server dev'); } catch {}
-    return;
+  if (window.EZTrack && typeof window.EZTrack.trackPageView === 'function') {
+    return await window.EZTrack.trackPageView();
   }
-  // Prevent duplicate sends within the same tab for the same URL
-  try {
-    const key = `pv_sent_${location.pathname}${location.search}`;
-    if (sessionStorage.getItem(key)) return;
-    sessionStorage.setItem(key, '1');
-  } catch {}
-  const user = (function(){ try { return JSON.parse(localStorage.getItem('currentUser')||'null'); } catch { return null; } })();
-  const payload = {
-    path: location.pathname.replace(/^\\\\/,'/') + location.search,
-    referrer: document.referrer || '',
-    visitorId: getVisitorId(),
-    userId: user?.id
-  };
-  await postWithFallback(`/api/analytics/track`, payload);
 }
 
-export async function trackEvent(type, productId) {
-  if (__DEV_DISABLE_TRACKING__) return;
-  const user = (function(){ try { return JSON.parse(localStorage.getItem('currentUser')||'null'); } catch { return null; } })();
-  const payload = { type, productId, visitorId: getVisitorId(), userId: user?.id };
-  await postWithFallback(`/api/analytics/event`, payload);
+export async function trackEvent(type, payload) {
+  if (window.EZTrack && typeof window.EZTrack.track === 'function') {
+    return await window.EZTrack.track(type, payload || {});
+  }
 }
 
 // Admin dashboard wiring (only runs on analytics.html)
@@ -149,8 +102,9 @@ async function loadAnalytics() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  // Track pageview on any page that includes this script
-  trackPageview();
+  if (window.EZTrack && typeof window.EZTrack.boot === 'function') {
+    window.EZTrack.boot({ trackPageView: true });
+  }
 
   // If we're on analytics dashboard, wire controls
   const isDashboard = /analytics\.html$/i.test(location.pathname);
@@ -164,4 +118,4 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // Expose for other modules
-window.trackEvent = trackEvent;
+if (typeof window.trackEvent !== 'function') window.trackEvent = trackEvent;

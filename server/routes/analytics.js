@@ -13,9 +13,13 @@ router.post('/track', async (req, res) => {
     if (/^http:\/\/(localhost|127\.0\.0\.1):5500$/i.test(origin)) {
       return res.json({ ok: true, devSkipped: true });
     }
-    const { path, referrer, visitorId, userId, ts } = req.body || {};
-    await analytics.trackPageView({ path, referrer, visitorId, userId, ts });
-    res.json({ ok: true });
+    const payload = req.body || {};
+    const result = await analytics.trackCanonicalEvent({
+      ...payload,
+      eventName: payload.eventName || 'page_view',
+      source: payload.source || 'web_client'
+    });
+    res.json({ ok: true, deduped: !!result?.deduped });
   } catch (err) {
     res.status(400).json({ message: err.message });
   }
@@ -28,13 +32,13 @@ router.post('/event', async (req, res) => {
     if (/^http:\/\/(localhost|127\.0\.0\.1):5500$/i.test(origin)) {
       return res.json({ ok: true, devSkipped: true });
     }
-    const { type, productId, visitorId, userId, path, label, value, meta, ts } = req.body || {};
-    if (path || label || value !== undefined || meta) {
-      await analytics.trackRichEvent({ type, productId, visitorId, userId, path, label, value, meta, ts });
-    } else {
-      await analytics.trackEvent({ type, productId, visitorId, userId, ts });
-    }
-    res.json({ ok: true });
+    const payload = req.body || {};
+    const result = await analytics.trackCanonicalEvent({
+      ...payload,
+      eventName: payload.eventName || payload.type,
+      source: payload.source || 'web_client'
+    });
+    res.json({ ok: true, deduped: !!result?.deduped });
   } catch (err) {
     res.status(400).json({ message: err.message });
   }

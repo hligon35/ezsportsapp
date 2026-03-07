@@ -1,5 +1,7 @@
 // Stripe Payment Element integration for cards, Apple Pay, Google Pay, PayPal
 // Publishable key will be provided by a config endpoint or fallback (dev)
+import './tracking.js';
+
 let stripe;
 let stripeEnabled = false;
 // Enable verbose logging with ?debug=1 or by setting window.__CHECKOUT_DEBUG = true
@@ -94,6 +96,41 @@ function variantText(i){
 
 function toCents(n){ return Math.round(Number(n||0) * 100); }
 function fromCents(c){ return Math.max(0, Math.round(Number(c||0))); }
+function stableStringify(value) {
+  if (Array.isArray(value)) return `[${value.map(stableStringify).join(',')}]`;
+  if (value && typeof value === 'object') {
+    return `{${Object.keys(value).sort().map(key => `${JSON.stringify(key)}:${stableStringify(value[key])}`).join(',')}}`;
+  }
+  return JSON.stringify(value);
+}
+
+function cartFingerprint(items) {
+  const normalized = (Array.isArray(items) ? items : []).map(item => ({
+    id: String(item.id || item.productId || '').trim(),
+    qty: Math.max(1, Number(item.qty || item.quantity || 1) || 1),
+    price: Number(item.price || 0) || 0,
+    size: String(item.size || '').trim(),
+    color: String(item.color || '').trim()
+  }));
+  return stableStringify(normalized);
+}
+
+function buildTrackingItems(cart) {
+  return (Array.isArray(cart) ? cart : []).map(item => ({
+    productId: item.id,
+    quantity: item.qty,
+    price: Number(item.price) || 0,
+    name: item.title || item.name || item.id,
+    category: item.category || '',
+    size: item.size || '',
+    color: item.color || ''
+  }));
+}
+
+function trackCheckoutEvent(eventName, meta = {}, options = {}) {
+  if (!window.EZTrack) return Promise.resolve({ ok: false, skipped: true });
+  return window.EZTrack.track(eventName, meta, options);
+}
 function calcSubtotalCents(cart){
   return cart.reduce((sum,i)=> sum + (toCents(i.price||0) * (i.qty||0)), 0);
 }
@@ -221,12 +258,92 @@ async function initialize() {
   const form = document.getElementById('payment-form');
   const cart = readCart();
   const hasAccessories = Array.isArray(cart) && cart.some(isAccessoryCartItem);
+  const trackingItems = buildTrackingItems(cart);
+  const fingerprint = cartFingerprint(cart);
   let appliedCoupon = null; // { code, type, value }
   let clientSecret = null;
   let amount = 0;
   let elements = null;
   let orderId = null;
   let serverBreakdown = null; // latest server-provided breakdown
+  let checkoutCompleting = false;
+  let beginCheckoutTracked = false;
+
+  const syncCheckoutIdentity = () => {
+    if (!window.EZTrack || !form) return;
+    const fd = new FormData(form);
+    const name = String(fd.get('name') || '').trim();
+    const email = String(fd.get('email') || '').trim();
+    if (!email && !name) return;
+    void window.EZTrack.identify({
+      name,
+      email,
+      source: 'checkout'
+    });
+  };
+
+  const currentCheckoutValue = () => {
+    if (Number.isFinite(Number(amount)) && Number(amount) > 0) return Number(amount) / 100;
+    const breakdown = updateSummary(cart, appliedCoupon, getShippingAddress(), getShippingMethod());
+    return Number((breakdown.total || 0) / 100) || 0;
+  };
+
+  const savePendingCheckout = (extra = {}) => {
+    if (!window.EZTrack) return;
+    window.EZTrack.setCheckoutPending({
+      orderId: orderId || null,
+      email: String(new FormData(form).get('email') || '').trim() || null,
+      path: location.pathname,
+      cartFingerprint: fingerprint,
+      value: currentCheckoutValue(),
+      items: trackingItems,
+      shippingMethod: getShippingMethod(),
+      ...extra
+    });
+  };
+
+  const ensureBeginCheckoutTracked = () => {
+    if (beginCheckoutTracked || hasAccessories) return;
+    beginCheckoutTracked = true;
+    syncCheckoutIdentity();
+    savePendingCheckout({ status: 'active' });
+    void trackCheckoutEvent('begin_checkout', {
+      ecommerce: {
+        value: currentCheckoutValue(),
+        orderId: orderId || null,
+        items: trackingItems
+      },
+      cartFingerprint: fingerprint,
+      shippingMethod: getShippingMethod(),
+      couponCode: appliedCoupon?.code || null
+    });
+  };
+
+  const emitCheckoutAbandon = (reason) => {
+    if (checkoutCompleting || hasAccessories || !window.EZTrack) return;
+    const pending = window.EZTrack.getCheckoutPending();
+    if (!pending) return;
+    if (window.EZTrack.hasCompletedPurchase(orderId || pending.orderId || null, clientSecret || null)) return;
+    syncCheckoutIdentity();
+    void trackCheckoutEvent('checkout_abandon', {
+      ecommerce: {
+        value: Number(pending.value || currentCheckoutValue()) || 0,
+        orderId: orderId || pending.orderId || null,
+        items: trackingItems
+      },
+      cartFingerprint: pending.cartFingerprint || fingerprint,
+      shippingMethod: pending.shippingMethod || getShippingMethod(),
+      reason,
+      pendingAgeMs: pending.updatedAt ? Math.max(0, Date.now() - Date.parse(pending.updatedAt)) : 0
+    }, { useBeacon: true });
+  };
+
+  ['pagehide', 'beforeunload'].forEach(eventName => {
+    window.addEventListener(eventName, () => emitCheckoutAbandon(eventName));
+  });
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden') emitCheckoutAbandon('visibility_hidden');
+  });
 
   // Prefill for logged-in users: name/email + default shipping address
   try {
@@ -340,6 +457,8 @@ async function initialize() {
     return;
   }
 
+  ensureBeginCheckoutTracked();
+
   const getPayload = () => {
     const fd = new FormData(form);
     const customer = { name: fd.get('name'), email: fd.get('email') };
@@ -386,6 +505,12 @@ async function initialize() {
         clientSecret = newSecret;
         amount = intentResp.amount;
         orderId = intentResp.orderId || orderId;
+        savePendingCheckout({
+          status: 'payment_intent_ready',
+          orderId: orderId || null,
+          clientSecret: clientSecret || null,
+          amount: Number(amount || 0) / 100
+        });
         if (intentResp.couponApplied) {
           appliedCoupon = intentResp.couponApplied;
           document.getElementById('discount-row').style.display = '';
@@ -479,12 +604,26 @@ async function initialize() {
   if (shipMethodEl) {
     shipMethodEl.value = getShippingMethod();
     shipMethodEl.addEventListener('change', async () => {
+      syncCheckoutIdentity();
       setShippingMethod(shipMethodEl.value);
       updateSummary(cart, appliedCoupon, getShippingAddress(), getShippingMethod());
+      savePendingCheckout({ status: 'active' });
       await createOrUpdatePaymentIntent();
       if (amount > 0) document.getElementById('sum-total').textContent = currencyFmt(amount);
     });
   }
+
+  ['name', 'email', 'address1', 'city', 'state', 'postal', 'country'].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.addEventListener('change', () => {
+      syncCheckoutIdentity();
+      savePendingCheckout({ status: 'active' });
+    });
+    if (id === 'email' || id === 'name') {
+      el.addEventListener('input', syncCheckoutIdentity);
+    }
+  });
 
   // Promo code apply handler
   const applyBtn = document.getElementById('apply-code');
@@ -506,6 +645,7 @@ async function initialize() {
           label.title = appliedCoupon.restricted ? 'This code is bound to your account.' : '';
         }
         updateSummary(cart, appliedCoupon, getShippingAddress());
+        savePendingCheckout({ status: 'active', couponCode: appliedCoupon.code });
         await createOrUpdatePaymentIntent();
         if (amount > 0) document.getElementById('sum-total').textContent = currencyFmt(amount);
         msg.textContent = appliedCoupon.restricted ? 'Code applied to your account.' : 'Code applied.';
@@ -554,6 +694,8 @@ async function initialize() {
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
     document.getElementById('submit').disabled = true;
+    syncCheckoutIdentity();
+    savePendingCheckout({ status: 'submit_attempted' });
     // Decide mode: Real Stripe when we have a clientSecret; else only allow test fallback when Stripe is disabled
     const testMode = !clientSecret && !stripeEnabled;
     if (testMode) {
@@ -584,10 +726,22 @@ async function initialize() {
         };
         // Save for confirmation page
         try{ sessionStorage.setItem('lastOrder', JSON.stringify(order)); }catch{}
+  checkoutCompleting = true;
+  if (window.EZTrack) {
+    window.EZTrack.markPurchaseCompleted(order.id, null);
+  }
   localStorage.removeItem('cart');
   const dest = new URL('order-confirmation.html?id=' + encodeURIComponent(order.id), window.location.href);
   window.location.href = dest.href;
       } catch (err) {
+        void trackCheckoutEvent('payment_failure', {
+          ecommerce: {
+            value: currentCheckoutValue(),
+            orderId: orderId || null,
+            items: trackingItems
+          },
+          reason: err?.message || 'test_checkout_failed'
+        });
         document.getElementById('payment-message').textContent = err.message || 'Checkout failed.';
         document.getElementById('submit').disabled = false;
       }
@@ -617,12 +771,24 @@ async function initialize() {
       };
       sessionStorage.setItem('lastOrder', JSON.stringify(order));
     } catch {}
+    checkoutCompleting = true;
+    savePendingCheckout({ status: 'payment_confirmation_started' });
     const _stripe = await getStripe();
     const { error } = await _stripe.confirmPayment({
       elements,
       confirmParams: { return_url: new URL('order-confirmation.html' + (orderId ? ('?id=' + encodeURIComponent(orderId)) : ''), window.location.href).href },
     });
     if (error) {
+      checkoutCompleting = false;
+      void trackCheckoutEvent('payment_failure', {
+        ecommerce: {
+          value: currentCheckoutValue(),
+          orderId: orderId || null,
+          items: trackingItems,
+          paymentIntentId: clientSecret || null
+        },
+        reason: error.message || 'stripe_confirm_failed'
+      });
       document.getElementById('payment-message').textContent = error.message;
       document.getElementById('submit').disabled = false;
     }
@@ -633,6 +799,11 @@ async function initialize() {
   if (params.get('success') === 'true') {
     document.getElementById('payment-message').style.color = 'green';
     document.getElementById('payment-message').textContent = 'Payment successful! Thank you for your order.';
+    checkoutCompleting = true;
+    if (window.EZTrack) {
+      window.EZTrack.markPurchaseCompleted(orderId || params.get('id') || null, clientSecret || null);
+      window.EZTrack.clearCheckoutPending();
+    }
     // Save order to localStorage for order history
     try {
       const cart = readCart();

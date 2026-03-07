@@ -124,6 +124,33 @@ const invoiceService = new InvoiceService();
 const analyticsService = new AnalyticsService();
 const addressService = new AddressService();
 
+function toTrackingItems(items = []) {
+  return (Array.isArray(items) ? items : []).map(item => ({
+    productId: item.productId || item.id || null,
+    id: item.id || item.productId || null,
+    quantity: Math.max(1, Number(item.quantity || item.qty || 1) || 1),
+    qty: Math.max(1, Number(item.quantity || item.qty || 1) || 1),
+    price: Number(item.price || item.unitPrice || 0) || 0,
+    productName: item.productName || item.name || null,
+    category: item.category || null,
+    size: item.size || null,
+    color: item.color || null
+  }));
+}
+
+async function trackServerEvent(eventName, payload = {}) {
+  try {
+    return await analyticsService.trackCanonicalEvent({
+      ...payload,
+      eventName,
+      source: payload.source || 'server'
+    });
+  } catch (err) {
+    console.warn(`Tracking ${eventName} failed:`, err?.message || err);
+    return null;
+  }
+}
+
 // Initialize database on startup
 db.initialize().catch(console.error);
 
@@ -135,6 +162,7 @@ const inventoryRoutes = require('./routes/inventory');
 const invoiceRoutes = require('./routes/invoices');
 const analyticsRoutes = require('./routes/analytics');
 const marketingRoutes = require('./routes/marketing');
+const workflowRoutes = require('./routes/workflows');
 const adminRoutes = require('./routes/admin');
 const errorRoutes = require('./routes/errors');
 const AlertingService = require('./services/AlertingService');
@@ -318,6 +346,51 @@ app.post('/webhook/stripe', express.raw({ type: 'application/json' }), async (re
               connectDestination: connectDestination || undefined,
               applicationFee: appFeeCents ? (appFeeCents / 100) : undefined,
               platformFeeBps: feeBps
+            });
+            const trackedOrder = await orderService.getOrderById(orderId).catch(() => null);
+
+            await trackServerEvent('payment_success', {
+              source: 'server_stripe_webhook',
+              path: '/webhook/stripe',
+              eventId: event.id,
+              occurredAt: new Date((pi.created || Math.floor(Date.now() / 1000)) * 1000).toISOString(),
+              userId: trackedOrder?.userId || null,
+              email: pi?.receipt_email || pi?.metadata?.email || trackedOrder?.userEmail || null,
+              ecommerce: {
+                currency: String(pi.currency || 'usd').toUpperCase(),
+                value: Number(pi.amount || 0) / 100,
+                orderId: orderId || null,
+                paymentIntentId: pi.id,
+                items: toTrackingItems(trackedOrder?.items || [])
+              },
+              meta: {
+                stripeEventType: event.type,
+                latestChargeId: latestChargeId || null,
+                couponCode: couponCode || null,
+                orderStatus: 'paid'
+              }
+            });
+
+            await trackServerEvent('purchase', {
+              source: 'server_stripe_webhook',
+              path: '/webhook/stripe',
+              eventId: event.id,
+              occurredAt: new Date((pi.created || Math.floor(Date.now() / 1000)) * 1000).toISOString(),
+              userId: trackedOrder?.userId || null,
+              email: pi?.receipt_email || pi?.metadata?.email || trackedOrder?.userEmail || null,
+              ecommerce: {
+                currency: String(pi.currency || 'usd').toUpperCase(),
+                value: Number(pi.amount || 0) / 100,
+                orderId: orderId || null,
+                paymentIntentId: pi.id,
+                items: toTrackingItems(trackedOrder?.items || [])
+              },
+              meta: {
+                stripeEventType: event.type,
+                latestChargeId: latestChargeId || null,
+                couponCode: couponCode || null,
+                orderStatus: 'paid'
+              }
             });
 
             // Order emails (customer + internal). Make them idempotent using paymentInfo flags.
@@ -1050,10 +1123,31 @@ app.post('/webhook/stripe', express.raw({ type: 'application/json' }), async (re
         try {
           const pi = event.data.object;
           const orderId = pi?.metadata?.order_id;
+          const trackedOrder = orderId ? await orderService.getOrderById(orderId).catch(() => null) : null;
           if (orderId) {
             await orderService.updateOrderStatus(orderId, 'cancelled');
             await orderService.updatePaymentInfo(orderId, { intentId: pi.id, failureCode: pi.last_payment_error?.code, failureMessage: pi.last_payment_error?.message });
           }
+          await trackServerEvent('payment_failure', {
+            source: 'server_stripe_webhook',
+            path: '/webhook/stripe',
+            eventId: event.id,
+            occurredAt: new Date((pi.created || Math.floor(Date.now() / 1000)) * 1000).toISOString(),
+            userId: trackedOrder?.userId || null,
+            email: pi?.receipt_email || pi?.metadata?.email || trackedOrder?.userEmail || null,
+            ecommerce: {
+              currency: String(pi.currency || 'usd').toUpperCase(),
+              value: Number(pi.amount || 0) / 100,
+              orderId: orderId || null,
+              paymentIntentId: pi.id,
+              items: toTrackingItems(trackedOrder?.items || [])
+            },
+            meta: {
+              stripeEventType: event.type,
+              failureCode: pi?.last_payment_error?.code || null,
+              failureMessage: pi?.last_payment_error?.message || null
+            }
+          });
         } catch (e) { console.warn('payment_failed handling failed:', e.message); }
         break;
       }
@@ -1136,6 +1230,7 @@ app.use('/api/orders', orderRoutes);
 app.use('/api/inventory', inventoryRoutes);
 app.use('/api/invoices', invoiceRoutes);
 app.use('/api/analytics', analyticsRoutes);
+app.use('/api/workflows', workflowRoutes);
 app.use('/api/errors', errorRoutes);
 // Accept text/plain payloads (JSON string) for marketing endpoints to support legacy/form fallbacks
 // (marketing routes are mounted above to avoid JSON parser errors on malformed bodies)
@@ -1887,6 +1982,32 @@ app.post('/api/create-payment-intent', async (req, res) => {
       } catch {}
     }
 
+    await trackServerEvent('order_create', {
+      source: 'server_checkout',
+      path: '/api/create-payment-intent',
+      occurredAt: new Date().toISOString(),
+      visitorId: req.body?.visitorId || null,
+      sessionId: req.body?.sessionId || null,
+      userId: customer.userId || req.user?.id || null,
+      email: customer.email || null,
+      ecommerce: {
+        currency: String(safeCurrency || 'usd').toUpperCase(),
+        value: Number(amount || 0) / 100,
+        orderId: newOrder?.id || existingOrderId || null,
+        paymentIntentId: paymentIntent?.id || null,
+        items: toTrackingItems(normItems)
+      },
+      meta: {
+        shippingMethod: normalizedMethod,
+        couponCode: appliedCoupon?.code || null,
+        discount: discountCents / 100,
+        tax: usedAutomaticTax ? null : (taxCents / 100),
+        subtotal: subtotal / 100,
+        shipping: shippingCents / 100,
+        status: 'pending_payment'
+      }
+    });
+
     // Return client secret and linked order id so the frontend can keep them in sync
     res.json({
       clientSecret: paymentIntent.client_secret,
@@ -1940,6 +2061,25 @@ app.post('/api/order', async (req, res) => {
         customerInfo: orderData.customer,
         paymentInfo: { method: 'stripe' },
         weightLbsTotal: Number.isFinite(Number(orderData.weightLbsTotal)) ? Number(orderData.weightLbsTotal) : undefined,
+      });
+      await trackServerEvent('order_create', {
+        source: 'server_order_endpoint',
+        path: '/api/order',
+        occurredAt: new Date().toISOString(),
+        visitorId: orderData.visitorId || null,
+        sessionId: orderData.sessionId || null,
+        userId: orderData.userId || null,
+        email: orderData.customer?.email || null,
+        ecommerce: {
+          currency: 'USD',
+          value: Number(order.total || 0) || 0,
+          orderId: order.id,
+          items: toTrackingItems(orderData.items)
+        },
+        meta: {
+          shippingMethod: orderData.shippingMethod || null,
+          status: 'pending_manual_payment'
+        }
       });
       res.json({ status: 'ok', orderId: order.id });
     } else {
@@ -2006,6 +2146,14 @@ try {
   startFinanceReportScheduler();
 } catch (e) {
   console.warn('Finance report scheduler not started:', e?.message || e);
+}
+
+// Workflow automation scheduler (processes captured workflow events into queued emails)
+try {
+  const { startWorkflowScheduler } = require('./jobs/workflowScheduler');
+  startWorkflowScheduler();
+} catch (e) {
+  console.warn('Workflow automation scheduler not started:', e?.message || e);
 }
 
 // Background email retry worker: periodically attempts to deliver queued/failed emails

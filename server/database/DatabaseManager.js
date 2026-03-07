@@ -44,7 +44,10 @@ class DatabaseManager {
   coupons: 'coupons.json',
   emails: 'emails.json',
   payouts: 'payouts.json',
-  errors: 'errors.json'
+  errors: 'errors.json',
+  workflow_events: 'workflow_events.json',
+  workflow_sends: 'workflow_sends.json',
+  identity_map: 'identity_map.json'
     };
   }
 
@@ -146,7 +149,7 @@ class DatabaseManager {
     // Ensure key exists for this collection
     if (typeof schema.metadata.autoIncrement[collection] !== 'number') {
       // sensible defaults
-      const defaults = { users: 1000, products: 2000, orders: 3000, analytics: 1, subscribers: 1, coupons: 1, emails: 1, payouts: 1, errors: 1 };
+      const defaults = { users: 1000, products: 2000, orders: 3000, analytics: 1, subscribers: 1, coupons: 1, emails: 1, payouts: 1, errors: 1, workflow_events: 1, workflow_sends: 1, identity_map: 1 };
       schema.metadata.autoIncrement[collection] = defaults[collection] || 1;
     }
     const stored = schema.metadata.autoIncrement[collection] || 0;
