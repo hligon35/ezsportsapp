@@ -688,8 +688,8 @@ ensureUniformFooter() {
           <div class="footer-brand-block">
             <img src="assets/img/footLogo.png" height="168" alt="EZ Sports Netting logo"/>
             <div class="socials" aria-label="social links">
-              <a href="https://www.facebook.com/Ezsportsnetting/" aria-label="Facebook" target="_blank" rel="noopener"><img src="assets/img/facebook.png?v=20251009" alt="Facebook"/></a>
-              <a href="#" aria-label="Instagram" target="_blank" rel="noopener"><img src="assets/img/instagram.png?v=20251009" alt="Instagram"/></a>
+              <a href="https://www.facebook.com/profile.php?id=61572098432539" aria-label="Facebook" target="_blank" rel="noopener"><img src="assets/img/facebook.png?v=20251009" alt="Facebook"/></a>
+              <a href="https://www.instagram.com/official_ezsportsnetting" aria-label="Instagram" target="_blank" rel="noopener"><img src="assets/img/instagram.png?v=20251009" alt="Instagram"/></a>
             </div>
           </div>
           <div>
