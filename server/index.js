@@ -1,6 +1,17 @@
 // Basic Express server with Stripe integration for POS and ordering
+const path = require('path');
+
 try {
-  require('dotenv').config();
+  const dotenv = require('dotenv');
+  const envPaths = String(process.env.NODE_ENV || '').toLowerCase() === 'test'
+    ? []
+    : [
+        path.resolve(__dirname, '..', '.env.local'),
+        path.resolve(__dirname, '..', '.env')
+      ];
+  for (const envPath of envPaths) {
+    dotenv.config({ path: envPath });
+  }
 } catch {
   // dotenv is optional in production environments (e.g., Render) where env vars are injected.
 }
@@ -55,7 +66,6 @@ async function bootstrapDevAdminUser() {
   }
 }
 const express = require('express');
-const path = require('path');
 const cors = require('cors');
 const fs = require('fs/promises');
 const compression = require('compression');

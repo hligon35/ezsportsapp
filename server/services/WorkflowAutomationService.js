@@ -1,6 +1,7 @@
 const crypto = require('crypto');
 const DatabaseManager = require('../database/DatabaseManager');
 const EmailService = require('./EmailService');
+const SubscriberService = require('./SubscriberService');
 const TrackingWorkflowService = require('./TrackingWorkflowService');
 const { renderBrandedEmailHtml, escapeHtml } = require('./EmailTheme');
 
@@ -8,6 +9,7 @@ class WorkflowAutomationService {
   constructor() {
     this.db = new DatabaseManager();
     this.mail = new EmailService();
+    this.subscribers = new SubscriberService();
     this.workflowStore = new TrackingWorkflowService();
     this.baseUrl = String(process.env.PUBLIC_SITE_URL || process.env.SITE_URL || 'https://ezsportsnetting.com').replace(/\/$/, '');
     this.supportEmail = String(process.env.CONTACT_INBOX || 'info@ezsportsnetting.com').trim();
@@ -15,7 +17,14 @@ class WorkflowAutomationService {
     this.checkoutSuppressHours = Math.max(1, Number(process.env.WORKFLOW_CHECKOUT_ABANDON_SUPPRESS_HOURS || 24) || 24);
     this.emailCaptureSuppressHours = Math.max(1, Number(process.env.WORKFLOW_EMAIL_CAPTURE_SUPPRESS_HOURS || 24 * 30) || (24 * 30));
     this.quoteAckSuppressHours = Math.max(1, Number(process.env.WORKFLOW_QUOTE_ACK_SUPPRESS_HOURS || 24) || 24);
+    this.marketingDailyCap = Math.max(1, Number(process.env.WORKFLOW_MARKETING_DAILY_CAP || 2) || 2);
+    this.suppressedRecipientPattern = new RegExp(
+      process.env.WORKFLOW_SUPPRESS_RECIPIENT_REGEX || '^(test\+|qa\+|dev\+)|@example\\.com$',
+      'i'
+    );
   }
+
+  static activeRun = null;
 
   hashRecipient(value) {
     const normalized = String(value || '').trim().toLowerCase();
@@ -36,7 +45,8 @@ class WorkflowAutomationService {
             workflowKey: 'subscriber_welcome',
             templateKey: 'subscriber-welcome',
             minAgeMs: 0,
-            suppressHours: this.emailCaptureSuppressHours
+            suppressHours: this.emailCaptureSuppressHours,
+            category: 'marketing'
           },
           {
             eventName: 'email_capture',
@@ -44,7 +54,8 @@ class WorkflowAutomationService {
             templateKey: 'subscriber-internal-notify',
             minAgeMs: 0,
             suppressHours: 0,
-            recipientMode: 'internal'
+            recipientMode: 'internal',
+            category: 'internal'
           }
         ];
       case 'quote_submit':
@@ -54,7 +65,8 @@ class WorkflowAutomationService {
             workflowKey: 'quote_submit_ack',
             templateKey: 'quote-submit-ack',
             minAgeMs: 0,
-            suppressHours: this.quoteAckSuppressHours
+            suppressHours: this.quoteAckSuppressHours,
+            category: 'transactional'
           }
         ];
       case 'checkout_abandon':
@@ -64,7 +76,8 @@ class WorkflowAutomationService {
             workflowKey: 'checkout_abandon_recovery',
             templateKey: 'checkout-abandon-reminder',
             minAgeMs: this.checkoutDelayMinutes * 60 * 1000,
-            suppressHours: this.checkoutSuppressHours
+            suppressHours: this.checkoutSuppressHours,
+            category: 'marketing'
           }
         ];
       default:
@@ -72,7 +85,22 @@ class WorkflowAutomationService {
     }
   }
 
-  async processPending({ limit = 25, now = new Date() } = {}) {
+  async processPending(options = {}) {
+    if (WorkflowAutomationService.activeRun) {
+      return WorkflowAutomationService.activeRun;
+    }
+
+    const run = this.runProcessPending(options).finally(() => {
+      if (WorkflowAutomationService.activeRun === run) {
+        WorkflowAutomationService.activeRun = null;
+      }
+    });
+
+    WorkflowAutomationService.activeRun = run;
+    return run;
+  }
+
+  async runProcessPending({ limit = 25, now = new Date() } = {}) {
     const max = Math.max(1, Math.min(250, Number(limit || 25)));
     const nowMs = now instanceof Date ? now.getTime() : Date.now();
     const events = await this.db.find('workflow_events');
@@ -193,6 +221,61 @@ class WorkflowAutomationService {
     return event?.meta?.meta || {};
   }
 
+  async isUnsubscribed(recipient) {
+    const email = this.normalizeEmail(recipient);
+    if (!email) return false;
+    const subscriber = await this.db.findOne('subscribers', { email });
+    return !!subscriber && subscriber.subscribed === false;
+  }
+
+  isSuppressedInternalOrTestRecipient(recipient, workflow) {
+    const email = this.normalizeEmail(recipient);
+    if (!email || String(process.env.NODE_ENV || '').toLowerCase() === 'test') return false;
+    if (workflow?.category === 'internal') return false;
+    if (this.mail.overrideTo && email === this.normalizeEmail(this.mail.overrideTo)) return false;
+    return this.suppressedRecipientPattern.test(email);
+  }
+
+  hasExceededDailyMarketingCap(sends, recipientHash, nowMs) {
+    if (!recipientHash || !this.marketingDailyCap) return false;
+    const cutoff = nowMs - (24 * 60 * 60 * 1000);
+    let count = 0;
+    for (const send of (Array.isArray(sends) ? sends : [])) {
+      if (String(send?.recipientHash || '') !== recipientHash) continue;
+      if (!['sent', 'queued', 'sending'].includes(String(send?.status || '').toLowerCase())) continue;
+      const category = String(send?.meta?.category || '').toLowerCase();
+      if (category !== 'marketing') continue;
+      const ts = Date.parse(send?.occurredAt || send?.createdAt || 0);
+      if (!Number.isFinite(ts) || ts < cutoff) continue;
+      count += 1;
+      if (count >= this.marketingDailyCap) return true;
+    }
+    return false;
+  }
+
+  async evaluateGovernance({ workflow, recipient, recipientHash, context, event }) {
+    if (!recipient) return { suppressed: true, reason: 'missing_email' };
+    if (this.isSuppressedInternalOrTestRecipient(recipient, workflow)) {
+      return { suppressed: true, reason: 'suppressed_test_or_internal_recipient' };
+    }
+    if (workflow?.category === 'marketing' && await this.isUnsubscribed(recipient)) {
+      return { suppressed: true, reason: 'unsubscribed' };
+    }
+    if (workflow?.category === 'marketing' && this.hasExceededDailyMarketingCap(context.sends, recipientHash, context.nowMs)) {
+      return { suppressed: true, reason: 'daily_marketing_cap_reached' };
+    }
+    if (this.hasRecentWorkflowSend(context.sends, workflow.workflowKey, recipientHash, workflow.suppressHours, context.nowMs)) {
+      return { suppressed: true, reason: 'suppressed_recent_send' };
+    }
+    if (workflow.workflowKey === 'checkout_abandon_recovery') {
+      const occurredAt = Date.parse(event?.occurredAt || event?.createdAt || 0) || context.nowMs;
+      if (this.hasRecoveredOrderSinceEvent(event, context.analytics, occurredAt)) {
+        return { suppressed: true, reason: 'purchase_recorded_after_abandon' };
+      }
+    }
+    return { suppressed: false };
+  }
+
   buildWorkflowEmail({ recipient, recipientHash, workflow, event, context, composed, tags = [], provider = null }) {
     return this.workflowStore.recordSend({
       recipient,
@@ -208,6 +291,7 @@ class WorkflowAutomationService {
       meta: {
         ...(composed.meta || {}),
         sourceEvent: event?.eventName || null,
+        category: workflow?.category || null,
         tags
       },
       occurredAt: new Date(context.nowMs).toISOString()
@@ -262,11 +346,9 @@ class WorkflowAutomationService {
   async processEmailCaptureWelcome(event, workflow, context) {
     const recipient = this.normalizeEmail(event?.email);
     const recipientHash = event?.emailHash || this.hashRecipient(recipient);
-    if (!recipient) {
-      return await this.recordSkipped({ workflow, event, context, recipientHash, reason: 'missing_email' });
-    }
-    if (this.hasRecentWorkflowSend(context.sends, workflow.workflowKey, recipientHash, workflow.suppressHours, context.nowMs)) {
-      return await this.recordSkipped({ workflow, event, context, recipient, recipientHash, reason: 'suppressed_recent_send' });
+    const governance = await this.evaluateGovernance({ workflow, recipient, recipientHash, context, event });
+    if (governance.suppressed) {
+      return await this.recordSkipped({ workflow, event, context, recipient, recipientHash, reason: governance.reason });
     }
     const composed = this.buildEmailCaptureWelcomeEmail(event);
     return await this.queueWorkflowEmail({
@@ -299,11 +381,9 @@ class WorkflowAutomationService {
   async processQuoteSubmitAck(event, workflow, context) {
     const recipient = this.normalizeEmail(event?.email);
     const recipientHash = event?.emailHash || this.hashRecipient(recipient);
-    if (!recipient) {
-      return await this.recordSkipped({ workflow, event, context, recipientHash, reason: 'missing_email' });
-    }
-    if (this.hasRecentWorkflowSend(context.sends, workflow.workflowKey, recipientHash, workflow.suppressHours, context.nowMs)) {
-      return await this.recordSkipped({ workflow, event, context, recipient, recipientHash, reason: 'suppressed_recent_send' });
+    const governance = await this.evaluateGovernance({ workflow, recipient, recipientHash, context, event });
+    if (governance.suppressed) {
+      return await this.recordSkipped({ workflow, event, context, recipient, recipientHash, reason: governance.reason });
     }
     const composed = this.buildQuoteSubmitAckEmail(event);
     return await this.queueWorkflowEmail({
@@ -319,18 +399,9 @@ class WorkflowAutomationService {
   async processCheckoutAbandon(event, workflow, context, ageMs) {
     const recipient = this.normalizeEmail(event?.email);
     const recipientHash = event?.emailHash || this.hashRecipient(recipient);
-    const occurredAt = Date.parse(event?.occurredAt || event?.createdAt || 0) || context.nowMs;
-
-    if (!recipient) {
-      return await this.recordSkipped({ workflow, event, context, recipientHash, reason: 'missing_email' });
-    }
-
-    if (this.hasRecoveredOrderSinceEvent(event, context.analytics, occurredAt)) {
-      return await this.recordSkipped({ workflow, event, context, recipient, recipientHash, reason: 'purchase_recorded_after_abandon' });
-    }
-
-    if (this.hasRecentWorkflowSend(context.sends, workflow.workflowKey, recipientHash, workflow.suppressHours, context.nowMs)) {
-      return await this.recordSkipped({ workflow, event, context, recipient, recipientHash, reason: 'suppressed_recent_send' });
+    const governance = await this.evaluateGovernance({ workflow, recipient, recipientHash, context, event });
+    if (governance.suppressed) {
+      return await this.recordSkipped({ workflow, event, context, recipient, recipientHash, reason: governance.reason });
     }
 
     const composed = this.buildCheckoutAbandonEmail(event, ageMs);
@@ -346,9 +417,8 @@ class WorkflowAutomationService {
 
   buildEmailCaptureWelcomeEmail() {
     const bodyHtml = `
-      <p style="margin:0 0 10px;">Thanks for subscribing to EZ Sports Netting.</p>
-      <p style="margin:0 0 12px;color:#5a5a5a;line-height:20px;">We’ll send occasional deals, product updates, and practical buying guidance for cages, screens, and netting systems.</p>
-      <p style="margin:0;color:#5a5a5a;line-height:20px;">You can unsubscribe anytime from any email we send.</p>
+      <p style="margin:0 0 10px;">Thanks for subscribing to EZ Sports Netting!</p>
+      <p style="margin:0;color:#5a5a5a;line-height:20px;">We’ll send occasional deals and product updates. You can unsubscribe anytime.</p>
     `;
     return {
       subject: 'Thanks for subscribing to EZ Sports Netting',
@@ -357,7 +427,7 @@ class WorkflowAutomationService {
         subtitle: 'EZ Sports Netting Newsletter',
         bodyHtml
       }),
-      text: 'Thanks for subscribing to EZ Sports Netting. We’ll send occasional deals, product updates, and practical buying guidance. You can unsubscribe anytime.'
+      text: 'Thanks for subscribing to EZ Sports Netting! We’ll send occasional deals and product updates. You can unsubscribe anytime.'
     };
   }
 
@@ -397,19 +467,28 @@ class WorkflowAutomationService {
     const topic = escapeHtml(lead?.topic || 'your request');
     const quoteType = String(lead?.quoteType || '').trim().toLowerCase();
     const estimatedValue = Number(lead?.estimatedValue || 0) || 0;
+    const message = escapeHtml(meta?.message || '');
     const subjectLine = quoteType === 'training_facility'
       ? 'We received your facility request'
       : 'We received your message';
-    const bodyHtml = `
-      <p style="margin:0 0 10px;">Hi ${name},</p>
-      <p style="margin:0 0 12px;color:#5a5a5a;line-height:20px;">Thanks for contacting EZ Sports Netting. We received your ${quoteType === 'training_facility' ? 'facility design request' : 'message'} and will follow up soon.</p>
+    const facilitySummary = `
       <div style="margin:16px 0 8px;font-weight:800;color:#241773;">Request summary</div>
       <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="border:1px solid #d3d0d7;border-radius:10px;overflow:hidden;">
         <tr><td style="padding:10px 12px;background:#ffffff;color:#5a5a5a;width:38%;border-bottom:1px solid #d3d0d7;">Topic</td><td style="padding:10px 12px;border-bottom:1px solid #d3d0d7;">${topic}</td></tr>
         <tr><td style="padding:10px 12px;background:#ffffff;color:#5a5a5a;width:38%;${estimatedValue > 0 ? 'border-bottom:1px solid #d3d0d7;' : ''}">Request Type</td><td style="padding:10px 12px;${estimatedValue > 0 ? 'border-bottom:1px solid #d3d0d7;' : ''}">${escapeHtml(lead?.submissionType || 'contact_form')}</td></tr>
         ${estimatedValue > 0 ? `<tr><td style="padding:10px 12px;background:#ffffff;color:#5a5a5a;width:38%;">Estimated Project Value</td><td style="padding:10px 12px;">$${escapeHtml(estimatedValue.toFixed(2))}</td></tr>` : ''}
       </table>
-      <p style="margin:16px 0 0;color:#5a5a5a;line-height:20px;">If you need immediate help, reply to this email and our team will pick it up.</p>
+    `;
+    const generalSummary = message
+      ? `
+      <div style="margin:16px 0 8px;font-weight:800;color:#241773;">Your message</div>
+      <pre style="margin:0;padding:12px 12px;border:1px solid #d3d0d7;border-radius:10px;white-space:pre-wrap;word-break:break-word;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,\"Liberation Mono\",\"Courier New\",monospace;font-size:12px;line-height:1.45;color:#000000;">${message}</pre>
+    `
+      : '';
+    const bodyHtml = `
+      <p style="margin:0 0 10px;">Hi ${name},</p>
+      <p style="margin:0 0 12px;color:#5a5a5a;line-height:20px;">Thanks for contacting EZ Sports Netting! We received your ${quoteType === 'training_facility' ? 'facility request' : 'message'} and will get back to you soon.</p>
+      ${quoteType === 'training_facility' ? facilitySummary : generalSummary}
     `;
     return {
       subject: subjectLine,
@@ -418,7 +497,9 @@ class WorkflowAutomationService {
         subtitle: 'EZ Sports Netting Support',
         bodyHtml
       }),
-      text: `Hi ${meta?.name || 'there'},\n\nThanks for contacting EZ Sports Netting. We received your ${quoteType === 'training_facility' ? 'facility design request' : 'message'} about ${lead?.topic || 'your request'} and will follow up soon.\n\nIf you need immediate help, reply to this email or contact ${this.supportEmail}.`
+      text: quoteType === 'training_facility'
+        ? `Hi ${meta?.name || 'there'},\n\nThanks for contacting EZ Sports Netting! We received your facility request and will get back to you soon.\n\nTopic: ${lead?.topic || 'your request'}${estimatedValue > 0 ? `\nEstimated Project Value: $${estimatedValue.toFixed(2)}` : ''}`
+        : `Hi ${meta?.name || 'there'},\n\nThanks for contacting EZ Sports Netting! We received your message and will get back to you soon.${meta?.message ? `\n\n---\nYour message:\n${meta.message}` : ''}`
     };
   }
 
