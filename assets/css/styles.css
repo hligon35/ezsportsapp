@@ -1735,6 +1735,14 @@ nav.quick-links li a[href="careers.html"]{
   align-items:center;
   justify-content:center;
 }
+.trust-band__logo-card{
+  margin:0;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:.45rem;
+  text-align:center;
+}
 .trust-band__img{
   display:block;
   width:auto;
@@ -1743,6 +1751,14 @@ nav.quick-links li a[href="careers.html"]{
   object-fit:contain;
   filter:none;
   opacity:1;
+}
+.trust-band__caption{
+  margin:0;
+  font-size:.76rem;
+  line-height:1.35;
+  font-weight:600;
+  letter-spacing:.01em;
+  color:var(--muted);
 }
 .trust-band__img--white{
   background:#fff;
@@ -1768,6 +1784,11 @@ nav.quick-links li a[href="careers.html"]{
   justify-content:space-between;
   gap:.9rem;
 }
+.trust-band--homepage .trust-band__logo-card,
+.trust-band--facility .trust-band__logo-card,
+.trust-band--calculator .trust-band__logo-card{
+  flex:0 1 210px;
+}
 .trust-band--calculator .trust-band__logos{
   gap:.75rem;
 }
@@ -1787,6 +1808,7 @@ nav.quick-links li a[href="careers.html"]{
   .trust-band{margin:1.15rem auto 1.7rem;padding:1rem .95rem 1.05rem}
   .trust-band__head{margin-bottom:.8rem}
   .trust-band__logos{gap:.75rem 1rem}
+  .trust-band__logo-card{gap:.35rem}
   .trust-band__img{max-width:min(100%,220px);max-height:84px}
   .trust-band__img--white{padding:.4rem .55rem}
   .trust-band--homepage,
@@ -1795,6 +1817,9 @@ nav.quick-links li a[href="careers.html"]{
   .trust-band--homepage .trust-band__logos,
   .trust-band--facility .trust-band__logos,
   .trust-band--calculator .trust-band__logos{flex-wrap:wrap;justify-content:center;gap:.8rem 1rem}
+  .trust-band--homepage .trust-band__logo-card,
+  .trust-band--facility .trust-band__logo-card,
+  .trust-band--calculator .trust-band__logo-card{flex-basis:160px}
   .trust-band--homepage .trust-band__img,
   .trust-band--facility .trust-band__img,
   .trust-band--calculator .trust-band__img{max-width:min(100%,180px);max-height:88px}
@@ -1806,6 +1831,9 @@ nav.quick-links li a[href="careers.html"]{
   .trust-band--homepage .trust-band__logos,
   .trust-band--facility .trust-band__logos,
   .trust-band--calculator .trust-band__logos{flex-wrap:wrap;justify-content:center;gap:1rem 1.25rem}
+  .trust-band--homepage .trust-band__logo-card,
+  .trust-band--facility .trust-band__logo-card,
+  .trust-band--calculator .trust-band__logo-card{flex-basis:180px}
   .trust-band--homepage .trust-band__img,
   .trust-band--facility .trust-band__img,
   .trust-band--calculator .trust-band__img{max-width:min(100%,190px);max-height:112px}
