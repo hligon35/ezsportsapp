@@ -12,6 +12,7 @@ const SubscriberService = require('../services/SubscriberService');
 const EmailService = require('../services/EmailService');
 const PayoutService = require('../services/PayoutService');
 const DailyReportService = require('../services/DailyReportService');
+const { summarizeErrors } = require('../services/ErrorClassificationService');
 
 // Stripe Billing Portal for admins to open on behalf of customer
 let stripe = null;
@@ -55,6 +56,17 @@ router.get('/diagnostics', requireAdmin, async (req, res) => {
     const subsCount = await safeCount(() => db.find('subscribers'));
     const emailsCount = await safeCount(() => db.find('emails'));
     const payoutsCount = await safeCount(() => db.find('payouts'));
+    const errorsCount = await safeCount(() => db.find('errors'));
+
+    let errorSummary7 = null;
+    try {
+      const errors = await db.find('errors');
+      const since = Date.now() - (7 * 24 * 60 * 60 * 1000);
+      errorSummary7 = summarizeErrors((Array.isArray(errors) ? errors : []).filter(err => {
+        const at = Date.parse(err?.createdAt || err?.updatedAt || '');
+        return Number.isFinite(at) && at >= since;
+      }));
+    } catch {}
 
     // Quick traffic summary for last 7d
     let traffic7 = null;
@@ -104,13 +116,17 @@ router.get('/diagnostics', requireAdmin, async (req, res) => {
         location: storageLocation,
         ok: storageOk,
         error: storageError,
-        ordersCount, analyticsCount, couponsCount, subscribersCount: subsCount, emailsCount, payoutsCount
+        ordersCount, analyticsCount, couponsCount, subscribersCount: subsCount, emailsCount, payoutsCount, errorsCount
       },
       analytics: traffic7 ? {
         timeframe: traffic7.timeframe,
         totalPageviews: traffic7.totalPageviews,
         uniqueVisitors: traffic7.uniqueVisitors,
         topPages: traffic7.topPages
+      } : null,
+      errors: errorSummary7 ? {
+        timeframe: 'last_7_days',
+        ...errorSummary7
       } : null
     });
   } catch (e) {

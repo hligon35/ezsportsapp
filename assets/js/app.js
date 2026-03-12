@@ -561,6 +561,18 @@ const Store = {
       } catch {}
 
       const visitorId = getVisitorId();
+      const shouldIgnoreClientError = (err, extra = {}) => {
+        try {
+          const message = String(err?.message || err || '').toLowerCase();
+          const stack = String(err?.stack || '').toLowerCase();
+          const filename = String(extra?.filename || '').toLowerCase();
+          return message.includes("can't find variable: _autofillcallbackhandler")
+            || stack.includes('_autofillcallbackhandler')
+            || filename.includes('_autofillcallbackhandler');
+        } catch {
+          return false;
+        }
+      };
 
       // Client error reporting
       if (!window.__errorTelemetryBound) {
@@ -568,6 +580,7 @@ const Store = {
         const report = (kind, err, extra = {}) => {
           try {
             const e = (err instanceof Error) ? err : new Error(String(err || 'Unknown error'));
+            if (shouldIgnoreClientError(e, extra)) return;
             postToApi('/api/errors/report', {
               kind,
               severity: 'error',

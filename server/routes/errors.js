@@ -1,6 +1,7 @@
 const express = require('express');
 const rateLimit = require('express-rate-limit');
 const AlertingService = require('../services/AlertingService');
+const { classifyErrorRecord } = require('../services/ErrorClassificationService');
 
 const router = express.Router();
 const alerts = new AlertingService();
@@ -42,6 +43,11 @@ router.post('/report', limiter, async (req, res) => {
     }
 
     const record = sanitizeClientError(req.body);
+    const classification = classifyErrorRecord(record);
+    if (classification.ignoreOnIngest) {
+      return res.json({ ok: true, ignored: true, reason: classification.code });
+    }
+
     const saved = await alerts.recordError(record);
 
     // Only alert for error-level or higher

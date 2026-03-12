@@ -321,10 +321,21 @@ async function renderDiagnostics(){
       rows.push(`<div class="product-item"><div><strong>CORS origins</strong></div><div>${origins}</div></div>`);
     }
     if (d.storage) {
-      rows.push(`<div class="product-item"><div><strong>DB counts</strong></div><div>orders: ${d.storage.ordersCount ?? '—'} • analytics: ${d.storage.analyticsCount ?? '—'} • coupons: ${d.storage.couponsCount ?? '—'} • subscribers: ${d.storage.subscribersCount ?? '—'} • emails: ${d.storage.emailsCount ?? '—'} • payouts: ${d.storage.payoutsCount ?? '—'}</div></div>`);
+      rows.push(`<div class="product-item"><div><strong>DB counts</strong></div><div>orders: ${d.storage.ordersCount ?? '—'} • analytics: ${d.storage.analyticsCount ?? '—'} • coupons: ${d.storage.couponsCount ?? '—'} • subscribers: ${d.storage.subscribersCount ?? '—'} • emails: ${d.storage.emailsCount ?? '—'} • payouts: ${d.storage.payoutsCount ?? '—'} • errors: ${d.storage.errorsCount ?? '—'}</div></div>`);
     }
     if (d.analytics) {
       rows.push(`<div class="product-item"><div><strong>Traffic (7d)</strong></div><div>Pageviews: ${d.analytics.totalPageviews ?? 0} • Visitors: ${d.analytics.uniqueVisitors ?? 0}</div></div>`);
+    }
+    if (d.errors) {
+      rows.push(`<div class="product-item"><div><strong>Error split (7d)</strong></div><div>Actionable: ${d.errors.actionableCount ?? 0} • Known noise: ${d.errors.knownNoiseCount ?? 0} • Total: ${d.errors.total ?? 0}</div></div>`);
+      const topNoise = Array.isArray(d.errors.byClassification)
+        ? d.errors.byClassification.filter(item => !item.actionable).map(item => `${item.label}: ${item.count}`).join(' • ')
+        : '';
+      if (topNoise) rows.push(`<div class="product-item"><div><small>Known noise buckets</small></div><div>${topNoise}</div></div>`);
+      const topActionable = Array.isArray(d.errors.topActionableMessages)
+        ? d.errors.topActionableMessages.map(item => `${item.message} (${item.count})`).join(' • ')
+        : '';
+      if (topActionable) rows.push(`<div class="product-item"><div><small>Top actionable errors</small></div><div>${topActionable}</div></div>`);
     }
     if (wrap) wrap.innerHTML = rows.join('');
   } catch (e) {

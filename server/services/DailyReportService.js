@@ -1,6 +1,7 @@
 const DatabaseManager = require('../database/DatabaseManager');
 const OrderService = require('./OrderService');
 const AlertingService = require('./AlertingService');
+const { summarizeErrors } = require('./ErrorClassificationService');
 const { escapeHtml, renderBrandedEmailHtml } = require('./EmailTheme');
 
 function startOfDayUTC(date = new Date()) {
@@ -43,6 +44,9 @@ class DailyReportService {
 
     const analytics = await this.db.find('analytics');
     const events = Array.isArray(analytics) ? analytics.filter(e => inRange(e.timestamp, start, end)) : [];
+    const errors = await this.db.find('errors');
+    const errorsInRange = Array.isArray(errors) ? errors.filter(e => inRange(e.createdAt || e.updatedAt, start, end)) : [];
+    const errorSummary = summarizeErrors(errorsInRange);
 
     const pageviews = events.filter(e => e.type === 'pageview');
     const clicks = events.filter(e => String(e.type || '').toLowerCase().includes('click'));
@@ -85,7 +89,28 @@ class DailyReportService {
     lines.push(`<li><strong>Purchase events (client):</strong> ${purchaseEvents}</li>`);
     lines.push(`<li><strong>Paid orders:</strong> ${paidOrders.length}</li>`);
     lines.push(`<li><strong>Gross revenue (paid orders):</strong> $${grossRevenue.toFixed(2)}</li>`);
+    lines.push(`<li><strong>Actionable client/server errors:</strong> ${errorSummary.actionableCount}</li>`);
+    lines.push(`<li><strong>Known client noise signatures:</strong> ${errorSummary.knownNoiseCount}</li>`);
     lines.push(`</ul>`);
+
+    lines.push(`<h3>Error summary</h3>`);
+    if (!errorSummary.total) {
+      lines.push(`<p>(no application errors recorded)</p>`);
+    } else {
+      lines.push(`<ul>`);
+      errorSummary.byClassification.forEach(item => {
+        lines.push(`<li><strong>${escapeHtml(item.label)}:</strong> ${item.count}</li>`);
+      });
+      lines.push(`</ul>`);
+      if (errorSummary.topActionableMessages.length) {
+        lines.push(`<h4>Top actionable error messages</h4>`);
+        lines.push(`<ol>`);
+        errorSummary.topActionableMessages.forEach(item => {
+          lines.push(`<li>${escapeHtml(safeText(item.message, 180))} — ${item.count}</li>`);
+        });
+        lines.push(`</ol>`);
+      }
+    }
 
     lines.push(`<h3>Top pages</h3>`);
     if (!topPages.length) {
@@ -103,7 +128,7 @@ class DailyReportService {
       subtitle: 'Daily visitor activity',
       bodyHtml
     });
-    const text = `Daily Visitor Activity — ${dayKey} (UTC)\n\nPageviews: ${pageviews.length}\nUnique visitors: ${uniqueVisitors}\nClicks tracked: ${clicks.length}\nAdd to cart: ${addToCart}\nBegin checkout: ${beginCheckout}\nPurchase events (client): ${purchaseEvents}\nPaid orders: ${paidOrders.length}\nGross revenue: $${grossRevenue.toFixed(2)}\n\nTop pages:\n` + topPages.map(p => `- ${p.path}: ${p.count}`).join('\n');
+    const text = `Daily Visitor Activity — ${dayKey} (UTC)\n\nPageviews: ${pageviews.length}\nUnique visitors: ${uniqueVisitors}\nClicks tracked: ${clicks.length}\nAdd to cart: ${addToCart}\nBegin checkout: ${beginCheckout}\nPurchase events (client): ${purchaseEvents}\nPaid orders: ${paidOrders.length}\nGross revenue: $${grossRevenue.toFixed(2)}\nActionable errors: ${errorSummary.actionableCount}\nKnown noise signatures: ${errorSummary.knownNoiseCount}\n\nError summary:\n${errorSummary.byClassification.map(item => `- ${item.label}: ${item.count}`).join('\n') || '(no application errors recorded)'}\n\nTop actionable error messages:\n${errorSummary.topActionableMessages.map(item => `- ${item.message}: ${item.count}`).join('\n') || '(none)'}\n\nTop pages:\n` + topPages.map(p => `- ${p.path}: ${p.count}`).join('\n');
 
     return { dayKey, start: start.toISOString(), end: end.toISOString(), subject, html, text };
   }
