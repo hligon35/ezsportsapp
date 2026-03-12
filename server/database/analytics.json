@@ -2444,5 +2444,1140 @@
     "createdAt": "2026-03-12T01:01:50.926Z",
     "updatedAt": "2026-03-12T01:01:50.926Z",
     "id": 180
+  },
+  {
+    "schemaVersion": 2,
+    "eventName": "page_view",
+    "type": "page_view",
+    "source": "web_client",
+    "eventId": "77284688-9593-4936-9b4d-56bc9ac4d35f",
+    "occurredAt": "2026-03-12T02:07:05.554Z",
+    "timestamp": "2026-03-12T02:07:05.554Z",
+    "path": "/training-facility-design.html",
+    "url": "http://localhost:5052/training-facility-design.html",
+    "title": "Training Facility Design — EZ Sports Netting",
+    "referrer": null,
+    "visitorId": "b73100c6-b529-4990-b0de-02f9b9e958d3",
+    "sessionId": "bc1ea671-64cc-4ff1-96d8-31904c6379c0",
+    "userId": null,
+    "email": null,
+    "emailHash": null,
+    "productId": null,
+    "attribution": {
+      "firstTouch": {
+        "landingPath": "/training-facility-design.html",
+        "referrer": "",
+        "utmSource": "",
+        "utmMedium": "",
+        "utmCampaign": "",
+        "utmContent": "",
+        "utmTerm": "",
+        "gclid": "",
+        "fbclid": "",
+        "msclkid": "",
+        "capturedAt": "2026-03-12T02:07:05.545Z"
+      },
+      "lastTouch": {
+        "landingPath": "/training-facility-design.html",
+        "referrer": "",
+        "utmSource": "",
+        "utmMedium": "",
+        "utmCampaign": "",
+        "utmContent": "",
+        "utmTerm": "",
+        "gclid": "",
+        "fbclid": "",
+        "msclkid": "",
+        "capturedAt": "2026-03-12T02:07:05.550Z"
+      }
+    },
+    "ecommerce": {
+      "currency": "USD",
+      "value": 0,
+      "orderId": null,
+      "paymentIntentId": null,
+      "items": []
+    },
+    "lead": {
+      "submissionType": null,
+      "topic": null,
+      "quoteType": null,
+      "formId": null,
+      "estimatedValue": 0
+    },
+    "meta": {},
+    "dedupeKey": "page_view:bc1ea671-64cc-4ff1-96d8-31904c6379c0:/training-facility-design.html",
+    "identityId": 12,
+    "createdAt": "2026-03-12T02:07:05.691Z",
+    "updatedAt": "2026-03-12T02:07:05.691Z",
+    "id": 181
+  },
+  {
+    "schemaVersion": 2,
+    "eventName": "page_view",
+    "type": "page_view",
+    "source": "web_client",
+    "eventId": "3919a5c3-7456-4050-a996-010fcbc70bc4",
+    "occurredAt": "2026-03-12T02:07:08.370Z",
+    "timestamp": "2026-03-12T02:07:08.370Z",
+    "path": "/index.html",
+    "url": "http://localhost:5050/index.html",
+    "title": "EZ Sports Netting | Custom Sports Netting, L-Screens & Batting Cages",
+    "referrer": null,
+    "visitorId": "b1b397ca-81eb-4002-b3d4-5b502b06f647",
+    "sessionId": "3f38e48b-07ce-4e21-b1fd-3487cb5e1641",
+    "userId": null,
+    "email": null,
+    "emailHash": null,
+    "productId": null,
+    "attribution": {
+      "firstTouch": {
+        "landingPath": "/index.html",
+        "referrer": "",
+        "utmSource": "",
+        "utmMedium": "",
+        "utmCampaign": "",
+        "utmContent": "",
+        "utmTerm": "",
+        "gclid": "",
+        "fbclid": "",
+        "msclkid": "",
+        "capturedAt": "2026-03-12T02:07:08.367Z"
+      },
+      "lastTouch": {
+        "landingPath": "/index.html",
+        "referrer": "",
+        "utmSource": "",
+        "utmMedium": "",
+        "utmCampaign": "",
+        "utmContent": "",
+        "utmTerm": "",
+        "gclid": "",
+        "fbclid": "",
+        "msclkid": "",
+        "capturedAt": "2026-03-12T02:07:08.370Z"
+      }
+    },
+    "ecommerce": {
+      "currency": "USD",
+      "value": 0,
+      "orderId": null,
+      "paymentIntentId": null,
+      "items": []
+    },
+    "lead": {
+      "submissionType": null,
+      "topic": null,
+      "quoteType": null,
+      "formId": null,
+      "estimatedValue": 0
+    },
+    "meta": {},
+    "dedupeKey": "page_view:3f38e48b-07ce-4e21-b1fd-3487cb5e1641:/index.html",
+    "identityId": 13,
+    "createdAt": "2026-03-12T02:07:09.920Z",
+    "updatedAt": "2026-03-12T02:07:09.920Z",
+    "id": 182
+  },
+  {
+    "schemaVersion": 2,
+    "eventName": "page_view",
+    "type": "page_view",
+    "source": "web_client",
+    "eventId": "0e9698b9-d3fa-4edc-9c66-33d1e912c1be",
+    "occurredAt": "2026-03-12T02:07:08.388Z",
+    "timestamp": "2026-03-12T02:07:08.388Z",
+    "path": "/index.html",
+    "url": "http://localhost:5050/index.html",
+    "title": "EZ Sports Netting | Custom Sports Netting, L-Screens & Batting Cages",
+    "referrer": null,
+    "visitorId": "b1b397ca-81eb-4002-b3d4-5b502b06f647",
+    "sessionId": "3f38e48b-07ce-4e21-b1fd-3487cb5e1641",
+    "userId": null,
+    "email": null,
+    "emailHash": null,
+    "productId": null,
+    "attribution": {
+      "firstTouch": {
+        "landingPath": "/index.html",
+        "referrer": "",
+        "utmSource": "",
+        "utmMedium": "",
+        "utmCampaign": "",
+        "utmContent": "",
+        "utmTerm": "",
+        "gclid": "",
+        "fbclid": "",
+        "msclkid": "",
+        "capturedAt": "2026-03-12T02:07:08.367Z"
+      },
+      "lastTouch": {
+        "landingPath": "/index.html",
+        "referrer": "",
+        "utmSource": "",
+        "utmMedium": "",
+        "utmCampaign": "",
+        "utmContent": "",
+        "utmTerm": "",
+        "gclid": "",
+        "fbclid": "",
+        "msclkid": "",
+        "capturedAt": "2026-03-12T02:07:08.383Z"
+      }
+    },
+    "ecommerce": {
+      "currency": "USD",
+      "value": 0,
+      "orderId": null,
+      "paymentIntentId": null,
+      "items": []
+    },
+    "lead": {
+      "submissionType": null,
+      "topic": null,
+      "quoteType": null,
+      "formId": null,
+      "estimatedValue": 0
+    },
+    "meta": {},
+    "dedupeKey": "page_view:3f38e48b-07ce-4e21-b1fd-3487cb5e1641:/index.html",
+    "identityId": 14,
+    "createdAt": "2026-03-12T02:07:10.075Z",
+    "updatedAt": "2026-03-12T02:07:10.076Z",
+    "id": 183
+  },
+  {
+    "schemaVersion": 2,
+    "eventName": "view_cart",
+    "type": "view_cart",
+    "source": "web_client",
+    "eventId": "5f836cf1-a502-494f-bee9-9fd3123c8638",
+    "occurredAt": "2026-03-12T02:07:10.556Z",
+    "timestamp": "2026-03-12T02:07:10.556Z",
+    "path": "/checkout.html",
+    "url": "http://localhost:5050/checkout.html",
+    "title": "Secure Checkout | EZ Sports Netting",
+    "referrer": null,
+    "visitorId": "b1b397ca-81eb-4002-b3d4-5b502b06f647",
+    "sessionId": "3f38e48b-07ce-4e21-b1fd-3487cb5e1641",
+    "userId": null,
+    "email": null,
+    "emailHash": null,
+    "productId": "PITCHERSPOCKET9",
+    "attribution": {
+      "firstTouch": {
+        "landingPath": "/index.html",
+        "referrer": "",
+        "utmSource": "",
+        "utmMedium": "",
+        "utmCampaign": "",
+        "utmContent": "",
+        "utmTerm": "",
+        "gclid": "",
+        "fbclid": "",
+        "msclkid": "",
+        "capturedAt": "2026-03-12T02:07:08.367Z"
+      },
+      "lastTouch": {
+        "landingPath": "/checkout.html",
+        "referrer": "",
+        "utmSource": "",
+        "utmMedium": "",
+        "utmCampaign": "",
+        "utmContent": "",
+        "utmTerm": "",
+        "gclid": "",
+        "fbclid": "",
+        "msclkid": "",
+        "capturedAt": "2026-03-12T02:07:10.555Z"
+      }
+    },
+    "ecommerce": {
+      "currency": "USD",
+      "value": 0,
+      "orderId": null,
+      "paymentIntentId": null,
+      "items": [
+        {
+          "productId": "PITCHERSPOCKET9",
+          "id": "PITCHERSPOCKET9",
+          "quantity": 1,
+          "qty": 1,
+          "price": 349.95,
+          "productName": null,
+          "category": null,
+          "size": null,
+          "color": null
+        }
+      ]
+    },
+    "lead": {
+      "submissionType": null,
+      "topic": null,
+      "quoteType": null,
+      "formId": null,
+      "estimatedValue": 0
+    },
+    "meta": {
+      "items": [
+        {
+          "id": "PITCHERSPOCKET9",
+          "price": 349.95,
+          "qty": 1
+        }
+      ]
+    },
+    "dedupeKey": "view_cart:3f38e48b-07ce-4e21-b1fd-3487cb5e1641:/checkout.html:PITCHERSPOCKET9",
+    "identityId": 13,
+    "createdAt": "2026-03-12T02:07:10.884Z",
+    "updatedAt": "2026-03-12T02:07:10.884Z",
+    "id": 184
+  },
+  {
+    "schemaVersion": 2,
+    "eventName": "page_view",
+    "type": "page_view",
+    "source": "web_client",
+    "eventId": "a1623d97-2f9f-42ba-9248-6c242d1e67f8",
+    "occurredAt": "2026-03-12T02:07:10.555Z",
+    "timestamp": "2026-03-12T02:07:10.555Z",
+    "path": "/checkout.html",
+    "url": "http://localhost:5050/checkout.html",
+    "title": "Secure Checkout | EZ Sports Netting",
+    "referrer": null,
+    "visitorId": "b1b397ca-81eb-4002-b3d4-5b502b06f647",
+    "sessionId": "3f38e48b-07ce-4e21-b1fd-3487cb5e1641",
+    "userId": null,
+    "email": null,
+    "emailHash": null,
+    "productId": null,
+    "attribution": {
+      "firstTouch": {
+        "landingPath": "/index.html",
+        "referrer": "",
+        "utmSource": "",
+        "utmMedium": "",
+        "utmCampaign": "",
+        "utmContent": "",
+        "utmTerm": "",
+        "gclid": "",
+        "fbclid": "",
+        "msclkid": "",
+        "capturedAt": "2026-03-12T02:07:08.367Z"
+      },
+      "lastTouch": {
+        "landingPath": "/checkout.html",
+        "referrer": "",
+        "utmSource": "",
+        "utmMedium": "",
+        "utmCampaign": "",
+        "utmContent": "",
+        "utmTerm": "",
+        "gclid": "",
+        "fbclid": "",
+        "msclkid": "",
+        "capturedAt": "2026-03-12T02:07:10.555Z"
+      }
+    },
+    "ecommerce": {
+      "currency": "USD",
+      "value": 0,
+      "orderId": null,
+      "paymentIntentId": null,
+      "items": []
+    },
+    "lead": {
+      "submissionType": null,
+      "topic": null,
+      "quoteType": null,
+      "formId": null,
+      "estimatedValue": 0
+    },
+    "meta": {},
+    "dedupeKey": "page_view:3f38e48b-07ce-4e21-b1fd-3487cb5e1641:/checkout.html",
+    "identityId": 13,
+    "createdAt": "2026-03-12T02:07:10.905Z",
+    "updatedAt": "2026-03-12T02:07:10.905Z",
+    "id": 185
+  },
+  {
+    "schemaVersion": 2,
+    "eventName": "view_cart",
+    "type": "view_cart",
+    "source": "web_client",
+    "eventId": "d7014c38-a6a6-479b-b70f-1e9686b77672",
+    "occurredAt": "2026-03-12T02:07:10.582Z",
+    "timestamp": "2026-03-12T02:07:10.582Z",
+    "path": "/checkout.html",
+    "url": "http://localhost:5050/checkout.html",
+    "title": "Secure Checkout | EZ Sports Netting",
+    "referrer": null,
+    "visitorId": "b1b397ca-81eb-4002-b3d4-5b502b06f647",
+    "sessionId": "3f38e48b-07ce-4e21-b1fd-3487cb5e1641",
+    "userId": null,
+    "email": null,
+    "emailHash": null,
+    "productId": "PITCHERSPOCKET9",
+    "attribution": {
+      "firstTouch": {
+        "landingPath": "/index.html",
+        "referrer": "",
+        "utmSource": "",
+        "utmMedium": "",
+        "utmCampaign": "",
+        "utmContent": "",
+        "utmTerm": "",
+        "gclid": "",
+        "fbclid": "",
+        "msclkid": "",
+        "capturedAt": "2026-03-12T02:07:08.367Z"
+      },
+      "lastTouch": {
+        "landingPath": "/checkout.html",
+        "referrer": "",
+        "utmSource": "",
+        "utmMedium": "",
+        "utmCampaign": "",
+        "utmContent": "",
+        "utmTerm": "",
+        "gclid": "",
+        "fbclid": "",
+        "msclkid": "",
+        "capturedAt": "2026-03-12T02:07:10.582Z"
+      }
+    },
+    "ecommerce": {
+      "currency": "USD",
+      "value": 0,
+      "orderId": null,
+      "paymentIntentId": null,
+      "items": [
+        {
+          "productId": "PITCHERSPOCKET9",
+          "id": "PITCHERSPOCKET9",
+          "quantity": 1,
+          "qty": 1,
+          "price": 349.95,
+          "productName": null,
+          "category": null,
+          "size": null,
+          "color": null
+        }
+      ]
+    },
+    "lead": {
+      "submissionType": null,
+      "topic": null,
+      "quoteType": null,
+      "formId": null,
+      "estimatedValue": 0
+    },
+    "meta": {
+      "items": [
+        {
+          "id": "PITCHERSPOCKET9",
+          "price": 349.95,
+          "qty": 1
+        }
+      ]
+    },
+    "dedupeKey": "view_cart:3f38e48b-07ce-4e21-b1fd-3487cb5e1641:/checkout.html:PITCHERSPOCKET9",
+    "identityId": 13,
+    "createdAt": "2026-03-12T02:07:10.985Z",
+    "updatedAt": "2026-03-12T02:07:10.985Z",
+    "id": 186
+  },
+  {
+    "schemaVersion": 2,
+    "eventName": "begin_checkout",
+    "type": "begin_checkout",
+    "source": "web_client",
+    "eventId": "355c2e60-e4df-4d5f-8766-47bd45586286",
+    "occurredAt": "2026-03-12T02:07:10.536Z",
+    "timestamp": "2026-03-12T02:07:10.536Z",
+    "path": "/checkout.html",
+    "url": "http://localhost:5050/checkout.html",
+    "title": "Secure Checkout | EZ Sports Netting",
+    "referrer": null,
+    "visitorId": "b1b397ca-81eb-4002-b3d4-5b502b06f647",
+    "sessionId": "3f38e48b-07ce-4e21-b1fd-3487cb5e1641",
+    "userId": null,
+    "email": null,
+    "emailHash": null,
+    "productId": null,
+    "attribution": {
+      "firstTouch": {
+        "landingPath": "/index.html",
+        "referrer": "",
+        "utmSource": "",
+        "utmMedium": "",
+        "utmCampaign": "",
+        "utmContent": "",
+        "utmTerm": "",
+        "gclid": "",
+        "fbclid": "",
+        "msclkid": "",
+        "capturedAt": "2026-03-12T02:07:08.367Z"
+      },
+      "lastTouch": {
+        "landingPath": "/checkout.html",
+        "referrer": "",
+        "utmSource": "",
+        "utmMedium": "",
+        "utmCampaign": "",
+        "utmContent": "",
+        "utmTerm": "",
+        "gclid": "",
+        "fbclid": "",
+        "msclkid": "",
+        "capturedAt": "2026-03-12T02:07:10.531Z"
+      }
+    },
+    "ecommerce": {
+      "currency": "USD",
+      "value": 399.95,
+      "orderId": null,
+      "paymentIntentId": null,
+      "items": []
+    },
+    "lead": {
+      "submissionType": null,
+      "topic": null,
+      "quoteType": null,
+      "formId": null,
+      "estimatedValue": 0
+    },
+    "meta": {
+      "ecommerce": {
+        "value": 399.95,
+        "orderId": null,
+        "items": [
+          {
+            "productId": "PITCHERSPOCKET9",
+            "quantity": 1,
+            "price": 349.95,
+            "name": "Pitcher's Pocket 9",
+            "category": "",
+            "size": "",
+            "color": ""
+          }
+        ]
+      },
+      "cartFingerprint": "[{\"color\":\"\",\"id\":\"PITCHERSPOCKET9\",\"price\":349.95,\"qty\":1,\"size\":\"\"}]",
+      "shippingMethod": "standard",
+      "couponCode": null
+    },
+    "dedupeKey": "begin_checkout:3f38e48b-07ce-4e21-b1fd-3487cb5e1641:/checkout.html:",
+    "identityId": 13,
+    "createdAt": "2026-03-12T02:07:11.000Z",
+    "updatedAt": "2026-03-12T02:07:11.000Z",
+    "id": 187
+  },
+  {
+    "schemaVersion": 2,
+    "eventName": "order_create",
+    "type": "order_create",
+    "source": "server_order_endpoint",
+    "eventId": null,
+    "occurredAt": "2026-03-12T02:07:11.458Z",
+    "timestamp": "2026-03-12T02:07:11.458Z",
+    "path": "/api/order",
+    "url": null,
+    "title": null,
+    "referrer": null,
+    "visitorId": null,
+    "sessionId": null,
+    "userId": null,
+    "email": "browser+1773281221957@example.com",
+    "emailHash": "38faff7a3c8d0a88f65e59665d128d80fb8a8dd617791675c0f06751ce4154c9",
+    "productId": "PITCHERSPOCKET9",
+    "attribution": null,
+    "ecommerce": {
+      "currency": "USD",
+      "value": 299.95,
+      "orderId": 3041,
+      "paymentIntentId": null,
+      "items": [
+        {
+          "productId": "PITCHERSPOCKET9",
+          "id": "PITCHERSPOCKET9",
+          "quantity": 1,
+          "qty": 1,
+          "price": 349.95,
+          "productName": "Pitcher's Pocket 9",
+          "category": null,
+          "size": null,
+          "color": null
+        }
+      ]
+    },
+    "lead": {
+      "submissionType": null,
+      "topic": null,
+      "quoteType": null,
+      "formId": null,
+      "estimatedValue": 0
+    },
+    "meta": {
+      "shippingMethod": "standard",
+      "status": "pending_manual_payment"
+    },
+    "dedupeKey": "order_create:3041",
+    "identityId": 15,
+    "createdAt": "2026-03-12T02:07:11.469Z",
+    "updatedAt": "2026-03-12T02:07:11.469Z",
+    "id": 188
+  },
+  {
+    "schemaVersion": 2,
+    "eventName": "cta_click",
+    "type": "cta_click",
+    "source": "web_client",
+    "eventId": "c71ad1ad-cf93-4f90-894a-d984ff71555d",
+    "occurredAt": "2026-03-12T02:07:11.252Z",
+    "timestamp": "2026-03-12T02:07:11.252Z",
+    "path": "/checkout.html",
+    "url": "http://localhost:5050/checkout.html",
+    "title": "Secure Checkout | EZ Sports Netting",
+    "referrer": null,
+    "visitorId": "b1b397ca-81eb-4002-b3d4-5b502b06f647",
+    "sessionId": "3f38e48b-07ce-4e21-b1fd-3487cb5e1641",
+    "userId": null,
+    "email": "browser+1773281221957@example.com",
+    "emailHash": "38faff7a3c8d0a88f65e59665d128d80fb8a8dd617791675c0f06751ce4154c9",
+    "productId": null,
+    "attribution": {
+      "firstTouch": {
+        "landingPath": "/index.html",
+        "referrer": "",
+        "utmSource": "",
+        "utmMedium": "",
+        "utmCampaign": "",
+        "utmContent": "",
+        "utmTerm": "",
+        "gclid": "",
+        "fbclid": "",
+        "msclkid": "",
+        "capturedAt": "2026-03-12T02:07:08.367Z"
+      },
+      "lastTouch": {
+        "landingPath": "/checkout.html",
+        "referrer": "",
+        "utmSource": "",
+        "utmMedium": "",
+        "utmCampaign": "",
+        "utmContent": "",
+        "utmTerm": "",
+        "gclid": "",
+        "fbclid": "",
+        "msclkid": "",
+        "capturedAt": "2026-03-12T02:07:11.251Z"
+      }
+    },
+    "ecommerce": {
+      "currency": "USD",
+      "value": 0,
+      "orderId": null,
+      "paymentIntentId": null,
+      "items": []
+    },
+    "lead": {
+      "submissionType": null,
+      "topic": null,
+      "quoteType": null,
+      "formId": null,
+      "estimatedValue": 0
+    },
+    "meta": {
+      "ctaName": "Apply",
+      "href": "",
+      "elementId": "apply-code",
+      "className": "btn btn-secondary",
+      "productId": null
+    },
+    "dedupeKey": "cta_click:3f38e48b-07ce-4e21-b1fd-3487cb5e1641:/checkout.html:Apply",
+    "identityId": 13,
+    "createdAt": "2026-03-12T02:07:11.576Z",
+    "updatedAt": "2026-03-12T02:07:11.576Z",
+    "id": 189
+  },
+  {
+    "schemaVersion": 2,
+    "eventName": "cta_click",
+    "type": "cta_click",
+    "source": "web_client",
+    "eventId": "7c8fb63c-2c66-44e9-95dd-d3c1989d9019",
+    "occurredAt": "2026-03-12T02:07:11.387Z",
+    "timestamp": "2026-03-12T02:07:11.387Z",
+    "path": "/checkout.html",
+    "url": "http://localhost:5050/checkout.html",
+    "title": "Secure Checkout | EZ Sports Netting",
+    "referrer": null,
+    "visitorId": "b1b397ca-81eb-4002-b3d4-5b502b06f647",
+    "sessionId": "3f38e48b-07ce-4e21-b1fd-3487cb5e1641",
+    "userId": null,
+    "email": "browser+1773281221957@example.com",
+    "emailHash": "38faff7a3c8d0a88f65e59665d128d80fb8a8dd617791675c0f06751ce4154c9",
+    "productId": null,
+    "attribution": {
+      "firstTouch": {
+        "landingPath": "/index.html",
+        "referrer": "",
+        "utmSource": "",
+        "utmMedium": "",
+        "utmCampaign": "",
+        "utmContent": "",
+        "utmTerm": "",
+        "gclid": "",
+        "fbclid": "",
+        "msclkid": "",
+        "capturedAt": "2026-03-12T02:07:08.367Z"
+      },
+      "lastTouch": {
+        "landingPath": "/checkout.html",
+        "referrer": "",
+        "utmSource": "",
+        "utmMedium": "",
+        "utmCampaign": "",
+        "utmContent": "",
+        "utmTerm": "",
+        "gclid": "",
+        "fbclid": "",
+        "msclkid": "",
+        "capturedAt": "2026-03-12T02:07:11.387Z"
+      }
+    },
+    "ecommerce": {
+      "currency": "USD",
+      "value": 0,
+      "orderId": null,
+      "paymentIntentId": null,
+      "items": []
+    },
+    "lead": {
+      "submissionType": null,
+      "topic": null,
+      "quoteType": null,
+      "formId": null,
+      "estimatedValue": 0
+    },
+    "meta": {
+      "ctaName": "Place Order",
+      "href": "",
+      "elementId": "submit",
+      "className": "btn btn-primary",
+      "productId": null
+    },
+    "dedupeKey": "cta_click:3f38e48b-07ce-4e21-b1fd-3487cb5e1641:/checkout.html:Place Order",
+    "identityId": 13,
+    "createdAt": "2026-03-12T02:07:11.592Z",
+    "updatedAt": "2026-03-12T02:07:11.592Z",
+    "id": 190
+  },
+  {
+    "schemaVersion": 2,
+    "eventName": "page_view",
+    "type": "page_view",
+    "source": "web_client",
+    "eventId": "d62372ed-5d2b-465b-9514-3b52c09fd229",
+    "occurredAt": "2026-03-12T02:07:12.406Z",
+    "timestamp": "2026-03-12T02:07:12.406Z",
+    "path": "/training-facility-design.html",
+    "url": "http://localhost:5052/training-facility-design.html",
+    "title": "Training Facility Design — EZ Sports Netting",
+    "referrer": null,
+    "visitorId": "96fa9d57-666a-409c-844e-184d34563269",
+    "sessionId": "fc52f7a9-dc37-48b3-a9d6-734569b3420f",
+    "userId": null,
+    "email": null,
+    "emailHash": null,
+    "productId": null,
+    "attribution": {
+      "firstTouch": {
+        "landingPath": "/training-facility-design.html",
+        "referrer": "",
+        "utmSource": "",
+        "utmMedium": "",
+        "utmCampaign": "",
+        "utmContent": "",
+        "utmTerm": "",
+        "gclid": "",
+        "fbclid": "",
+        "msclkid": "",
+        "capturedAt": "2026-03-12T02:07:12.401Z"
+      },
+      "lastTouch": {
+        "landingPath": "/training-facility-design.html",
+        "referrer": "",
+        "utmSource": "",
+        "utmMedium": "",
+        "utmCampaign": "",
+        "utmContent": "",
+        "utmTerm": "",
+        "gclid": "",
+        "fbclid": "",
+        "msclkid": "",
+        "capturedAt": "2026-03-12T02:07:12.404Z"
+      }
+    },
+    "ecommerce": {
+      "currency": "USD",
+      "value": 0,
+      "orderId": null,
+      "paymentIntentId": null,
+      "items": []
+    },
+    "lead": {
+      "submissionType": null,
+      "topic": null,
+      "quoteType": null,
+      "formId": null,
+      "estimatedValue": 0
+    },
+    "meta": {},
+    "dedupeKey": "page_view:fc52f7a9-dc37-48b3-a9d6-734569b3420f:/training-facility-design.html",
+    "identityId": 16,
+    "createdAt": "2026-03-12T02:07:13.121Z",
+    "updatedAt": "2026-03-12T02:07:13.121Z",
+    "id": 191
+  },
+  {
+    "schemaVersion": 2,
+    "eventName": "facility_configurator_engage",
+    "type": "facility_configurator_engage",
+    "source": "web_client",
+    "eventId": "918e98fb-32f6-466f-8f1c-be7d2e99f8df",
+    "occurredAt": "2026-03-12T02:07:13.239Z",
+    "timestamp": "2026-03-12T02:07:13.239Z",
+    "path": "/training-facility-design.html",
+    "url": "http://localhost:5052/training-facility-design.html",
+    "title": "Training Facility Design — EZ Sports Netting",
+    "referrer": null,
+    "visitorId": "96fa9d57-666a-409c-844e-184d34563269",
+    "sessionId": "fc52f7a9-dc37-48b3-a9d6-734569b3420f",
+    "userId": null,
+    "email": null,
+    "emailHash": null,
+    "productId": null,
+    "attribution": {
+      "firstTouch": {
+        "landingPath": "/training-facility-design.html",
+        "referrer": "",
+        "utmSource": "",
+        "utmMedium": "",
+        "utmCampaign": "",
+        "utmContent": "",
+        "utmTerm": "",
+        "gclid": "",
+        "fbclid": "",
+        "msclkid": "",
+        "capturedAt": "2026-03-12T02:07:12.401Z"
+      },
+      "lastTouch": {
+        "landingPath": "/training-facility-design.html",
+        "referrer": "",
+        "utmSource": "",
+        "utmMedium": "",
+        "utmCampaign": "",
+        "utmContent": "",
+        "utmTerm": "",
+        "gclid": "",
+        "fbclid": "",
+        "msclkid": "",
+        "capturedAt": "2026-03-12T02:07:13.239Z"
+      }
+    },
+    "ecommerce": {
+      "currency": "USD",
+      "value": 0,
+      "orderId": null,
+      "paymentIntentId": null,
+      "items": []
+    },
+    "lead": {
+      "submissionType": null,
+      "topic": null,
+      "quoteType": "training_facility",
+      "formId": "facility-form",
+      "estimatedValue": 0
+    },
+    "meta": {
+      "formId": "facility-form",
+      "quoteType": "training_facility",
+      "estimatedValue": 0
+    },
+    "dedupeKey": "facility_configurator_engage:fc52f7a9-dc37-48b3-a9d6-734569b3420f:/training-facility-design.html:",
+    "identityId": 16,
+    "createdAt": "2026-03-12T02:07:13.543Z",
+    "updatedAt": "2026-03-12T02:07:13.543Z",
+    "id": 192
+  },
+  {
+    "schemaVersion": 2,
+    "eventName": "page_view",
+    "type": "page_view",
+    "source": "web_client",
+    "eventId": "f3cbab46-11bc-49f0-9d43-7eca8ce38cb9",
+    "occurredAt": "2026-03-12T02:07:15.693Z",
+    "timestamp": "2026-03-12T02:07:15.693Z",
+    "path": "/netting-calculator.html",
+    "url": "http://localhost:5051/netting-calculator.html",
+    "title": "Custom Netting Calculator — EZ Sports Netting",
+    "referrer": null,
+    "visitorId": "a75786d9-0fbb-47ef-bf72-3676e0479cf4",
+    "sessionId": "285c4472-4d72-43f7-90d4-17b0e2fe86df",
+    "userId": null,
+    "email": null,
+    "emailHash": null,
+    "productId": null,
+    "attribution": {
+      "firstTouch": {
+        "landingPath": "/netting-calculator.html",
+        "referrer": "",
+        "utmSource": "",
+        "utmMedium": "",
+        "utmCampaign": "",
+        "utmContent": "",
+        "utmTerm": "",
+        "gclid": "",
+        "fbclid": "",
+        "msclkid": "",
+        "capturedAt": "2026-03-12T02:07:15.690Z"
+      },
+      "lastTouch": {
+        "landingPath": "/netting-calculator.html",
+        "referrer": "",
+        "utmSource": "",
+        "utmMedium": "",
+        "utmCampaign": "",
+        "utmContent": "",
+        "utmTerm": "",
+        "gclid": "",
+        "fbclid": "",
+        "msclkid": "",
+        "capturedAt": "2026-03-12T02:07:15.692Z"
+      }
+    },
+    "ecommerce": {
+      "currency": "USD",
+      "value": 0,
+      "orderId": null,
+      "paymentIntentId": null,
+      "items": []
+    },
+    "lead": {
+      "submissionType": null,
+      "topic": null,
+      "quoteType": null,
+      "formId": null,
+      "estimatedValue": 0
+    },
+    "meta": {},
+    "dedupeKey": "page_view:285c4472-4d72-43f7-90d4-17b0e2fe86df:/netting-calculator.html",
+    "identityId": 17,
+    "createdAt": "2026-03-12T02:07:18.098Z",
+    "updatedAt": "2026-03-12T02:07:18.098Z",
+    "id": 193
+  },
+  {
+    "schemaVersion": 2,
+    "eventName": "page_view",
+    "type": "page_view",
+    "source": "web_client",
+    "eventId": "9b50c3af-a7f7-4e06-9775-1edf7f84516c",
+    "occurredAt": "2026-03-12T02:07:15.748Z",
+    "timestamp": "2026-03-12T02:07:15.748Z",
+    "path": "/netting-calculator.html",
+    "url": "http://localhost:5051/netting-calculator.html",
+    "title": "Custom Netting Calculator — EZ Sports Netting",
+    "referrer": null,
+    "visitorId": "a75786d9-0fbb-47ef-bf72-3676e0479cf4",
+    "sessionId": "285c4472-4d72-43f7-90d4-17b0e2fe86df",
+    "userId": null,
+    "email": null,
+    "emailHash": null,
+    "productId": null,
+    "attribution": {
+      "firstTouch": {
+        "landingPath": "/netting-calculator.html",
+        "referrer": "",
+        "utmSource": "",
+        "utmMedium": "",
+        "utmCampaign": "",
+        "utmContent": "",
+        "utmTerm": "",
+        "gclid": "",
+        "fbclid": "",
+        "msclkid": "",
+        "capturedAt": "2026-03-12T02:07:15.690Z"
+      },
+      "lastTouch": {
+        "landingPath": "/netting-calculator.html",
+        "referrer": "",
+        "utmSource": "",
+        "utmMedium": "",
+        "utmCampaign": "",
+        "utmContent": "",
+        "utmTerm": "",
+        "gclid": "",
+        "fbclid": "",
+        "msclkid": "",
+        "capturedAt": "2026-03-12T02:07:15.730Z"
+      }
+    },
+    "ecommerce": {
+      "currency": "USD",
+      "value": 0,
+      "orderId": null,
+      "paymentIntentId": null,
+      "items": []
+    },
+    "lead": {
+      "submissionType": null,
+      "topic": null,
+      "quoteType": null,
+      "formId": null,
+      "estimatedValue": 0
+    },
+    "meta": {},
+    "dedupeKey": "page_view:285c4472-4d72-43f7-90d4-17b0e2fe86df:/netting-calculator.html",
+    "identityId": 18,
+    "createdAt": "2026-03-12T02:07:18.276Z",
+    "updatedAt": "2026-03-12T02:07:18.276Z",
+    "id": 194
+  },
+  {
+    "schemaVersion": 2,
+    "eventName": "page_view",
+    "type": "page_view",
+    "source": "web_client",
+    "eventId": "623ac5a4-0bcc-4060-b4c7-9e551bedebd8",
+    "occurredAt": "2026-03-12T02:07:15.828Z",
+    "timestamp": "2026-03-12T02:07:15.828Z",
+    "path": "/netting-calculator.html",
+    "url": "http://localhost:5051/netting-calculator.html",
+    "title": "Custom Netting Calculator — EZ Sports Netting",
+    "referrer": null,
+    "visitorId": "1a011ac8-4fed-4613-a827-95804fae33a2",
+    "sessionId": "7a39b2ff-1d57-4421-b249-0e10ff264dee",
+    "userId": null,
+    "email": null,
+    "emailHash": null,
+    "productId": null,
+    "attribution": {
+      "firstTouch": {
+        "landingPath": "/netting-calculator.html",
+        "referrer": "",
+        "utmSource": "",
+        "utmMedium": "",
+        "utmCampaign": "",
+        "utmContent": "",
+        "utmTerm": "",
+        "gclid": "",
+        "fbclid": "",
+        "msclkid": "",
+        "capturedAt": "2026-03-12T02:07:15.808Z"
+      },
+      "lastTouch": {
+        "landingPath": "/netting-calculator.html",
+        "referrer": "",
+        "utmSource": "",
+        "utmMedium": "",
+        "utmCampaign": "",
+        "utmContent": "",
+        "utmTerm": "",
+        "gclid": "",
+        "fbclid": "",
+        "msclkid": "",
+        "capturedAt": "2026-03-12T02:07:15.815Z"
+      }
+    },
+    "ecommerce": {
+      "currency": "USD",
+      "value": 0,
+      "orderId": null,
+      "paymentIntentId": null,
+      "items": []
+    },
+    "lead": {
+      "submissionType": null,
+      "topic": null,
+      "quoteType": null,
+      "formId": null,
+      "estimatedValue": 0
+    },
+    "meta": {},
+    "dedupeKey": "page_view:7a39b2ff-1d57-4421-b249-0e10ff264dee:/netting-calculator.html",
+    "identityId": 19,
+    "createdAt": "2026-03-12T02:07:18.293Z",
+    "updatedAt": "2026-03-12T02:07:18.293Z",
+    "id": 195
+  },
+  {
+    "schemaVersion": 2,
+    "eventName": "page_view",
+    "type": "page_view",
+    "source": "web_client",
+    "eventId": "e8e77030-c2ce-4237-9e32-37f2b759b4d9",
+    "occurredAt": "2026-03-12T02:07:15.868Z",
+    "timestamp": "2026-03-12T02:07:15.868Z",
+    "path": "/netting-calculator.html",
+    "url": "http://localhost:5051/netting-calculator.html",
+    "title": "Custom Netting Calculator — EZ Sports Netting",
+    "referrer": null,
+    "visitorId": "1a011ac8-4fed-4613-a827-95804fae33a2",
+    "sessionId": "7a39b2ff-1d57-4421-b249-0e10ff264dee",
+    "userId": null,
+    "email": null,
+    "emailHash": null,
+    "productId": null,
+    "attribution": {
+      "firstTouch": {
+        "landingPath": "/netting-calculator.html",
+        "referrer": "",
+        "utmSource": "",
+        "utmMedium": "",
+        "utmCampaign": "",
+        "utmContent": "",
+        "utmTerm": "",
+        "gclid": "",
+        "fbclid": "",
+        "msclkid": "",
+        "capturedAt": "2026-03-12T02:07:15.808Z"
+      },
+      "lastTouch": {
+        "landingPath": "/netting-calculator.html",
+        "referrer": "",
+        "utmSource": "",
+        "utmMedium": "",
+        "utmCampaign": "",
+        "utmContent": "",
+        "utmTerm": "",
+        "gclid": "",
+        "fbclid": "",
+        "msclkid": "",
+        "capturedAt": "2026-03-12T02:07:15.864Z"
+      }
+    },
+    "ecommerce": {
+      "currency": "USD",
+      "value": 0,
+      "orderId": null,
+      "paymentIntentId": null,
+      "items": []
+    },
+    "lead": {
+      "submissionType": null,
+      "topic": null,
+      "quoteType": null,
+      "formId": null,
+      "estimatedValue": 0
+    },
+    "meta": {},
+    "dedupeKey": "page_view:7a39b2ff-1d57-4421-b249-0e10ff264dee:/netting-calculator.html",
+    "identityId": 20,
+    "createdAt": "2026-03-12T02:07:18.372Z",
+    "updatedAt": "2026-03-12T02:07:18.372Z",
+    "id": 196
   }
 ]
