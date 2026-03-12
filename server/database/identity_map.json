@@ -1,1 +1,110 @@
-[]
+[
+  {
+    "visitorId": "02babf6a-243c-4d02-ac5d-e2a57cf18832",
+    "aliasVisitorIds": [
+      "02babf6a-243c-4d02-ac5d-e2a57cf18832"
+    ],
+    "sessionIds": [
+      "d48a3d5a-2b74-4d6f-b072-51cd3782810e"
+    ],
+    "userIds": [],
+    "emails": [
+      "browser+1773277289296@example.com"
+    ],
+    "emailHashes": [
+      "ac09369f649725934a42576bc6d5fc6ac7e3c4e1f5a3ef855a9af1d71d505dbd"
+    ],
+    "firstSeenAt": "2026-03-12T01:01:42.390Z",
+    "lastSeenAt": "2026-03-12T01:01:42.320Z",
+    "lastSource": "web_client",
+    "mergedIntoIdentityId": null,
+    "createdAt": "2026-03-12T01:01:42.404Z",
+    "updatedAt": "2026-03-12T01:01:42.579Z",
+    "id": 6
+  },
+  {
+    "visitorId": "7eeceb2f-423d-4a7f-92a0-7792ebf087eb",
+    "aliasVisitorIds": [],
+    "sessionIds": [
+      "460e59d8-010f-40f8-91d9-6836f0db2d53"
+    ],
+    "userIds": [],
+    "emails": [],
+    "emailHashes": [],
+    "firstSeenAt": "2026-03-12T01:01:44.752Z",
+    "lastSeenAt": "2026-03-12T01:01:45.734Z",
+    "lastSource": "web_client",
+    "mergedIntoIdentityId": null,
+    "createdAt": "2026-03-12T01:01:45.200Z",
+    "updatedAt": "2026-03-12T01:01:45.739Z",
+    "id": 7
+  },
+  {
+    "visitorId": "e6007ad1-32d4-4383-b9dc-7cdb45ef5b9c",
+    "aliasVisitorIds": [],
+    "sessionIds": [
+      "98524146-11e2-4899-ad97-6485f092b869"
+    ],
+    "userIds": [],
+    "emails": [],
+    "emailHashes": [],
+    "firstSeenAt": "2026-03-12T01:01:47.918Z",
+    "lastSeenAt": "2026-03-12T01:01:47.918Z",
+    "lastSource": "web_client",
+    "mergedIntoIdentityId": null,
+    "createdAt": "2026-03-12T01:01:48.909Z",
+    "updatedAt": "2026-03-12T01:01:48.909Z",
+    "id": 8
+  },
+  {
+    "visitorId": "e6007ad1-32d4-4383-b9dc-7cdb45ef5b9c",
+    "aliasVisitorIds": [],
+    "sessionIds": [
+      "98524146-11e2-4899-ad97-6485f092b869"
+    ],
+    "userIds": [],
+    "emails": [],
+    "emailHashes": [],
+    "firstSeenAt": "2026-03-12T01:01:47.949Z",
+    "lastSeenAt": "2026-03-12T01:01:47.949Z",
+    "lastSource": "web_client",
+    "mergedIntoIdentityId": null,
+    "createdAt": "2026-03-12T01:01:49.316Z",
+    "updatedAt": "2026-03-12T01:01:49.316Z",
+    "id": 9
+  },
+  {
+    "visitorId": "83bfa308-7f6e-4292-9700-576bbd42a99e",
+    "aliasVisitorIds": [],
+    "sessionIds": [
+      "56b137a8-0225-4c22-af52-a32cb1ea550e"
+    ],
+    "userIds": [],
+    "emails": [],
+    "emailHashes": [],
+    "firstSeenAt": "2026-03-12T01:01:48.559Z",
+    "lastSeenAt": "2026-03-12T01:01:48.559Z",
+    "lastSource": "web_client",
+    "mergedIntoIdentityId": null,
+    "createdAt": "2026-03-12T01:01:49.759Z",
+    "updatedAt": "2026-03-12T01:01:49.759Z",
+    "id": 10
+  },
+  {
+    "visitorId": "83bfa308-7f6e-4292-9700-576bbd42a99e",
+    "aliasVisitorIds": [],
+    "sessionIds": [
+      "56b137a8-0225-4c22-af52-a32cb1ea550e"
+    ],
+    "userIds": [],
+    "emails": [],
+    "emailHashes": [],
+    "firstSeenAt": "2026-03-12T01:01:48.579Z",
+    "lastSeenAt": "2026-03-12T01:01:48.579Z",
+    "lastSource": "web_client",
+    "mergedIntoIdentityId": null,
+    "createdAt": "2026-03-12T01:01:50.135Z",
+    "updatedAt": "2026-03-12T01:01:50.135Z",
+    "id": 11
+  }
+]

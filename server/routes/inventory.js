@@ -32,7 +32,7 @@ router.post('/adjust', requireAdmin, async (req, res) => {
 });
 
 // Get stock movement history
-router.get('/history/:productId?', requireAdmin, async (req, res) => {
+async function handleInventoryHistory(req, res) {
   try {
     const { productId } = req.params;
     const { limit = 50 } = req.query;
@@ -42,7 +42,10 @@ router.get('/history/:productId?', requireAdmin, async (req, res) => {
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
-});
+}
+
+router.get('/history', requireAdmin, handleInventoryHistory);
+router.get('/history/:productId', requireAdmin, handleInventoryHistory);
 
 // Get low stock alerts
 router.get('/alerts', requireAdmin, async (req, res) => {

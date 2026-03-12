@@ -261,7 +261,7 @@ const corsOptions = {
 };
 app.use(cors(corsOptions));
 // Ensure preflight is handled for any route
-app.options('*', cors(corsOptions));
+app.options('/{*path}', cors(corsOptions));
 // Helmet security headers (CSP disabled for now). Also disable COEP/COOP here
 // because we handle them manually to ensure third-party scripts like Stripe.js work.
 app.use(helmet({

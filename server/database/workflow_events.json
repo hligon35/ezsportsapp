@@ -1,1 +1,301 @@
-[]
+[
+  {
+    "eventId": "b720fac9-fe3f-4325-a9e4-299d7c418bef",
+    "dedupeKey": "workflow:begin_checkout:begin_checkout:d48a3d5a-2b74-4d6f-b072-51cd3782810e:/checkout.html:",
+    "eventName": "begin_checkout",
+    "source": "web_client",
+    "identityId": 3,
+    "visitorId": "02babf6a-243c-4d02-ac5d-e2a57cf18832",
+    "userId": null,
+    "email": null,
+    "emailHash": null,
+    "path": "/checkout.html",
+    "occurredAt": "2026-03-12T01:01:40.447Z",
+    "workflowKey": "begin_checkout",
+    "eligibility": {
+      "eligible": true,
+      "suppressForHours": 6
+    },
+    "meta": {
+      "ecommerce": {
+        "currency": "USD",
+        "value": 399.95,
+        "orderId": null,
+        "paymentIntentId": null,
+        "items": []
+      },
+      "lead": {
+        "submissionType": null,
+        "topic": null,
+        "quoteType": null,
+        "formId": null,
+        "estimatedValue": 0
+      },
+      "attribution": {
+        "firstTouch": {
+          "landingPath": "/index.html",
+          "referrer": "",
+          "utmSource": "",
+          "utmMedium": "",
+          "utmCampaign": "",
+          "utmContent": "",
+          "utmTerm": "",
+          "gclid": "",
+          "fbclid": "",
+          "msclkid": "",
+          "capturedAt": "2026-03-12T01:01:37.366Z"
+        },
+        "lastTouch": {
+          "landingPath": "/checkout.html",
+          "referrer": "",
+          "utmSource": "",
+          "utmMedium": "",
+          "utmCampaign": "",
+          "utmContent": "",
+          "utmTerm": "",
+          "gclid": "",
+          "fbclid": "",
+          "msclkid": "",
+          "capturedAt": "2026-03-12T01:01:40.442Z"
+        }
+      },
+      "meta": {
+        "ecommerce": {
+          "value": 399.95,
+          "orderId": null,
+          "items": [
+            {
+              "productId": "PITCHERSPOCKET9",
+              "quantity": 1,
+              "price": 349.95,
+              "name": "Pitcher's Pocket 9",
+              "category": "",
+              "size": "",
+              "color": ""
+            }
+          ]
+        },
+        "cartFingerprint": "[{\"color\":\"\",\"id\":\"PITCHERSPOCKET9\",\"price\":349.95,\"qty\":1,\"size\":\"\"}]",
+        "shippingMethod": "standard",
+        "couponCode": null
+      }
+    },
+    "createdAt": "2026-03-12T01:01:41.972Z",
+    "updatedAt": "2026-03-12T01:01:41.972Z",
+    "id": 2
+  },
+  {
+    "eventId": "93767d4e-8848-4841-b8a6-3db875674ffc",
+    "dedupeKey": "workflow:cta_click:cta_click:d48a3d5a-2b74-4d6f-b072-51cd3782810e:/checkout.html:Apply",
+    "eventName": "cta_click",
+    "source": "web_client",
+    "identityId": 5,
+    "visitorId": "02babf6a-243c-4d02-ac5d-e2a57cf18832",
+    "userId": null,
+    "email": "browser+1773277289296@example.com",
+    "emailHash": "ac09369f649725934a42576bc6d5fc6ac7e3c4e1f5a3ef855a9af1d71d505dbd",
+    "path": "/checkout.html",
+    "occurredAt": "2026-03-12T01:01:42.204Z",
+    "workflowKey": "cta_click",
+    "eligibility": {
+      "eligible": false,
+      "suppressForHours": 6
+    },
+    "meta": {
+      "ecommerce": {
+        "currency": "USD",
+        "value": 0,
+        "orderId": null,
+        "paymentIntentId": null,
+        "items": []
+      },
+      "lead": {
+        "submissionType": null,
+        "topic": null,
+        "quoteType": null,
+        "formId": null,
+        "estimatedValue": 0
+      },
+      "attribution": {
+        "firstTouch": {
+          "landingPath": "/index.html",
+          "referrer": "",
+          "utmSource": "",
+          "utmMedium": "",
+          "utmCampaign": "",
+          "utmContent": "",
+          "utmTerm": "",
+          "gclid": "",
+          "fbclid": "",
+          "msclkid": "",
+          "capturedAt": "2026-03-12T01:01:37.366Z"
+        },
+        "lastTouch": {
+          "landingPath": "/checkout.html",
+          "referrer": "",
+          "utmSource": "",
+          "utmMedium": "",
+          "utmCampaign": "",
+          "utmContent": "",
+          "utmTerm": "",
+          "gclid": "",
+          "fbclid": "",
+          "msclkid": "",
+          "capturedAt": "2026-03-12T01:01:42.202Z"
+        }
+      },
+      "meta": {
+        "ctaName": "Apply",
+        "href": "",
+        "elementId": "apply-code",
+        "className": "btn btn-secondary",
+        "productId": null
+      }
+    },
+    "createdAt": "2026-03-12T01:01:42.442Z",
+    "updatedAt": "2026-03-12T01:01:42.442Z",
+    "id": 3
+  },
+  {
+    "eventId": "2ae5437c-1c44-4e01-854c-6eb9580cb7a5",
+    "dedupeKey": "workflow:cta_click:cta_click:d48a3d5a-2b74-4d6f-b072-51cd3782810e:/checkout.html:Place Order",
+    "eventName": "cta_click",
+    "source": "web_client",
+    "identityId": 6,
+    "visitorId": "02babf6a-243c-4d02-ac5d-e2a57cf18832",
+    "userId": null,
+    "email": "browser+1773277289296@example.com",
+    "emailHash": "ac09369f649725934a42576bc6d5fc6ac7e3c4e1f5a3ef855a9af1d71d505dbd",
+    "path": "/checkout.html",
+    "occurredAt": "2026-03-12T01:01:42.320Z",
+    "workflowKey": "cta_click",
+    "eligibility": {
+      "eligible": false,
+      "suppressForHours": 6
+    },
+    "meta": {
+      "ecommerce": {
+        "currency": "USD",
+        "value": 0,
+        "orderId": null,
+        "paymentIntentId": null,
+        "items": []
+      },
+      "lead": {
+        "submissionType": null,
+        "topic": null,
+        "quoteType": null,
+        "formId": null,
+        "estimatedValue": 0
+      },
+      "attribution": {
+        "firstTouch": {
+          "landingPath": "/index.html",
+          "referrer": "",
+          "utmSource": "",
+          "utmMedium": "",
+          "utmCampaign": "",
+          "utmContent": "",
+          "utmTerm": "",
+          "gclid": "",
+          "fbclid": "",
+          "msclkid": "",
+          "capturedAt": "2026-03-12T01:01:37.366Z"
+        },
+        "lastTouch": {
+          "landingPath": "/checkout.html",
+          "referrer": "",
+          "utmSource": "",
+          "utmMedium": "",
+          "utmCampaign": "",
+          "utmContent": "",
+          "utmTerm": "",
+          "gclid": "",
+          "fbclid": "",
+          "msclkid": "",
+          "capturedAt": "2026-03-12T01:01:42.319Z"
+        }
+      },
+      "meta": {
+        "ctaName": "Place Order",
+        "href": "",
+        "elementId": "submit",
+        "className": "btn btn-primary",
+        "productId": null
+      }
+    },
+    "createdAt": "2026-03-12T01:01:42.629Z",
+    "updatedAt": "2026-03-12T01:01:42.629Z",
+    "id": 4
+  },
+  {
+    "eventId": "336900ba-baf4-4724-ac3e-c90e0708506c",
+    "dedupeKey": "workflow:facility_configurator_engage:facility_configurator_engage:460e59d8-010f-40f8-91d9-6836f0db2d53:/training-facility-design.html:",
+    "eventName": "facility_configurator_engage",
+    "source": "web_client",
+    "identityId": 7,
+    "visitorId": "7eeceb2f-423d-4a7f-92a0-7792ebf087eb",
+    "userId": null,
+    "email": null,
+    "emailHash": null,
+    "path": "/training-facility-design.html",
+    "occurredAt": "2026-03-12T01:01:45.734Z",
+    "workflowKey": "facility_configurator_engage",
+    "eligibility": {
+      "eligible": false,
+      "suppressForHours": 6
+    },
+    "meta": {
+      "ecommerce": {
+        "currency": "USD",
+        "value": 0,
+        "orderId": null,
+        "paymentIntentId": null,
+        "items": []
+      },
+      "lead": {
+        "submissionType": null,
+        "topic": null,
+        "quoteType": "training_facility",
+        "formId": "facility-form",
+        "estimatedValue": 0
+      },
+      "attribution": {
+        "firstTouch": {
+          "landingPath": "/training-facility-design.html",
+          "referrer": "",
+          "utmSource": "",
+          "utmMedium": "",
+          "utmCampaign": "",
+          "utmContent": "",
+          "utmTerm": "",
+          "gclid": "",
+          "fbclid": "",
+          "msclkid": "",
+          "capturedAt": "2026-03-12T01:01:44.749Z"
+        },
+        "lastTouch": {
+          "landingPath": "/training-facility-design.html",
+          "referrer": "",
+          "utmSource": "",
+          "utmMedium": "",
+          "utmCampaign": "",
+          "utmContent": "",
+          "utmTerm": "",
+          "gclid": "",
+          "fbclid": "",
+          "msclkid": "",
+          "capturedAt": "2026-03-12T01:01:45.733Z"
+        }
+      },
+      "meta": {
+        "formId": "facility-form",
+        "quoteType": "training_facility",
+        "estimatedValue": 0
+      }
+    },
+    "createdAt": "2026-03-12T01:01:45.762Z",
+    "updatedAt": "2026-03-12T01:01:45.762Z",
+    "id": 5
+  }
+]
