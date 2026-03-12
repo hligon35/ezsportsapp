@@ -1,4 +1,5 @@
 const DatabaseManager = require('../database/DatabaseManager');
+const { getFetch } = require('../utils/getFetch');
 
 class EmailService {
   constructor(){
@@ -33,12 +34,7 @@ class EmailService {
   }
 
   getFetch() {
-    let doFetch = (typeof fetch === 'function') ? fetch : null;
-    if (!doFetch) {
-      try { doFetch = require('undici').fetch; } catch { /* no-op */ }
-    }
-    if (!doFetch) throw new Error('fetch is not available in this Node runtime');
-    return doFetch;
+    return getFetch();
   }
 
   calcBackoffSec(nextRetryCount) {

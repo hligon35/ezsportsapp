@@ -1,4 +1,4 @@
-const { fetch } = require('undici');
+const { getFetch } = require('../utils/getFetch');
 
 class AddressService {
   constructor() {
@@ -32,6 +32,7 @@ class AddressService {
 
   async #validateSmarty(base) {
     try {
+      const fetch = getFetch();
       const authId = process.env.SMARTY_AUTH_ID || '';
       const authToken = process.env.SMARTY_AUTH_TOKEN || '';
       if (!authId || !authToken) return { valid: true, address: base, provider: 'smartystreets', reason: 'disabled_missing_keys' };
@@ -61,6 +62,7 @@ class AddressService {
 
   async #validateGoogle(base) {
     try {
+      const fetch = getFetch();
       const key = process.env.GOOGLE_MAPS_API_KEY || '';
       if (!key) return { valid: true, address: base, provider: 'google', reason: 'disabled_missing_key' };
       // Use Address Validation API if enabled on the project; otherwise accept

@@ -9,7 +9,8 @@
 */
 
 const base = process.argv[2] || process.env.BASE_URL || 'http://127.0.0.1:4242';
-const f = (typeof fetch === 'function') ? fetch : require('undici').fetch;
+const { getFetch } = require('../utils/getFetch');
+const f = getFetch();
 
 async function get(path, opts){
   const res = await f(base.replace(/\/$/, '') + path, opts);

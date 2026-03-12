@@ -8,6 +8,7 @@ const AnalyticsService = require('../services/AnalyticsService');
 const WorkflowAutomationService = require('../services/WorkflowAutomationService');
 const { escapeHtml, renderBrandedEmailHtml } = require('../services/EmailTheme');
 const { requireAdmin } = require('../middleware/auth');
+const { getFetch } = require('../utils/getFetch');
 
 const subs = new SubscriberService();
 const coupons = new CouponService();
@@ -58,7 +59,7 @@ router.post('/subscribe', async (req, res) => {
       if (url) {
         const payload = { type: 'subscribe', email: addr, name, source: source || '', referer: referer || '' };
         const body = JSON.stringify(payload);
-        const doFetch = (typeof fetch === 'function') ? fetch : null;
+        const doFetch = (typeof globalThis.fetch === 'function') ? getFetch() : null;
         if (doFetch) { void doFetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body }).catch(()=>{}); }
       }
     } catch {}
@@ -125,7 +126,7 @@ router.post('/contact', async (req, res) => {
         try {
           const tsSecret = (process.env.CF_TURNSTILE_SECRET || '').trim();
           if (tsSecret && !bypassTurnstile) {
-            const doFetch = (typeof fetch === 'function') ? fetch : (require('undici').fetch);
+            const doFetch = getFetch();
             const resp = await doFetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
               method: 'POST',
               headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
