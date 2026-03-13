@@ -1,10 +1,10 @@
-// Bumped versions to invalidate old cached assets (including prodList.json)
-const CORE_CACHE = 'core-v9';
-const ASSET_CACHE = 'assets-v7';
+// Bumped versions to invalidate old cached assets, including trust-band CSS.
+const CORE_CACHE = 'core-v10';
+const ASSET_CACHE = 'assets-v8';
 const CORE = [
   '/index.html',
   '/coming-soon.html',
-  '/assets/css/styles.css',
+  '/assets/css/styles.css?v=7',
   '/assets/js/app.js'
 ];
 
